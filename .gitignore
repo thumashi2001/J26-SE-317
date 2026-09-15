@@ -1,0 +1,65 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+env/
+ENV/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Build and coverage outputs
+dist/
+build/
+coverage/
+.nyc_output/
+
+# Logs
+*.log
+logs/
+
+# Model artifacts
+*.bin
+*.ckpt
+*.h5
+*.joblib
+*.onnx
+*.pkl
+*.pt
+*.safetensors
+models/
+checkpoints/
+
+# Datasets and generated results
+**/datasets/raw/*
+**/datasets/processed/*
+**/datasets/samples/*
+**/experiments/results/*
+!**/.gitkeep
+
+# IDE files
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+*.iml
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Local database data
+mongodb_data/
+neo4j_data/
