@@ -1,5 +1,7 @@
 from fastapi import FastAPI
 
+from app.routes.analysis import router as analysis_router
+
 app = FastAPI(
     title="AdaptiveLearnSE - Component 3 AI Service",
     description="AI-powered Automated Marking and Answer Analysis System",
@@ -14,3 +16,6 @@ def health_check():
         "status": "running",
         "version": "0.1.0",
     }
+
+
+app.include_router(analysis_router)
