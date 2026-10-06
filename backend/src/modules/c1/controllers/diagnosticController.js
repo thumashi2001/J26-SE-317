@@ -1,4 +1,5 @@
 import { getDb } from '../../../config/db.js';
+import { resolveStudentId } from '../../../middleware/auth.js';
 import * as service from '../services/diagnosticService.js';
 
 const AI_URL = () => process.env.C1_AI_URL || 'http://127.0.0.1:8001';
@@ -19,19 +20,20 @@ function badRequest(message) {
   return e;
 }
 
-// TODO: when shared login exists, take the student ID from the login token instead of the request.
+// The student ID comes from the login token, so nobody can read another student's data.
 export const getDiagnostic = handle(async (req) => {
-  const studentId = req.query.studentId;
-  if (!studentId) throw badRequest('studentId is required');
+  const studentId = resolveStudentId(req, req.query.studentId);
   return service.getOrCreateAssignment(getDb(), studentId);
 });
 
 export const submitDiagnostic = handle(async (req) => {
-  const { studentId, answers } = req.body || {};
-  if (!studentId || !Array.isArray(answers)) throw badRequest('studentId and answers[] are required');
+  const { studentId: supplied, answers } = req.body || {};
+  if (!Array.isArray(answers)) throw badRequest('answers[] is required');
+  const studentId = resolveStudentId(req, supplied);
   return service.submitDiagnostic(getDb(), studentId, answers, AI_URL());
 });
 
 export const getTwin = handle(async (req) => {
-  return service.getTwin(getDb(), req.params.studentId);
+  const studentId = resolveStudentId(req, req.params.studentId);
+  return service.getTwin(getDb(), studentId);
 });
