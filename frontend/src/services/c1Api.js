@@ -14,3 +14,6 @@ export const getAlerts = (studentId) => api(`/c1/alerts/${encodeURIComponent(stu
 
 export const getHistory = (studentId, topic) =>
   api(`/c1/history/${encodeURIComponent(studentId)}/${encodeURIComponent(topic)}`);
+
+export const getForecast = (studentId, topic, { days, perWeek }) =>
+  api(`/c1/forecast/${encodeURIComponent(studentId)}/${encodeURIComponent(topic)}?days=${days}&perWeek=${perWeek}`);
