@@ -1,4 +1,5 @@
 import { callAi, httpError } from './aiClient.js';
+import { recordSnapshot } from './historyService.js';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const WEAK_BELOW = 30;
@@ -89,6 +90,15 @@ export async function recordEvent(db, input, aiUrl) {
   state.risk_probability = risk.risk_probability;
   state.updated_at = when;
   await db.collection('mastery_state').replaceOne({ student_id: studentId }, state, { upsert: true });
+  await recordSnapshot(db, {
+    studentId,
+    topic,
+    score: entry.score,
+    scoreBefore: before,
+    afterForgetting: ai.after_forgetting,
+    source: 'quiz_answer',
+    when,
+  });
 
   return {
     studentId,
