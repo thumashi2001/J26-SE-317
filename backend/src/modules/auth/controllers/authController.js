@@ -6,11 +6,12 @@ function handle(fn, status = 200) {
     try {
       res.status(status).json(await fn(req));
     } catch (err) {
-      res.status(err.status || 500).json({ error: err.message });
+      res.status(err.status || 500).json({ error: err.message, ...(err.code ? { code: err.code } : {}) });
     }
   };
 }
 
 export const register = handle((req) => service.register(getDb(), req.body || {}), 201);
+export const registerLecturer = handle((req) => service.registerLecturer(getDb(), req.body || {}), 201);
 export const login = handle((req) => service.login(getDb(), req.body || {}));
-export const me = handle((req) => service.me(getDb(), req.user.sub));
+export const me = handle((req) => service.me(getDb(), req.user));

@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from 'react';
-import { loginRequest, registerRequest } from '../services/authApi.js';
+import { loginRequest, registerRequest, getMe } from '../services/authApi.js';
 import { getTwin } from '../services/c1Api.js';
 
 // Keeps the logged-in student. The token is sent with every API call by services/apiClient.js.
@@ -27,8 +27,21 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(readUser);
   const [diagnosticDone, setDiagnosticDone] = useState(null);
 
+  // Lecturers and the admin: make sure the account is still approved. If the admin removed
+  // a lecturer's access, they are logged out here instead of at the next request.
   useEffect(() => {
-    if (!user) {
+    if (!user || user.role === 'student') return undefined;
+    let alive = true;
+    getMe().catch((err) => {
+      if (alive && err.status === 403) logout();
+    });
+    return () => {
+      alive = false;
+    };
+  }, [user]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (!user || user.role !== 'student') {
       setDiagnosticDone(null);
       return undefined;
     }
@@ -48,7 +61,7 @@ export function AuthProvider({ children }) {
     setUser(u);
   };
 
-  const login = async (studentId, password) => finish(await loginRequest(studentId, password));
+  const login = async (userId, password) => finish(await loginRequest(userId, password));
   const register = async (form) => finish(await registerRequest(form));
   const logout = () => {
     try {
