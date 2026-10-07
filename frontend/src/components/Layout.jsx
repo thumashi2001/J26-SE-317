@@ -1,3 +1,4 @@
+import { maskStudentId } from '../utils/studentId.js';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import ErrorBoundary from './ErrorBoundary.jsx';
@@ -51,7 +52,7 @@ export default function Layout() {
           <div className="side-user-text">
             <div className="side-name">{user.name}</div>
             <div className="side-sub">
-              {user.student_id}, {user.semester}
+              {maskStudentId(user.student_id)}, {user.semester}
             </div>
           </div>
           <button

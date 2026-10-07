@@ -65,4 +65,29 @@ def apply_event(req: EventRequest):
 @app.post("/risk/predict")
 def risk_predict(req: RiskRequest):
     out = predict_risk([e.model_dump() for e in req.events], req.as_of_day)
-    return {"student_id": req.student_id, **out}
+    return {"student_id": req.student_id, **out}# --- paste: imports (top of app/main.py, with the other imports) ---
+from services.forecast.simulator import forecast
+
+
+# --- paste: model + endpoint (bottom of app/main.py) ---
+class ForecastRequest(BaseModel):
+    current_score: float          # 0-100, the topic's stored score
+    days_since_practice: float = 0
+    practice_sessions: int = 0
+    correct: int = 0              # answers correct so far on this topic
+    answered: int = 0             # answers given so far on this topic
+    days_ahead: int = 21          # how many days until the exam
+    sessions_per_week: int = 3    # the "what if" plan
+
+
+@app.post("/twin/forecast")
+def twin_forecast(req: ForecastRequest):
+    return forecast(
+        req.current_score,
+        req.days_since_practice,
+        req.practice_sessions,
+        req.correct,
+        req.answered,
+        req.days_ahead,
+        req.sessions_per_week,
+    )

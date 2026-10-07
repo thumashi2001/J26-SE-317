@@ -1,3 +1,5 @@
+import { recordSnapshot } from './historyService.js';
+
 const QUESTIONS_PER_TOPIC = 2;
 
 function httpError(status, message) {
@@ -135,6 +137,9 @@ export async function submitDiagnostic(db, studentId, answers, aiUrl) {
   };
   await db.collection('mastery_state').replaceOne({ student_id: studentId }, state, { upsert: true });
   await db.collection('learning_events').insertMany(events);
+  for (const [topic, m] of Object.entries(mastery)) {
+    await recordSnapshot(db, { studentId, topic, score: m.score, source: 'diagnostic', when: now });
+  }
   await db.collection('diagnostic_assignments').updateOne(
     { student_id: studentId, completed: false },
     { $set: { completed: true, completed_at: now } }

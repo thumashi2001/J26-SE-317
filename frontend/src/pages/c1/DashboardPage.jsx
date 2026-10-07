@@ -118,9 +118,10 @@ export default function DashboardPage() {
       </section>
 
       <h2>Topics</h2>
+      <p className="muted small">Select a topic to see how its score changed over time.</p>
       <div className="heat">
         {topics.map(([topic, m]) => (
-          <div key={topic} className={`topic ${scoreBand(m.score)}`}>
+          <Link key={topic} to={`/c1/topic/${topic}`} className={`topic link ${scoreBand(m.score)}`}>
             <div className="topic-name">{prettyTopic(topic)}</div>
             <div className="topic-score">{Math.round(m.score)}%</div>
             <div className="bar">
@@ -129,7 +130,7 @@ export default function DashboardPage() {
             <div className="muted small">
               {m.practice_sessions ?? 0} {m.practice_sessions === 1 ? 'practice session' : 'practice sessions'}
             </div>
-          </div>
+          </Link>
         ))}
       </div>
 
