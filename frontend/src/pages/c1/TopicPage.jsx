@@ -4,6 +4,7 @@ import { useAuth } from '../../context/AuthContext.jsx';
 import { getHistory } from '../../services/c1Api.js';
 import { prettyTopic, scoreBand } from '../../utils/topics.js';
 import ScoreChart from '../../components/charts/ScoreChart.jsx';
+import WhatIfPanel from '../../components/WhatIfPanel.jsx';
 
 const BAND_TEXT = { weak: 'Weak', fair: 'Fair', strong: 'Strong' };
 
@@ -61,6 +62,9 @@ export default function TopicPage() {
         )}
         <ScoreChart points={points} />
       </div>
+
+      <h2 id="whatif-title">What if I study?</h2>
+      <WhatIfPanel topic={topic} />
     </div>
   );
 }
