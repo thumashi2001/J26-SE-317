@@ -76,3 +76,58 @@ uvicorn app.main:app --reload --port 8003
 
 The existing `GET /health` endpoint remains available. Interactive API documentation
 is available at `/docs`, and the OpenAPI document is available at `/openapi.json`.
+
+## Function 2: Deterministic Rubric-Aware Marking Baseline
+
+Function 2 provides `POST /marking/evaluate`. It accepts the Function 1 answer
+fields plus a lecturer-defined rubric containing criteria and explicit scoring
+levels. The marking engine reuses Function 1 preprocessing, lexical similarity,
+concept statuses, and sentence evidence.
+
+Each criterion is evaluated independently. The engine selects the highest scoring
+level whose required concepts and evidence requirements are supported by the
+available deterministic lexical evidence. The awarded mark is the exact mark from
+that rubric level. It never converts a percentage of concept overlap into marks and
+does not use a universal partial-credit formula.
+
+The overall proposed mark is derived only by summing criterion marks. Each result
+contains the selected level, rubric descriptor, awarded mark, evidence sentence IDs,
+supporting concepts, explanation, and warnings. This remains a proposed baseline
+result, not a claim of factual correctness, true semantic understanding, or final
+lecturer judgment.
+
+Function 2 deliberately does not implement LLMs, RAG, advanced transformer models,
+feedback generation, mind maps, lecturer dashboards, persistence, CCKG integration,
+or Node.js orchestration.
+
+Run the complete C3 test suite from `ai-services/c3/` with:
+
+```powershell
+python -m pytest -q
+```
+
+The current suite covers rubric validation, criterion-level selection, explicit
+partial levels, aggregation, explanations, warnings, API validation, and regression
+checks for `/health` and `/analysis/answer`.
+
+### C3-010: Machine-readable evidence rules
+
+Scoring levels may include an `evidence_rule` with type
+`required_concept_count`. The rule can require a minimum number of demonstrated
+concepts and, when explicitly enabled, a minimum number of partial concepts:
+
+```json
+{
+  "type": "required_concept_count",
+  "minimum_demonstrated": 1,
+  "minimum_partial": 0,
+  "allow_partial": false
+}
+```
+
+The evaluator uses these fields against Function 1 concept statuses. It never parses
+the human-readable descriptor and never derives marks from percentages. The selected
+level's exact rubric mark is returned. For example, a level requiring one
+demonstrated concept can award its explicit mark when one concept is demonstrated
+and another is partial, while a level requiring two demonstrated concepts is not
+supported by that evidence.
