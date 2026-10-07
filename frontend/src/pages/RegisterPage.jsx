@@ -1,3 +1,4 @@
+import { STUDENT_ID_HELP, cleanStudentId, isValidStudentId } from '../utils/studentId.js';
 import { useState } from 'react';
 import { Link, useNavigate, Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
@@ -16,10 +17,14 @@ export default function RegisterPage() {
 
   const submit = async (e) => {
     e.preventDefault();
-    setBusy(true);
     setError('');
+    if (!isValidStudentId(form.studentId)) {
+      setError(STUDENT_ID_HELP);
+      return;
+    }
+    setBusy(true);
     try {
-      await register(form);
+      await register({ ...form, studentId: cleanStudentId(form.studentId) });
       navigate('/');
     } catch (err) {
       setError(err.message);
@@ -39,7 +44,7 @@ export default function RegisterPage() {
         <div className="two">
           <div>
             <label htmlFor="sid">Student ID</label>
-            <input id="sid" value={form.studentId} onChange={set('studentId')} placeholder="IT23280588" required />
+            <input id="sid" value={form.studentId} onChange={(e) => setForm({ ...form, studentId: cleanStudentId(e.target.value) })} placeholder="IT********" maxLength={14} required />
           </div>
           <div>
             <label htmlFor="sem">Semester</label>
