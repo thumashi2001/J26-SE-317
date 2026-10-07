@@ -8,7 +8,7 @@ def build_explanation(
 ) -> str:
     """
     Explain the existing Function 2 result using only traceable data.
-    Function 3 does not independently generate unsupported evidence. Explanations are constructed 
+    Function 3 does not independently generate unsupported evidence. Explanations are constructed
     only from structured evidence and concept matches produced by the upstream analysis pipeline.
     """
     evidence_ids = ", ".join(str(value) for value in result.evidence_sentence_ids)

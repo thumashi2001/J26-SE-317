@@ -124,7 +124,7 @@ def test_function_3_preserves_function_2_selected_level_and_mark() -> None:
     request = feedback_request("Security matters. Performance is unclear.", ["security", "performance benefits"])
     response = generate_feedback(request)
     criterion = response.criteria_feedback[0]
-    
+
     # Function 2 marks this as Level L2 (1 concept demonstrated) with a mark of 2
     assert criterion.selected_level_id == "L2"
     assert criterion.awarded_mark == 2.0
@@ -172,15 +172,15 @@ def test_higher_level_concepts_are_not_reported_as_missing() -> None:
     )
     response = generate_feedback(request)
     criterion = response.criteria_feedback[0]
-    
+
     assert criterion.selected_level_id == "L1"
     assert criterion.awarded_mark == 1.0
-    
+
     # Authentication is required by L1 and is demonstrated
     assert "authentication" in criterion.demonstrated_concepts
-    
+
     # Encryption is required by L2 but we only selected L1, so it should NOT be in missing_concepts
     assert "encryption" not in criterion.missing_concepts
-    
+
     # It SHOULD be in next_level_improvements
     assert "encryption" in criterion.next_level_improvements

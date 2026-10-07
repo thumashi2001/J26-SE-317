@@ -35,7 +35,7 @@ def _unique(values: list[str]) -> list[str]:
 def generate_feedback(request: FeedbackRequest) -> FeedbackResponse:
     """
     Generate traceable feedback from the existing Function 2 result.
-    Function 3 does not independently generate unsupported evidence. Explanations are constructed 
+    Function 3 does not independently generate unsupported evidence. Explanations are constructed
     only from structured evidence and concept matches produced by the upstream analysis pipeline.
     """
     marking = mark_answer(request.marking_request)
