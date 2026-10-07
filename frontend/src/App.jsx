@@ -7,6 +7,7 @@ import HomeRedirect from './pages/HomeRedirect.jsx';
 import ComingSoon from './pages/ComingSoon.jsx';
 import DiagnosticPage from './pages/c1/DiagnosticPage.jsx';
 import DashboardPage from './pages/c1/DashboardPage.jsx';
+import TopicPage from './pages/c1/TopicPage.jsx';
 
 // Each teammate replaces their ComingSoon routes with real pages.
 // Add your routes under your own prefix (/c2, /c3, /c4) and keep this file small.
@@ -20,6 +21,7 @@ export default function App() {
 
         <Route path="/c1/diagnostic" element={<DiagnosticPage />} />
         <Route path="/c1/dashboard" element={<DashboardPage />} />
+        <Route path="/c1/topic/:topic" element={<TopicPage />} />
 
         <Route path="/c2/*" element={<ComingSoon title="Exam Intelligence" owner="Rupasinghe H T N N" />} />
         <Route path="/c3/*" element={<ComingSoon title="Automated Marking" owner="Edirisinghe T P V K" />} />
