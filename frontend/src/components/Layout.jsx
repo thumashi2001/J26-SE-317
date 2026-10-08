@@ -2,17 +2,7 @@ import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import ErrorBoundary from './ErrorBoundary.jsx';
 
-const MENU = [
-  { heading: 'Digital twin' },
-  { to: '/c1/diagnostic', label: 'Diagnostic test', onlyBeforeDiagnostic: true },
-  { to: '/c1/dashboard', label: 'My learning state' },
-  { heading: 'Exams' },
-  { to: '/c2', label: 'Exam intelligence' },
-  { heading: 'Marking' },
-  { to: '/c3', label: 'Automated marking' },
-  { heading: 'Study plan' },
-  { to: '/c4', label: 'Adaptive path' },
-];
+import { getMenuForRole } from '../config/menus.js';
 
 export default function Layout() {
   const { user, logout, diagnosticDone } = useAuth();
@@ -29,7 +19,7 @@ export default function Layout() {
       <aside className="sidebar">
         <div className="side-brand">AdaptiveLearnSE</div>
         <nav>
-          {MENU.filter((m) => !m.onlyBeforeDiagnostic || diagnosticDone === false).map((m, i) =>
+          {getMenuForRole(user.role).filter((m) => !m.onlyBeforeDiagnostic || diagnosticDone === false).map((m, i) =>
             m.heading ? (
               <div key={i} className="menu-heading">
                 {m.heading}

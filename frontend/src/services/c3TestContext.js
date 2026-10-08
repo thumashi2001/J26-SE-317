@@ -1,0 +1,180 @@
+export const TEST_ASSESSMENT = {
+  question_id: 'SE-DB-001',
+  question_text:
+    'Explain database normalization and describe the purpose of the First Normal Form (1NF), Second Normal Form (2NF), and Third Normal Form (3NF).',
+  reference_answer:
+    'Database normalization is a process of organizing data in a relational database to reduce data redundancy and prevent insertion, update, and deletion anomalies. First Normal Form (1NF) requires each attribute to contain atomic values and each record to be uniquely identifiable. Second Normal Form (2NF) requires a relation to be in 1NF and every non-key attribute to depend on the entire primary key rather than only part of a composite key. Third Normal Form (3NF) requires a relation to be in 2NF and non-key attributes must not depend transitively on the primary key.',
+  expected_concepts: [
+    'Database Normalization',
+    'Data Redundancy',
+    'Data Anomalies',
+    'First Normal Form (1NF)',
+    'Atomic Values',
+    'Second Normal Form (2NF)',
+    'Entire Primary Key',
+    'Third Normal Form (3NF)',
+    'Transitive Dependency',
+  ],
+  answer_type: 'Essay',
+};
+
+export const TEST_RUBRIC = {
+  rubric_id: 'rubric-se-db-001',
+  title: 'Database Normalization Rubric',
+  criteria: [
+    {
+      criterion_id: 'c1',
+      description: 'Normalization Purpose',
+      max_marks: 2.0,
+      scoring_levels: [
+        {
+          level_id: 'c1-l1',
+          label: 'Demonstrated',
+          mark: 2.0,
+          descriptor: 'Clearly explains the purpose of reducing redundancy and anomalies.',
+          required_concepts: ['Database Normalization', 'Data Redundancy', 'Data Anomalies'],
+          evidence_requirements: ['Must mention reducing redundancy and avoiding anomalies.'],
+          evidence_rule: {
+            type: 'required_concept_count',
+            minimum_demonstrated: 2,
+            minimum_partial: 0,
+            allow_partial: true,
+          },
+        },
+        {
+          level_id: 'c1-l2',
+          label: 'Partial',
+          mark: 1.0,
+          descriptor: 'Mentions database normalization but incomplete purpose.',
+          required_concepts: ['Database Normalization'],
+          evidence_requirements: ['Mentions database normalization.'],
+          evidence_rule: {
+            type: 'required_concept_count',
+            minimum_demonstrated: 1,
+            minimum_partial: 0,
+            allow_partial: true,
+          },
+        },
+        {
+          level_id: 'c1-l3',
+          label: 'Not Demonstrated',
+          mark: 0.0,
+          descriptor: 'Fails to explain the purpose.',
+          required_concepts: [],
+          evidence_requirements: [],
+          evidence_rule: {
+            type: 'required_concept_count',
+            minimum_demonstrated: 0,
+            minimum_partial: 0,
+            allow_partial: true,
+          },
+        },
+      ],
+    },
+    {
+      criterion_id: 'c2',
+      description: 'First Normal Form',
+      max_marks: 2.0,
+      scoring_levels: [
+        {
+          level_id: 'c2-l1',
+          label: 'Demonstrated',
+          mark: 2.0,
+          descriptor: 'Explains 1NF and atomic values.',
+          required_concepts: ['First Normal Form (1NF)', 'Atomic Values'],
+          evidence_requirements: ['Must mention atomic values and unique identification.'],
+          evidence_rule: {
+            type: 'required_concept_count',
+            minimum_demonstrated: 1,
+            minimum_partial: 0,
+            allow_partial: true,
+          },
+        },
+        {
+          level_id: 'c2-l2',
+          label: 'Not Demonstrated',
+          mark: 0.0,
+          descriptor: 'Fails to explain 1NF.',
+          required_concepts: [],
+          evidence_requirements: [],
+          evidence_rule: {
+            type: 'required_concept_count',
+            minimum_demonstrated: 0,
+            minimum_partial: 0,
+            allow_partial: true,
+          },
+        },
+      ],
+    },
+    {
+      criterion_id: 'c3',
+      description: 'Second Normal Form',
+      max_marks: 3.0,
+      scoring_levels: [
+        {
+          level_id: 'c3-l1',
+          label: 'Demonstrated',
+          mark: 3.0,
+          descriptor: 'Explains 2NF correctly.',
+          required_concepts: ['Second Normal Form (2NF)', 'Entire Primary Key'],
+          evidence_requirements: ['Must mention entire primary key dependency.'],
+          evidence_rule: {
+            type: 'required_concept_count',
+            minimum_demonstrated: 1,
+            minimum_partial: 0,
+            allow_partial: true,
+          },
+        },
+        {
+          level_id: 'c3-l2',
+          label: 'Not Demonstrated',
+          mark: 0.0,
+          descriptor: 'Fails to explain 2NF.',
+          required_concepts: [],
+          evidence_requirements: [],
+          evidence_rule: {
+            type: 'required_concept_count',
+            minimum_demonstrated: 0,
+            minimum_partial: 0,
+            allow_partial: true,
+          },
+        },
+      ],
+    },
+    {
+      criterion_id: 'c4',
+      description: 'Third Normal Form',
+      max_marks: 3.0,
+      scoring_levels: [
+        {
+          level_id: 'c4-l1',
+          label: 'Demonstrated',
+          mark: 3.0,
+          descriptor: 'Explains 3NF correctly.',
+          required_concepts: ['Third Normal Form (3NF)', 'Transitive Dependency'],
+          evidence_requirements: ['Must mention lack of transitive dependency.'],
+          evidence_rule: {
+            type: 'required_concept_count',
+            minimum_demonstrated: 1,
+            minimum_partial: 0,
+            allow_partial: true,
+          },
+        },
+        {
+          level_id: 'c4-l2',
+          label: 'Not Demonstrated',
+          mark: 0.0,
+          descriptor: 'Fails to explain 3NF.',
+          required_concepts: [],
+          evidence_requirements: [],
+          evidence_rule: {
+            type: 'required_concept_count',
+            minimum_demonstrated: 0,
+            minimum_partial: 0,
+            allow_partial: true,
+          },
+        },
+      ],
+    },
+  ],
+};
