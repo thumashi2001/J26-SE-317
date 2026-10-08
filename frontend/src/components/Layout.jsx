@@ -1,11 +1,9 @@
-import { maskStudentId } from '../utils/studentId.js';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import ErrorBoundary from './ErrorBoundary.jsx';
 
-import { getMenuForRole } from '../config/menus.js';
-
-export default function Layout() {
+// One shell for every role. Each role passes its own menu (see config/menus.js).
+export default function Layout({ menu, roleLabel }) {
   const { user, logout, diagnosticDone } = useAuth();
   const navigate = useNavigate();
   const initials = user.name
@@ -19,8 +17,9 @@ export default function Layout() {
     <div className="shell">
       <aside className="sidebar">
         <div className="side-brand">AdaptiveLearnSE</div>
+        <div className="side-role">{roleLabel}</div>
         <nav>
-          {getMenuForRole(user.role).filter((m) => !m.onlyBeforeDiagnostic || diagnosticDone === false).map((m, i) =>
+          {menu.filter((m) => !m.onlyBeforeDiagnostic || diagnosticDone === false).map((m, i) =>
             m.heading ? (
               <div key={i} className="menu-heading">
                 {m.heading}
@@ -42,7 +41,7 @@ export default function Layout() {
           <div className="side-user-text">
             <div className="side-name">{user.name}</div>
             <div className="side-sub">
-              {maskStudentId(user.student_id)}, {user.semester}
+              {user.role === 'student' ? `${user.student_id}, ${user.semester}` : user.id}
             </div>
           </div>
           <button
