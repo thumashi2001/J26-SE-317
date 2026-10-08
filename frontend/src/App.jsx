@@ -13,6 +13,7 @@ import StudentResult from './pages/c3/StudentResult.jsx';
 import LecturerC3Dashboard from './pages/lecturer/c3/LecturerC3Dashboard.jsx';
 import LecturerReview from './pages/lecturer/c3/LecturerReview.jsx';
 import AdminC3Dashboard from './pages/admin/c3/AdminC3Dashboard.jsx';
+import TopicPage from './pages/c1/TopicPage.jsx';
 
 // Each teammate replaces their ComingSoon routes with real pages.
 // Add your routes under your own prefix (/c2, /c3, /c4) and keep this file small.
@@ -26,6 +27,7 @@ export default function App() {
 
         <Route path="/c1/diagnostic" element={<DiagnosticPage />} />
         <Route path="/c1/dashboard" element={<DashboardPage />} />
+        <Route path="/c1/topic/:topic" element={<TopicPage />} />
 
         <Route path="/c2/*" element={<ComingSoon title="Exam Intelligence" owner="Rupasinghe H T N N" />} />
         {/* Student C3 */}

@@ -40,7 +40,7 @@ export async function register(db, body) {
   const semester = body.semester;
   const password = String(body.password || '');
 
-  if (!/^[A-Z0-9]{4,20}$/.test(studentId)) throw httpError(400, 'Student ID must be 4 to 20 letters or numbers');
+  if (!/^IT\d{8}$/.test(studentId)) throw httpError(400, 'Student ID must start with IT followed by 8 digits, for example IT********');
   if (name.length < 2) throw httpError(400, 'Please enter your full name');
   if (!/^\S+@\S+\.\S+$/.test(email)) throw httpError(400, 'Please enter a valid email address');
   if (!SEMESTERS.includes(semester)) throw httpError(400, 'Choose Year 3 Semester 1 or Semester 2');

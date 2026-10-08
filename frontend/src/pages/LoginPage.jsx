@@ -1,3 +1,4 @@
+import { STUDENT_ID_HELP, cleanStudentId, isValidStudentId } from '../utils/studentId.js';
 import { useState } from 'react';
 import { Link, useNavigate, Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
@@ -15,10 +16,14 @@ export default function LoginPage() {
 
   const submit = async (e) => {
     e.preventDefault();
-    setBusy(true);
     setError('');
+    if (!isValidStudentId(studentId)) {
+      setError(STUDENT_ID_HELP);
+      return;
+    }
+    setBusy(true);
     try {
-      await login(studentId, password);
+      await login(cleanStudentId(studentId), password);
       navigate('/');
     } catch (err) {
       setError(err.message);
@@ -33,7 +38,7 @@ export default function LoginPage() {
         <p className="muted">Use the student ID and password you registered with.</p>
 
         <label htmlFor="sid">Student ID</label>
-        <input id="sid" value={studentId} onChange={(e) => setStudentId(e.target.value)} autoComplete="username" required />
+        <input id="sid" value={studentId} onChange={(e) => setStudentId(cleanStudentId(e.target.value))} placeholder="IT********" maxLength={14} autoComplete="username" required />
 
         <label htmlFor="pw">Password</label>
         <input id="pw" type="password" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="current-password" required />

@@ -11,3 +11,6 @@ export const getTwin = (studentId) => api(`/c1/twin/${encodeURIComponent(student
 export const recordEvent = (event) => api('/c1/events', { method: 'POST', body: event });
 
 export const getAlerts = (studentId) => api(`/c1/alerts/${encodeURIComponent(studentId)}`);
+
+export const getHistory = (studentId, topic) =>
+  api(`/c1/history/${encodeURIComponent(studentId)}/${encodeURIComponent(topic)}`);
