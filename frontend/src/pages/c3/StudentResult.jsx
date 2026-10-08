@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useOutletContext } from 'react-router-dom';
 import { getResult } from '../../services/c3Api.js';
 import '../c3/C3.css';
 
@@ -131,6 +131,38 @@ function MindMapVisual({ mindmap }) {
   );
 }
 
+function PipelineStatus({ aiResult, isFailed }) {
+  const steps = [
+    { label: 'Answer Analysis', hasData: !!aiResult?.analysis?.student_word_count, desc: 'Processed raw text payload.' },
+    { label: 'Semantic / Concept Analysis', hasData: !!aiResult?.analysis?.concept_matches?.length, desc: 'Mapped sentences to expected concepts.' },
+    { label: 'Rubric Marking', hasData: !!aiResult?.marking?.criteria_results?.length, desc: 'Evaluated concepts against rubric rules.' },
+    { label: 'Evidence', hasData: !!aiResult?.marking?.criteria_results?.[0]?.evidence_sentence_ids, desc: 'Linked exact sentences to criterion decisions.' },
+    { label: 'Explainable Decision', hasData: !!aiResult?.marking?.overall_explanation, desc: 'Generated structured explanation.' },
+    { label: 'Concept Diagnosis', hasData: !!aiResult?.analysis?.concept_matches, desc: 'Classified concepts as demonstrated/partial/missing.' },
+    { label: 'Feedback', hasData: !!aiResult?.feedback?.overall_feedback, desc: 'Structured strengths & missing concepts.' },
+    { label: 'Mind Map', hasData: !!aiResult?.mindmap?.nodes?.length, desc: 'Transformed concepts into graph representation.' }
+  ];
+
+  return (
+    <div className="c3-card c3-mb-6">
+      <div className="c3-section-title"><span className="c3-section-dot" />Pipeline Status</div>
+      <div className="c3-pipeline-grid">
+        {steps.map((s, i) => (
+          <div key={i} className="c3-pipeline-step">
+            <div className={`c3-pipeline-icon ${isFailed ? 'failed' : (s.hasData ? 'success' : 'pending')}`}>
+               {isFailed ? '✗' : (s.hasData ? '✓' : '○')}
+            </div>
+            <div className="c3-pipeline-text">
+               <div className="c3-pipeline-label">{s.label}</div>
+               <div className="c3-pipeline-desc">{s.desc}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function StudentResult() {
   const { id: submissionId } = useParams();
   const navigate = useNavigate();
@@ -179,12 +211,11 @@ export default function StudentResult() {
   if (submission?.status === 'failed') {
     return (
       <div className="c3-page c3-page-dark">
-        <div className="c3-header-row c3-mb-6">
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px' }}>
           <div>
-            <button className="c3-btn c3-btn-ghost c3-btn-sm c3-mb-4" onClick={() => navigate('/c3')}>
+            <button className="c3-btn c3-btn-ghost c3-btn-sm" onClick={() => navigate('/c3')}>
               ← My Assessments
             </button>
-            <h1 className="c3-page-title">Assessment Result</h1>
           </div>
           <span className="c3-badge c3-badge-failed">✗ AI Processing Failed</span>
         </div>
@@ -218,7 +249,7 @@ export default function StudentResult() {
 
   return (
     <div className="c3-page c3-page-dark">
-      {/* Header */}
+      {/* A. RESULT HEADER */}
       <div className="c3-header-row">
         <div>
           <button className="c3-btn c3-btn-ghost c3-btn-sm c3-mb-4" onClick={() => navigate('/c3')}>
@@ -229,17 +260,31 @@ export default function StudentResult() {
             {isFinalized ? 'Finalized by Lecturer' : 'AI Assessment Complete — Awaiting Lecturer Review'}
           </p>
         </div>
-        <span
-          className={`c3-result-status-pill ${isFinalized ? 'finalized' : 'awaiting'}`}
-        >
+        <span className={`c3-result-status-pill ${isFinalized ? 'finalized' : 'awaiting'}`}>
           {isFinalized ? '✓ Finalized' : '◐ Awaiting Review'}
         </span>
       </div>
 
-      {/* ── Summary metrics */}
-      <div className="c3-bento c3-mb-6">
-        <div className="c3-col-4">
-          <div className="c3-card-metric">
+      {/* B. PIPELINE STATUS */}
+      <div className="c3-flat-section">
+        <PipelineStatus aiResult={ai} isFailed={false} />
+      </div>
+
+      <hr className="c3-divider-strong" />
+
+      {/* C. MAIN CONTENT */}
+      <div className="c3-bento">
+        {/* Student Answer */}
+        <div className="c3-col-7">
+          <div className="c3-section-title large"><span className="c3-section-dot" />Student Answer</div>
+          <div className="c3-answer-flat">
+            {submission.student_answer}
+          </div>
+        </div>
+
+        {/* Mark Summary */}
+        <div className="c3-col-5">
+          <div className="c3-card-metric" style={{ height: '100%' }}>
             <div className="c3-label">
               {isFinalized && result.lecturer_decision === 'overridden' ? 'AI Suggested Mark' : 'AI Suggested Mark'}
             </div>
@@ -247,154 +292,111 @@ export default function StudentResult() {
               {aiMark}
               <span className="c3-result-mark-denom"> / {maxMarks}</span>
             </div>
-            {!isFinalized && (
-              <div className="c3-metric-sub">Pending lecturer review</div>
+            {!isFinalized && <div className="c3-metric-sub">Pending lecturer review</div>}
+            
+            {isFinalized && (
+              <div className="c3-mt-4" style={{ paddingTop: 16, borderTop: '1px solid var(--c3-border-m)' }}>
+                <div className="c3-label">Final Mark</div>
+                <div className="c3-result-mark-big" style={{ color: 'var(--c3-success)' }}>
+                  {finalMark}
+                  <span className="c3-result-mark-denom"> / {maxMarks}</span>
+                </div>
+                {result.lecturer_decision === 'overridden' && result.override_reason && (
+                  <div className="c3-metric-sub" style={{ marginTop: 8 }}>
+                    Revised by lecturer: <em>{result.override_reason}</em>
+                  </div>
+                )}
+              </div>
             )}
+            
+            <div className="c3-mt-4" style={{ paddingTop: 16, borderTop: '1px solid var(--c3-border-m)' }}>
+              <div className="c3-label">Concept Coverage</div>
+              <div style={{ fontSize: 24, fontWeight: 700, color: 'var(--c3-primary)' }}>{pct}%</div>
+              <div className="c3-metric-sub">{demonstratedCount} of {conceptMatches.length} concepts demonstrated</div>
+            </div>
           </div>
         </div>
+      </div>
 
-        {isFinalized && (
-          <div className="c3-col-4">
-            <div className="c3-card-metric">
-              <div className="c3-label">Final Mark</div>
-              <div className="c3-result-mark-big" style={{ color: '#34d399' }}>
-                {finalMark}
-                <span className="c3-result-mark-denom"> / {maxMarks}</span>
-              </div>
-              {result.lecturer_decision === 'overridden' && result.override_reason && (
-                <div className="c3-metric-sub" style={{ marginTop: 8 }}>
-                  Revised by lecturer
+      <hr className="c3-divider-strong" />
+
+      {/* D. WHY THIS MARK? */}
+      {marking.criteria_results?.length > 0 && (
+        <div className="c3-flat-section">
+          <div className="c3-section-title large"><span className="c3-section-dot" />Why did I get this mark?</div>
+          {marking.overall_explanation && (
+            <p style={{ color: 'var(--c3-muted)', fontSize: 16, lineHeight: 1.8, marginBottom: 32, maxWidth: '80ch' }}>
+              {marking.overall_explanation}
+            </p>
+          )}
+          <div className="c3-stack" style={{ gap: 16 }}>
+            {marking.criteria_results.map((cr, i) => (
+              <CriterionAccordion key={i} cr={cr} rubricCriteria={[]} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      <hr className="c3-divider-strong" />
+
+      {/* E. CONCEPT ANALYSIS & FEEDBACK */}
+      <div className="c3-bento">
+        {conceptMatches.length > 0 && (
+          <div className="c3-col-6">
+            <div className="c3-section-title large"><span className="c3-section-dot" />Concept Analysis</div>
+            <div className="c3-concept-grid">
+              {conceptMatches.map((c, i) => {
+                const statusCls = c.status === 'demonstrated' ? 'demonstrated' : c.status === 'partial' ? 'partial' : 'not_demonstrated';
+                return (
+                  <div key={i} className={`c3-concept-chip ${statusCls}`}>
+                    <div className="c3-concept-name">{c.concept}</div>
+                    <div className="c3-concept-status-label"><ConceptStatus status={c.status} /></div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {feedback.overall_feedback && (
+          <div className="c3-col-6">
+            <div className="c3-section-title large"><span className="c3-section-dot" />Actionable Feedback</div>
+            <div className="c3-stack" style={{ gap: 24 }}>
+              {feedback.overall_feedback.overall_strengths?.length > 0 && (
+                <div>
+                  <div className="c3-label" style={{ color: 'var(--c3-success)' }}>Strengths</div>
+                  <ul style={{ margin: 0, paddingLeft: 18, color: 'var(--c3-muted)', lineHeight: 1.8 }}>
+                    {feedback.overall_feedback.overall_strengths.map((s, i) => <li key={i}>{s}</li>)}
+                  </ul>
+                </div>
+              )}
+              {feedback.overall_feedback.overall_missing_concepts?.length > 0 && (
+                <div>
+                  <div className="c3-label" style={{ color: 'var(--c3-warning)' }}>Missing Concepts</div>
+                  <ul style={{ margin: 0, paddingLeft: 18, color: 'var(--c3-muted)', lineHeight: 1.8 }}>
+                    {feedback.overall_feedback.overall_missing_concepts.map((c, i) => <li key={i}>{c}</li>)}
+                  </ul>
+                </div>
+              )}
+              {feedback.overall_feedback.overall_improvement_suggestions?.length > 0 && (
+                <div>
+                  <div className="c3-label" style={{ color: 'var(--c3-primary)' }}>How to Improve</div>
+                  <ul style={{ margin: 0, paddingLeft: 18, color: 'var(--c3-muted)', lineHeight: 1.8 }}>
+                    {feedback.overall_feedback.overall_improvement_suggestions.map((s, i) => <li key={i}>{s}</li>)}
+                  </ul>
                 </div>
               )}
             </div>
           </div>
         )}
-
-        <div className="c3-col-4">
-          <div className="c3-card-metric">
-            <div className="c3-label">Concept Coverage</div>
-            <div className="c3-result-mark-big" style={{ color: '#c4b5fd' }}>
-              {pct}%
-            </div>
-            <div className="c3-metric-sub">{demonstratedCount} of {conceptMatches.length} concepts</div>
-          </div>
-        </div>
-
-        {!isFinalized && (
-          <div className="c3-col-4">
-            <div className="c3-card-metric">
-              <div className="c3-label">Concepts Demonstrated</div>
-              <div className="c3-result-mark-big">
-                {demonstratedCount}
-                <span className="c3-result-mark-denom"> / {conceptMatches.length}</span>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
 
-      {/* Override notice */}
-      {isFinalized && result.lecturer_decision === 'overridden' && (
-        <div className="c3-alert c3-alert-info c3-mb-6">
-          <span>ℹ</span>
-          <div>
-            <strong>Lecturer override applied.</strong> The lecturer adjusted the AI suggested mark.
-            {result.override_reason && (
-              <> Reason: <em>{result.override_reason}</em></>
-            )}
-          </div>
-        </div>
-      )}
+      <hr className="c3-divider-strong" />
 
-      {/* ── Overall explanation */}
-      {marking.overall_explanation && (
-        <div className="c3-card c3-mb-6">
-          <div className="c3-section-title"><span className="c3-section-dot" />Why did I get this mark?</div>
-          <p style={{ color: 'var(--c3-muted)', lineHeight: 1.8, margin: 0 }}>
-            {marking.overall_explanation}
-          </p>
-        </div>
-      )}
-
-      {/* ── Criterion breakdown */}
-      {marking.criteria_results?.length > 0 && (
-        <div className="c3-card c3-mb-6">
-          <div className="c3-section-title"><span className="c3-section-dot" />Criterion Breakdown</div>
-          {marking.criteria_results.map((cr, i) => (
-            <CriterionAccordion key={i} cr={cr} rubricCriteria={[]} />
-          ))}
-        </div>
-      )}
-
-      {/* ── Concept analysis */}
-      {conceptMatches.length > 0 && (
-        <div className="c3-card c3-mb-6">
-          <div className="c3-section-title"><span className="c3-section-dot" />Concept Analysis</div>
-          <div className="c3-concept-grid">
-            {conceptMatches.map((c, i) => {
-              const statusCls = c.status === 'demonstrated' ? 'demonstrated' : c.status === 'partial' ? 'partial' : 'not_demonstrated';
-              return (
-                <div key={i} className={`c3-concept-chip ${statusCls}`}>
-                  <div className="c3-concept-name">{c.concept}</div>
-                  <div className="c3-concept-status-label"><ConceptStatus status={c.status} /></div>
-                  {c.overlap_score !== undefined && (
-                    <div style={{ fontSize: 11, color: 'var(--c3-dim)', marginTop: 2 }}>
-                      Overlap: {Math.round(c.overlap_score * 100)}%
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
-      {/* ── Feedback */}
-      {feedback.overall_feedback && (
-        <div className="c3-bento c3-mb-6">
-          {feedback.overall_feedback.overall_strengths?.length > 0 && (
-            <div className="c3-col-4">
-              <div className="c3-card">
-                <div className="c3-section-title" style={{ color: '#34d399' }}>
-                  <span className="c3-section-dot" style={{ background: '#34d399' }} /> Strengths
-                </div>
-                <ul style={{ margin: 0, paddingLeft: 18, color: 'var(--c3-muted)', lineHeight: 1.8 }}>
-                  {feedback.overall_feedback.overall_strengths.map((s, i) => <li key={i}>{s}</li>)}
-                </ul>
-              </div>
-            </div>
-          )}
-          {feedback.overall_feedback.overall_missing_concepts?.length > 0 && (
-            <div className="c3-col-4">
-              <div className="c3-card">
-                <div className="c3-section-title" style={{ color: '#fbbf24' }}>
-                  <span className="c3-section-dot" style={{ background: '#fbbf24' }} /> Missing Concepts
-                </div>
-                <ul style={{ margin: 0, paddingLeft: 18, color: 'var(--c3-muted)', lineHeight: 1.8 }}>
-                  {feedback.overall_feedback.overall_missing_concepts.map((c, i) => <li key={i}>{c}</li>)}
-                </ul>
-              </div>
-            </div>
-          )}
-          {feedback.overall_feedback.overall_improvement_suggestions?.length > 0 && (
-            <div className="c3-col-4">
-              <div className="c3-card">
-                <div className="c3-section-title" style={{ color: '#a78bfa' }}>
-                  <span className="c3-section-dot" style={{ background: '#a78bfa' }} /> How to Improve
-                </div>
-                <ul style={{ margin: 0, paddingLeft: 18, color: 'var(--c3-muted)', lineHeight: 1.8 }}>
-                  {feedback.overall_feedback.overall_improvement_suggestions.map((s, i) => <li key={i}>{s}</li>)}
-                </ul>
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* ── Mind map */}
-      <div className="c3-card c3-mb-6">
+      {/* F. MIND MAP */}
+      <div className="c3-flat-section">
         <div className="c3-between c3-mb-4">
-          <div className="c3-section-title" style={{ margin: 0 }}>
+          <div className="c3-section-title large" style={{ margin: 0 }}>
             <span className="c3-section-dot" /> Concept Mind Map
           </div>
           {mindmap.title && <span className="c3-text-muted">{mindmap.title}</span>}
@@ -402,8 +404,8 @@ export default function StudentResult() {
         <MindMapVisual mindmap={mindmap} />
       </div>
 
-      {/* ── Audit disclaimer */}
-      <div className="c3-alert c3-alert-info">
+      {/* G. AUDIT DISCLAIMER */}
+      <div className="c3-alert c3-alert-info c3-mt-8" style={{ background: 'transparent' }}>
         <span>ℹ</span>
         <span>
           {isFinalized

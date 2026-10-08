@@ -1,5 +1,11 @@
 # C3 Research Decision Log
 
+## C3 Research Context: Combined Evidence-Traceable Pipeline
+C3 is evaluating an integrated workflow rather than standalone features:
+Student Answer → Analysis → Evidence → Rubric Decision → Explanation → Concept Diagnosis → Feedback → Mind Map → Lecturer Verification.
+
+This combined pipeline is a research artifact whose individual stages can be evaluated AND whose end-to-end consistency will be evaluated in future phases (e.g. marking quality, concept detection, explanation traceability, feedback quality, mind-map quality, and lecturer agreement).
+
 ## C3-DEC-001
 **Date:** 2026-10-08  
 **Component:** C3 — Automated Marking  
@@ -19,8 +25,8 @@
 **Component:** C3 — Automated Marking  
 **Category:** C — New implementation/research decision  
 **Problem / Need:** C3 needs to process answers through multiple specialized analytical steps.  
-**Alternatives Considered:** A. Monolithic LLM prompt B. Modular microservices  
-**Decision:** C3 modular architecture separating Analysis, Marking, Feedback, and Mindmap into distinct FastAPI endpoints.  
+**Alternatives Considered:** A. Monolithic LLM prompt B. Modular architecture within the C3 FastAPI service  
+**Decision:** C3 modular service architecture separating Analysis, Marking, Feedback, and Mindmap into distinct modules/routes within one FastAPI service.  
 **Reason / Justification:** Separation of concerns allows independent experimental evaluation of each phase (e.g. testing RAG on Analysis vs Rubric).  
 **Evidence Source:** Implementation / system requirement — pending research validation.  
 **Implementation:** `ai-services/c3/app/api/` routing structure.  
@@ -32,9 +38,9 @@
 **Component:** C3 — Automated Marking  
 **Category:** C — New implementation/research decision  
 **Problem / Need:** Need a measurable starting point for semantic analysis before introducing non-deterministic LLMs.  
-**Alternatives Considered:** A. Direct LLM extraction B. Deterministic baseline (TF-IDF/Keyword)  
-**Decision:** Function 1 deterministic baseline using lexical/semantic matching rules.  
-**Reason / Justification:** A deterministic baseline is required to measure if advanced LLM/RAG techniques actually improve precision/recall.  
+**Alternatives Considered:** A. Direct LLM extraction B. Deterministic baseline (lexical/concept-overlap)  
+**Decision:** Function 1 deterministic baseline using lexical/semantic concept-overlap matching rules. TF-IDF and advanced LLMs are proposed as future experimental comparisons.  
+**Reason / Justification:** A deterministic baseline is required to measure if advanced techniques actually improve precision/recall.  
 **Evidence Source:** Research methodology best practice.  
 **Implementation:** `analysis_api.py` baseline matching logic mapping sentences.  
 **Validation:** Outputs consistent concept-to-sentence mapping arrays.  
@@ -76,8 +82,8 @@
 **Reason / Justification:** True explainable AI in education must highlight exact phrases/sentences contributing to a decision.  
 **Evidence Source:** Supervisor-directed explainable AI requirement.  
 **Implementation:** Analysis engine tags sentences; Marking engine assigns `evidence_sentence_ids`.  
-**Validation:** Browser UI highlights specific sentences per criterion.  
-**Outcome:** Complete traceability from mark back to student input.  
+**Validation:** API-level evidence verified; manual/static UI verification confirms highlighting.  
+**Outcome:** Traceability from mark back to student input established in API and UI components.  
 
 ## C3-DEC-007
 **Date:** 2026-10-08  
@@ -99,7 +105,7 @@
 **Problem / Need:** Feedback must be actionable and grounded.  
 **Alternatives Considered:** A. Generative text wall B. Explainable feedback based on structured evidence  
 **Decision:** Explainable feedback based on structured evidence.  
-**Reason / Justification:** Generative feedback often hallucinates. Structured feedback ensures comments are derived strictly from criterion performance.  
+**Reason / Justification:** The baseline was designed so feedback is constructed from structured upstream evidence, ensuring comments are derived strictly from criterion performance without introducing an additional generative dependency.  
 **Evidence Source:** Supervisor-approved scope.  
 **Implementation:** Function 3 feedback generator separating strengths and missing concepts.  
 **Validation:** Generates arrays of specific strengths and weaknesses tied to concepts.  
@@ -190,34 +196,34 @@
 **Problem / Need:** Handling AI errors or disagreements.  
 **Alternatives Considered:** A. Blind override B. Accept vs Override with reason  
 **Decision:** Accept vs Override with explicit reason persistence.  
-**Reason / Justification:** Capturing the override reason is critical for RLHF (Reinforcement Learning from Human Feedback) and future model tuning.  
-**Evidence Source:** System requirement for AI optimization.  
+**Reason / Justification:** Capturing the override reason provides auditable lecturer disagreement data that can later support error analysis, disagreement analysis, model improvement research, and future learning experiments.  
+**Evidence Source:** System requirement for AI optimization research.  
 **Implementation:** Override action requires `overrideMark` and `overrideReason` payloads.  
 **Validation:** DB inspection confirms original mark and lecturer mark are safely separated.  
-**Outcome:** High-quality audit trails for ML tuning.  
+**Outcome:** High-quality audit trails for future analysis.  
 
 ## C3-DEC-016
 **Date:** 2026-10-08  
 **Component:** C3 — Automated Marking  
 **Category:** B — Supervisor-directed decision  
 **Problem / Need:** Evaluating the system without real student privacy risks.  
-**Alternatives Considered:** A. Live classroom deployment B. Synthetic dataset as the primary research dataset  
-**Decision:** Synthetic dataset as the primary research dataset.  
-**Reason / Justification:** Prevents PII leaks and allows controlled edge-case generation (e.g. perfectly flawed answers).  
+**Alternatives Considered:** A. Live classroom deployment B. Purpose-built synthetic dataset  
+**Decision:** The MAIN research dataset will be purpose-built and synthetic (to be created in a later phase). Current seed/test data is purely for development/integration.  
+**Reason / Justification:** Prevents PII leaks and allows controlled edge-case generation.  
 **Evidence Source:** Supervisor-directed decision on dataset methodology.  
-**Implementation:** `seed_users.js` and `assessmentService.js` utilize fake `IT` IDs and seeded rubric structures.  
-**Validation:** End-to-end tests function over synthetic bounds.  
-**Outcome:** Safe experimental sandbox.  
+**Implementation:** `seed_users.js` and `assessmentService.js` utilize fake `IT` IDs and seeded rubric structures for integration data.  
+**Validation:** End-to-end tests function over the development bounds.  
+**Outcome:** Safe experimental sandbox established for future research dataset application.  
 
 ## C3-DEC-017
 **Date:** 2026-10-08  
 **Component:** C3 — Automated Marking  
 **Category:** C — New implementation/research decision  
 **Problem / Need:** Role of LLM/RAG in the architecture.  
-**Alternatives Considered:** A. Hardcode LLM everywhere B. LLM/RAG as experimental comparison  
-**Decision:** LLM/RAG as experimental comparison rather than assumed core implementation.  
-**Reason / Justification:** The research question is *whether* RAG/LLMs improve scoring over deterministic/lexical models. We must measure it, not assume it.  
+**Alternatives Considered:** A. Assumed core architecture B. LLM/RAG as experimental comparison  
+**Decision:** LLM/RAG is strictly an experimental comparison methodology, not the assumed core architecture.  
+**Reason / Justification:** We must not claim LLM/RAG is superior until experiments demonstrate it. The research compares deterministic baselines against generative models.  
 **Evidence Source:** Research methodology best practice.  
 **Implementation:** Pluggable AI engine via `ai-services` modularity.  
-**Validation:** TBD (Pending experimental metrics).  
+**Validation:** NOT YET EVALUATED.  
 **Outcome:** Architecturally prepared for rigorous comparative evaluation.  

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useOutletContext } from 'react-router-dom';
 import { getAssessment, submitAnswer } from '../../services/c3Api.js';
 import '../c3/C3.css';
 
@@ -26,6 +26,12 @@ export default function StudentAssessment() {
   const [submitError, setSubmitError] = useState(null);
   const [stage, setStage] = useState('idle'); // idle | submitting | done
   const [currentStep, setCurrentStep] = useState(-1);
+  const { setPageTitle } = useOutletContext();
+
+  useEffect(() => {
+    if (stage === 'idle') setPageTitle(assessment?.title || 'C3 Assessment');
+    else setPageTitle('AI Assessment in Progress');
+  }, [stage, assessment, setPageTitle]);
 
   useEffect(() => {
     setLoadingAssessment(true);
@@ -112,12 +118,7 @@ export default function StudentAssessment() {
   if (stage === 'submitting' || stage === 'done') {
     return (
       <div className="c3-page c3-page-dark">
-        <div className="c3-header-row">
-          <div>
-            <h1 className="c3-page-title">AI Assessment in Progress</h1>
-            <p className="c3-page-subtitle">{assessment.title}</p>
-          </div>
-        </div>
+        {/* Header managed by Top Nav */}
 
         <div className="c3-bento">
           <div className="c3-col-6">
@@ -169,17 +170,16 @@ export default function StudentAssessment() {
   // ── Idle: show question + textarea
   return (
     <div className="c3-page c3-page-dark">
-      {/* Header */}
-      <div className="c3-header-row">
+      {/* Back button above content since header is top nav */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px' }}>
         <div>
           <button
-            className="c3-btn c3-btn-ghost c3-btn-sm c3-mb-4"
+            className="c3-btn c3-btn-ghost c3-btn-sm"
             onClick={() => navigate('/c3')}
           >
             ← Back
           </button>
-          <h1 className="c3-page-title">{assessment.course || assessment.title}</h1>
-          <p className="c3-page-subtitle">{assessment.is_dev_seed ? 'PP1 Demonstration Assessment' : 'Assessment'}</p>
+          <p className="c3-page-subtitle" style={{ marginTop: '8px' }}>{assessment.is_dev_seed ? 'PP1 Demonstration Assessment' : 'Assessment'}</p>
         </div>
         <span className="c3-badge c3-badge-available">● Available</span>
       </div>

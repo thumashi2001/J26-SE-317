@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useOutletContext } from 'react-router-dom';
 import { lecturerListSubmissions } from '../../../services/c3Api.js';
 import '../../c3/C3.css';
 
@@ -17,6 +17,11 @@ export default function LecturerC3Dashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [filter, setFilter] = useState('');
+  const { setPageTitle } = useOutletContext();
+
+  useEffect(() => {
+    setPageTitle('C3 Assessment Review');
+  }, [setPageTitle]);
 
   const load = () => {
     setLoading(true);
@@ -39,14 +44,8 @@ export default function LecturerC3Dashboard() {
 
   return (
     <div className="c3-page c3-page-dark">
-      {/* ── Header */}
-      <div className="c3-header-row">
-        <div>
-          <h1 className="c3-page-title">C3 — Assessment Review</h1>
-          <p className="c3-page-subtitle">
-            Review AI-generated assessment results and retain final academic control.
-          </p>
-        </div>
+      {/* Header managed by Top Nav */}
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '24px' }}>
         <button className="c3-btn c3-btn-ghost" onClick={load}>↻ Refresh</button>
       </div>
 
@@ -66,7 +65,7 @@ export default function LecturerC3Dashboard() {
         <div className="c3-bento c3-mb-6">
           <div className="c3-col-4">
             <div className="c3-card-metric" style={{ cursor: 'pointer' }} onClick={() => setFilter('awaiting_review')}>
-              <div className="c3-metric-value" style={{ color: '#fbbf24' }}>
+              <div className="c3-metric-value" style={{ color: 'var(--c3-warning)' }}>
                 {String(pendingCount).padStart(2, '0')}
               </div>
               <div className="c3-metric-label">Pending Review</div>
@@ -75,7 +74,7 @@ export default function LecturerC3Dashboard() {
           </div>
           <div className="c3-col-4">
             <div className="c3-card-metric">
-              <div className="c3-metric-value" style={{ color: '#60a5fa' }}>
+              <div className="c3-metric-value" style={{ color: 'var(--c3-primary)' }}>
                 {String(finalizedCount).padStart(2, '0')}
               </div>
               <div className="c3-metric-label">Finalized</div>
@@ -84,7 +83,7 @@ export default function LecturerC3Dashboard() {
           </div>
           <div className="c3-col-4">
             <div className="c3-card-metric">
-              <div className="c3-metric-value" style={{ color: '#34d399' }}>
+              <div className="c3-metric-value" style={{ color: 'var(--c3-success)' }}>
                 {String(pendingCount + finalizedCount).padStart(2, '0')}
               </div>
               <div className="c3-metric-label">Total Submissions</div>
@@ -169,7 +168,7 @@ export default function LecturerC3Dashboard() {
                   const date = new Date(sub.submitted_at).toLocaleDateString();
                   return (
                     <tr key={String(sub._id)}>
-                      <td style={{ fontFamily: 'monospace', fontWeight: 600, color: '#fff' }}>
+                      <td style={{ fontFamily: 'monospace', fontWeight: 600, color: 'var(--c3-text)' }}>
                         {sub.student_id}
                       </td>
                       <td className="c3-text-muted" style={{ maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={sub.assessment_title || sub.assessment_id}>
@@ -178,7 +177,7 @@ export default function LecturerC3Dashboard() {
                       <td className="c3-text-dim">{date}</td>
                       <td>
                         {sub.ai_mark !== null && sub.ai_mark !== undefined ? (
-                          <span style={{ fontWeight: 600, color: '#fff' }}>{sub.ai_mark}</span>
+                          <span style={{ fontWeight: 600, color: 'var(--c3-text)' }}>{sub.ai_mark}</span>
                         ) : (
                           <span style={{ fontWeight: 600, color: '#94a3b8' }}>—</span>
                         )}

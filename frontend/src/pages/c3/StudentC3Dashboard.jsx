@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useOutletContext } from 'react-router-dom';
 import { listAssessments, listMySubmissions } from '../../services/c3Api.js';
 import '../c3/C3.css';
 
@@ -9,8 +9,10 @@ export default function StudentC3Dashboard() {
   const [submissions, setSubmissions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { setPageTitle } = useOutletContext();
 
   useEffect(() => {
+    setPageTitle('C3 My Assessments');
     setLoading(true);
     Promise.all([listAssessments(), listMySubmissions()])
       .then(([aRes, sRes]) => {
@@ -38,13 +40,7 @@ export default function StudentC3Dashboard() {
 
   return (
     <div className="c3-page c3-page-dark">
-      {/* ── Header ─────────────────────────────────────────── */}
-      <div className="c3-header-row">
-        <div>
-          <h1 className="c3-page-title">C3 — My Assessments</h1>
-          <p className="c3-page-subtitle">Submit your answers and understand your assessment results.</p>
-        </div>
-      </div>
+      {/* Page title managed by Top Nav */}
 
       {/* ── Summary metrics ─────────────────────────────────── */}
       {loading ? (
@@ -62,21 +58,21 @@ export default function StudentC3Dashboard() {
         <div className="c3-bento c3-mb-6">
           <div className="c3-col-4">
             <div className="c3-card-metric">
-              <div className="c3-metric-value" style={{ color: '#34d399' }}>{String(available).padStart(2, '0')}</div>
+              <div className="c3-metric-value" style={{ color: 'var(--c3-success)' }}>{String(available).padStart(2, '0')}</div>
               <div className="c3-metric-label">Available</div>
               <div className="c3-metric-sub">Ready to attempt</div>
             </div>
           </div>
           <div className="c3-col-4">
             <div className="c3-card-metric">
-              <div className="c3-metric-value" style={{ color: '#fbbf24' }}>{String(inProgress).padStart(2, '0')}</div>
+              <div className="c3-metric-value" style={{ color: 'var(--c3-warning)' }}>{String(inProgress).padStart(2, '0')}</div>
               <div className="c3-metric-label">Awaiting Review</div>
               <div className="c3-metric-sub">AI assessment complete</div>
             </div>
           </div>
           <div className="c3-col-4">
             <div className="c3-card-metric">
-              <div className="c3-metric-value" style={{ color: '#60a5fa' }}>{String(finalized).padStart(2, '0')}</div>
+              <div className="c3-metric-value" style={{ color: 'var(--c3-primary)' }}>{String(finalized).padStart(2, '0')}</div>
               <div className="c3-metric-label">Finalized</div>
               <div className="c3-metric-sub">Lecturer reviewed</div>
             </div>

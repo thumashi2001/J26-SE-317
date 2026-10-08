@@ -54,12 +54,6 @@ export default function App() {
         <Route path="/c3/assessment/:id" element={<StudentAssessment />} />
         <Route path="/c3/result/:id" element={<StudentResult />} />
 
-        {/* Lecturer C3 */}
-        <Route path="/lecturer/c3" element={<LecturerC3Dashboard />} />
-        <Route path="/lecturer/c3/review/:submissionId" element={<LecturerReview />} />
-
-        {/* Admin C3 */}
-        <Route path="/admin/c3" element={<AdminC3Dashboard />} />
         <Route path="/c4/*" element={<ComingSoon title="Adaptive Learning Path" owner="Muthumali W G G A S" />} />
       </Route>
 
@@ -67,13 +61,17 @@ export default function App() {
         <Route path="/lecturer" element={<LecturerHome />} />
         <Route path="/lecturer/c1/*" element={<ComingSoon title="Class learning state" owner="Component 1" text="Class and student learning state for lecturers." />} />
         <Route path="/lecturer/c2/*" element={<ComingSoon title="Exam intelligence" owner="Rupasinghe H T N N" text="Question papers, rubrics and exam patterns." />} />
-        <Route path="/lecturer/c3/*" element={<ComingSoon title="Marking review" owner="Edirisinghe T P V K" text="Review automated marks and feedback." />} />
+        {/* Lecturer C3 */}
+        <Route path="/lecturer/c3" element={<LecturerC3Dashboard />} />
+        <Route path="/lecturer/c3/review/:submissionId" element={<LecturerReview />} />
         <Route path="/lecturer/c4/*" element={<ComingSoon title="Adaptive paths" owner="Muthumali W G G A S" text="Study plans recommended to students." />} />
       </Route>
 
       <Route element={area('admin', ADMIN_MENU, 'Administrator')}>
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/admin/lecturers" element={<LecturerApprovals />} />
+        {/* Admin C3 */}
+        <Route path="/admin/c3" element={<AdminC3Dashboard />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />

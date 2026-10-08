@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useOutletContext } from 'react-router-dom';
 import { lecturerGetSubmission, lecturerAccept, lecturerOverride } from '../../../services/c3Api.js';
 import '../../c3/C3.css';
 
@@ -150,6 +150,38 @@ function MindMapPanel({ mindmap }) {
   );
 }
 
+function PipelineStatus({ aiResult, isFailed }) {
+  const steps = [
+    { label: 'Answer Analysis', hasData: !!aiResult?.analysis?.student_word_count, desc: 'Processed raw text payload.' },
+    { label: 'Semantic / Concept Analysis', hasData: !!aiResult?.analysis?.concept_matches?.length, desc: 'Mapped sentences to expected concepts.' },
+    { label: 'Rubric Marking', hasData: !!aiResult?.marking?.criteria_results?.length, desc: 'Evaluated concepts against rubric rules.' },
+    { label: 'Evidence', hasData: !!aiResult?.marking?.criteria_results?.[0]?.evidence_sentence_ids, desc: 'Linked exact sentences to criterion decisions.' },
+    { label: 'Explainable Decision', hasData: !!aiResult?.marking?.overall_explanation, desc: 'Generated structured explanation.' },
+    { label: 'Concept Diagnosis', hasData: !!aiResult?.analysis?.concept_matches, desc: 'Classified concepts as demonstrated/partial/missing.' },
+    { label: 'Feedback', hasData: !!aiResult?.feedback?.overall_feedback, desc: 'Structured strengths & missing concepts.' },
+    { label: 'Mind Map', hasData: !!aiResult?.mindmap?.nodes?.length, desc: 'Transformed concepts into graph representation.' }
+  ];
+
+  return (
+    <div className="c3-card c3-mb-6">
+      <div className="c3-section-title"><span className="c3-section-dot" />Pipeline Status</div>
+      <div className="c3-pipeline-grid">
+        {steps.map((s, i) => (
+          <div key={i} className="c3-pipeline-step">
+            <div className={`c3-pipeline-icon ${isFailed ? 'failed' : (s.hasData ? 'success' : 'pending')}`}>
+               {isFailed ? '✗' : (s.hasData ? '✓' : '○')}
+            </div>
+            <div className="c3-pipeline-text">
+               <div className="c3-pipeline-label">{s.label}</div>
+               <div className="c3-pipeline-desc">{s.desc}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function LecturerReview() {
   const { submissionId } = useParams();
   const navigate = useNavigate();
@@ -252,12 +284,11 @@ export default function LecturerReview() {
   if (submission.status === 'failed') {
     return (
       <div className="c3-page c3-page-dark">
-        <div className="c3-header-row c3-mb-6">
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px' }}>
           <div>
-            <button className="c3-btn c3-btn-ghost c3-btn-sm c3-mb-4" onClick={() => navigate('/lecturer/c3')}>
+            <button className="c3-btn c3-btn-ghost c3-btn-sm" onClick={() => navigate('/lecturer/c3')}>
               ← Submission Queue
             </button>
-            <h1 className="c3-page-title">Assessment Review</h1>
             <div className="c3-gap-3 c3-mt-4">
               <span className="c3-text-muted">Student:</span>
               <code style={{ color: '#93c5fd', fontWeight: 600 }}>{submission.student_id}</code>
@@ -288,12 +319,11 @@ export default function LecturerReview() {
   return (
     <div className="c3-page c3-page-dark">
       {/* ── Header */}
-      <div className="c3-header-row">
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '32px' }}>
         <div>
-          <button className="c3-btn c3-btn-ghost c3-btn-sm c3-mb-4" onClick={() => navigate('/lecturer/c3')}>
+          <button className="c3-btn c3-btn-ghost c3-btn-sm" onClick={() => navigate('/lecturer/c3')}>
             ← Submission Queue
           </button>
-          <h1 className="c3-page-title">Assessment Review</h1>
           <div className="c3-gap-3 c3-mt-4">
             <span className="c3-text-muted">Student:</span>
             <code style={{ color: '#93c5fd', fontWeight: 600 }}>{submission.student_id}</code>
@@ -327,11 +357,18 @@ export default function LecturerReview() {
 
       <div className="c3-bento">
         {/* ── LEFT: Main review area */}
-        <div className="c3-col-8">
+        <div className="c3-col-8" style={{ paddingRight: 32 }}>
+          {/* Pipeline Status */}
+          <div className="c3-flat-section">
+            <PipelineStatus aiResult={ai} isFailed={false} />
+          </div>
+
+          <hr className="c3-divider-strong" style={{ marginTop: 0 }} />
+
           {/* Student Answer */}
-          <div className="c3-card c3-mb-6">
-            <div className="c3-section-title"><span className="c3-section-dot" />Student Answer</div>
-            <div className="c3-answer-display">
+          <div className="c3-flat-section">
+            <div className="c3-section-title large"><span className="c3-section-dot" />Student Answer</div>
+            <div className="c3-answer-flat">
               {submission.student_answer}
             </div>
             <div className="c3-word-count">
@@ -340,21 +377,25 @@ export default function LecturerReview() {
             </div>
           </div>
 
+          <hr className="c3-divider-strong" />
+
           {/* Criterion Evaluation */}
           {marking.criteria_results?.length > 0 && (
-            <div className="c3-card c3-mb-6">
+            <div className="c3-flat-section">
               <div className="c3-between c3-mb-4">
-                <div className="c3-section-title" style={{ margin: 0 }}>
+                <div className="c3-section-title large" style={{ margin: 0 }}>
                   <span className="c3-section-dot" />Criterion Evaluation
                 </div>
                 <span className="c3-text-muted">Evidence-based review</span>
               </div>
-              {marking.criteria_results.map((cr, i) => (
-                <CriterionPanel key={i} cr={cr} />
-              ))}
+              <div className="c3-stack" style={{ gap: 16 }}>
+                {marking.criteria_results.map((cr, i) => (
+                  <CriterionPanel key={i} cr={cr} />
+                ))}
+              </div>
               {marking.overall_explanation && (
-                <div className="c3-mt-4">
-                  <div className="c3-label">Overall Explanation</div>
+                <div className="c3-mt-6" style={{ background: 'rgba(59, 130, 246, 0.05)', padding: 20, borderRadius: 12, border: '1px solid rgba(59, 130, 246, 0.2)' }}>
+                  <div className="c3-label" style={{ color: 'var(--c3-primary)' }}>Overall Explanation</div>
                   <p style={{ color: 'var(--c3-muted)', margin: 0, lineHeight: 1.75 }}>
                     {marking.overall_explanation}
                   </p>
@@ -363,10 +404,12 @@ export default function LecturerReview() {
             </div>
           )}
 
+          <hr className="c3-divider-strong" />
+
           {/* Concept Analysis */}
           {conceptMatches.length > 0 && (
-            <div className="c3-card c3-mb-6">
-              <div className="c3-section-title"><span className="c3-section-dot" />Concept Analysis</div>
+            <div className="c3-flat-section">
+              <div className="c3-section-title large"><span className="c3-section-dot" />Concept Analysis</div>
               <div className="c3-concept-grid">
                 {conceptMatches.map((c, i) => {
                   const statusCls = c.status === 'demonstrated' ? 'demonstrated' : c.status === 'partial' ? 'partial' : 'not_demonstrated';
@@ -386,41 +429,47 @@ export default function LecturerReview() {
             </div>
           )}
 
+          <hr className="c3-divider-strong" />
+
           {/* Feedback */}
           {feedback.overall_feedback && (
-            <div className="c3-card c3-mb-6">
-              <div className="c3-section-title"><span className="c3-section-dot" />AI-Generated Feedback</div>
-              {feedback.overall_feedback.overall_strengths?.length > 0 && (
-                <div className="c3-mb-4">
-                  <div className="c3-label">Strengths</div>
-                  <ul style={{ margin: 0, paddingLeft: 18, color: 'var(--c3-muted)', lineHeight: 1.8 }}>
-                    {feedback.overall_feedback.overall_strengths.map((s, i) => <li key={i}>{s}</li>)}
-                  </ul>
-                </div>
-              )}
-              {feedback.overall_feedback.overall_missing_concepts?.length > 0 && (
-                <div className="c3-mb-4">
-                  <div className="c3-label">Missing Concepts</div>
-                  <ul style={{ margin: 0, paddingLeft: 18, color: 'var(--c3-muted)', lineHeight: 1.8 }}>
-                    {feedback.overall_feedback.overall_missing_concepts.map((c, i) => <li key={i}>{c}</li>)}
-                  </ul>
-                </div>
-              )}
-              {feedback.overall_feedback.overall_improvement_suggestions?.length > 0 && (
-                <div>
-                  <div className="c3-label">Improvement Suggestions</div>
-                  <ul style={{ margin: 0, paddingLeft: 18, color: 'var(--c3-muted)', lineHeight: 1.8 }}>
-                    {feedback.overall_feedback.overall_improvement_suggestions.map((s, i) => <li key={i}>{s}</li>)}
-                  </ul>
-                </div>
-              )}
+            <div className="c3-flat-section">
+              <div className="c3-section-title large"><span className="c3-section-dot" />AI-Generated Feedback</div>
+              <div className="c3-bento">
+                {feedback.overall_feedback.overall_strengths?.length > 0 && (
+                  <div className="c3-col-6">
+                    <div className="c3-label" style={{ color: 'var(--c3-success)' }}>Strengths</div>
+                    <ul style={{ margin: 0, paddingLeft: 18, color: 'var(--c3-muted)', lineHeight: 1.8 }}>
+                      {feedback.overall_feedback.overall_strengths.map((s, i) => <li key={i}>{s}</li>)}
+                    </ul>
+                  </div>
+                )}
+                {feedback.overall_feedback.overall_missing_concepts?.length > 0 && (
+                  <div className="c3-col-6">
+                    <div className="c3-label" style={{ color: 'var(--c3-warning)' }}>Missing Concepts</div>
+                    <ul style={{ margin: 0, paddingLeft: 18, color: 'var(--c3-muted)', lineHeight: 1.8 }}>
+                      {feedback.overall_feedback.overall_missing_concepts.map((c, i) => <li key={i}>{c}</li>)}
+                    </ul>
+                  </div>
+                )}
+                {feedback.overall_feedback.overall_improvement_suggestions?.length > 0 && (
+                  <div className="c3-col-12 c3-mt-4">
+                    <div className="c3-label" style={{ color: 'var(--c3-primary)' }}>Improvement Suggestions</div>
+                    <ul style={{ margin: 0, paddingLeft: 18, color: 'var(--c3-muted)', lineHeight: 1.8 }}>
+                      {feedback.overall_feedback.overall_improvement_suggestions.map((s, i) => <li key={i}>{s}</li>)}
+                    </ul>
+                  </div>
+                )}
+              </div>
             </div>
           )}
 
+          <hr className="c3-divider-strong" />
+
           {/* Mind Map */}
-          <div className="c3-card c3-mb-6">
+          <div className="c3-flat-section">
             <div className="c3-between c3-mb-4">
-              <div className="c3-section-title" style={{ margin: 0 }}>
+              <div className="c3-section-title large" style={{ margin: 0 }}>
                 <span className="c3-section-dot" />Concept Mind Map
               </div>
               {mindmap.title && <span className="c3-text-muted">{mindmap.title}</span>}

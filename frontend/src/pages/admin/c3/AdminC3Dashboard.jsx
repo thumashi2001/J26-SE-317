@@ -2,29 +2,28 @@ import { useState, useEffect } from 'react';
 import { getAdminStats } from '../../../services/c3Api.js';
 import '../../c3/C3.css';
 
+import { useOutletContext } from 'react-router-dom';
+
 export default function AdminC3Dashboard() {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { setPageTitle } = useOutletContext();
 
   useEffect(() => {
+    setPageTitle('C3 Administration');
     setLoading(true);
     getAdminStats()
       .then(res => setStats(res.counts))
       .catch(err => setError(err.message || 'Failed to load stats'))
       .finally(() => setLoading(false));
-  }, []);
+  }, [setPageTitle]);
 
   const total = stats ? (stats.processing || 0) + (stats.awaiting_review || 0) + (stats.finalized || 0) : 0;
 
   return (
     <div className="c3-page c3-page-dark">
-      <div className="c3-header-row">
-        <div>
-          <h1 className="c3-page-title">C3 — Administration</h1>
-          <p className="c3-page-subtitle">Platform health and assessment throughput.</p>
-        </div>
-      </div>
+      {/* Page Title is now managed by the global Top Nav */}
 
       {loading ? (
         <div className="c3-bento">
@@ -45,28 +44,28 @@ export default function AdminC3Dashboard() {
         <div className="c3-bento">
           <div className="c3-col-3">
             <div className="c3-card-metric">
-              <div className="c3-metric-value" style={{ color: '#60a5fa' }}>{total}</div>
+              <div className="c3-metric-value" style={{ color: 'var(--c3-primary)' }}>{total}</div>
               <div className="c3-metric-label">Total Submissions</div>
               <div className="c3-metric-sub">Platform-wide</div>
             </div>
           </div>
           <div className="c3-col-3">
             <div className="c3-card-metric">
-              <div className="c3-metric-value" style={{ color: '#fbbf24' }}>{stats.awaiting_review || 0}</div>
+              <div className="c3-metric-value" style={{ color: 'var(--c3-warning)' }}>{stats.awaiting_review || 0}</div>
               <div className="c3-metric-label">Pending Review</div>
               <div className="c3-metric-sub">Awaiting lecturer action</div>
             </div>
           </div>
           <div className="c3-col-3">
             <div className="c3-card-metric">
-              <div className="c3-metric-value" style={{ color: '#34d399' }}>{stats.finalized || 0}</div>
+              <div className="c3-metric-value" style={{ color: 'var(--c3-success)' }}>{stats.finalized || 0}</div>
               <div className="c3-metric-label">Finalized</div>
               <div className="c3-metric-sub">Fully completed</div>
             </div>
           </div>
           <div className="c3-col-3">
             <div className="c3-card-metric">
-              <div className="c3-metric-value" style={{ color: '#a78bfa' }}>{stats.processing || 0}</div>
+              <div className="c3-metric-value" style={{ color: 'var(--c3-violet)' }}>{stats.processing || 0}</div>
               <div className="c3-metric-label">Processing</div>
               <div className="c3-metric-sub">In AI Pipeline</div>
             </div>
