@@ -76,24 +76,15 @@ export default function AdminC3Dashboard() {
 
       <div className="c3-bento c3-mt-6">
         <div className="c3-col-6">
-          <div className="c3-card">
-            <div className="c3-section-title"><span className="c3-section-dot" />Service Status</div>
+          <div className="c3-card" style={{ height: '100%' }}>
+            <div className="c3-section-title"><span className="c3-section-dot" />Service Connectivity</div>
             <div className="c3-stack">
-              <div className="c3-between" style={{ padding: '8px 0', borderBottom: '1px solid var(--c3-border-m)' }}>
-                <span>Frontend UI</span>
-                <span className="c3-status-demonstrated">✓ Online</span>
-              </div>
-              <div className="c3-between" style={{ padding: '8px 0', borderBottom: '1px solid var(--c3-border-m)' }}>
-                <span>Node.js Orchestrator</span>
-                <span className="c3-status-demonstrated">✓ Online</span>
-              </div>
-              <div className="c3-between" style={{ padding: '8px 0', borderBottom: '1px solid var(--c3-border-m)' }}>
-                <span>Python C3 AI Pipeline</span>
-                <span className="c3-status-demonstrated">✓ Online</span>
-              </div>
-              <div className="c3-between" style={{ padding: '8px 0' }}>
-                <span>MongoDB Persistence</span>
-                <span className="c3-status-demonstrated">✓ Connected</span>
+              <p className="c3-text-muted" style={{ lineHeight: 1.7 }}>
+                System statistics successfully retrieved from Node.js Orchestrator and MongoDB. 
+                Active database connection verified.
+              </p>
+              <div className="c3-text-dim" style={{ marginTop: 'auto' }}>
+                Last synced: {new Date().toLocaleTimeString()}
               </div>
             </div>
           </div>

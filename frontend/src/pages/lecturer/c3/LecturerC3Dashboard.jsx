@@ -172,12 +172,16 @@ export default function LecturerC3Dashboard() {
                       <td style={{ fontFamily: 'monospace', fontWeight: 600, color: '#fff' }}>
                         {sub.student_id}
                       </td>
-                      <td className="c3-text-muted" style={{ maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        {sub.assessment_id}
+                      <td className="c3-text-muted" style={{ maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={sub.assessment_title || sub.assessment_id}>
+                        {sub.assessment_title || sub.assessment_id}
                       </td>
                       <td className="c3-text-dim">{date}</td>
                       <td>
-                        <span style={{ fontWeight: 600, color: '#fff' }}>—</span>
+                        {sub.ai_mark !== null && sub.ai_mark !== undefined ? (
+                          <span style={{ fontWeight: 600, color: '#fff' }}>{sub.ai_mark}</span>
+                        ) : (
+                          <span style={{ fontWeight: 600, color: '#94a3b8' }}>—</span>
+                        )}
                       </td>
                       <td>
                         <span className={`c3-badge ${badge.cls}`}>{badge.dot} {badge.label}</span>

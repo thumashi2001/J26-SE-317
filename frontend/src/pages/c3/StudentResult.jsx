@@ -135,14 +135,14 @@ export default function StudentResult() {
   const { id: submissionId } = useParams();
   const navigate = useNavigate();
 
-  const [result, setResult] = useState(null);
+  const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     setLoading(true);
     getResult(submissionId)
-      .then((res) => setResult(res.result))
+      .then((res) => setData(res))
       .catch((err) => setError(err.message || 'Failed to load result'))
       .finally(() => setLoading(false));
   }, [submissionId]);
@@ -170,6 +170,34 @@ export default function StudentResult() {
       <div className="c3-page c3-page-dark">
         <div className="c3-alert c3-alert-error">{error}</div>
         <button className="c3-btn c3-btn-ghost" onClick={() => navigate('/c3')}>← Back</button>
+      </div>
+    );
+  }
+
+  const { submission, result } = data || {};
+
+  if (submission?.status === 'failed') {
+    return (
+      <div className="c3-page c3-page-dark">
+        <div className="c3-header-row c3-mb-6">
+          <div>
+            <button className="c3-btn c3-btn-ghost c3-btn-sm c3-mb-4" onClick={() => navigate('/c3')}>
+              ← My Assessments
+            </button>
+            <h1 className="c3-page-title">Assessment Result</h1>
+          </div>
+          <span className="c3-badge c3-badge-failed">✗ AI Processing Failed</span>
+        </div>
+        <div className="c3-alert c3-alert-error">
+          <h2 style={{ fontSize: 18, marginTop: 0 }}>Processing Failed</h2>
+          <p style={{ margin: 0 }}>The AI processing pipeline failed for this submission, therefore no results were generated. Please try submitting again later.</p>
+        </div>
+        <div className="c3-card c3-mt-6">
+          <div className="c3-section-title"><span className="c3-section-dot" />Your Answer</div>
+          <div className="c3-answer-display">
+            {submission.student_answer}
+          </div>
+        </div>
       </div>
     );
   }

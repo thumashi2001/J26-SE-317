@@ -128,9 +128,12 @@ export const getMySubmission = handle(async (req) => {
 export const getMyResult = handle(async (req) => {
   const { submissionId } = req.params;
   // Verify the submission belongs to this student
-  await submissionSvc.getSubmission(submissionId, req.user.sub);
-  const result = await submissionSvc.getResultBySubmissionId(submissionId, req.user.sub);
-  return { result };
+  const submission = await submissionSvc.getSubmission(submissionId, req.user.sub);
+  let result = null;
+  try {
+    result = await submissionSvc.getResultBySubmissionId(submissionId, req.user.sub);
+  } catch (e) {}
+  return { submission, result };
 });
 
 // ─── STUDENT: List own submissions ────────────────────────────────────────────
@@ -146,10 +149,31 @@ export const lecturerListSubmissions = handle(async (req) => {
   const filters = {};
   if (req.query.status) filters.status = req.query.status;
   if (req.query.assessment_id) filters.assessment_id = req.query.assessment_id;
-  const [submissions, counts] = await Promise.all([
+  const [submissionsRaw, counts] = await Promise.all([
     submissionSvc.listLecturerSubmissions(filters),
     submissionSvc.countSubmissionsByStatus(),
   ]);
+
+  // Map assessment titles and ai_marks
+  const submissions = await Promise.all(submissionsRaw.map(async (sub) => {
+    let title = sub.assessment_id;
+    try {
+      const a = await assessmentSvc.getAssessment(sub.assessment_id);
+      if (a) title = a.title;
+    } catch (e) {}
+
+    let aiMark = null;
+    if (sub.status === 'awaiting_review' || sub.status === 'finalized') {
+      try {
+        const r = await submissionSvc.getResultBySubmissionId(sub._id);
+        if (r && r.ai_result?.marking?.total_awarded_marks !== undefined) {
+          aiMark = r.ai_result.marking.total_awarded_marks;
+        }
+      } catch (e) {}
+    }
+    return { ...sub, assessment_title: title, ai_mark: aiMark };
+  }));
+
   return { submissions, counts };
 });
 

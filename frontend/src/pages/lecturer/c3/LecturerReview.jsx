@@ -249,6 +249,42 @@ export default function LecturerReview() {
   const isAlreadyFinalized = finalized || result?.status === 'finalized';
   const conceptMatches = analysis.concept_matches || [];
 
+  if (submission.status === 'failed') {
+    return (
+      <div className="c3-page c3-page-dark">
+        <div className="c3-header-row c3-mb-6">
+          <div>
+            <button className="c3-btn c3-btn-ghost c3-btn-sm c3-mb-4" onClick={() => navigate('/lecturer/c3')}>
+              ← Submission Queue
+            </button>
+            <h1 className="c3-page-title">Assessment Review</h1>
+            <div className="c3-gap-3 c3-mt-4">
+              <span className="c3-text-muted">Student:</span>
+              <code style={{ color: '#93c5fd', fontWeight: 600 }}>{submission.student_id}</code>
+              {assessment && (
+                <>
+                  <span className="c3-text-dim">|</span>
+                  <span className="c3-text-muted">{assessment.title}</span>
+                </>
+              )}
+            </div>
+          </div>
+          <span className="c3-badge c3-badge-failed">✗ AI Processing Failed</span>
+        </div>
+        <div className="c3-alert c3-alert-error">
+          <h2 style={{ fontSize: 18, marginTop: 0 }}>Cannot Review Submission</h2>
+          <p style={{ margin: 0 }}>The AI processing pipeline failed for this submission, therefore no results were generated.</p>
+        </div>
+        <div className="c3-card c3-mt-6">
+          <div className="c3-section-title"><span className="c3-section-dot" />Student Answer</div>
+          <div className="c3-answer-display">
+            {submission.student_answer}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="c3-page c3-page-dark">
       {/* ── Header */}
