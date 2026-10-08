@@ -1,8 +1,9 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
-import { getTwin, getAlerts, recordEvent } from '../../services/c1Api.js';
+import { getTwin, getAlerts, getPracticeTopics } from '../../services/c1Api.js';
 import { prettyTopic, scoreBand } from '../../utils/topics.js';
+import './practice.css';
 
 function Ring({ value }) {
   const r = 52;
@@ -30,19 +31,20 @@ export default function DashboardPage() {
   const { user } = useAuth();
   const [twin, setTwin] = useState(null);
   const [alerts, setAlerts] = useState([]);
+  const [practicable, setPracticable] = useState([]);
   const [error, setError] = useState('');
-  const [practice, setPractice] = useState({ topic: '', correct: 'true', hint: false });
-  const [last, setLast] = useState(null);
-  const [busy, setBusy] = useState(false);
 
   const load = useCallback(async () => {
     try {
-      const [t, a] = await Promise.all([getTwin(user.student_id), getAlerts(user.student_id)]);
+      const [t, a, pt] = await Promise.all([
+        getTwin(user.student_id),
+        getAlerts(user.student_id),
+        getPracticeTopics().catch(() => ({ topics: [] })), // no practice list is not a reason to hide the page
+      ]);
       setTwin(t);
       setAlerts(a.alerts);
+      setPracticable(pt.topics);
       setError('');
-      const topics = Object.keys(t.mastery || {});
-      setPractice((p) => (p.topic || !topics.length ? p : { ...p, topic: topics[0] }));
     } catch (err) {
       setError(err.message);
     }
@@ -76,27 +78,9 @@ export default function DashboardPage() {
   const average = Math.round(topics.reduce((s, [, m]) => s + m.score, 0) / (topics.length || 1));
   const weak = topics.filter(([, m]) => m.score < 30).length;
   const risk = twin.riskLevel;
-
-  const submitPractice = async (e) => {
-    e.preventDefault();
-    setBusy(true);
-    setError('');
-    try {
-      const res = await recordEvent({
-        studentId: user.student_id,
-        topic: practice.topic,
-        correct: practice.correct === 'true',
-        hintUsed: practice.hint,
-        timeSec: 40,
-      });
-      setLast(res);
-      await load();
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setBusy(false);
-    }
-  };
+  const canPractise = (t) => practicable.includes(t);
+  // lowest score among the topics that have practice questions
+  const weakest = topics.filter(([t]) => canPractise(t)).sort((x, y) => x[1].score - y[1].score)[0];
 
   return (
     <div>
@@ -114,75 +98,59 @@ export default function DashboardPage() {
           <span className={`badge risk-${(risk || 'none').toLowerCase()}`}>
             {risk ? `${risk} risk of falling behind` : 'Risk not assessed yet'}
           </span>
+          {weakest && (
+            <div className="next-up">
+              <Link className="btn" to={`/c1/practice/${weakest[0]}`}>
+                Practise your weakest topic
+              </Link>
+              <span className="muted small">
+                {prettyTopic(weakest[0])} is at {Math.round(weakest[1].score)}%
+              </span>
+            </div>
+          )}
         </div>
       </section>
 
       <h2>Topics</h2>
-      <p className="muted small">Select a topic to see how its score changed over time.</p>
+      <p className="muted small">Select a topic to see how its score changed over time, or press Practise to answer questions on it.</p>
       <div className="heat">
         {topics.map(([topic, m]) => (
-          <Link key={topic} to={`/c1/topic/${topic}`} className={`topic link ${scoreBand(m.score)}`}>
-            <div className="topic-name">{prettyTopic(topic)}</div>
-            <div className="topic-score">{Math.round(m.score)}%</div>
-            <div className="bar">
-              <span style={{ width: `${Math.max(3, m.score)}%` }} />
-            </div>
-            <div className="muted small">
-              {m.practice_sessions ?? 0} {m.practice_sessions === 1 ? 'practice session' : 'practice sessions'}
-            </div>
-          </Link>
+          <div key={topic} className="topic-cell">
+            <Link to={`/c1/topic/${topic}`} className={`topic link ${scoreBand(m.score)}`}>
+              <div className="topic-name">{prettyTopic(topic)}</div>
+              <div className="topic-score">{Math.round(m.score)}%</div>
+              <div className="bar">
+                <span style={{ width: `${Math.max(3, m.score)}%` }} />
+              </div>
+              <div className="muted small">
+                {m.practice_sessions ?? 0} {m.practice_sessions === 1 ? 'practice session' : 'practice sessions'}
+              </div>
+            </Link>
+            {canPractise(topic) && (
+              <Link className="btn secondary practise-btn" to={`/c1/practice/${topic}`} aria-label={`Practise ${prettyTopic(topic)}`}>
+                Practise
+              </Link>
+            )}
+          </div>
         ))}
       </div>
 
-      <div className="two-col">
-        <section>
-          <h2>Alerts</h2>
-          {alerts.length === 0 ? (
-            <p className="muted">Nothing needs your attention right now.</p>
-          ) : (
-            <ul className="alerts">
-              {alerts.map((a, i) => (
-                <li key={i} className={`alert ${a.severity === 'High' ? 'high' : 'medium'}`}>
-                  <strong>{a.severity}</strong>
-                  <span>{a.topic ? a.message.replace(a.topic, prettyTopic(a.topic)) : a.message}</span>
-                </li>
-              ))}
-            </ul>
-          )}
-        </section>
+      <section>
+        <h2>Alerts</h2>
+        {alerts.length === 0 ? (
+          <p className="muted">Nothing needs your attention right now.</p>
+        ) : (
+          <ul className="alerts">
+            {alerts.map((a, i) => (
+              <li key={i} className={`alert ${a.severity === 'High' ? 'high' : 'medium'}`}>
+                <strong>{a.severity}</strong>
+                <span>{a.topic ? a.message.replace(a.topic, prettyTopic(a.topic)) : a.message}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
 
-        <section>
-          <h2>Log a practice answer</h2>
-          <form className="panel form-block compact" onSubmit={submitPractice}>
-            <label htmlFor="topic">Topic</label>
-            <select id="topic" value={practice.topic} onChange={(e) => setPractice({ ...practice, topic: e.target.value })}>
-              {topics.map(([t]) => (
-                <option key={t} value={t}>
-                  {prettyTopic(t)}
-                </option>
-              ))}
-            </select>
-            <label htmlFor="result">Result</label>
-            <select id="result" value={practice.correct} onChange={(e) => setPractice({ ...practice, correct: e.target.value })}>
-              <option value="true">Correct</option>
-              <option value="false">Wrong</option>
-            </select>
-            <label className="check">
-              <input type="checkbox" checked={practice.hint} onChange={(e) => setPractice({ ...practice, hint: e.target.checked })} />
-              I used a hint
-            </label>
-            {error && <p className="error" role="alert">{error}</p>}
-            <button className="btn" disabled={busy} type="submit">
-              {busy ? 'Saving...' : 'Save answer'}
-            </button>
-          </form>
-          {last && (
-            <p className="muted small">
-              {prettyTopic(last.topic)} was {last.scoreBefore}%, fell to {last.afterForgetting}% after forgetting, and is now {last.scoreAfter}%.
-            </p>
-          )}
-        </section>
-      </div>
     </div>
   );
 }
