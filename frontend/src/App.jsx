@@ -10,6 +10,7 @@ import ComingSoon from './pages/ComingSoon.jsx';
 import DiagnosticPage from './pages/c1/DiagnosticPage.jsx';
 import DashboardPage from './pages/c1/DashboardPage.jsx';
 import TopicPage from './pages/c1/TopicPage.jsx';
+import PracticePage from './pages/c1/PracticePage.jsx';
 import LecturerHome from './pages/lecturer/LecturerHome.jsx';
 import AdminDashboard from './pages/admin/AdminDashboard.jsx';
 import LecturerApprovals from './pages/admin/LecturerApprovals.jsx';
@@ -39,6 +40,7 @@ export default function App() {
         <Route path="/c1/diagnostic" element={<DiagnosticPage />} />
         <Route path="/c1/dashboard" element={<DashboardPage />} />
         <Route path="/c1/topic/:topic" element={<TopicPage />} />
+        <Route path="/c1/practice/:topic" element={<PracticePage />} />
 
         <Route path="/c2/*" element={<ComingSoon title="Exam Intelligence" owner="Rupasinghe H T N N" />} />
         <Route path="/c3/*" element={<ComingSoon title="Automated Marking" owner="Edirisinghe T P V K" />} />
