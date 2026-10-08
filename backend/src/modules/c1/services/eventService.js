@@ -33,7 +33,8 @@ export async function recordEvent(db, input, aiUrl) {
   entry.answered += 1;
   if (correct) entry.correct += 1;
   entry.last_practiced = when;
-  entry.practice_sessions = (entry.practice_sessions || 0) + 1;
+  // A quiz of several answers counts as one practice session (the quiz sets newSession false after its first answer).
+  if (input.newSession !== false) entry.practice_sessions = (entry.practice_sessions || 0) + 1;
 
   // 2. log the event
   await db.collection('learning_events').insertOne({
@@ -44,6 +45,7 @@ export async function recordEvent(db, input, aiUrl) {
     correct,
     hint_used: hintUsed,
     time_sec: timeSec,
+    ...(input.questionId ? { question_id: input.questionId, session_id: input.sessionId } : {}),
   });
 
   // 3. risk from the whole history (day 1 = the student's first event)
