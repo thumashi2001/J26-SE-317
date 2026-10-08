@@ -5,6 +5,7 @@ import { getHistory } from '../../services/c1Api.js';
 import { prettyTopic, scoreBand } from '../../utils/topics.js';
 import ScoreChart from '../../components/charts/ScoreChart.jsx';
 import WhatIfPanel from '../../components/WhatIfPanel.jsx';
+import './practice.css';
 
 const BAND_TEXT = { weak: 'Weak', fair: 'Fair', strong: 'Strong' };
 
@@ -54,6 +55,11 @@ export default function TopicPage() {
           <div><dt>Last practised</dt><dd>{lastPracticed}</dd></div>
         </dl>
       </section>
+
+      <div className="topic-actions">
+        <Link className="btn" to={`/c1/practice/${topic}`}>Practise this topic</Link>
+        <span className="muted small">7 questions. Each answer updates your score.</span>
+      </div>
 
       <h2>Score history</h2>
       <div className="panel">
