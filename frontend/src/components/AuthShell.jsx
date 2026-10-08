@@ -1,10 +1,14 @@
 // Two-column layout shared by the login and register pages.
 // The left side draws the idea behind the product: memory fades unless you review it.
+import AdaptiveLearnSELogo from './AdaptiveLearnSELogo';
+
 export default function AuthShell({ children }) {
   return (
     <div className="auth">
       <section className="auth-art" aria-hidden="true">
-        <div className="auth-brand">AdaptiveLearnSE</div>
+        <div className="auth-brand">
+          <AdaptiveLearnSELogo variant="dark" />
+        </div>
         <h2>Know what you have forgotten before the exam does.</h2>
         <svg viewBox="0 0 420 220" className="curve" role="img">
           <line x1="10" y1="200" x2="410" y2="200" className="axis" />
