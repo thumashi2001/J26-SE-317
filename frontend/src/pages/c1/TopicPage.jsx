@@ -77,7 +77,7 @@ export default function TopicPage() {
           <h2 id="why-title">Why this score?</h2>
           {info.scoreWhy && <p>{info.scoreWhy}</p>}
           <p>
-            <span className={`tag conf-${info.confidenceLabel.toLowerCase()}`}>Confidence: {info.confidenceLabel}</span>{' '}
+            <span className={`tag conf-${info.confidenceLabel.toLowerCase()}`}>Score reliability: {info.confidenceLabel}</span>{' '}
             {info.confidenceWhy}
           </p>
         </section>
