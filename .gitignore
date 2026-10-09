@@ -47,6 +47,8 @@ checkpoints/
 **/datasets/samples/*
 **/experiments/results/*
 !**/.gitkeep
+# C2 authentic examination papers - keep local only
+ai-services/c2/datasets/authentic/*.pdf
 
 # IDE files
 .vscode/*
