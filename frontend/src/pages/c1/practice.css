@@ -2,52 +2,52 @@
 .quiz-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; margin: 6px 0 4px; }
 .quiz-head h1 { margin: 0; }
 .quiz-progress { margin: 10px 0 18px; }
-.quiz-progress-bar { height: 8px; border-radius: 8px; background: var(--line, #e3e9ef); overflow: hidden; }
-.quiz-progress-bar span { display: block; height: 100%; background: var(--primary, #087a63); transition: width 0.25s; }
-.quiz-progress-text { font-size: 0.86rem; color: var(--muted, #5a6b7b); margin-top: 6px; }
+.quiz-progress-bar { height: 8px; border-radius: 8px; background: var(--line, var(--track)); overflow: hidden; }
+.quiz-progress-bar span { display: block; height: 100%; background: var(--primary, var(--primary)); transition: width 0.25s; }
+.quiz-progress-text { font-size: 0.86rem; color: var(--muted, var(--muted)); margin-top: 6px; }
 
-.quiz-card { background: #fff; border: 1px solid var(--line, #e3e9ef); border-radius: 14px; padding: 22px; }
-.quiz-kind { display: inline-block; font-size: 0.78rem; font-weight: 600; letter-spacing: 0.03em; color: #0b5f4e; background: #e3f6ef; border-radius: 20px; padding: 3px 12px; margin-bottom: 10px; }
+.quiz-card { background: var(--panel); border: 1px solid var(--line, var(--track)); border-radius: 14px; padding: 22px; }
+.quiz-kind { display: inline-block; font-size: 0.78rem; font-weight: 600; letter-spacing: 0.03em; color: var(--good-ink); background: var(--chip-bg); border-radius: 20px; padding: 3px 12px; margin-bottom: 10px; }
 .quiz-question { font-size: 1.15rem; line-height: 1.5; margin: 0 0 16px; overflow-wrap: anywhere; }
 
 .quiz-options { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
-.quiz-opt { display: grid; grid-template-columns: 34px 1fr auto; align-items: center; gap: 12px; border: 2px solid var(--line, #d5dee6); border-radius: 12px; padding: 12px 14px; cursor: pointer; background: #fff; transition: border-color 0.12s, background 0.12s; }
-.quiz-opt:hover { border-color: #9bb7c8; }
+.quiz-opt { display: grid; grid-template-columns: 34px 1fr auto; align-items: center; gap: 12px; border: 2px solid var(--line, var(--line)); border-radius: 12px; padding: 12px 14px; cursor: pointer; background: var(--panel); transition: border-color 0.12s, background 0.12s; }
+.quiz-opt:hover { border-color: var(--line-hover); }
 .quiz-opt input { position: absolute; opacity: 0; pointer-events: none; }
-.quiz-opt:focus-within { outline: 3px solid #9fd8c8; outline-offset: 1px; }
-.quiz-letter { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; border: 2px solid #b7c6d2; color: #35495a; background: #fff; }
+.quiz-opt:focus-within { outline: 3px solid var(--focus-soft); outline-offset: 1px; }
+.quiz-letter { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; border: 2px solid var(--line-strong); color: var(--text-2); background: var(--panel); }
 .quiz-opt.multi .quiz-letter { border-radius: 8px; }
 .quiz-text { overflow-wrap: anywhere; }
-.quiz-opt.picked { border-color: var(--primary, #087a63); background: #eef9f5; }
-.quiz-opt.picked .quiz-letter { background: var(--primary, #087a63); border-color: var(--primary, #087a63); color: #fff; }
+.quiz-opt.picked { border-color: var(--primary, var(--primary)); background: var(--picked-bg); }
+.quiz-opt.picked .quiz-letter { background: var(--primary, var(--primary)); border-color: var(--primary, var(--primary)); color: var(--panel); }
 .quiz-opt.locked { cursor: default; }
-.quiz-opt.right { border-color: #0a8a6a; background: #eaf8f2; }
-.quiz-opt.right .quiz-letter { background: #0a8a6a; border-color: #0a8a6a; color: #fff; }
-.quiz-opt.wrong { border-color: #c2410c; background: #fdf0e9; }
-.quiz-opt.wrong .quiz-letter { background: #c2410c; border-color: #c2410c; color: #fff; }
+.quiz-opt.right { border-color: var(--good); background: var(--good-bg); }
+.quiz-opt.right .quiz-letter { background: var(--good); border-color: var(--good); color: var(--panel); }
+.quiz-opt.wrong { border-color: var(--bad); background: var(--bad-bg); }
+.quiz-opt.wrong .quiz-letter { background: var(--bad); border-color: var(--bad); color: var(--panel); }
 .quiz-opt.missed { border-style: dashed; }
 .quiz-tag { font-size: 0.78rem; font-weight: 600; white-space: nowrap; }
-.quiz-opt.right .quiz-tag { color: #0b5f4e; }
-.quiz-opt.wrong .quiz-tag { color: #9a3412; }
+.quiz-opt.right .quiz-tag { color: var(--good-ink); }
+.quiz-opt.wrong .quiz-tag { color: var(--bad-ink); }
 
 .quiz-actions { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 18px; }
 .quiz-actions .muted { margin: 0; }
 
-.feedback { margin-top: 18px; border-radius: 12px; border: 1px solid var(--line, #e3e9ef); border-left: 6px solid var(--c); padding: 16px 18px; background: #fbfdfc; }
-.feedback.good { --c: #0a8a6a; }
-.feedback.part { --c: #b7791f; }
-.feedback.bad { --c: #c2410c; }
+.feedback { margin-top: 18px; border-radius: 12px; border: 1px solid var(--line, var(--track)); border-left: 6px solid var(--c); padding: 16px 18px; background: var(--surface-soft); }
+.feedback.good { --c: var(--good); }
+.feedback.part { --c: var(--warn); }
+.feedback.bad { --c: var(--bad); }
 .feedback h3 { margin: 0 0 4px; font-size: 1.05rem; }
 .feedback p { margin: 6px 0; }
-.feedback .fb-label { font-size: 0.8rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted, #5a6b7b); margin: 12px 0 2px; }
-.feedback .fb-tip { background: #f1f6fa; border-radius: 8px; padding: 10px 12px; margin-top: 4px; }
+.feedback .fb-label { font-size: 0.8rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted, var(--muted)); margin: 12px 0 2px; }
+.feedback .fb-tip { background: var(--info-bg); border-radius: 8px; padding: 10px 12px; margin-top: 4px; }
 
 .quiz-summary { text-align: center; padding: 28px 20px; }
 .quiz-big { font-family: var(--font-head, inherit); font-size: 3rem; font-weight: 700; line-height: 1.1; }
 .quiz-change { display: flex; justify-content: center; align-items: center; gap: 14px; flex-wrap: wrap; margin: 16px 0; }
-.quiz-change div { border: 1px solid var(--line, #e3e9ef); border-radius: 12px; padding: 10px 18px; min-width: 110px; }
+.quiz-change div { border: 1px solid var(--line, var(--track)); border-radius: 12px; padding: 10px 18px; min-width: 110px; }
 .quiz-change strong { display: block; font-size: 1.5rem; }
-.quiz-change span.arrow { font-size: 1.4rem; color: var(--muted, #5a6b7b); }
+.quiz-change span.arrow { font-size: 1.4rem; color: var(--muted, var(--muted)); }
 .quiz-summary .quiz-actions { justify-content: center; }
 @media (max-width: 520px) { .quiz-card { padding: 16px; } .quiz-opt { grid-template-columns: 30px 1fr; } .quiz-tag { grid-column: 2; } }
 .quiz-opt { position: relative; }
@@ -59,3 +59,25 @@
 .topic-cell .topic { flex: 1; }
 .practise-btn { width: 100%; text-align: center; padding: 8px 12px; font-size: 0.9rem; }
 .next-up { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 12px; }
+
+/* honesty note and light friction */
+.quiz-note { margin: -6px 0 14px; font-size: 0.86rem; color: var(--muted); }
+.quiz-card { -webkit-user-select: none; user-select: none; }
+.fb-away { margin: 10px 0 0; font-size: 0.88rem; color: var(--bad-ink); }
+
+/* engagement, confidence and the score explanation */
+.tag { display: inline-block; font-size: 0.78rem; font-weight: 700; padding: 2px 10px; border-radius: 20px; border: 1px solid var(--line-strong); background: var(--panel); color: var(--text-2); margin-top: 8px; }
+.tag.conf-high, .tag.eng-high { border-color: var(--good); background: var(--good-bg); color: var(--good-ink); }
+.tag.conf-medium, .tag.eng-steady { border-color: var(--warn); background: var(--panel); color: var(--text); }
+.tag.conf-low, .tag.eng-low { border-color: var(--bad); background: var(--bad-bg); color: var(--bad-ink); }
+.tag.eng-not-started { border-style: dashed; }
+.engage { width: 100%; max-width: 520px; margin-top: 10px; }
+.engage-head { display: flex; align-items: center; gap: 10px; }
+.engage-head .tag { margin-top: 0; }
+.meter { height: 8px; border-radius: 8px; background: var(--track); overflow: hidden; margin: 8px 0 4px; }
+.meter span { display: block; height: 100%; background: var(--primary); }
+.engage p { margin: 4px 0 0; }
+.why-panel h2 { margin-top: 0; }
+.why-panel p { margin: 6px 0; }
+.why-panel .tag { margin-top: 0; }
+.topic .tag { margin-top: 8px; }

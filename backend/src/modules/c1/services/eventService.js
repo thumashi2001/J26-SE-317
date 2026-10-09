@@ -46,6 +46,7 @@ export async function recordEvent(db, input, aiUrl) {
     hint_used: hintUsed,
     time_sec: timeSec,
     ...(input.questionId ? { question_id: input.questionId, session_id: input.sessionId } : {}),
+    ...(input.tabLeaves !== undefined ? { tab_leaves: input.tabLeaves, away_sec: input.awaySec || 0 } : {}),
   });
 
   // 3. risk from the whole history (day 1 = the student's first event)
