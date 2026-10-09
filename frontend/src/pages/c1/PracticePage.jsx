@@ -5,6 +5,10 @@ import { prettyTopic } from '../../utils/topics.js';
 import './practice.css';
 
 const LETTERS = ['A', 'B', 'C', 'D'];
+const QUIZ_SECONDS = 5 * 60; // time for the whole quiz
+const WARN_AFTER = 4 * 60; // the timer turns red after 4 minutes (last minute)
+
+const clock = (sec) => `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, '0')}`;
 
 // ["B"] -> "B", ["A","C"] -> "A and C", ["B","C","D"] -> "B, C and D"
 const joinLetters = (l) => (l.length <= 1 ? l.join('') : `${l.slice(0, -1).join(', ')} and ${l[l.length - 1]}`);
@@ -23,6 +27,17 @@ export default function PracticePage() {
   // Time spent away from this tab during the current question. Used only to judge how reliable the answer is.
   const away = useRef({ start: null, leaves: 0, ms: 0 });
   const answered = useRef(false);
+  const [left, setLeft] = useState(QUIZ_SECONDS);
+  const deadline = useRef(null);
+
+  // Quiz clock: counts down from the moment the questions are shown.
+  useEffect(() => {
+    if (state.status !== 'ready') return undefined;
+    const tick = () => setLeft(Math.max(0, Math.ceil((deadline.current - Date.now()) / 1000)));
+    tick();
+    const id = setInterval(tick, 500);
+    return () => clearInterval(id);
+  }, [state.status, session]);
 
   useEffect(() => {
     const leave = () => {
@@ -65,6 +80,8 @@ export default function PracticePage() {
       const firstOpen = s.questions.findIndex((q) => !q.answered);
       setIndex(firstOpen === -1 ? s.questions.length : firstOpen);
       shownAt.current = Date.now();
+      deadline.current = Date.now() + QUIZ_SECONDS * 1000;
+      setLeft(QUIZ_SECONDS);
       away.current = { start: null, leaves: 0, ms: 0 };
       answered.current = false;
       setState({ status: 'ready' });
@@ -95,9 +112,12 @@ export default function PracticePage() {
     );
 
   const total = session.questions.length;
-  const finished = index >= total;
-  const q = finished ? null : session.questions[index];
   const locked = !!feedback;
+  // time is up: the question on screen can still be read if it was just answered, otherwise the quiz ends
+  const timeUp = left <= 0 && !locked;
+  const finished = index >= total || timeUp;
+  const q = finished ? null : session.questions[index];
+  const answeredCount = Math.min(index, total);
 
   const toggle = (i) => {
     if (locked) return;
@@ -153,8 +173,11 @@ export default function PracticePage() {
         {back}
         <div className="quiz-head"><h1>{prettyTopic(topic)}</h1></div>
         <section className="quiz-card quiz-summary" aria-live="polite">
-          <div className="quiz-big">{session.correctCount} of {total}</div>
+          <div className="quiz-big">{session.correctCount} of {answeredCount < total ? answeredCount : total}</div>
           <p className="muted">questions fully correct</p>
+          {answeredCount < total && (
+            <p className="fb-away" role="status">Time is up. You answered {answeredCount} of {total} questions. The rest were not counted. Practise again to carry on with them.</p>
+          )}
           <div className="quiz-change">
             <div><span className="muted small">Topic score before</span><strong>{Math.round(session.scoreStart)}%</strong></div>
             <span className="arrow" aria-hidden="true">&rarr;</span>
@@ -199,6 +222,12 @@ export default function PracticePage() {
           <span style={{ width: `${((index + (locked ? 1 : 0)) / total) * 100}%` }} />
         </div>
         <div className="quiz-progress-text">Question {index + 1} of {total}</div>
+      </div>
+      <div className="quiz-timer-row">
+        <span className={`quiz-timer${QUIZ_SECONDS - left >= WARN_AFTER ? ' warn' : ''}`} role="timer" aria-label="Time left for this quiz">
+          <span aria-hidden="true">{QUIZ_SECONDS - left >= WARN_AFTER ? '\u26A0' : '\u23F1'}</span> {clock(left)}
+        </span>
+        {QUIZ_SECONDS - left >= WARN_AFTER && <span className="quiz-timer-msg" role="status">Less than 1 minute left</span>}
       </div>
       <p className="quiz-note">
         This practice is for you. Answer on your own so your plan is true. We note when you leave this tab, and those answers count a little less.
