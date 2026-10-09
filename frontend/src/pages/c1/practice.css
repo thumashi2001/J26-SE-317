@@ -80,4 +80,16 @@
 .why-panel h2 { margin-top: 0; }
 .why-panel p { margin: 6px 0; }
 .why-panel .tag { margin-top: 0; }
-.topic .tag { margin-top: 8px; }
+.topic .tag { margin-top: 0; }
+/* every card: same height, reliability tag pinned to the same place at the bottom */
+.topic-cell .topic.link { display: flex; flex-direction: column; }
+.topic-foot { margin-top: auto; padding-top: 10px; }
+
+/* quiz timer */
+.quiz-timer { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; font-variant-numeric: tabular-nums; padding: 4px 12px; border-radius: 20px; border: 1px solid var(--line-strong); background: var(--panel); color: var(--text); }
+.quiz-timer.warn { border-color: var(--bad); background: var(--bad-bg); color: var(--bad-ink); }
+.quiz-timer-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 0 0 10px; }
+.quiz-timer-msg { font-size: 0.88rem; color: var(--bad-ink); font-weight: 600; }
+
+.practise-off { display: block; border: 1px dashed var(--line-strong); border-radius: 8px; color: var(--muted); }
+.practise-btn { box-sizing: border-box; height: 40px; display: flex; align-items: center; justify-content: center; }

@@ -135,6 +135,7 @@ export default function DashboardPage() {
 
       <h2>Topics</h2>
       <p className="muted small">Scores show your estimated level now, including forgetting since you last practised. Select a topic to see why, or press Practise.</p>
+      <p className="muted small">Score reliability shows how far you can trust a score, based on how many recent, honest answers we have. It does not show how well you know the topic.</p>
       <div className="heat">
         {topics.map(([topic, m]) => {
           const score = shown(topic, m);
@@ -153,15 +154,19 @@ export default function DashboardPage() {
                 </div>
                 {faded && <div className="muted small">Was {Math.round(m.score)}% when last practised</div>}
                 {i && (
-                  <span className={`tag conf-${i.confidenceLabel.toLowerCase()}`} title={i.confidenceWhy}>
-                    Confidence: {i.confidenceLabel}
-                  </span>
+                  <div className="topic-foot">
+                    <span className={`tag conf-${i.confidenceLabel.toLowerCase()}`} title={i.confidenceWhy}>
+                      Score reliability: {i.confidenceLabel}
+                    </span>
+                  </div>
                 )}
               </Link>
-              {canPractise(topic) && (
+              {canPractise(topic) ? (
                 <Link className="btn secondary practise-btn" to={`/c1/practice/${topic}`} aria-label={`Practise ${prettyTopic(topic)}`}>
                   Practise
                 </Link>
+              ) : (
+                <span className="practise-btn practise-off">No practice questions yet</span>
               )}
             </div>
           );
