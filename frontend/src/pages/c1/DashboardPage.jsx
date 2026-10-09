@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
-import { getTwin, getAlerts, getPracticeTopics } from '../../services/c1Api.js';
+import { getTwin, getAlerts, getPracticeTopics, getInsights } from '../../services/c1Api.js';
 import { prettyTopic, scoreBand } from '../../utils/topics.js';
 import './practice.css';
 
@@ -32,18 +32,21 @@ export default function DashboardPage() {
   const [twin, setTwin] = useState(null);
   const [alerts, setAlerts] = useState([]);
   const [practicable, setPracticable] = useState([]);
+  const [insights, setInsights] = useState(null);
   const [error, setError] = useState('');
 
   const load = useCallback(async () => {
     try {
-      const [t, a, pt] = await Promise.all([
+      const [t, a, pt, ins] = await Promise.all([
         getTwin(user.student_id),
         getAlerts(user.student_id),
         getPracticeTopics().catch(() => ({ topics: [] })), // no practice list is not a reason to hide the page
+        getInsights(user.student_id).catch(() => null), // the page still works without the extra insights
       ]);
       setTwin(t);
       setAlerts(a.alerts);
       setPracticable(pt.topics);
+      setInsights(ins);
       setError('');
     } catch (err) {
       setError(err.message);
@@ -75,12 +78,19 @@ export default function DashboardPage() {
     );
 
   const topics = Object.entries(twin.mastery);
-  const average = Math.round(topics.reduce((s, [, m]) => s + m.score, 0) / (topics.length || 1));
-  const weak = topics.filter(([, m]) => m.score < 30).length;
+  // Use the estimated score now (forgetting applied) when the AI service gave one, else the stored score.
+  const info = (t) => (insights && insights.topics ? insights.topics[t] : null);
+  const shown = (t, m) => {
+    const i = info(t);
+    return i && i.estimatedNow !== null && i.estimatedNow !== undefined ? i.estimatedNow : m.score;
+  };
+  const average = Math.round(topics.reduce((sum, [t, m]) => sum + shown(t, m), 0) / (topics.length || 1));
+  const weak = topics.filter(([t, m]) => shown(t, m) < 30).length;
+  const eng = insights ? insights.engagement : null;
   const risk = twin.riskLevel;
   const canPractise = (t) => practicable.includes(t);
   // lowest score among the topics that have practice questions
-  const weakest = topics.filter(([t]) => canPractise(t)).sort((x, y) => x[1].score - y[1].score)[0];
+  const weakest = topics.filter(([t]) => canPractise(t)).sort((x, y) => shown(x[0], x[1]) - shown(y[0], y[1]))[0];
 
   return (
     <div>
@@ -98,13 +108,25 @@ export default function DashboardPage() {
           <span className={`badge risk-${(risk || 'none').toLowerCase()}`}>
             {risk ? `${risk} risk of falling behind` : 'Risk not assessed yet'}
           </span>
+          {eng && (
+            <div className="engage">
+              <div className="engage-head">
+                <strong>Engagement</strong>
+                <span className={`tag eng-${eng.label.toLowerCase().replace(' ', '-')}`}>{eng.label}</span>
+              </div>
+              <div className="meter" role="img" aria-label={`Engagement index ${eng.index} out of 100`}>
+                <span style={{ width: `${Math.max(2, eng.index)}%` }} />
+              </div>
+              <p className="muted small">{eng.why}</p>
+            </div>
+          )}
           {weakest && (
             <div className="next-up">
               <Link className="btn" to={`/c1/practice/${weakest[0]}`}>
                 Practise your weakest topic
               </Link>
               <span className="muted small">
-                {prettyTopic(weakest[0])} is at {Math.round(weakest[1].score)}%
+                {prettyTopic(weakest[0])} is at about {Math.round(shown(weakest[0], weakest[1]))}%
               </span>
             </div>
           )}
@@ -112,27 +134,38 @@ export default function DashboardPage() {
       </section>
 
       <h2>Topics</h2>
-      <p className="muted small">Select a topic to see how its score changed over time, or press Practise to answer questions on it.</p>
+      <p className="muted small">Scores show your estimated level now, including forgetting since you last practised. Select a topic to see why, or press Practise.</p>
       <div className="heat">
-        {topics.map(([topic, m]) => (
-          <div key={topic} className="topic-cell">
-            <Link to={`/c1/topic/${topic}`} className={`topic link ${scoreBand(m.score)}`}>
-              <div className="topic-name">{prettyTopic(topic)}</div>
-              <div className="topic-score">{Math.round(m.score)}%</div>
-              <div className="bar">
-                <span style={{ width: `${Math.max(3, m.score)}%` }} />
-              </div>
-              <div className="muted small">
-                {m.practice_sessions ?? 0} {m.practice_sessions === 1 ? 'practice session' : 'practice sessions'}
-              </div>
-            </Link>
-            {canPractise(topic) && (
-              <Link className="btn secondary practise-btn" to={`/c1/practice/${topic}`} aria-label={`Practise ${prettyTopic(topic)}`}>
-                Practise
+        {topics.map(([topic, m]) => {
+          const score = shown(topic, m);
+          const i = info(topic);
+          const faded = i && i.estimatedNow !== null && m.score - score >= 1;
+          return (
+            <div key={topic} className="topic-cell">
+              <Link to={`/c1/topic/${topic}`} className={`topic link ${scoreBand(score)}`}>
+                <div className="topic-name">{prettyTopic(topic)}</div>
+                <div className="topic-score">{Math.round(score)}%</div>
+                <div className="bar">
+                  <span style={{ width: `${Math.max(3, score)}%` }} />
+                </div>
+                <div className="muted small">
+                  {m.practice_sessions ?? 0} {m.practice_sessions === 1 ? 'practice session' : 'practice sessions'}
+                </div>
+                {faded && <div className="muted small">Was {Math.round(m.score)}% when last practised</div>}
+                {i && (
+                  <span className={`tag conf-${i.confidenceLabel.toLowerCase()}`} title={i.confidenceWhy}>
+                    Confidence: {i.confidenceLabel}
+                  </span>
+                )}
               </Link>
-            )}
-          </div>
-        ))}
+              {canPractise(topic) && (
+                <Link className="btn secondary practise-btn" to={`/c1/practice/${topic}`} aria-label={`Practise ${prettyTopic(topic)}`}>
+                  Practise
+                </Link>
+              )}
+            </div>
+          );
+        })}
       </div>
 
       <section>

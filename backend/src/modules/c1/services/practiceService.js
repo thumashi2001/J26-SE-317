@@ -191,6 +191,9 @@ export async function answerQuestion(db, studentId, input, aiUrl) {
   const correctDisplay = item.order.map((orig, d) => (q.correct.includes(orig) ? d : -1)).filter((d) => d >= 0);
 
   const timeSec = Math.min(600, Math.max(1, Math.round(Number(input.timeSec) || 30)));
+  // How many times the student left the quiz tab for a while during this question, and for how long.
+  const tabLeaves = Math.min(50, Math.max(0, Math.round(Number(input.tabLeaves) || 0)));
+  const awaySec = Math.min(3600, Math.max(0, Math.round(Number(input.awaySec) || 0)));
   const result = await recordEvent(
     db,
     {
@@ -199,6 +202,8 @@ export async function answerQuestion(db, studentId, input, aiUrl) {
       correct: isCorrect,
       hintUsed: false,
       timeSec,
+      tabLeaves,
+      awaySec,
       questionId: qid,
       sessionId,
       newSession: !session.items.some((i) => i.answered), // only the first answer starts a practice session
@@ -211,6 +216,8 @@ export async function answerQuestion(db, studentId, input, aiUrl) {
   item.correct = isCorrect;
   item.found = found;
   item.time_sec = timeSec;
+  item.tab_leaves = tabLeaves;
+  item.away_sec = awaySec;
   session.score_now = result.scoreAfter;
   if (session.items.every((i) => i.answered)) {
     session.completed = true;
@@ -229,6 +236,7 @@ export async function answerQuestion(db, studentId, input, aiUrl) {
     tip: TIPS[q.tip] || TIPS.concept,
     afterForgetting: result.afterForgetting,
     scoreAfter: result.scoreAfter,
+    tabLeaves,
     session: {
       answered: session.items.filter((i) => i.answered).length,
       total: session.items.length,

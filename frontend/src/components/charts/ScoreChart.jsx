@@ -9,10 +9,10 @@ import { useState } from 'react';
 const W = 640;
 const H = 300;
 const PAD = { top: 20, right: 28, bottom: 44, left: 44 };
-const INK = '#13222f';
-const MUTED = '#5a6b7b';
-const GRID = '#e3e9ef';
-const LINE = '#087a63';
+const INK = 'var(--text)';
+const MUTED = 'var(--muted)';
+const GRID = 'var(--track)';
+const LINE = 'var(--primary)';
 const WEAK = 30;
 
 const fmtDate = (t) =>
@@ -84,7 +84,7 @@ export default function ScoreChart({ points }) {
               <text x={PAD.left - 8} y={y(t) + 4} textAnchor="end" fontSize="12" fill={MUTED}>{t}%</text>
             </g>
           ))}
-          <line x1={PAD.left} x2={W - PAD.right} y1={y(WEAK)} y2={y(WEAK)} stroke="#d6453d" strokeWidth="1" strokeDasharray="2 4" />
+          <line x1={PAD.left} x2={W - PAD.right} y1={y(WEAK)} y2={y(WEAK)} stroke="var(--weak)" strokeWidth="1" strokeDasharray="2 4" />
           <text x={PAD.left + 6} y={y(WEAK) + 15} textAnchor="start" fontSize="12" fill={MUTED}>Weak below 30%</text>
 
           {labelIdx.map((i) => (
@@ -100,7 +100,7 @@ export default function ScoreChart({ points }) {
 
           {points.map((p, i) => (
             <g key={p.version}>
-              <circle cx={x(i)} cy={y(p.score)} r={active === i ? 7 : 5} fill={LINE} stroke="#fff" strokeWidth="2" />
+              <circle cx={x(i)} cy={y(p.score)} r={active === i ? 7 : 5} fill={LINE} stroke="var(--panel)" strokeWidth="2" />
               <circle
                 cx={x(i)}
                 cy={y(p.score)}

@@ -8,11 +8,11 @@ import { useState } from 'react';
 const W = 640;
 const H = 320;
 const PAD = { top: 22, right: 76, bottom: 44, left: 44 };
-const INK = '#13222f';
-const MUTED = '#5a6b7b';
-const GRID = '#e3e9ef';
-const PLAN = '#0a8a6a';
-const NOTHING = '#c2410c';
+const INK = 'var(--text)';
+const MUTED = 'var(--muted)';
+const GRID = 'var(--track)';
+const PLAN = 'var(--good)';
+const NOTHING = 'var(--bad)';
 const WEAK = 30;
 
 const dateOf = (start, offset) => {
@@ -75,8 +75,8 @@ export default function ForecastChart({ data, start, planLabel }) {
               <text x={PAD.left - 8} y={y(t) + 4} textAnchor="end" fontSize="12" fill={MUTED}>{t}%</text>
             </g>
           ))}
-          <line x1={PAD.left} x2={W - PAD.right} y1={y(WEAK)} y2={y(WEAK)} stroke="#d6453d" strokeWidth="1" strokeDasharray="2 4" />
-          <text x={PAD.left + 6} y={y(WEAK) + 15} fontSize="12" fill={MUTED} stroke="#fff" strokeWidth="3" paintOrder="stroke">Weak below 30%</text>
+          <line x1={PAD.left} x2={W - PAD.right} y1={y(WEAK)} y2={y(WEAK)} stroke="var(--weak)" strokeWidth="1" strokeDasharray="2 4" />
+          <text x={PAD.left + 6} y={y(WEAK) + 15} fontSize="12" fill={MUTED} stroke="var(--panel)" strokeWidth="3" paintOrder="stroke">Weak below 30%</text>
 
           {labelIdx.map((i) => (
             <text key={i} x={x(i)} y={H - PAD.bottom + 20} textAnchor={i === 0 ? 'start' : i === n - 1 ? 'end' : 'middle'} fontSize="12" fill={MUTED}>
@@ -90,18 +90,18 @@ export default function ForecastChart({ data, start, planLabel }) {
           <path d={line(data.plan.series)} fill="none" stroke={PLAN} strokeWidth="2" />
 
           {data.practiceDays.map((d) => (
-            <circle key={d} cx={x(d)} cy={y(data.plan.series[d])} r="3.5" fill={PLAN} stroke="#fff" strokeWidth="1.5" />
+            <circle key={d} cx={x(d)} cy={y(data.plan.series[d])} r="3.5" fill={PLAN} stroke="var(--panel)" strokeWidth="1.5" />
           ))}
 
-          <circle cx={x(n - 1)} cy={y(lastP)} r="5" fill={PLAN} stroke="#fff" strokeWidth="2" />
-          <circle cx={x(n - 1)} cy={y(lastN)} r="5" fill={NOTHING} stroke="#fff" strokeWidth="2" />
+          <circle cx={x(n - 1)} cy={y(lastP)} r="5" fill={PLAN} stroke="var(--panel)" strokeWidth="2" />
+          <circle cx={x(n - 1)} cy={y(lastN)} r="5" fill={NOTHING} stroke="var(--panel)" strokeWidth="2" />
           <text x={x(n - 1) + 10} y={pY + 4} fontSize="13" fontWeight="600" fill={INK}>{lastP}%</text>
           <text x={x(n - 1) + 10} y={nY + 4} fontSize="13" fontWeight="600" fill={INK}>{lastN}%</text>
 
           {active !== null && (
             <>
-              <circle cx={x(active)} cy={y(data.plan.series[active])} r="6" fill={PLAN} stroke="#fff" strokeWidth="2" />
-              <circle cx={x(active)} cy={y(data.nothing.series[active])} r="6" fill={NOTHING} stroke="#fff" strokeWidth="2" />
+              <circle cx={x(active)} cy={y(data.plan.series[active])} r="6" fill={PLAN} stroke="var(--panel)" strokeWidth="2" />
+              <circle cx={x(active)} cy={y(data.nothing.series[active])} r="6" fill={NOTHING} stroke="var(--panel)" strokeWidth="2" />
             </>
           )}
         </svg>

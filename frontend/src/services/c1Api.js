@@ -20,7 +20,10 @@ export const getForecast = (studentId, topic, { days, perWeek }) =>
 
 export const startPractice = (topic) => api('/c1/practice/start', { method: 'POST', body: { topic } });
 
-export const answerPractice = ({ sessionId, questionId, selected, timeSec }) =>
-  api('/c1/practice/answer', { method: 'POST', body: { sessionId, questionId, selected, timeSec } });
+export const answerPractice = ({ sessionId, questionId, selected, timeSec, tabLeaves, awaySec }) =>
+  api('/c1/practice/answer', { method: 'POST', body: { sessionId, questionId, selected, timeSec, tabLeaves, awaySec } });
+
+// Engagement index, confidence per topic and the estimated score now.
+export const getInsights = (studentId) => api(`/c1/insights/${encodeURIComponent(studentId)}`);
 
 export const getPracticeTopics = () => api('/c1/practice/topics');

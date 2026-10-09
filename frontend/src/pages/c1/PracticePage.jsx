@@ -20,6 +20,39 @@ export default function PracticePage() {
   const [error, setError] = useState('');
   const shownAt = useRef(Date.now());
   const startedFor = useRef(null);
+  // Time spent away from this tab during the current question. Used only to judge how reliable the answer is.
+  const away = useRef({ start: null, leaves: 0, ms: 0 });
+  const answered = useRef(false);
+
+  useEffect(() => {
+    const leave = () => {
+      if (!answered.current && away.current.start === null) away.current.start = Date.now();
+    };
+    const back = () => {
+      const a = away.current;
+      if (a.start === null) return;
+      const ms = Date.now() - a.start;
+      a.start = null;
+      if (!answered.current && ms >= 2000) {
+        a.leaves += 1; // short flickers under 2 seconds are ignored
+        a.ms += ms;
+      }
+    };
+    const onVisibility = () => (document.hidden ? leave() : back());
+    document.addEventListener('visibilitychange', onVisibility);
+    window.addEventListener('blur', leave);
+    window.addEventListener('focus', back);
+    return () => {
+      document.removeEventListener('visibilitychange', onVisibility);
+      window.removeEventListener('blur', leave);
+      window.removeEventListener('focus', back);
+    };
+  }, []);
+
+  const resetAway = () => {
+    away.current = { start: null, leaves: 0, ms: 0 };
+    answered.current = false;
+  };
 
   const begin = useCallback(async () => {
     setState({ status: 'loading' });
@@ -32,6 +65,8 @@ export default function PracticePage() {
       const firstOpen = s.questions.findIndex((q) => !q.answered);
       setIndex(firstOpen === -1 ? s.questions.length : firstOpen);
       shownAt.current = Date.now();
+      away.current = { start: null, leaves: 0, ms: 0 };
+      answered.current = false;
       setState({ status: 'ready' });
     } catch (err) {
       setState({ status: 'error', message: err.message });
@@ -75,7 +110,24 @@ export default function PracticePage() {
     setError('');
     try {
       const timeSec = Math.max(1, Math.round((Date.now() - shownAt.current) / 1000));
-      const res = await answerPractice({ sessionId: session.sessionId, questionId: q.id, selected: picked, timeSec });
+      // close an open "away" period, then read the totals for this question
+      if (away.current.start !== null) {
+        const ms = Date.now() - away.current.start;
+        away.current.start = null;
+        if (ms >= 2000) {
+          away.current.leaves += 1;
+          away.current.ms += ms;
+        }
+      }
+      const res = await answerPractice({
+        sessionId: session.sessionId,
+        questionId: q.id,
+        selected: picked,
+        timeSec,
+        tabLeaves: away.current.leaves,
+        awaySec: Math.round(away.current.ms / 1000),
+      });
+      answered.current = true;
       setFeedback(res);
       setSession((s) => ({ ...s, scoreNow: res.session.scoreNow, correctCount: res.session.correctCount }));
     } catch (err) {
@@ -90,6 +142,7 @@ export default function PracticePage() {
     setPicked([]);
     setIndex((i) => i + 1);
     shownAt.current = Date.now();
+    resetAway();
   };
 
   // ---- summary
@@ -147,8 +200,18 @@ export default function PracticePage() {
         </div>
         <div className="quiz-progress-text">Question {index + 1} of {total}</div>
       </div>
+      <p className="quiz-note">
+        This practice is for you. Answer on your own so your plan is true. We note when you leave this tab, and those answers count a little less.
+      </p>
 
-      <section className="quiz-card" aria-labelledby="q-text">
+      <section
+        className="quiz-card"
+        aria-labelledby="q-text"
+        onCopy={(e) => e.preventDefault()}
+        onCut={(e) => e.preventDefault()}
+        onContextMenu={(e) => e.preventDefault()}
+        onDragStart={(e) => e.preventDefault()}
+      >
         <span className="quiz-kind">{q.multi ? 'Select one or more' : 'Select one'}</span>
         <p id="q-text" className="quiz-question">{q.text}</p>
 
@@ -207,6 +270,11 @@ export default function PracticePage() {
             <p>{feedback.explanation}</p>
             <div className="fb-label">How to tackle this type of question</div>
             <p className="fb-tip">{feedback.tip}</p>
+            {feedback.tabLeaves > 0 && (
+              <p className="fb-away">
+                You left this tab {feedback.tabLeaves === 1 ? 'once' : `${feedback.tabLeaves} times`} during this question, so this answer counts a little less toward your confidence score.
+              </p>
+            )}
             <div className="quiz-actions">
               <button type="button" className="btn" onClick={next}>
                 {index + 1 >= total ? 'See my result' : 'Next question'}
