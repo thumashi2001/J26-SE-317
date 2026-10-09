@@ -5,6 +5,7 @@ import * as events from '../controllers/eventController.js';
 import * as history from '../controllers/historyController.js';
 import * as forecast from '../controllers/forecastController.js';
 import * as practice from '../controllers/practiceController.js';
+import * as insights from '../controllers/insightsController.js';
 
 const router = Router();
 
@@ -18,6 +19,7 @@ router.post('/events', events.recordEvent);
 router.get('/alerts/:studentId', events.getAlerts);
 router.get('/history/:studentId/:topic', history.getHistory);
 router.get('/forecast/:studentId/:topic', forecast.getForecast);
+router.get('/insights/:studentId', insights.getInsights);
 router.get('/practice/topics', practice.topics);
 router.post('/practice/start', practice.start);
 router.post('/practice/answer', practice.answer);
