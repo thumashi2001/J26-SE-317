@@ -56,7 +56,15 @@ class RubricCriterion(BaseModel):
     criterion_id: str = Field(min_length=1)
     description: str = Field(min_length=1)
     max_marks: float = Field(gt=0.0)
+    required_concepts: list[str] = Field(default_factory=list)
     scoring_levels: list[ScoringLevel] = Field(min_length=1)
+
+    @field_validator("required_concepts")
+    @classmethod
+    def validate_non_blank_concepts(cls, values: list[str]) -> list[str]:
+        if any(not value.strip() for value in values):
+            raise ValueError("required_concepts cannot contain blank values")
+        return [value.strip() for value in values]
 
 
 class Rubric(BaseModel):

@@ -18,17 +18,46 @@ def _concept_matches(analysis: AnswerAnalysisResponse) -> dict[str, object]:
     return {match.concept.casefold(): match for match in analysis.concept_matches}
 
 
+def _effective_concepts(criterion: RubricCriterion, level: ScoringLevel) -> list[str]:
+    concepts: list[str] = []
+    seen: set[str] = set()
+    for c in criterion.required_concepts:
+        if c.casefold() not in seen:
+            concepts.append(c)
+            seen.add(c.casefold())
+    for c in level.required_concepts:
+        if c.casefold() not in seen:
+            concepts.append(c)
+            seen.add(c.casefold())
+    return concepts
+
+
 def _level_evidence(
+    criterion: RubricCriterion,
     level: ScoringLevel,
     analysis: AnswerAnalysisResponse,
 ) -> LevelEvidence:
     matches = _concept_matches(analysis)
+    effective_required_concepts = _effective_concepts(criterion, level)
     concepts: list[str] = []
     sentence_ids: set[int] = set()
     reasons: list[str] = []
 
+    if level.mark == 0.0 and level.evidence_rule is None and not level.required_concepts and not level.evidence_requirements:
+        for required_concept in effective_required_concepts:
+            match = matches.get(required_concept.casefold())
+            if match and match.status == "demonstrated":
+                concepts.append(required_concept)
+                sentence_ids.update(match.evidence_sentence_ids)
+        return LevelEvidence(
+            supported=True,
+            concepts=concepts,
+            sentence_ids=sorted(sentence_ids),
+            reasons=[],
+        )
+
     if level.evidence_rule is None:
-        for required_concept in level.required_concepts:
+        for required_concept in effective_required_concepts:
             match = matches.get(required_concept.casefold())
             if match is None:
                 reasons.append(
@@ -45,7 +74,7 @@ def _level_evidence(
     else:
         demonstrated_count = 0
         partial_count = 0
-        for required_concept in level.required_concepts:
+        for required_concept in effective_required_concepts:
             match = matches.get(required_concept.casefold())
             if match is None:
                 reasons.append(
@@ -84,7 +113,7 @@ def _level_evidence(
         sentence_ids.update(requirement_sentence_ids)
 
     has_requirements = bool(
-        level.required_concepts
+        effective_required_concepts
         or level.evidence_requirements
         or level.evidence_rule
     )
@@ -139,7 +168,7 @@ def evaluate_criterion(
     for _, level in ordered_levels:
         if level.mark <= 0.0:
             continue
-        evidence = _level_evidence(level, analysis)
+        evidence = _level_evidence(criterion, level, analysis)
         if evidence.supported:
             return _result_for_level(criterion, level, evidence, [])
 
@@ -151,7 +180,7 @@ def evaluate_criterion(
         f"No positive scoring level was supported for criterion {criterion.criterion_id}; "
         f"selected lowest rubric level '{lowest_level.level_id}'."
     ]
-    evidence = _level_evidence(lowest_level, analysis)
+    evidence = _level_evidence(criterion, lowest_level, analysis)
     return _result_for_level(criterion, lowest_level, evidence, warnings)
 
 

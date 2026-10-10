@@ -13,9 +13,22 @@ MARKING_VERSION = "baseline-v1"
 
 
 def _analysis_request(request: MarkingRequest) -> AnswerAnalysisRequest:
-    return AnswerAnalysisRequest.model_validate(
-        request.model_dump(exclude={"rubric"})
-    )
+    concepts: list[str] = list(request.expected_concepts or [])
+    seen: set[str] = {c.casefold() for c in concepts}
+    for criterion in request.rubric.criteria:
+        for concept in criterion.required_concepts:
+            if concept.casefold() not in seen:
+                concepts.append(concept)
+                seen.add(concept.casefold())
+        for level in criterion.scoring_levels:
+            for concept in level.required_concepts:
+                if concept.casefold() not in seen:
+                    concepts.append(concept)
+                    seen.add(concept.casefold())
+
+    dump = request.model_dump(exclude={"rubric", "expected_concepts"})
+    dump["expected_concepts"] = concepts if concepts else None
+    return AnswerAnalysisRequest.model_validate(dump)
 
 
 def _overall_explanation(results: list[CriterionMarkingResult]) -> str:

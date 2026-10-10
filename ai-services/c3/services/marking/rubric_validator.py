@@ -25,6 +25,8 @@ def validate_rubric(rubric: Rubric) -> None:
             errors.append(f"criterion {criterion.criterion_id} has a blank description")
         if criterion.max_marks <= 0:
             errors.append(f"criterion {criterion.criterion_id} max_marks must be greater than zero")
+        if any(not concept.strip() for concept in criterion.required_concepts):
+            errors.append(f"criterion {criterion.criterion_id} has a blank required concept")
         if not criterion.scoring_levels:
             errors.append(f"criterion {criterion.criterion_id} must contain scoring levels")
 
@@ -47,7 +49,8 @@ def validate_rubric(rubric: Rubric) -> None:
             if any(not requirement.strip() for requirement in level.evidence_requirements):
                 errors.append(f"level {level.level_id} has an invalid evidence requirement")
             if level.evidence_rule is not None:
-                required_concept_count = len(level.required_concepts)
+                effective_concepts = {c.casefold() for c in criterion.required_concepts} | {c.casefold() for c in level.required_concepts}
+                required_concept_count = len(effective_concepts)
                 if required_concept_count == 0:
                     errors.append(
                         f"level {level.level_id} evidence_rule requires required_concepts"
