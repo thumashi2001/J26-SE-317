@@ -1,4 +1,5 @@
 import { callAi, httpError } from './aiClient.js';
+import { FAST_SEC } from './behaviourService.js';
 
 // Engagement, confidence and "estimated score now" for one student.
 //
@@ -11,7 +12,7 @@ import { callAi, httpError } from './aiClient.js';
 //
 // CONFIDENCE (0 to 100) says how far a topic score can be trusted:
 //   evidence = sum of answer reliability on that topic (diagnostic and quiz answers)
-//   an answer counts 1.0, half if the student left the tab during it, x0.6 if answered in under 3 seconds
+//   an answer counts 1.0, half if the student left the tab during it, x0.6 if answered in under 8 seconds
 //   confidence = (1 - e^(-evidence / 8)) x recency, where recency fades slowly with days since practice
 //   labels: below 40 Low, 40 to 69 Medium, 70 and above High
 //
@@ -20,7 +21,6 @@ import { callAi, httpError } from './aiClient.js';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 export const WINDOW_DAYS = 14;
-const FAST_SEC = 3;
 
 const clamp01 = (x) => Math.max(0, Math.min(1, x));
 const round = (x) => Math.round(x);
