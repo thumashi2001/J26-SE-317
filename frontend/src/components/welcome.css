@@ -1,0 +1,13 @@
+.welcome-backdrop { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; padding: 16px; background: rgba(10, 20, 30, 0.55); animation: wfade 0.2s ease-out; }
+.welcome { width: 100%; max-width: 480px; background: var(--panel); border: 1px solid var(--line); border-radius: 18px; padding: 26px 26px 22px; box-shadow: 0 24px 60px rgba(0, 0, 0, 0.3); animation: wrise 0.25s ease-out; }
+.welcome-kicker { margin: 0 0 4px; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--primary); }
+.welcome h2 { margin: 0 0 16px; font-size: 1.6rem; }
+.welcome-list { list-style: none; margin: 0 0 20px; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.welcome-item { display: flex; gap: 14px; align-items: flex-start; padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface-soft); }
+.welcome-icon { flex: none; width: 36px; height: 36px; display: grid; place-items: center; border-radius: 10px; background: var(--info-bg); font-size: 1.15rem; }
+.welcome-item strong { display: block; font-size: 0.95rem; }
+.welcome-item p { margin: 2px 0 0; font-size: 0.92rem; color: var(--text-2); }
+.welcome-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+@keyframes wfade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes wrise { from { opacity: 0; transform: translateY(12px) scale(0.98); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .welcome-backdrop, .welcome { animation: none; } }

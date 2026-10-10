@@ -3,9 +3,26 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { getTwin, getAlerts, getPracticeTopics, getInsights, getBehaviour } from '../../services/c1Api.js';
 import { prettyTopic, scoreBand } from '../../utils/topics.js';
+import WelcomePopup from '../../components/WelcomePopup.jsx';
+import AnswerStyle from '../../components/AnswerStyle.jsx';
 import './practice.css';
 
-const BEH_ICON = { Steady: '\u2713', Careful: '\u2713', Rushing: '\u26A0', Struggling: '\u26A0', Guessing: '\u26A0' };
+const READ_ICON = { strong: '\u2713', slow_right: '\u23F1', guessing: '\u26A0', revise: '\u21BB', building: '\u2026' };
+
+const seenWelcome = () => {
+  try {
+    return sessionStorage.getItem('c1_welcome_seen') === '1';
+  } catch {
+    return true; // storage blocked: do not nag
+  }
+};
+const markWelcome = () => {
+  try {
+    sessionStorage.setItem('c1_welcome_seen', '1');
+  } catch {
+    /* ignore */
+  }
+};
 
 function Ring({ value }) {
   const r = 52;
@@ -37,6 +54,7 @@ export default function DashboardPage() {
   const [insights, setInsights] = useState(null);
   const [behaviour, setBehaviour] = useState(null);
   const [error, setError] = useState('');
+  const [welcome, setWelcome] = useState(false);
 
   const load = useCallback(async () => {
     try {
@@ -61,6 +79,16 @@ export default function DashboardPage() {
   useEffect(() => {
     load();
   }, [load]);
+
+  // Show the welcome popup once per login, after the first successful load.
+  const ready = !!twin && twin.diagnosticCompleted;
+  useEffect(() => {
+    if (ready && !seenWelcome()) {
+      setWelcome(true);
+      markWelcome();
+    }
+  }, [ready]);
+  const closeWelcome = useCallback(() => setWelcome(false), []);
 
   if (error && !twin)
     return (
@@ -97,24 +125,56 @@ export default function DashboardPage() {
   // lowest score among the topics that have practice questions
   const weakest = topics.filter(([t]) => canPractise(t)).sort((x, y) => shown(x[0], x[1]) - shown(y[0], y[1]))[0];
 
-  return (
-    <div>
-      <h1>My learning state</h1>
+  const firstName = (user.name || '').split(' ')[0];
+  const reads = behaviour && behaviour.topics ? behaviour.topics : {};
+  const focus = weakest ? { topic: weakest[0], name: prettyTopic(weakest[0]), score: Math.round(shown(weakest[0], weakest[1])) } : null;
+  const attention = alerts.length;
+  const sessionsTotal = topics.reduce((sum, [, m]) => sum + (m.practice_sessions || 0), 0);
 
-      <section className="summary panel">
-        <Ring value={average} />
-        <div className="summary-text">
-          <div className="summary-line">
-            Overall mastery <strong>{average}%</strong> across {topics.length} topics
+  return (
+    <div className="dash">
+      {welcome && (
+        <WelcomePopup
+          name={firstName}
+          focus={focus}
+          alertCount={attention}
+          headline={behaviour ? behaviour.headline : 'Take a quiz to see how you answer.'}
+          onClose={closeWelcome}
+        />
+      )}
+
+      <div className="dash-top">
+        <section className="dhero">
+          <div className="dhero-text">
+            <p className="dhero-kicker">My learning state</p>
+            <h1>Hello{firstName ? `, ${firstName}` : ''}</h1>
+            <p className="dhero-sub">
+              {weak === 0 ? 'No topic is below 30%. Keep the rhythm going.' : `${weak} ${weak === 1 ? 'topic is' : 'topics are'} below 30%. Start with the weakest one.`}
+            </p>
+            <div className="dhero-chips">
+              <span className={`badge risk-${(risk || 'none').toLowerCase()}`}>
+                {risk ? `${risk} risk of falling behind` : 'Risk not assessed yet'}
+              </span>
+              <span className="chip-soft">{sessionsTotal} practice {sessionsTotal === 1 ? 'session' : 'sessions'}</span>
+            </div>
+            {focus && (
+              <div className="next-up">
+                <Link className="btn" to={`/c1/practice/${focus.topic}`}>
+                  Practise your weakest topic
+                </Link>
+                <span className="muted small">{focus.name} is at about {focus.score}%</span>
+              </div>
+            )}
           </div>
-          <div className="summary-line">
-            {weak === 0 ? 'No topic is below 30%.' : `${weak} ${weak === 1 ? 'topic is' : 'topics are'} below 30%.`}
+          <div className="dhero-ring">
+            <Ring value={average} />
+            <span className="muted small">Overall mastery across {topics.length} topics</span>
           </div>
-          <span className={`badge risk-${(risk || 'none').toLowerCase()}`}>
-            {risk ? `${risk} risk of falling behind` : 'Risk not assessed yet'}
-          </span>
+        </section>
+
+        <aside className="dash-side">
           {eng && (
-            <div className="engage">
+            <section className="panel side-card">
               <div className="engage-head">
                 <strong>Engagement</strong>
                 <span className={`tag eng-${eng.label.toLowerCase().replace(' ', '-')}`}>{eng.label}</span>
@@ -123,34 +183,27 @@ export default function DashboardPage() {
                 <span style={{ width: `${Math.max(2, eng.index)}%` }} />
               </div>
               <p className="muted small">{eng.why}</p>
-            </div>
+            </section>
           )}
-          {weakest && (
-            <div className="next-up">
-              <Link className="btn" to={`/c1/practice/${weakest[0]}`}>
-                Practise your weakest topic
-              </Link>
-              <span className="muted small">
-                {prettyTopic(weakest[0])} is at about {Math.round(shown(weakest[0], weakest[1]))}%
-              </span>
-            </div>
-          )}
-        </div>
-      </section>
+          <section className="panel side-card">
+            <strong>Alerts</strong>
+            {alerts.length === 0 ? (
+              <p className="muted small">Nothing needs your attention right now.</p>
+            ) : (
+              <ul className="alerts alerts-scroll">
+                {alerts.map((a, i) => (
+                  <li key={i} className={`alert ${a.severity === 'High' ? 'high' : 'medium'}`}>
+                    <span aria-hidden="true">{a.type === 'guessing' ? '\u26A0' : a.type === 'sudden_drop' ? '\u2198' : '\u2757'}</span>
+                    <span>{a.topic ? a.message.replace(a.topic, prettyTopic(a.topic)) : a.message}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+        </aside>
+      </div>
 
-      {behaviour && (
-        <section className="panel behaviour" aria-labelledby="beh-h">
-          <h2 id="beh-h">How you answer</h2>
-          <div className="engage-head">
-            <span className={`tag beh-${behaviour.pattern.toLowerCase().replace(/\s+/g, '-')}`}>
-              <span aria-hidden="true">{BEH_ICON[behaviour.pattern] || ''}</span> {behaviour.pattern}
-            </span>
-            {behaviour.medianSec !== null && <span className="muted small">Typical time: {behaviour.medianSec} s per question</span>}
-          </div>
-          <p>{behaviour.why}</p>
-          <p className="muted">{behaviour.advice}</p>
-        </section>
-      )}
+      {behaviour && <AnswerStyle data={behaviour} />}
 
       <h2>Topics</h2>
       <p className="muted small">Scores show your estimated level now, including forgetting since you last practised. Select a topic to see why, or press Practise.</p>
@@ -159,6 +212,7 @@ export default function DashboardPage() {
         {topics.map(([topic, m]) => {
           const score = shown(topic, m);
           const i = info(topic);
+          const r = reads[topic];
           const faded = i && i.estimatedNow !== null && m.score - score >= 1;
           return (
             <div key={topic} className="topic-cell">
@@ -172,6 +226,11 @@ export default function DashboardPage() {
                   {m.practice_sessions ?? 0} {m.practice_sessions === 1 ? 'practice session' : 'practice sessions'}
                 </div>
                 {faded && <div className="muted small">Was {Math.round(m.score)}% when last practised</div>}
+                {r && (
+                  <div className={`topic-read read-${r.key}`} title={r.tip}>
+                    <span aria-hidden="true">{READ_ICON[r.key]}</span> {r.label}
+                  </div>
+                )}
                 {i && (
                   <div className="topic-foot">
                     <span className={`tag conf-${i.confidenceLabel.toLowerCase()}`} title={i.confidenceWhy}>
@@ -191,23 +250,6 @@ export default function DashboardPage() {
           );
         })}
       </div>
-
-      <section>
-        <h2>Alerts</h2>
-        {alerts.length === 0 ? (
-          <p className="muted">Nothing needs your attention right now.</p>
-        ) : (
-          <ul className="alerts">
-            {alerts.map((a, i) => (
-              <li key={i} className={`alert ${a.severity === 'High' ? 'high' : 'medium'}`}>
-                <strong>{a.severity}</strong>
-                <span>{a.topic ? a.message.replace(a.topic, prettyTopic(a.topic)) : a.message}</span>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
-
     </div>
   );
 }
