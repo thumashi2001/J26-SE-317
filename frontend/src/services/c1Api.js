@@ -26,4 +26,7 @@ export const answerPractice = ({ sessionId, questionId, selected, timeSec, tabLe
 // Engagement index, confidence per topic and the estimated score now.
 export const getInsights = (studentId) => api(`/c1/insights/${encodeURIComponent(studentId)}`);
 
+// How the student answers: fast, slow, guessing.
+export const getBehaviour = (studentId) => api(`/c1/behaviour/${encodeURIComponent(studentId)}`);
+
 export const getPracticeTopics = () => api('/c1/practice/topics');

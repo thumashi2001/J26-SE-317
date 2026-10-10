@@ -1,9 +1,11 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
-import { getTwin, getAlerts, getPracticeTopics, getInsights } from '../../services/c1Api.js';
+import { getTwin, getAlerts, getPracticeTopics, getInsights, getBehaviour } from '../../services/c1Api.js';
 import { prettyTopic, scoreBand } from '../../utils/topics.js';
 import './practice.css';
+
+const BEH_ICON = { Steady: '\u2713', Careful: '\u2713', Rushing: '\u26A0', Struggling: '\u26A0', Guessing: '\u26A0' };
 
 function Ring({ value }) {
   const r = 52;
@@ -33,20 +35,23 @@ export default function DashboardPage() {
   const [alerts, setAlerts] = useState([]);
   const [practicable, setPracticable] = useState([]);
   const [insights, setInsights] = useState(null);
+  const [behaviour, setBehaviour] = useState(null);
   const [error, setError] = useState('');
 
   const load = useCallback(async () => {
     try {
-      const [t, a, pt, ins] = await Promise.all([
+      const [t, a, pt, ins, beh] = await Promise.all([
         getTwin(user.student_id),
         getAlerts(user.student_id),
         getPracticeTopics().catch(() => ({ topics: [] })), // no practice list is not a reason to hide the page
         getInsights(user.student_id).catch(() => null), // the page still works without the extra insights
+        getBehaviour(user.student_id).catch(() => null),
       ]);
       setTwin(t);
       setAlerts(a.alerts);
       setPracticable(pt.topics);
       setInsights(ins);
+      setBehaviour(beh);
       setError('');
     } catch (err) {
       setError(err.message);
@@ -132,6 +137,20 @@ export default function DashboardPage() {
           )}
         </div>
       </section>
+
+      {behaviour && (
+        <section className="panel behaviour" aria-labelledby="beh-h">
+          <h2 id="beh-h">How you answer</h2>
+          <div className="engage-head">
+            <span className={`tag beh-${behaviour.pattern.toLowerCase().replace(/\s+/g, '-')}`}>
+              <span aria-hidden="true">{BEH_ICON[behaviour.pattern] || ''}</span> {behaviour.pattern}
+            </span>
+            {behaviour.medianSec !== null && <span className="muted small">Typical time: {behaviour.medianSec} s per question</span>}
+          </div>
+          <p>{behaviour.why}</p>
+          <p className="muted">{behaviour.advice}</p>
+        </section>
+      )}
 
       <h2>Topics</h2>
       <p className="muted small">Scores show your estimated level now, including forgetting since you last practised. Select a topic to see why, or press Practise.</p>
