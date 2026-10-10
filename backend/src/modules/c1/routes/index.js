@@ -20,6 +20,7 @@ router.get('/alerts/:studentId', events.getAlerts);
 router.get('/history/:studentId/:topic', history.getHistory);
 router.get('/forecast/:studentId/:topic', forecast.getForecast);
 router.get('/insights/:studentId', insights.getInsights);
+router.get('/behaviour/:studentId', insights.getBehaviour);
 router.get('/practice/topics', practice.topics);
 router.post('/practice/start', practice.start);
 router.post('/practice/answer', practice.answer);

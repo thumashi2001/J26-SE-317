@@ -304,6 +304,9 @@ export default function PracticePage() {
                 You left this tab {feedback.tabLeaves === 1 ? 'once' : `${feedback.tabLeaves} times`} during this question, so this answer counts a little less toward your confidence score.
               </p>
             )}
+            {feedback.correct && feedback.gainWeight < 1 && (
+              <p className="fb-away">This correct answer raised your score by less than usual, because you left the tab or answered very fast.</p>
+            )}
             <div className="quiz-actions">
               <button type="button" className="btn" onClick={next}>
                 {index + 1 >= total ? 'See my result' : 'Next question'}

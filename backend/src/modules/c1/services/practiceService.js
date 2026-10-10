@@ -236,6 +236,7 @@ export async function answerQuestion(db, studentId, input, aiUrl) {
     tip: TIPS[q.tip] || TIPS.concept,
     afterForgetting: result.afterForgetting,
     scoreAfter: result.scoreAfter,
+    gainWeight: result.gainWeight,
     tabLeaves,
     session: {
       answered: session.items.filter((i) => i.answered).length,
