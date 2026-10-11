@@ -36,3 +36,10 @@ export const generateMindmap = handle(async (req) => {
   resolveStudentId(req, student_id);
   return aiClient.generateMindmap(AI_URL(), payload);
 });
+
+export const assessAnswer = handle(async (req) => {
+  const { student_id, ...payload } = req.body || {};
+  resolveStudentId(req, student_id);
+  return aiClient.assessAnswer(AI_URL(), payload);
+});
+

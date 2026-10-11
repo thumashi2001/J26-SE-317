@@ -240,3 +240,44 @@ def test_evidence_rule_preserves_arbitrary_rubric_mark() -> None:
         status_analysis(["demonstrated"]),
     )
     assert result.awarded_mark == 3.5
+
+
+def test_criterion_level_required_concepts_are_evaluated_strictly_but_can_be_lenient() -> None:
+    c_strict = RubricCriterion(
+        criterion_id="C1",
+        description="Strict",
+        max_marks=2,
+        required_concepts=["concept 1", "concept 2"],
+        scoring_levels=[
+            ScoringLevel(level_id="L0", label="None", mark=0, descriptor="None"),
+            ScoringLevel(level_id="L2", label="Full", mark=2, descriptor="Both"),
+        ],
+    )
+    result_strict = evaluate_criterion(c_strict, status_analysis(["demonstrated", "partial"]))
+    assert result_strict.selected_level_id == "L0"
+    assert result_strict.awarded_mark == 0
+
+    c_lenient = RubricCriterion(
+        criterion_id="C1",
+        description="Lenient",
+        max_marks=2,
+        required_concepts=["concept 1", "concept 2"],
+        scoring_levels=[
+            ScoringLevel(level_id="L0", label="None", mark=0, descriptor="None"),
+            ScoringLevel(
+                level_id="L2",
+                label="Full",
+                mark=2,
+                descriptor="Lenient",
+                evidence_rule=EvidenceRule(
+                    type="required_concept_count",
+                    minimum_demonstrated=1,
+                    minimum_partial=1,
+                    allow_partial=True,
+                ),
+            ),
+        ],
+    )
+    result_lenient = evaluate_criterion(c_lenient, status_analysis(["demonstrated", "partial"]))
+    assert result_lenient.selected_level_id == "L2"
+    assert result_lenient.awarded_mark == 2

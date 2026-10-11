@@ -1,10 +1,11 @@
-from app.schemas.analysis import AnswerAnalysisRequest
+from app.schemas.analysis import AnswerAnalysisRequest, AnswerAnalysisResponse
 from app.schemas.feedback import (
     CriterionFeedback,
     FeedbackRequest,
     FeedbackResponse,
     OverallFeedback,
 )
+from app.schemas.marking import MarkingResponse, Rubric
 from services.feedback.evidence_formatter import (
     concept_status_lists,
     evidence_warning,
@@ -23,26 +24,35 @@ FEEDBACK_VERSION = "baseline-v1"
 
 
 def _analysis_request(request: FeedbackRequest) -> AnswerAnalysisRequest:
-    return AnswerAnalysisRequest.model_validate(
-        request.marking_request.model_dump(exclude={"rubric"})
-    )
+    marking_req = request.marking_request
+    expected = list(marking_req.expected_concepts or [])
+    seen = {c.casefold() for c in expected}
+    for criterion in marking_req.rubric.criteria:
+        for c in (criterion.required_concepts or []):
+            if c.casefold() not in seen:
+                expected.append(c)
+                seen.add(c.casefold())
+        for level in criterion.scoring_levels:
+            for c in (level.required_concepts or []):
+                if c.casefold() not in seen:
+                    expected.append(c)
+                    seen.add(c.casefold())
+    data = marking_req.model_dump(exclude={"rubric", "expected_concepts"})
+    return AnswerAnalysisRequest(expected_concepts=expected or None, **data)
 
 
 def _unique(values: list[str]) -> list[str]:
     return list(dict.fromkeys(values))
 
 
-def generate_feedback(request: FeedbackRequest) -> FeedbackResponse:
-    """
-    Generate traceable feedback from the existing Function 2 result.
-    Function 3 does not independently generate unsupported evidence. Explanations are constructed
-    only from structured evidence and concept matches produced by the upstream analysis pipeline.
-    """
-    marking = mark_answer(request.marking_request)
-    analysis = analyze_answer(_analysis_request(request))
+def build_feedback_from_results(
+    marking: MarkingResponse,
+    analysis: AnswerAnalysisResponse,
+    rubric: Rubric,
+) -> FeedbackResponse:
     criteria_by_id = {
         criterion.criterion_id: criterion
-        for criterion in request.marking_request.rubric.criteria
+        for criterion in rubric.criteria
     }
     criteria_feedback: list[CriterionFeedback] = []
     all_strengths: list[str] = []
@@ -120,3 +130,19 @@ def generate_feedback(request: FeedbackRequest) -> FeedbackResponse:
         warnings=_unique(warnings),
         feedback_version=FEEDBACK_VERSION,
     )
+
+
+def generate_feedback(request: FeedbackRequest) -> FeedbackResponse:
+    """
+    Generate traceable feedback from the existing Function 2 result.
+    The baseline constructs feedback from structured upstream marking and concept evidence
+    without an additional generative dependency.
+    """
+    marking = mark_answer(request.marking_request)
+    analysis = analyze_answer(_analysis_request(request))
+    return build_feedback_from_results(
+        marking=marking,
+        analysis=analysis,
+        rubric=request.marking_request.rubric,
+    )
+

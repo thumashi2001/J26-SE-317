@@ -106,22 +106,25 @@ test('C3 Module Backend Integration', async (t) => {
     process.env.C3_AI_URL = oldUrl;
   });
 
-  await t.test('all four C3 endpoints are registered', async () => {
+  await t.test('all C3 endpoints including /assess are registered', async () => {
     aiRequests = [];
     nextAiResponse = { success: true };
     await fetchApi('/analysis', studentToken, {});
     await fetchApi('/marking', studentToken, {});
     await fetchApi('/feedback', studentToken, {});
     await fetchApi('/mindmap', studentToken, {});
+    await fetchApi('/assess', studentToken, {});
     
     const paths = aiRequests.map(r => r.path);
     assert.deepStrictEqual(paths, [
       '/analysis/answer',
       '/marking/evaluate',
       '/feedback/generate',
-      '/mindmap/generate'
+      '/mindmap/generate',
+      '/c3/assess'
     ]);
   });
+
 
   // Cleanup
   server.close();

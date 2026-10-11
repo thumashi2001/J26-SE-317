@@ -10,5 +10,7 @@ router.post('/analysis', controller.analyzeAnswer);
 router.post('/marking', controller.markAnswer);
 router.post('/feedback', controller.generateFeedback);
 router.post('/mindmap', controller.generateMindmap);
+router.post('/assess', controller.assessAnswer);
 
 export default router;
+

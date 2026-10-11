@@ -31,3 +31,5 @@ export function analyzeAnswer(aiUrl, payload) { return callAi(aiUrl, '/analysis/
 export function markAnswer(aiUrl, payload) { return callAi(aiUrl, '/marking/evaluate', payload); }
 export function generateFeedback(aiUrl, payload) { return callAi(aiUrl, '/feedback/generate', payload); }
 export function generateMindmap(aiUrl, payload) { return callAi(aiUrl, '/mindmap/generate', payload); }
+export function assessAnswer(aiUrl, payload) { return callAi(aiUrl, '/c3/assess', payload); }
+
