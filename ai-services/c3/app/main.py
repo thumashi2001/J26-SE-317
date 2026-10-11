@@ -2,6 +2,7 @@ from fastapi import FastAPI
 
 from app.routes.analysis import router as analysis_router
 from app.routes.marking import router as marking_router
+from app.routes.feedback import router as feedback_router
 
 app = FastAPI(
     title="AdaptiveLearnSE - Component 3 AI Service",
@@ -21,3 +22,4 @@ def health_check():
 
 app.include_router(analysis_router)
 app.include_router(marking_router)
+app.include_router(feedback_router)
