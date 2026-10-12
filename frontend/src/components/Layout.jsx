@@ -1,3 +1,5 @@
+import Logo from './Logo.jsx';
+import ThemeToggle from './ThemeToggle.jsx';
 import { useState } from 'react';
 import { NavLink, Navigate, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
@@ -33,7 +35,7 @@ export default function Layout({ menu, roleLabel }) {
   return (
     <div className="shell">
       <aside className="sidebar">
-        <div className="side-brand">AdaptiveLearnSE</div>
+        <div className="side-brand"><Logo size={34} onDark /></div>
         <div className="side-role">{roleLabel}</div>
         <nav>
           {menu.filter((m) => !m.onlyBeforeDiagnostic || diagnosticDone === false).map((m, i) =>
@@ -57,6 +59,7 @@ export default function Layout({ menu, roleLabel }) {
             )
           )}
         </nav>
+        <div className="side-theme"><ThemeToggle onDark /></div>
         <div className="side-user">
           <div className="avatar">{initials}</div>
           <div className="side-user-text">
@@ -75,7 +78,7 @@ export default function Layout({ menu, roleLabel }) {
       </aside>
       <main className="content">
         <ErrorBoundary>
-          <Outlet />
+          <Outlet context={{ testStarted: !locked || introSeen }} />
         </ErrorBoundary>
       </main>
       {locked && !introSeen && <DiagnosticIntro name={user.name} onStart={() => setIntroSeen(true)} onLogout={signOut} />}

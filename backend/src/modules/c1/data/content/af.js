@@ -1,6 +1,6 @@
 import { S, M, D } from './helpers.js';
 export default {
-  semester: 'Y3S2',
+  semester: 'Y3S1',
   module_code: 'SE3040',
   module_name: 'Application Frameworks',
   topics: {

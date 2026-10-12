@@ -7,6 +7,9 @@ import ScoreChart from '../../components/charts/ScoreChart.jsx';
 import WhatIfPanel from '../../components/WhatIfPanel.jsx';
 import './practice.css';
 
+// 95 -> "2 min", 3600 -> "1 h", 40 -> "40 s"
+const minutesText = (sec) => (sec < 60 ? `${Math.round(sec)} s` : sec < 3600 ? `${Math.round(sec / 60)} min` : `${Math.floor(sec / 3600)} h ${Math.round((sec % 3600) / 60)} min`);
+
 const BAND_TEXT = { weak: 'Weak', fair: 'Fair', strong: 'Strong' };
 
 export default function TopicPage() {
@@ -70,6 +73,8 @@ export default function TopicPage() {
           <div><dt>Practice sessions</dt><dd>{current.practiceSessions}</dd></div>
           <div><dt>Answers correct</dt><dd>{current.correct} of {current.answered}</dd></div>
           <div><dt>Last practised</dt><dd>{lastPracticed}</dd></div>
+          {info && info.timeSpentSec > 0 && <div><dt>Time spent answering</dt><dd>{minutesText(info.timeSpentSec)}</dd></div>}
+          {info && info.quizAnswers > 0 && <div><dt>Hints used</dt><dd>{info.hintsUsed} of {info.quizAnswers} practice answers</dd></div>}
         </dl>
       </section>
 
