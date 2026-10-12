@@ -14,7 +14,6 @@ dotenv.config({ path: path.join(__dirname, '..', '.env') });
 
 const { connectDb } = await import('../src/config/db.js');
 const { TOPICS } = await import('../src/modules/c1/data/content/index.js');
-const { seedAll } = await import('../src/modules/c1/services/practiceService.js');
 
 const LETTERS = ['A', 'B', 'C', 'D'];
 const SEMESTERS = [...new Set(Object.values(TOPICS).map((t) => t.semester))];
@@ -38,6 +37,45 @@ function diagnosticDocs() {
   return docs;
 }
 
+// Same documents that practiceService.seedAll writes (one per practice question).
+function practiceDocs() {
+  const docs = [];
+  for (const [topic, t] of Object.entries(TOPICS)) {
+    t.practice.forEach((q, i) => {
+      docs.push({
+        question_id: `PQ-${topic}-${String(i + 1).padStart(2, '0')}`,
+        topic,
+        question_text: q.text,
+        options: q.options,
+        correct: q.correct,
+        explanation: q.why,
+        tip: q.tip,
+      });
+    });
+  }
+  return docs;
+}
+
+// Saves in a few big batches instead of hundreds of single writes, and tries again if the connection drops.
+async function saveAll(col, docs, label) {
+  const BATCH = 60;
+  for (let i = 0; i < docs.length; i += BATCH) {
+    const part = docs.slice(i, i + BATCH);
+    const ops = part.map((d) => ({ replaceOne: { filter: { question_id: d.question_id }, replacement: d, upsert: true } }));
+    for (let attempt = 1; ; attempt++) {
+      try {
+        await col.bulkWrite(ops, { ordered: false });
+        break;
+      } catch (err) {
+        if (attempt >= 5) throw err;
+        console.log(`  ${label}: connection problem (${err.message}), trying again (${attempt}/4)...`);
+        await new Promise((r) => setTimeout(r, 1500 * attempt));
+      }
+    }
+    console.log(`  ${label}: ${Math.min(i + BATCH, docs.length)} of ${docs.length} saved`);
+  }
+}
+
 const ask = (question) =>
   new Promise((resolve) => {
     const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
@@ -48,11 +86,12 @@ try {
   const db = await connectDb();
   const docs = diagnosticDocs();
 
-  for (const d of docs) await db.collection('question_bank').replaceOne({ question_id: d.question_id }, d, { upsert: true });
+  await saveAll(db.collection('question_bank'), docs, 'Diagnostic bank');
   console.log(`Diagnostic bank: ${docs.length} questions saved (${Object.keys(TOPICS).length} topics).`);
 
-  const practiceTotal = await seedAll(db);
-  console.log(`Practice bank: ${practiceTotal} questions saved.`);
+  const pdocs = practiceDocs();
+  await saveAll(db.collection('practice_bank'), pdocs, 'Practice bank');
+  console.log(`Practice bank: ${pdocs.length} questions saved.`);
 
   // 1) Old sample questions
   const keep = docs.map((d) => d.question_id);

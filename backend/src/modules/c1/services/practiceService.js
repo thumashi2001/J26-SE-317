@@ -77,6 +77,8 @@ function publicItem(item, bank) {
     options: item.order.map((i) => q.options[i]),
     multi: q.correct.length > 1,
     answered: !!item.answered,
+    hinted: !!item.hint_used,
+    hidden: item.hidden || [], // option positions removed by a 50/50 hint
   };
 }
 
@@ -160,6 +162,28 @@ export async function startSession(db, studentId, topic) {
   return sessionView(session, bank);
 }
 
+// 50/50 hint: removes two wrong options. Only for single-answer questions, once per question.
+// The answer then counts less toward the twin (hint_used halves the gain).
+export async function useHint(db, studentId, input) {
+  const { sessionId, questionId: qid } = input;
+  const session = await db.collection('practice_sessions').findOne({ session_id: sessionId, student_id: studentId });
+  if (!session) throw httpError(404, 'Practice session not found');
+  const item = session.items.find((i) => i.question_id === qid);
+  if (!item) throw httpError(404, 'That question is not part of this session');
+  if (item.answered) throw httpError(409, 'This question is already answered');
+  const bank = await loadBank(db, [qid]);
+  const q = bank[qid];
+  if (!q) throw httpError(404, 'Question not found');
+  if (q.correct.length !== 1) throw httpError(400, 'Hints are only available for single-answer questions');
+  if (!item.hint_used) {
+    const wrongShown = item.order.map((orig, d) => (q.correct.includes(orig) ? -1 : d)).filter((d) => d >= 0);
+    item.hidden = shuffle(wrongShown).slice(0, 2).sort();
+    item.hint_used = true;
+    await db.collection('practice_sessions').replaceOne({ session_id: sessionId }, session);
+  }
+  return { hidden: item.hidden };
+}
+
 const sameSet = (a, b) => a.length === b.length && a.every((x) => b.includes(x));
 const letters = (idxs) => idxs.map((i) => 'ABCD'[i]);
 
@@ -178,6 +202,7 @@ export async function answerQuestion(db, studentId, input, aiUrl) {
     new Set(selected).size === selected.length &&
     selected.every((n) => Number.isInteger(n) && n >= 0 && n < OPTIONS_PER_QUESTION);
   if (!valid) throw httpError(400, 'Choose at least one answer');
+  if (selected.some((d) => (item.hidden || []).includes(d))) throw httpError(400, 'That option was removed by the hint');
 
   const bank = await loadBank(db, [qid]);
   const q = bank[qid];
@@ -200,7 +225,7 @@ export async function answerQuestion(db, studentId, input, aiUrl) {
       studentId,
       topic: session.topic,
       correct: isCorrect,
-      hintUsed: false,
+      hintUsed: !!item.hint_used,
       timeSec,
       tabLeaves,
       awaySec,
@@ -237,6 +262,7 @@ export async function answerQuestion(db, studentId, input, aiUrl) {
     afterForgetting: result.afterForgetting,
     scoreAfter: result.scoreAfter,
     gainWeight: result.gainWeight,
+    hintUsed: !!item.hint_used,
     tabLeaves,
     session: {
       answered: session.items.filter((i) => i.answered).length,

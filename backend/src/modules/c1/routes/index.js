@@ -24,5 +24,6 @@ router.get('/behaviour/:studentId', insights.getBehaviour);
 router.get('/practice/topics', practice.topics);
 router.post('/practice/start', practice.start);
 router.post('/practice/answer', practice.answer);
+router.post('/practice/hint', practice.hint);
 
 export default router;
