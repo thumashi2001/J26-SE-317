@@ -12,12 +12,13 @@ export async function getPlan(req, res) {
   }
 }
 
-// PUT /exam-date  { studentId, examDate: "2026-11-20" | null }
+// PUT /exam-date  { studentId, module: "SE3020", examDate: "2026-11-20" | null }  (each module has its own exam date)
 export async function setExamDate(req, res) {
   try {
     const studentId = resolveStudentId(req, req.body && req.body.studentId);
-    const saved = await service.setExamDate(getDb(), studentId, req.body ? req.body.examDate : null);
-    res.json({ studentId, examDate: saved });
+    const body = req.body || {};
+    const saved = await service.setExamDate(getDb(), studentId, body.module, body.examDate);
+    res.json({ studentId, module: body.module, examDate: saved });
   } catch (err) {
     res.status(err.status || 500).json({ error: err.message });
   }

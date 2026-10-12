@@ -99,7 +99,7 @@ export default function DashboardPage() {
   const [behaviour, setBehaviour] = useState(null);
   const [plan, setPlan] = useState(null);
   const [planError, setPlanError] = useState('');
-  const [savingDate, setSavingDate] = useState(false);
+  const [savingDate, setSavingDate] = useState(null);
   const [error, setError] = useState('');
   const [welcome, setWelcome] = useState(false);
   const [filter, setFilter] = useState('all');
@@ -142,16 +142,16 @@ export default function DashboardPage() {
   const closeWelcome = useCallback(() => setWelcome(false), []);
 
   const onSaveDate = useCallback(
-    async (value) => {
-      setSavingDate(true);
+    async (module, value) => {
+      setSavingDate(module);
       setPlanError('');
       try {
-        await saveExamDate(user.student_id, value);
+        await saveExamDate(user.student_id, module, value);
         setPlan(await getPlan(user.student_id));
       } catch (err) {
         setPlanError(err.message);
       } finally {
-        setSavingDate(false);
+        setSavingDate(null);
       }
     },
     [user.student_id]
@@ -262,9 +262,9 @@ export default function DashboardPage() {
             <span className="kpi-note">{plan ? `if you follow the plan, ${plan.predicted.ifYouStop}% if you stop` : 'working it out'}</span>
           </section>
           <section className="kpi k-teal">
-            <span className="kpi-label">Exam</span>
-            <strong className="kpi-value">{plan && plan.daysLeft !== null ? `${plan.daysLeft} ${plan.daysLeft === 1 ? 'day' : 'days'}` : 'Not set'}</strong>
-            <span className="kpi-note">{plan && plan.examDate ? new Date(plan.examDate + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'long' }) : 'add it in the calendar'}</span>
+            <span className="kpi-label">Next exam</span>
+            <strong className="kpi-value">{plan && plan.nextExam ? `${plan.daysLeft} ${plan.daysLeft === 1 ? 'day' : 'days'}` : 'Not set'}</strong>
+            <span className="kpi-note">{plan && plan.nextExam ? `${plan.nextExam.module}, ${new Date(plan.nextExam.date + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'long' })}` : 'add each module exam date in the calendar'}</span>
           </section>
           <section className="kpi k-indigo">
             <span className="kpi-label">Engagement</span>
@@ -281,7 +281,7 @@ export default function DashboardPage() {
 
       <div className="plan-row">
         <TodayPlan plan={plan} />
-        <ExamCalendar plan={plan} onSave={onSaveDate} saving={savingDate} error={planError} />
+        <ExamCalendar plan={plan} onSave={onSaveDate} savingModule={savingDate} error={planError} />
       </div>
 
       {alerts.length > 0 && (

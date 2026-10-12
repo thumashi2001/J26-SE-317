@@ -58,3 +58,19 @@
 .cal-day li { display: flex; justify-content: space-between; gap: 10px; font-size: 0.9rem; }
 .cal-day em { font-style: normal; font-size: 0.74rem; font-weight: 700; color: var(--primary-dark); background: var(--chip-bg); border-radius: 999px; padding: 1px 8px; margin-left: 4px; }
 .cal-predict { margin: 12px 0 0; font-size: 0.88rem; color: var(--text-2); }
+
+.plan-mod { font-size: 0.7rem; font-weight: 800; letter-spacing: 0.05em; padding: 2px 8px; border-radius: 6px; background: var(--chip-bg); color: var(--primary-dark); }
+.cal-mods { list-style: none; margin: 12px 0 4px; padding: 0; display: grid; gap: 6px; }
+.cal-mods li { display: grid; grid-template-columns: 62px minmax(0, 1fr) 150px 48px; gap: 8px; align-items: center; }
+.cal-mods li.done { opacity: 0.55; }
+.cal-mod-code { font-size: 0.74rem; font-weight: 800; letter-spacing: 0.04em; text-align: center; padding: 3px 0; border-radius: 8px; background: var(--chip-bg); color: var(--primary-dark); }
+.cal-mod-name { font-size: 0.86rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cal-mods input { padding: 6px 8px; font-size: 0.86rem; }
+.cal-mod-left { font-size: 0.78rem; font-weight: 700; color: var(--muted); text-align: right; }
+@media (max-width: 520px) { .cal-mods li { grid-template-columns: 56px 1fr 130px; } .cal-mod-left { display: none; } }
+.cal-exam-line { font-size: 0.88rem; }
+.cal-code { font-size: 0.7rem; background: var(--chip-bg); color: var(--primary-dark); padding: 1px 6px; border-radius: 6px; margin-right: 4px; }
+.cal-pred { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 0.84rem; }
+.cal-pred th, .cal-pred td { text-align: left; padding: 5px 6px; border-bottom: 1px solid var(--line); }
+.cal-pred th { color: var(--muted); font-weight: 600; }
+.cal-exam { font-size: 0.6rem; }
