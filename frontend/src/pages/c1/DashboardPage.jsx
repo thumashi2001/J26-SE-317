@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { getTwin, getAlerts, getPracticeTopics, getInsights, getBehaviour } from '../../services/c1Api.js';
-import { prettyTopic, scoreBand } from '../../utils/topics.js';
+import { prettyTopic, scoreBand, topicModule } from '../../utils/topics.js';
 import WelcomePopup from '../../components/WelcomePopup.jsx';
 import AnswerStyle from '../../components/AnswerStyle.jsx';
 import './practice.css';
@@ -217,6 +217,7 @@ export default function DashboardPage() {
           return (
             <div key={topic} className="topic-cell">
               <Link to={`/c1/topic/${topic}`} className={`topic link ${scoreBand(score)}`}>
+                {topicModule(topic) && <div className="topic-module">{topicModule(topic)}</div>}
                 <div className="topic-name">{prettyTopic(topic)}</div>
                 <div className="topic-score">{Math.round(score)}%</div>
                 <div className="bar">
