@@ -15,6 +15,7 @@ export default function RegisterPage() {
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   const [sent, setSent] = useState(null);
+  const [show, setShow] = useState(false);
 
   if (user) return <Navigate to="/" replace />;
 
@@ -100,7 +101,10 @@ export default function RegisterPage() {
         <input id="email" type="email" value={form.email} onChange={set('email')} autoComplete="email" required />
 
         <label htmlFor="pw">Password</label>
-        <input id="pw" type="password" minLength={8} value={form.password} onChange={set('password')} autoComplete="new-password" required />
+        <div className="pw-wrap">
+          <input id="pw" type={show ? 'text' : 'password'} minLength={8} value={form.password} onChange={set('password')} autoComplete="new-password" required />
+          <button type="button" className="pw-toggle" onClick={() => setShow(!show)}>{show ? 'Hide' : 'Show'}</button>
+        </div>
         <span className="hint">At least 8 characters.</span>
 
         {error && <p className="error" role="alert">{error}</p>}

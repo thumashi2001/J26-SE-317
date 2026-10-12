@@ -13,7 +13,7 @@ import DiagnosticPage from './pages/c1/DiagnosticPage.jsx';
 import DashboardPage from './pages/c1/DashboardPage.jsx';
 import TopicPage from './pages/c1/TopicPage.jsx';
 import PracticePage from './pages/c1/PracticePage.jsx';
-import CelebratePreview from './pages/c1/CelebratePreview.jsx';
+import ProfilePage from './pages/ProfilePage.jsx';
 import LecturerHome from './pages/lecturer/LecturerHome.jsx';
 import AdminDashboard from './pages/admin/AdminDashboard.jsx';
 import LecturerApprovals from './pages/admin/LecturerApprovals.jsx';
@@ -31,6 +31,22 @@ const area = (role, menu, label) => (
     </RoleRoute>
   </ProtectedRoute>
 );
+
+// The profile page opens inside the layout of whoever is logged in.
+function ProfileArea() {
+  const { user } = useAuth();
+  if (!user) return <Navigate to="/login" replace />;
+  const cfg = {
+    student: [STUDENT_MENU, 'Student'],
+    lecturer: [LECTURER_MENU, 'Lecturer'],
+    admin: [ADMIN_MENU, 'Administrator'],
+  }[user.role] || [STUDENT_MENU, 'Student'];
+  return (
+    <ProtectedRoute>
+      <Layout menu={cfg[0]} roleLabel={cfg[1]} />
+    </ProtectedRoute>
+  );
+}
 
 // The first page: the landing page for visitors, the person's own home page after login.
 function Root() {
@@ -50,7 +66,6 @@ export default function App() {
         <Route path="/c1/dashboard" element={<DashboardPage />} />
         <Route path="/c1/topic/:topic" element={<TopicPage />} />
         <Route path="/c1/practice/:topic" element={<PracticePage />} />
-        {import.meta.env.DEV && <Route path="/c1/celebrate" element={<CelebratePreview />} />}
 
         <Route path="/c2/*" element={<ComingSoon title="Exam Intelligence" owner="Rupasinghe H T N N" />} />
         <Route path="/c3/*" element={<ComingSoon title="Automated Marking" owner="Edirisinghe T P V K" />} />
@@ -68,6 +83,11 @@ export default function App() {
       <Route element={area('admin', ADMIN_MENU, 'Administrator')}>
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/admin/lecturers" element={<LecturerApprovals />} />
+      </Route>
+
+      {/* My profile: one page for every role, inside that role's own layout */}
+      <Route path="/profile" element={<ProfileArea />} >
+        <Route index element={<ProfilePage />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />

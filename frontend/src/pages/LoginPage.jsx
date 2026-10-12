@@ -4,56 +4,26 @@ import { useAuth } from '../context/AuthContext.jsx';
 import AuthShell from '../components/AuthShell.jsx';
 import { cleanId } from '../utils/userId.js';
 
-// Shown instead of a red error when a lecturer is not allowed in yet.
-const NOTICES = {
-  pending_approval: {
-    tone: 'wait',
-    title: 'Waiting for approval',
-    text: 'Your registration was received. The administrator must approve your account before you can log in. Please try again later.',
-  },
-  not_approved: {
-    tone: 'stop',
-    title: 'Registration not approved',
-    text: 'The administrator did not approve this account. Please contact the administrator for help.',
-  },
-};
-
-function NoticeIcon({ tone }) {
-  return tone === 'wait' ? (
-    <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <circle cx="12" cy="12" r="9" />
-      <path d="M12 7v5l3 2" />
-    </svg>
-  ) : (
-    <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <circle cx="12" cy="12" r="9" />
-      <path d="M8 8l8 8M16 8l-8 8" />
-    </svg>
-  );
-}
-
 export default function LoginPage() {
   const { user, login } = useAuth();
   const navigate = useNavigate();
   const [userId, setUserId] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [notice, setNotice] = useState(null);
   const [busy, setBusy] = useState(false);
+  const [show, setShow] = useState(false);
 
   if (user) return <Navigate to="/" replace />;
 
   const submit = async (e) => {
     e.preventDefault();
     setError('');
-    setNotice(null);
     setBusy(true);
     try {
       await login(cleanId(userId), password);
       navigate('/');
     } catch (err) {
-      if (err.code === 'pending_approval' || err.code === 'not_approved') setNotice(NOTICES[err.code]);
-      else setError(err.message);
+      setError(err.message);
       setBusy(false);
     }
   };
@@ -61,8 +31,8 @@ export default function LoginPage() {
   return (
     <AuthShell>
       <form className="form-block" onSubmit={submit}>
-        <h1>Log in</h1>
-        <p className="muted">Students, lecturers and the administrator all log in here.</p>
+        <h1>Welcome back</h1>
+        <p className="muted">Log in to continue your learning.</p>
 
         <label htmlFor="sid">ID</label>
         <input
@@ -75,17 +45,11 @@ export default function LoginPage() {
         />
 
         <label htmlFor="pw">Password</label>
-        <input id="pw" type="password" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="current-password" required />
+        <div className="pw-wrap">
+          <input id="pw" type={show ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="current-password" required />
+          <button type="button" className="pw-toggle" onClick={() => setShow(!show)}>{show ? 'Hide' : 'Show'}</button>
+        </div>
 
-        {notice && (
-          <div className={`notice ${notice.tone}`} role="status">
-            <span className="notice-icon"><NoticeIcon tone={notice.tone} /></span>
-            <div>
-              <strong>{notice.title}</strong>
-              <p>{notice.text}</p>
-            </div>
-          </div>
-        )}
         {error && <p className="error" role="alert">{error}</p>}
         <button className="btn" disabled={busy} type="submit">
           {busy ? 'Logging in...' : 'Log in'}
