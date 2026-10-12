@@ -2,18 +2,18 @@
 
 New endpoints (student token required):
 - `GET /api/v1/c1/plan/:studentId` returns today's tasks, the day by day calendar, the next review dates and the predicted exam level.
-- `PUT /api/v1/c1/exam-date` with `{ "studentId": "...", "examDate": "2026-11-20" }` saves the exam date. Send `null` to clear it.
+- `PUT /api/v1/c1/exam-date` with `{ "studentId": "...", "module": "SE3020", "examDate": "2026-11-20" }` saves the exam date of one module. Send `null` as the date to clear it.
 
-New collection: `student_plans` (`student_id`, `exam_date`, `updated_at`). Created on first save.
+New collection: `student_plans` (`student_id`, `exam_dates` as `{ moduleCode: date }`, `updated_at`). Created on first save.
 
 ## How the plan is built (`planService.js`)
 1. **Forgetting curve.** score after d days = stored score x (0.35 + 0.65 x e^(-d / stability)), stability = 14 days x (1 + 0.6 x sessions).
 2. **Review due date.** The day a topic has kept 80% of its last score (about 0.37 x stability after the last practice).
 3. **Priority.** Gap to the 70% target on exam day, points lost to forgetting, overdue bonus, never-practised bonus, and a behaviour adjustment (guessing or needs-revision up, strong and quick down).
 4. **Behaviour.** Per topic reads from `behaviourService` (guessing, needs revision, knows it but slow, strong). A student whose recent pattern is Rushing or Guessing is told to slow down on every task.
-5. **Exam date.** Tasks per day grow as the exam gets closer (2, 3, 4, then 5 in the last 2 days). The last 2 days are final revision. Without an exam date the plan covers the next 14 days.
+5. **Exam dates, one per module.** A topic is planned against the exam of its own module. Tasks per day follow the nearest upcoming exam (2, 3, 4, then 5 in the last 2 days). The last 2 days before a module's exam are final revision for its topics, the exam day has no quiz for that module, and its topics leave the plan after the exam. Modules with no date are planned for the next 14 days.
 6. **Calendar simulation.** Each planned quiz is assumed to keep the topic's accuracy (at least 60%), moves the score by the same expected value rule as the forecast, and lengthens the next review gap.
-7. **Predicted exam level.** Average topic score on exam day with the plan, and with no more practice.
+7. **Predicted exam level.** Per module (on its own exam day) and overall, with the plan and with no more practice.
 
 Check the rules without a database: `node backend/scripts/checkPlan.js` (from the backend folder).
 

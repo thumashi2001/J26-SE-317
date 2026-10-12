@@ -63,7 +63,10 @@ export default function TopicPage() {
       .then((d) => alive && setInfo((d.topics || {})[topic] || null))
       .catch(() => {}); // the page works without the extra explanation
     getPlan(user.student_id)
-      .then((p) => alive && setExamDate(p.examDate))
+      .then((p) => {
+        const mod = (p.modules || []).find((m) => m.code === topicModule(topic));
+        if (alive) setExamDate(mod && mod.examDate ? mod.examDate : null);
+      })
       .catch(() => {});
     return () => {
       alive = false;

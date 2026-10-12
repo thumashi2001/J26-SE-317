@@ -16,7 +16,7 @@ const KIND_TEXT = {
 // (guessing, slow, strong) and the number of days left before the exam.
 export default function TodayPlan({ plan }) {
   if (!plan) return <section className="panel plan-card"><p className="muted">Working out today's plan...</p></section>;
-  const { today, daysLeft, slowDown, examDate } = plan;
+  const { today, daysLeft, slowDown, nextExam, hasExamDates } = plan;
   const tasks = today.tasks;
   return (
     <section className="panel plan-card" aria-labelledby="today-title">
@@ -27,19 +27,19 @@ export default function TodayPlan({ plan }) {
             {tasks.length === 0
               ? 'Nothing is due today. Enjoy the rest.'
               : `${tasks.length} short ${tasks.length === 1 ? 'quiz' : 'quizzes'}, about ${today.minutes} minutes.`}
-            {daysLeft !== null && ` Exam in ${daysLeft} ${daysLeft === 1 ? 'day' : 'days'}.`}
+            {nextExam && ` Next exam: ${nextExam.module} in ${daysLeft} ${daysLeft === 1 ? 'day' : 'days'}.`}
           </p>
         </div>
-        {daysLeft !== null && (
-          <div className="countdown" aria-label={`${daysLeft} days to the exam`}>
+        {nextExam && (
+          <div className="countdown" aria-label={`${daysLeft} days to the ${nextExam.module} exam`}>
             <strong>{daysLeft}</strong>
-            <span>{daysLeft === 1 ? 'day left' : 'days left'}</span>
+            <span>{nextExam.module}</span>
           </div>
         )}
       </header>
 
-      {!examDate && (
-        <p className="plan-note">Set your exam date in the calendar and this plan will count down to it. Until then it plans the next 2 weeks.</p>
+      {!hasExamDates && (
+        <p className="plan-note">Add the exam date of each module in the calendar and this plan will count down to them. Until then it plans the next 2 weeks.</p>
       )}
       {slowDown && (
         <p className="plan-note warm">Your recent answers were quick, so every task below asks you to slow down. Fast correct answers count less.</p>
@@ -51,6 +51,7 @@ export default function TodayPlan({ plan }) {
             <span className="plan-num" aria-hidden="true">{i + 1}</span>
             <div className="plan-body">
               <div className="plan-line">
+                <span className="plan-mod">{t.module}</span>
                 <Link to={`/c1/topic/${t.topic}`} className="plan-name">{prettyTopic(t.topic)}</Link>
                 <span className={`plan-tag k-${t.kind}`}>{KIND_TEXT[t.kind] || t.label}</span>
               </div>
