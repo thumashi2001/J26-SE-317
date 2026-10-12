@@ -1,0 +1,47 @@
+/* Dashboard: full-width layout, KPI tiles, plan row and coloured topic cards */
+.dash { width: 100%; }
+.dash-top { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 18px; align-items: stretch; margin-top: 4px; }
+.dhero { background: linear-gradient(135deg, color-mix(in srgb, var(--primary) 16%, var(--panel)) 0%, var(--panel) 70%); }
+.kpis { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.kpi { --c: var(--primary); display: flex; flex-direction: column; gap: 4px; padding: 16px 18px; border-radius: 18px; background: color-mix(in srgb, var(--c) 11%, var(--panel)); border: 1px solid color-mix(in srgb, var(--c) 26%, var(--line)); min-width: 0; }
+.kpi.k-blue { --c: var(--primary); }
+.kpi.k-teal { --c: var(--strong); }
+.kpi.k-indigo { --c: var(--weak); }
+.kpi.k-sky { --c: var(--fair); }
+.kpi-label { font-size: 0.74rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: var(--c); }
+.kpi-value { font-family: var(--font-head); font-size: 1.9rem; line-height: 1.1; color: var(--text); }
+.kpi-note { font-size: 0.82rem; color: var(--text-2); overflow-wrap: anywhere; }
+
+.plan-row { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(320px, 1fr); gap: 18px; align-items: start; margin-top: 18px; }
+.alert-panel { margin: 18px 0 0; }
+.alert-panel .alerts { margin: 8px 0 0; max-height: 200px; overflow-y: auto; }
+.dash .tp-head h2 { margin-top: 26px; }
+@media (max-width: 1100px) { .dash-top, .plan-row { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 520px) { .kpis { grid-template-columns: 1fr; } }
+
+/* topic cards: colour by level, simple content */
+.tp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 16px; }
+.tp-card { --c: var(--strong); position: relative; display: flex; flex-direction: column; gap: 14px; padding: 18px; border-radius: 20px;
+  background: color-mix(in srgb, var(--c) 13%, var(--panel)); border: 1px solid color-mix(in srgb, var(--c) 30%, var(--line));
+  transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s; animation: tpin 0.45s ease-out both; }
+.tp-card.weak { --c: var(--weak); } .tp-card.fair { --c: var(--fair); } .tp-card.strong { --c: var(--strong); }
+.tp-card:hover { transform: translateY(-3px); border-color: var(--c); box-shadow: 0 14px 30px color-mix(in srgb, var(--c) 22%, transparent); }
+@keyframes tpin { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+.tp-care { position: absolute; top: 12px; right: 12px; width: 10px; height: 10px; border-radius: 50%; background: var(--text); }
+.tp-main { display: flex; gap: 14px; align-items: center; text-decoration: none; color: inherit; }
+.tp-main:focus-visible { outline: 3px solid var(--focus-soft); outline-offset: 4px; border-radius: 12px; }
+.tp-ring { width: 68px; height: 68px; flex: none; }
+.tp-ring .trk { fill: none; stroke: color-mix(in srgb, var(--c) 18%, var(--panel)); stroke-width: 7; }
+.tp-ring .fil { fill: none; stroke: var(--c); stroke-width: 7; stroke-linecap: round; animation: tpring 0.9s ease-out both; }
+@keyframes tpring { from { stroke-dashoffset: var(--full); } }
+.tp-ring text { font-family: var(--font-head); font-weight: 800; font-size: 19px; fill: var(--text); }
+.tp-title { display: flex; flex-direction: column; gap: 4px; min-width: 0; padding-right: 10px; }
+.tp-name { font-weight: 700; font-size: 0.98rem; line-height: 1.28; overflow-wrap: break-word; }
+.tp-level { font-size: 0.8rem; font-weight: 800; color: var(--c); }
+.tp-go { margin-top: auto; display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; font-weight: 700; font-size: 0.9rem; padding: 9px 14px; border-radius: 12px; color: var(--text); background: var(--panel); border: 1px solid color-mix(in srgb, var(--c) 40%, var(--line)); transition: background 0.15s, color 0.15s, gap 0.15s; }
+.tp-go:hover { background: var(--c); color: #fff; gap: 12px; }
+.tp-go.off { color: var(--muted); font-weight: 600; background: transparent; border-style: dashed; }
+.tp-avg { background: color-mix(in srgb, var(--c) 16%, var(--panel)); color: var(--text); border: 1px solid color-mix(in srgb, var(--c) 40%, var(--line)); }
+.tp-code { background: var(--chip-bg); color: var(--primary-dark); }
+.tp-seg button.on { background: var(--primary); color: #fff; }
+@media (prefers-reduced-motion: reduce) { .tp-card, .tp-ring .fil { animation: none; transition: none; } .tp-card:hover { transform: none; } }

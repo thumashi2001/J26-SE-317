@@ -11,9 +11,10 @@ const PAD = { top: 22, right: 76, bottom: 44, left: 44 };
 const INK = 'var(--text)';
 const MUTED = 'var(--muted)';
 const GRID = 'var(--track)';
-const PLAN = 'var(--good)';
-const NOTHING = 'var(--bad)';
+const PLAN = '#2f6fd6';
+const NOTHING = '#d9534f';
 const WEAK = 30;
+const PASS = 70; // the strong zone starts here
 
 const dateOf = (start, offset) => {
   const d = new Date(start);
@@ -86,8 +87,13 @@ export default function ForecastChart({ data, start, planLabel }) {
 
           {active !== null && <line x1={x(active)} x2={x(active)} y1={PAD.top} y2={H - PAD.bottom} stroke={MUTED} strokeWidth="1" />}
 
-          <path d={line(data.nothing.series)} fill="none" stroke={NOTHING} strokeWidth="2" strokeDasharray="6 5" />
-          <path d={line(data.plan.series)} fill="none" stroke={PLAN} strokeWidth="2" />
+          <rect x={PAD.left} y={y(100)} width={innerW} height={y(PASS) - y(100)} fill="var(--strong)" opacity="0.09" />
+          <line x1={PAD.left} x2={W - PAD.right} y1={y(PASS)} y2={y(PASS)} stroke="var(--strong)" strokeWidth="1.5" strokeDasharray="5 4" />
+          <text x={W - PAD.right - 4} y={y(PASS) - 5} textAnchor="end" fontSize="12" fontWeight="700" fill="var(--strong)">Strong zone 70+</text>
+          <path d={`${line(data.plan.series)} L${x(n - 1)},${y(0)} L${x(0)},${y(0)} Z`} fill={PLAN} opacity="0.1" />
+          <line x1={x(0)} x2={x(0)} y1={PAD.top} y2={H - PAD.bottom} stroke={INK} strokeWidth="1.5" strokeDasharray="3 3" opacity="0.6" />
+          <path d={line(data.nothing.series)} fill="none" stroke={NOTHING} strokeWidth="2.5" strokeDasharray="6 5" strokeLinecap="round" />
+          <path d={line(data.plan.series)} fill="none" stroke={PLAN} strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
 
           {data.practiceDays.map((d) => (
             <circle key={d} cx={x(d)} cy={y(data.plan.series[d])} r="3.5" fill={PLAN} stroke="var(--panel)" strokeWidth="1.5" />
@@ -116,7 +122,7 @@ export default function ForecastChart({ data, start, planLabel }) {
       </div>
 
       <figcaption className="chart-note">
-        Hover the chart to read any day. Dots on the green line are practice days.
+        Hover the chart to read any day. Dots on the blue line are practice days.
         {' '}
         <button type="button" className="btn-link-dark" onClick={() => setShowTable(!showTable)}>
           {showTable ? 'Hide table' : 'Show as table'}

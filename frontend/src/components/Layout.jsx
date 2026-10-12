@@ -35,7 +35,16 @@ export default function Layout({ menu, roleLabel }) {
   return (
     <div className="shell">
       <aside className="sidebar">
-        <div className="side-brand"><Logo size={34} onDark /></div>
+        <div className="side-brand"><Logo size={36} onDark /></div>
+        <div className="side-user">
+          <div className="avatar">{initials}</div>
+          <div className="side-user-text">
+            <div className="side-name">{user.name}</div>
+            <div className="side-sub">
+              {user.role === 'student' ? `${user.student_id}, ${user.semester}` : user.id}
+            </div>
+          </div>
+        </div>
         <div className="side-role">{roleLabel}</div>
         <nav>
           {menu.filter((m) => !m.onlyBeforeDiagnostic || diagnosticDone === false).map((m, i) =>
@@ -59,19 +68,9 @@ export default function Layout({ menu, roleLabel }) {
             )
           )}
         </nav>
-        <div className="side-theme"><ThemeToggle onDark /></div>
-        <div className="side-user">
-          <div className="avatar">{initials}</div>
-          <div className="side-user-text">
-            <div className="side-name">{user.name}</div>
-            <div className="side-sub">
-              {user.role === 'student' ? `${user.student_id}, ${user.semester}` : user.id}
-            </div>
-          </div>
-          <button
-            className="btn-ghost"
-            onClick={signOut}
-          >
+        <div className="side-bottom">
+          <ThemeToggle onDark />
+          <button className="btn-ghost" onClick={signOut}>
             Log out
           </button>
         </div>
