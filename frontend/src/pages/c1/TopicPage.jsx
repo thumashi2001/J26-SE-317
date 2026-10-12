@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { getHistory, getInsights } from '../../services/c1Api.js';
-import { prettyTopic, scoreBand } from '../../utils/topics.js';
+import { prettyTopic, scoreBand, topicModule, topicLectures } from '../../utils/topics.js';
 import ScoreChart from '../../components/charts/ScoreChart.jsx';
 import WhatIfPanel from '../../components/WhatIfPanel.jsx';
 import './practice.css';
@@ -57,6 +57,7 @@ export default function TopicPage() {
     <div>
       <Link to="/c1/dashboard" className="btn secondary back">&larr; Back to my learning state</Link>
       <h1>{prettyTopic(topic)}</h1>
+      {topicModule(topic) && <p className="muted small topic-sub">{topicModule(topic)}, lectures {topicLectures(topic)}</p>}
 
       <section className={`panel topic-head ${band}`}>
         <div>

@@ -1,6 +1,6 @@
 import { recordSnapshot } from './historyService.js';
 
-const QUESTIONS_PER_TOPIC = 2;
+const QUESTIONS_PER_TOPIC = 1;
 
 function httpError(status, message) {
   const err = new Error(message);

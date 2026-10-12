@@ -118,3 +118,5 @@
 .topic-read.read-revise { color: var(--bad-ink); }
 .dash .heat { grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
 @media (max-width: 980px) { .dash-top { grid-template-columns: 1fr; } .dhero { flex-direction: column-reverse; align-items: flex-start; } }
+.topic-module { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.04em; color: var(--text-2); margin-bottom: 2px; }
+.topic-sub { margin-top: -6px; }
