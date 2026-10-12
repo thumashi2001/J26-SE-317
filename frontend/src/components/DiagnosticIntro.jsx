@@ -46,6 +46,7 @@ export default function DiagnosticIntro({ name, onStart, onLogout }) {
           </p>
           <ul className="dxi-points">
             <li><span aria-hidden="true">🎯</span> One question for every topic in your semester</li>
+            <li><span aria-hidden="true">⏱️</span> A timer starts when you press the button: about 40 seconds for each question</li>
             <li><span aria-hidden="true">💚</span> No pass or fail. It only helps us help you</li>
             <li><span aria-hidden="true">🔓</span> Everything else opens as soon as you finish</li>
           </ul>

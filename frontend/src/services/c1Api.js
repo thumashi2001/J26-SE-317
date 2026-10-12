@@ -3,8 +3,8 @@ import { api } from './apiClient.js';
 export const getDiagnostic = (studentId) =>
   api(`/c1/diagnostic?studentId=${encodeURIComponent(studentId)}`);
 
-export const submitDiagnostic = (studentId, answers) =>
-  api('/c1/diagnostic/submit', { method: 'POST', body: { studentId, answers } });
+export const submitDiagnostic = (studentId, answers, meta = {}) =>
+  api('/c1/diagnostic/submit', { method: 'POST', body: { studentId, answers, ...meta } });
 
 export const getTwin = (studentId) => api(`/c1/twin/${encodeURIComponent(studentId)}`);
 
@@ -22,6 +22,9 @@ export const startPractice = (topic) => api('/c1/practice/start', { method: 'POS
 
 export const answerPractice = ({ sessionId, questionId, selected, timeSec, tabLeaves, awaySec }) =>
   api('/c1/practice/answer', { method: 'POST', body: { sessionId, questionId, selected, timeSec, tabLeaves, awaySec } });
+
+export const hintPractice = ({ sessionId, questionId }) =>
+  api('/c1/practice/hint', { method: 'POST', body: { sessionId, questionId } });
 
 // Engagement index, confidence per topic and the estimated score now.
 export const getInsights = (studentId) => api(`/c1/insights/${encodeURIComponent(studentId)}`);
