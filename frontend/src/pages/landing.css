@@ -156,3 +156,22 @@
 
 @media (max-width: 600px) { .lp-nav .logo-name { display: none; } .lp-nav .theme-label { display: none; } .lp-nav .theme-toggle { padding: 8px 10px; } }
 @media (max-width: 600px) { .lp-nav-in { gap: 8px; } .lp-nav-cta { gap: 6px; } .lp-nav-cta .lp-btn { padding: 9px 14px; } .bm-logo { padding: 4px 7px; } }
+
+/* animated laptop scene */
+.laptop-scene { width: 100%; height: auto; display: block; }
+.laptop-scene .ls-cloud { animation: lscloud 14s ease-in-out infinite alternate; }
+@keyframes lscloud { from { transform: translateX(0); } to { transform: translateX(40px); } }
+.laptop-scene .ls-stu-a, .laptop-scene .ls-stu-b { animation: lsbob 3.2s ease-in-out infinite; transform-box: fill-box; transform-origin: bottom center; }
+.laptop-scene .ls-stu-b { animation-delay: 0.8s; }
+@keyframes lsbob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+.laptop-scene .ls-arm-up { opacity: 0; transition: opacity 0.3s; transform-box: fill-box; transform-origin: 70% 90%; }
+.laptop-scene .ls-arm-up.on { opacity: 1; animation: lswave 0.6s ease-in-out infinite alternate; }
+@keyframes lswave { from { transform: rotate(-12deg); } to { transform: rotate(14deg); } }
+.laptop-scene .ls-stu-b.cheer .ls-arm-b { animation: lswave 0.5s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: 20% 90%; }
+.laptop-scene .ls-spark { opacity: 0; transform-box: fill-box; transform-origin: center; }
+.laptop-scene .ls-spark.on { opacity: 1; animation: lstwinkle 0.9s ease-in-out infinite alternate; }
+@keyframes lstwinkle { from { transform: scale(0.8) rotate(-8deg); } to { transform: scale(1.15) rotate(8deg); } }
+.laptop-scene .ls-plus { animation: lsplus 2.4s ease-out infinite; }
+@keyframes lsplus { 0% { opacity: 0; transform: translateY(8px); } 30% { opacity: 1; } 100% { opacity: 0; transform: translateY(-14px); } }
+.laptop-scene .ls-badge.on rect { fill: #12304f; }
+@media (prefers-reduced-motion: reduce) { .laptop-scene * { animation: none !important; } }
