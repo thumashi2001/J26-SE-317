@@ -1,6 +1,7 @@
 import { httpError } from './aiClient.js';
 import { behaviourFrom, topicReads } from './behaviourService.js';
 import { practiceTopics } from './practiceService.js';
+import { TOPICS } from '../data/content/index.js';
 
 // STUDY PLAN from the forgetting curve, the student's answer behaviour and the exam date.
 //
@@ -18,12 +19,17 @@ import { practiceTopics } from './practiceService.js';
 //   overdue           a bonus when the review date has passed
 //   behaviour         guessing or needs-revision topics get a bonus, strong and quick topics a discount
 //
+// EXAM DATES   every module has its own exam date. A topic is planned against the exam of its module.
+//   Topics of a module with no date are planned for the next 14 days. Once a module's exam day has passed
+//   its topics leave the plan. The daily task count follows the nearest upcoming exam.
+//
 // TODAY'S TASKS   the number of topics scales with the days left (more as the exam gets closer)
 //   a student who is rushing or guessing is told to slow down on every task
 //
 // CALENDAR   the plan is simulated day by day. Each practice is assumed to keep the topic's accuracy
 //   (at least 60%), moves the score by the same expected-value rule as the forecast, and makes the
-//   topic fade more slowly, so the review spacing grows. The last 2 days before the exam are final revision.
+//   topic fade more slowly, so the review spacing grows. The last 2 days before a module's exam are final
+//   revision for that module's topics.
 //
 // Nothing here calls the AI service, so the plan works even when it is offline.
 
@@ -95,52 +101,75 @@ function describeTask(t, daysLeft) {
   return `${parts.join(', ')}.`;
 }
 
-// Build the plan from plain data so it can be tested without a database.
-export function buildPlan({ mastery, events, examDate, now = new Date(), practicable = null, engagement = null }) {
-  const today = startOfDay(now);
-  const exam = examDate ? parseDate(examDate) : null;
-  let daysLeft = exam ? daysBetween(today, exam) : null;
-  if (daysLeft !== null && daysLeft < 0) daysLeft = null; // the exam date has passed: plan as if none is set
-  const examActive = daysLeft !== null;
-  const horizon = examActive ? Math.min(daysLeft, MAX_HORIZON) : 14;
+export const DEFAULT_HORIZON = 14;
 
+const moduleOfTopic = (topic) => (TOPICS[topic] ? TOPICS[topic].module_code : null);
+const moduleNameOf = (code) => {
+  const hit = Object.values(TOPICS).find((t) => t.module_code === code);
+  return hit ? hit.module_name : '';
+};
+export const knownModules = () => [...new Set(Object.values(TOPICS).map((t) => t.module_code))];
+
+// Build the plan from plain data so it can be tested without a database.
+// examDates is { moduleCode: 'YYYY-MM-DD' }. moduleOf(topic) gives the module code of a topic.
+export function buildPlan({ mastery, events, examDates = {}, now = new Date(), practicable = null, engagement = null, moduleOf = moduleOfTopic, moduleName = moduleNameOf }) {
+  const today = startOfDay(now);
   const reads = topicReads(events || []);
   const overall = behaviourFrom(events || [], now);
   const slowDown = overall.pattern === 'Rushing' || overall.pattern === 'Guessing';
 
-  const topics = Object.entries(mastery || {})
+  const offsetOf = (code) => {
+    const d = examDates && examDates[code] ? parseDate(examDates[code]) : null;
+    return d ? daysBetween(today, d) : null; // negative = the exam has passed
+  };
+
+  const all = Object.entries(mastery || {})
     .filter(([t]) => !practicable || practicable.includes(t))
     .map(([topic, m]) => {
+      const module = moduleOf(topic) || 'Other';
+      const off = offsetOf(module);
       const last = m.last_practiced ? new Date(m.last_practiced) : today;
-      const sessions = m.practice_sessions || 0;
-      const daysSince = Math.max(0, (now.getTime() - last.getTime()) / DAY_MS);
-      const stored = m.score;
-      const nowScore = decay(stored, daysSince, sessions);
-      const examIfStop = decay(stored, daysSince + (examActive ? daysLeft : 14), sessions);
-      const dueInDays = reviewAfterDays(sessions) - daysSince;
-      const read = reads[topic] || null;
-      const beh = read ? BEHAVIOUR[read.key] : null;
-      return {
-        topic, stored, sessions, daysSince, now: nowScore, examIfStop, dueInDays,
-        overdueDays: Math.max(0, -dueInDays),
-        accuracy: accuracyOf(m),
-        read, beh,
-      };
+      return { topic, m, module, examOffset: off !== null && off >= 0 ? off : null, passed: off !== null && off < 0, last };
     });
+  const live = all.filter((t) => !t.passed);
+
+  const offsets = live.map((t) => t.examOffset).filter((o) => o !== null);
+  const horizon = offsets.length ? Math.min(Math.max(...offsets), MAX_HORIZON) : DEFAULT_HORIZON;
+  const nearestDays = offsets.length ? Math.min(...offsets) : null;
+
+  const topics = live.map(({ topic, m, module, examOffset, last }) => {
+    const sessions = m.practice_sessions || 0;
+    const daysSince = Math.max(0, (now.getTime() - last.getTime()) / DAY_MS);
+    const stored = m.score;
+    const end = examOffset !== null ? examOffset : DEFAULT_HORIZON;
+    const nowScore = decay(stored, daysSince, sessions);
+    const examIfStop = decay(stored, daysSince + end, sessions);
+    const dueInDays = reviewAfterDays(sessions) - daysSince;
+    const read = reads[topic] || null;
+    const beh = read ? BEHAVIOUR[read.key] : null;
+    return {
+      topic, module, examOffset, end, stored, sessions, daysSince, now: nowScore, examIfStop, dueInDays,
+      overdueDays: Math.max(0, -dueInDays),
+      accuracy: accuracyOf(m),
+      read, beh,
+    };
+  });
 
   const priority = (t) => {
     const gap = Math.max(0, TARGET - t.examIfStop);
     const fading = Math.max(0, t.now - t.examIfStop);
     const overdue = Math.min(20, t.overdueDays * 2) + (t.dueInDays <= 0.5 ? 8 : 0);
     const start = t.sessions === 0 ? 6 : 0;
-    return gap * 0.6 + fading * 0.5 + overdue + start + (t.beh ? t.beh.bonus : 0);
+    // a nearer exam makes the same gap more urgent
+    const near = t.examOffset !== null ? Math.max(0, 14 - t.examOffset) * 0.8 : 0;
+    return gap * 0.6 + fading * 0.5 + overdue + start + near + (t.beh ? t.beh.bonus : 0);
   };
   topics.forEach((t) => { t.priority = priority(t); });
 
   // ---- today's tasks
-  const limit = tasksPerDay(examActive ? daysLeft : null);
+  const limit = tasksPerDay(nearestDays);
   const due = topics.filter((t) => t.dueInDays <= 0.5 || t.sessions === 0 || t.examIfStop < TARGET - 15 || (t.beh && t.beh.kind !== 'keep_sharp'));
-  const pool = (due.length >= limit ? due : [...due, ...topics.filter((t) => !due.includes(t))]);
+  const pool = due.length >= limit ? due : [...due, ...topics.filter((t) => !due.includes(t))];
   const todayTasks = pool
     .sort((a, b) => b.priority - a.priority)
     .slice(0, limit)
@@ -152,6 +181,8 @@ export function buildPlan({ mastery, events, examDate, now = new Date(), practic
       if (slowDown && kind !== 'slow_down') tips.push('Your recent answers were quick, so take at least 15 seconds a question.');
       return {
         topic: t.topic,
+        module: t.module,
+        examInDays: t.examOffset,
         kind,
         label,
         minutes: SESSION_MINUTES,
@@ -160,7 +191,7 @@ export function buildPlan({ mastery, events, examDate, now = new Date(), practic
         examIfStop: Math.round(t.examIfStop),
         daysSincePractice: Math.round(t.daysSince * 10) / 10,
         overdue: t.overdueDays >= 1,
-        why: describeTask(t, examActive ? daysLeft : null),
+        why: describeTask(t, t.examOffset),
         tips,
       };
     });
@@ -168,38 +199,45 @@ export function buildPlan({ mastery, events, examDate, now = new Date(), practic
   // ---- calendar simulation
   const sim = topics.map((t) => ({
     topic: t.topic,
+    module: t.module,
+    examOffset: t.examOffset,
+    end: t.examOffset !== null ? t.examOffset : horizon,
     stored: t.stored,
     sessions: t.sessions,
     lastDay: -t.daysSince, // day offset of the last practice, relative to today
     nextDue: -t.daysSince + reviewAfterDays(t.sessions),
     accuracy: t.accuracy,
     weight: t.priority,
-    plannedToday: false,
   }));
   const todaySet = new Set(todayTasks.map((t) => t.topic));
+  const examsOn = {};
+  Object.keys(examDates || {}).forEach((code) => {
+    const o = offsetOf(code);
+    if (o !== null && o >= 0 && o <= horizon && live.some((t) => t.module === code)) (examsOn[o] ||= []).push(code);
+  });
+
   const days = [];
   for (let d = 0; d <= horizon; d++) {
     const date = new Date(today.getTime() + d * DAY_MS);
-    const isExam = examActive && d === daysLeft;
-    const cap = tasksPerDay(examActive ? daysLeft - d : null);
-    const final = examActive && daysLeft - d <= 2 && !isExam;
+    const open = sim.filter((s) => s.examOffset === null || d < s.examOffset); // the exam day itself has no quiz
+    const upcoming = sim.map((s) => s.examOffset).filter((o) => o !== null && o >= d);
+    const cap = tasksPerDay(upcoming.length ? Math.min(...upcoming) - d : null);
+    const inFinal = (s) => s.examOffset !== null && s.examOffset - d <= 2 && s.examOffset > d;
     let picks = [];
     if (d === 0) {
-      picks = sim.filter((s) => todaySet.has(s.topic));
-    } else if (!isExam) {
-      const dueNow = sim.filter((s) => s.nextDue <= d + 0.01);
-      // weak-for-the-exam topics are worth an extra look: pull them forward when they will end below target
-      const risky = sim.filter((s) => !dueNow.includes(s) && decay(s.stored, (examActive ? daysLeft : horizon) - s.lastDay, s.sessions) < TARGET - 10 && d - s.lastDay >= 3);
+      picks = open.filter((s) => todaySet.has(s.topic));
+    } else if (open.length) {
+      const dueNow = open.filter((s) => s.nextDue <= d + 0.01);
+      // topics that will end below target are worth an extra look: pull them forward
+      const risky = open.filter((s) => !dueNow.includes(s) && decay(s.stored, s.end - s.lastDay, s.sessions) < TARGET - 10 && d - s.lastDay >= 3);
       picks = [...dueNow, ...risky].sort((a, b) => b.weight - a.weight).slice(0, cap);
-      // keep a daily rhythm: a day with nothing due still gets one short quiz on the topic that needs it most
       if (picks.length === 0) {
-        const rhythm = sim.filter((s) => d - s.lastDay >= 2 && decay(s.stored, d - s.lastDay, s.sessions) < TARGET + 10).sort((a, b) => b.weight - a.weight)[0];
+        // keep a daily rhythm: a day with nothing due still gets one short quiz on the topic that needs it most
+        const rhythm = open.filter((s) => d - s.lastDay >= 2 && decay(s.stored, d - s.lastDay, s.sessions) < TARGET + 10).sort((a, b) => b.weight - a.weight)[0];
         if (rhythm) picks = [rhythm];
       }
-      if (final) {
-        const rest = [...sim].sort((a, b) => b.weight - a.weight).filter((s) => !picks.includes(s));
-        picks = [...picks, ...rest].slice(0, cap);
-      }
+      const finals = open.filter(inFinal).sort((a, b) => b.weight - a.weight).filter((s) => !picks.includes(s));
+      picks = [...picks, ...finals].slice(0, Math.max(cap, picks.length));
     }
     const items = picks.map((s) => {
       const faded = decay(s.stored, d - s.lastDay, s.sessions);
@@ -207,17 +245,35 @@ export function buildPlan({ mastery, events, examDate, now = new Date(), practic
       s.sessions += 1;
       s.lastDay = d;
       s.nextDue = d + reviewAfterDays(s.sessions);
-      return { topic: s.topic, kind: final ? 'final' : d === 0 ? 'today' : 'review' };
+      return { topic: s.topic, module: s.module, kind: d === 0 ? 'today' : inFinal(s) ? 'final' : 'review' };
     });
-    days.push({ date: isoDate(date), offset: d, isToday: d === 0, isExam, finalRevision: final, items });
+    const exams = (examsOn[d] || []).map((code) => ({ module: code, name: moduleName(code) }));
+    days.push({ date: isoDate(date), offset: d, isToday: d === 0, isExam: exams.length > 0, exams, finalRevision: items.some((i) => i.kind === 'final'), items });
   }
 
-  // ---- predicted exam score, with and without following the plan
-  const endDay = examActive ? daysLeft : horizon;
-  const withPlan = sim.map((s) => decay(s.stored, endDay - s.lastDay, s.sessions));
-  const without = topics.map((t) => decay(t.stored, t.daysSince + endDay, t.sessions));
+  // ---- predicted exam level, per module and overall, with and without following the plan
   const avg = (a) => (a.length ? Math.round(a.reduce((x, y) => x + y, 0) / a.length) : 0);
-  const planned = days.reduce((n, d) => n + d.items.length, 0);
+  const withPlanOf = (s) => decay(s.stored, s.end - s.lastDay, s.sessions);
+  const withoutOf = (t) => decay(t.stored, t.daysSince + t.end, t.sessions);
+  const codes = [...new Set([...all.map((t) => t.module), ...Object.keys(examDates || {}).filter((c) => all.some((t) => t.module === c))])];
+  const modules = codes.map((code) => {
+    const off = offsetOf(code);
+    const sims = sim.filter((s) => s.module === code);
+    const tops = topics.filter((t) => t.module === code);
+    return {
+      code,
+      name: moduleName(code),
+      examDate: examDates && examDates[code] ? examDates[code] : null,
+      daysLeft: off !== null && off >= 0 ? off : null,
+      passed: off !== null && off < 0,
+      topicCount: all.filter((t) => t.module === code).length,
+      predicted: sims.length ? { withPlan: avg(sims.map(withPlanOf)), ifYouStop: avg(tops.map(withoutOf)) } : null,
+    };
+  }).sort((a, b) => (a.examDate && !b.examDate ? -1 : !a.examDate && b.examDate ? 1 : a.examDate && b.examDate ? a.examDate.localeCompare(b.examDate) : a.code.localeCompare(b.code)));
+
+  const withPlan = sim.map(withPlanOf);
+  const without = topics.map(withoutOf);
+  const nextMod = modules.filter((m) => m.daysLeft !== null).sort((a, b) => a.daysLeft - b.daysLeft)[0] || null;
 
   const nextReviews = [...topics]
     .sort((a, b) => a.dueInDays - b.dueInDays)
@@ -225,9 +281,10 @@ export function buildPlan({ mastery, events, examDate, now = new Date(), practic
     .map((t) => ({ topic: t.topic, dueInDays: Math.round(t.dueInDays * 10) / 10, scoreNow: Math.round(t.now) }));
 
   return {
-    examDate: exam ? isoDate(exam) : null,
-    daysLeft: examActive ? daysLeft : null,
-    examPassed: !!exam && daysLeft === null,
+    modules,
+    nextExam: nextMod ? { module: nextMod.code, name: nextMod.name, date: nextMod.examDate, daysLeft: nextMod.daysLeft } : null,
+    daysLeft: nextMod ? nextMod.daysLeft : null,
+    hasExamDates: offsets.length > 0,
     horizonDays: horizon,
     target: TARGET,
     pattern: overall.pattern,
@@ -241,21 +298,24 @@ export function buildPlan({ mastery, events, examDate, now = new Date(), practic
     },
     today: { limit, tasks: todayTasks, minutes: todayTasks.length * SESSION_MINUTES },
     nextReviews,
-    totalPlannedSessions: planned,
+    totalPlannedSessions: days.reduce((n, d) => n + d.items.length, 0),
     engagement: engagement ? { index: engagement.index, label: engagement.label } : null,
     days,
   };
 }
 
-export async function getExamDate(db, studentId) {
+export async function getExamDates(db, studentId) {
   const doc = await db.collection('student_plans').findOne({ student_id: studentId });
-  return doc ? doc.exam_date : null;
+  return doc && doc.exam_dates ? doc.exam_dates : {};
 }
 
-export async function setExamDate(db, studentId, value, now = new Date()) {
+// Save (or clear, with null) the exam date of one module.
+export async function setExamDate(db, studentId, module, value, now = new Date()) {
+  if (!module || !knownModules().includes(module)) throw httpError(400, 'Unknown module');
   const col = db.collection('student_plans');
+  const key = `exam_dates.${module}`;
   if (value === null || value === '' || value === undefined) {
-    await col.deleteOne({ student_id: studentId });
+    await col.updateOne({ student_id: studentId }, { $unset: { [key]: '' }, $set: { updated_at: now.toISOString() } }, { upsert: true });
     return null;
   }
   const d = parseDate(value);
@@ -264,7 +324,7 @@ export async function setExamDate(db, studentId, value, now = new Date()) {
   if (n < 0) throw httpError(400, 'The exam date cannot be in the past');
   if (n > 365) throw httpError(400, 'Pick an exam date within the next year');
   const exam_date = isoDate(d);
-  await col.updateOne({ student_id: studentId }, { $set: { student_id: studentId, exam_date, updated_at: now.toISOString() } }, { upsert: true });
+  await col.updateOne({ student_id: studentId }, { $set: { [key]: exam_date, student_id: studentId, updated_at: now.toISOString() } }, { upsert: true });
   return exam_date;
 }
 
@@ -272,7 +332,7 @@ export async function getPlan(db, studentId, now = new Date()) {
   const state = await db.collection('mastery_state').findOne({ student_id: studentId });
   if (!state || !state.diagnostic_completed) throw httpError(409, 'Complete the diagnostic test first');
   const events = await db.collection('learning_events').find({ student_id: studentId }).toArray();
-  const examDate = await getExamDate(db, studentId);
-  const plan = buildPlan({ mastery: state.mastery, events, examDate, now, practicable: practiceTopics() });
+  const examDates = await getExamDates(db, studentId);
+  const plan = buildPlan({ mastery: state.mastery, events, examDates, now, practicable: practiceTopics() });
   return { studentId, generatedAt: now.toISOString(), ...plan };
 }
