@@ -6,11 +6,14 @@ import { STUDENT_MENU, LECTURER_MENU, ADMIN_MENU } from './config/menus.js';
 import LoginPage from './pages/LoginPage.jsx';
 import RegisterPage from './pages/RegisterPage.jsx';
 import HomeRedirect from './pages/HomeRedirect.jsx';
+import LandingPage from './pages/LandingPage.jsx';
+import { useAuth } from './context/AuthContext.jsx';
 import ComingSoon from './pages/ComingSoon.jsx';
 import DiagnosticPage from './pages/c1/DiagnosticPage.jsx';
 import DashboardPage from './pages/c1/DashboardPage.jsx';
 import TopicPage from './pages/c1/TopicPage.jsx';
 import PracticePage from './pages/c1/PracticePage.jsx';
+import CelebratePreview from './pages/c1/CelebratePreview.jsx';
 import LecturerHome from './pages/lecturer/LecturerHome.jsx';
 import AdminDashboard from './pages/admin/AdminDashboard.jsx';
 import LecturerApprovals from './pages/admin/LecturerApprovals.jsx';
@@ -29,18 +32,25 @@ const area = (role, menu, label) => (
   </ProtectedRoute>
 );
 
+// The first page: the landing page for visitors, the person's own home page after login.
+function Root() {
+  const { user } = useAuth();
+  return user ? <HomeRedirect /> : <LandingPage />;
+}
+
 export default function App() {
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
-      <Route path="/" element={<ProtectedRoute><HomeRedirect /></ProtectedRoute>} />
+      <Route path="/" element={<Root />} />
 
       <Route element={area('student', STUDENT_MENU, 'Student')}>
         <Route path="/c1/diagnostic" element={<DiagnosticPage />} />
         <Route path="/c1/dashboard" element={<DashboardPage />} />
         <Route path="/c1/topic/:topic" element={<TopicPage />} />
         <Route path="/c1/practice/:topic" element={<PracticePage />} />
+        {import.meta.env.DEV && <Route path="/c1/celebrate" element={<CelebratePreview />} />}
 
         <Route path="/c2/*" element={<ComingSoon title="Exam Intelligence" owner="Rupasinghe H T N N" />} />
         <Route path="/c3/*" element={<ComingSoon title="Automated Marking" owner="Edirisinghe T P V K" />} />
