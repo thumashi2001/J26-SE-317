@@ -106,7 +106,7 @@ export default function DiagnosticPage() {
   };
 
   return (
-    <div className="quiz">
+    <div className="quiz dx">
       <div className="quiz-head">
         <h1>Diagnostic test</h1>
         <span className="muted">
