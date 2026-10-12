@@ -75,6 +75,7 @@ export default function ProfilePage() {
   const [pw, setPw] = useState({ current: '', next: '', again: '' });
   const [pwMsg, setPwMsg] = useState({ type: '', text: '' });
   const [showPw, setShowPw] = useState(false);
+  const [editPw, setEditPw] = useState(false);
   const [level, setLevel] = useState(null);
   const [levelErr, setLevelErr] = useState('');
 
@@ -160,6 +161,7 @@ export default function ProfilePage() {
       await changePassword(pw.current, pw.next);
       setPw({ current: '', next: '', again: '' });
       setPwMsg({ type: 'ok', text: 'Your password was changed.' });
+      setEditPw(false);
     } catch (err) {
       setPwMsg({ type: 'err', text: err.message });
     }
@@ -189,8 +191,8 @@ export default function ProfilePage() {
           <h1>{profile.name}</h1>
           <p className="pf-id"><span aria-hidden="true">&#128274;</span> {profile.id}</p>
           <div className="pf-photo-actions">
-            <button type="button" className="pf-btn" onClick={() => fileRef.current && fileRef.current.click()} disabled={picBusy}>{picBusy ? 'Saving...' : 'Change picture'}</button>
-            {profile.avatar && <button type="button" className="pf-btn ghost" onClick={onRemove} disabled={picBusy}>Remove</button>}
+            {picBusy && <span className="pf-ok">Saving...</span>}
+            {profile.avatar && <button type="button" className="pf-btn ghost" onClick={onRemove} disabled={picBusy}>Remove picture</button>}
             {picMsg.text && <span className={picMsg.type === 'ok' ? 'pf-ok' : 'pf-err'} role="status">{picMsg.text}</span>}
           </div>
         </div>
@@ -283,18 +285,27 @@ export default function ProfilePage() {
           <button className="btn" type="submit" disabled={saving || !dirty}>{saving ? 'Saving...' : 'Save changes'}</button>
         </form>
 
-        <form className="pf-card" onSubmit={onPassword}>
-          <h2>Change password</h2>
-          <label htmlFor="pf-cur">Current password</label>
-          <input id="pf-cur" type={showPw ? 'text' : 'password'} value={pw.current} onChange={(e) => setPw({ ...pw, current: e.target.value })} autoComplete="current-password" required />
-          <label htmlFor="pf-new">New password</label>
-          <input id="pf-new" type={showPw ? 'text' : 'password'} minLength={8} value={pw.next} onChange={(e) => setPw({ ...pw, next: e.target.value })} autoComplete="new-password" required />
-          <label htmlFor="pf-again">Repeat the new password</label>
-          <input id="pf-again" type={showPw ? 'text' : 'password'} minLength={8} value={pw.again} onChange={(e) => setPw({ ...pw, again: e.target.value })} autoComplete="new-password" required />
-          <label className="check"><input type="checkbox" checked={showPw} onChange={(e) => setShowPw(e.target.checked)} /> Show passwords</label>
-          {pwMsg.text && <p className={pwMsg.type === 'ok' ? 'pf-ok' : 'pf-err'} role="status">{pwMsg.text}</p>}
-          <button className="btn" type="submit" disabled={!pw.current || !pw.next || !pw.again}>Change password</button>
-        </form>
+        <section className="pf-card">
+          <h2>Password</h2>
+          <div className="pf-pwrow">
+            <span className="pf-dots" aria-label="Hidden password">&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;</span>
+            {!editPw && <button type="button" className="pf-btn ghost" onClick={() => { setEditPw(true); setPwMsg({ type: '', text: '' }); }}>Change</button>}
+          </div>
+          {!editPw && pwMsg.type === 'ok' && <p className="pf-ok" role="status">{pwMsg.text}</p>}
+          {editPw && (
+          <form className="pf-pwform" onSubmit={onPassword}>
+            <label htmlFor="pf-cur">Current password</label>
+            <input id="pf-cur" type={showPw ? 'text' : 'password'} value={pw.current} onChange={(e) => setPw({ ...pw, current: e.target.value })} autoComplete="current-password" required />
+            <label htmlFor="pf-new">New password</label>
+            <input id="pf-new" type={showPw ? 'text' : 'password'} minLength={8} value={pw.next} onChange={(e) => setPw({ ...pw, next: e.target.value })} autoComplete="new-password" required />
+            <label htmlFor="pf-again">Repeat the new password</label>
+            <input id="pf-again" type={showPw ? 'text' : 'password'} minLength={8} value={pw.again} onChange={(e) => setPw({ ...pw, again: e.target.value })} autoComplete="new-password" required />
+            <label className="check"><input type="checkbox" checked={showPw} onChange={(e) => setShowPw(e.target.checked)} /> Show passwords</label>
+            {pwMsg.type === 'err' && <p className="pf-err" role="status">{pwMsg.text}</p>}
+            <div className="pf-row-btns"><button className="btn" type="submit" disabled={!pw.current || !pw.next || !pw.again}>Save new password</button><button type="button" className="pf-btn ghost" onClick={() => { setEditPw(false); setPw({ current: '', next: '', again: '' }); setPwMsg({ type: '', text: '' }); }}>Cancel</button></div>
+          </form>
+          )}
+        </section>
       </div>
     </div>
   );

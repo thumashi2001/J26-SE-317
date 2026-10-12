@@ -63,3 +63,11 @@
 @media (max-width: 1000px) { .pf-grid { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 560px) { .pf-hero { padding: 22px 18px; } .pf-who h1 { font-size: 1.6rem; } }
 @media (prefers-reduced-motion: reduce) { .goal-ring .fil, .lv-bar span, .us-bar i { transition: none; } }
+
+.pf-pwrow { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.pf-dots { letter-spacing: 3px; color: var(--muted); font-size: 1.1rem; }
+.pf-pwform { display: flex; flex-direction: column; gap: 6px; margin-top: 12px; }
+.pf-pwform label:not(.check) { font-size: 0.86rem; font-weight: 600; margin-top: 6px; }
+.pf-row-btns { display: flex; gap: 10px; margin-top: 10px; align-items: center; }
+.pf-card .pf-btn, .pf-pwform .pf-btn { background: var(--panel); color: var(--primary-dark); border: 1px solid var(--line-strong); }
+.pf-card .pf-btn:hover { border-color: var(--primary); background: var(--info-bg); }

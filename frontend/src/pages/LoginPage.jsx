@@ -11,7 +11,6 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
-  const [role, setRole] = useState('student');
   const [show, setShow] = useState(false);
 
   if (user) return <Navigate to="/" replace />;
@@ -34,13 +33,8 @@ export default function LoginPage() {
       <form className="form-block" onSubmit={submit}>
         <h1>Welcome back</h1>
         <p className="muted">Log in to continue your learning.</p>
-        <div className="segment" role="tablist" aria-label="Log in as">
-          {[['student', 'Student'], ['lecturer', 'Lecturer'], ['admin', 'Admin']].map(([k, label]) => (
-            <button key={k} type="button" role="tab" aria-selected={role === k} className={role === k ? 'on' : ''} onClick={() => setRole(k)}>{label}</button>
-          ))}
-        </div>
 
-        <label htmlFor="sid">{role === 'student' ? 'Student ID' : role === 'lecturer' ? 'Lecturer ID' : 'Admin ID'}</label>
+        <label htmlFor="sid">ID</label>
         <input
           id="sid"
           value={userId}
