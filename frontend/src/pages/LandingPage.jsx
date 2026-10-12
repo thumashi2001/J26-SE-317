@@ -2,39 +2,14 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import ThemeToggle from '../components/ThemeToggle.jsx';
 import BrandMark from '../components/BrandMark.jsx';
-import StudentsArt from '../components/StudentsArt.jsx';
+import LaptopScene from '../components/LaptopScene.jsx';
 import { TOPIC_INFO } from '../utils/topicLabels.js';
 import './landing.css';
 
 const NAV = [
-  { href: '#components', label: 'Four components' },
   { href: '#how', label: 'How it works' },
   { href: '#modules', label: 'Your modules' },
   { href: '#features', label: 'Digital twin' },
-];
-
-// The four parts of AdaptiveLearnSE, one for each member of the research team.
-const COMPONENTS = [
-  {
-    id: 'C1', icon: '\u{1F9E0}', tone: 'green', title: 'Cognitive Digital Twin',
-    text: 'A live score for every topic. It fades like real memory and rises again when you practise.',
-    points: ['Diagnostic test for each semester', 'Forgetting curve and early alerts', 'What if I study forecasts'],
-  },
-  {
-    id: 'C2', icon: '\u{1F4C4}', tone: 'blue', title: 'Exam Intelligence',
-    text: 'Reads question papers, rubrics and exam patterns, so you know what exams really ask.',
-    points: ['Past paper questions sorted by topic', 'Exam structure and patterns', 'Rubrics explained clearly'],
-  },
-  {
-    id: 'C3', icon: '\u2705', tone: 'amber', title: 'Automated Marking',
-    text: 'Marks your answers and gives feedback you can learn from, with lecturers able to review.',
-    points: ['Quick marks against a rubric', 'Clear feedback on every answer', 'Lecturer review of results'],
-  },
-  {
-    id: 'C4', icon: '\u{1F6E4}\uFE0F', tone: 'violet', title: 'Adaptive Learning Path',
-    text: 'Turns your twin into a study plan: what to learn next, and in what order.',
-    points: ['Plans based on your weak topics', 'Updates as your scores change', 'Short steps toward the exam'],
-  },
 ];
 
 const STEPS = [
@@ -104,8 +79,6 @@ export default function LandingPage() {
           </nav>
           <div className="lp-nav-cta">
             <ThemeToggle onDark />
-            <Link className="lp-btn ghost" to="/login">Log in</Link>
-            <Link className="lp-btn solid" to="/register">Register</Link>
             <button type="button" className="lp-burger" aria-expanded={open} aria-label="Menu" onClick={() => setOpen(!open)}>
               <span /><span /><span />
             </button>
@@ -129,50 +102,14 @@ export default function LandingPage() {
               </div>
             </div>
 
-            <div className="lp-hero-art" aria-hidden="true">
-              <div className="lp-art-card"><StudentsArt /></div>
-              <div className="lp-float f1">
-                <span className="lp-tag">Example</span>
-                <svg viewBox="0 0 44 44" width="46" height="46"><circle cx="22" cy="22" r="18" fill="none" stroke="#e3e9ef" strokeWidth="5" /><circle cx="22" cy="22" r="18" fill="none" stroke="#0fa883" strokeWidth="5" strokeLinecap="round" strokeDasharray="88 113" transform="rotate(-90 22 22)" /></svg>
-                <div><strong>78%</strong><small>Topic score</small></div>
-              </div>
-              <div className="lp-float f2">
-                <span className="lp-tag">Example</span>
-                <svg viewBox="0 0 120 44" width="96" height="36"><path d="M2 8 C30 10 50 30 118 38" fill="none" stroke="#c9d3dc" strokeWidth="2" strokeDasharray="4 4" /><path d="M2 8 L40 18 L40 6 L80 16 L80 4 L118 12" fill="none" stroke="#0fa883" strokeWidth="2.5" strokeLinejoin="round" /></svg>
-                <div><strong>Review in time</strong><small>Beat the forgetting curve</small></div>
-              </div>
-              <div className="lp-float f3">
-                <span className="lp-tag">Example</span>
-                <span className="lp-emoji">{'\u{1F389}'}</span>
-                <div><strong>Great work!</strong><small>6 of 7 correct</small></div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* four components */}
-        <section id="components" className="lp-sec">
-          <div className="lp-wrap">
-            <p className="lp-eyebrow">One platform, four components</p>
-            <h2>Everything you need for exam success</h2>
-            <p className="lp-sub">Each part solves one problem. Together they follow you from your first test to the exam hall.</p>
-            <div className="lp-comps">
-              {COMPONENTS.map((c, i) => (
-                <article key={c.id} className={'lp-comp lp-reveal ' + c.tone} style={{ transitionDelay: `${i * 70}ms` }}>
-                  <div className="lp-comp-top">
-                    <span className="lp-comp-icon" aria-hidden="true">{c.icon}</span>
-                  </div>
-                  <h3>{c.title}</h3>
-                  <p>{c.text}</p>
-                  <ul>{c.points.map((pt) => <li key={pt}>{pt}</li>)}</ul>
-                </article>
-              ))}
+            <div className="lp-hero-art">
+              <div className="lp-art-card"><LaptopScene /></div>
             </div>
           </div>
         </section>
 
         {/* how it works */}
-        <section id="how" className="lp-sec alt">
+        <section id="how" className="lp-sec">
           <div className="lp-wrap">
             <p className="lp-eyebrow">How it works</p>
             <h2>From first test to exam ready, in four steps</h2>
@@ -191,7 +128,7 @@ export default function LandingPage() {
         </section>
 
         {/* modules */}
-        <section id="modules" className="lp-sec">
+        <section id="modules" className="lp-sec alt">
           <div className="lp-wrap">
             <p className="lp-eyebrow">Your modules</p>
             <h2>Built from your own lecture slides</h2>
@@ -222,7 +159,7 @@ export default function LandingPage() {
         </section>
 
         {/* features */}
-        <section id="features" className="lp-sec alt">
+        <section id="features" className="lp-sec">
           <div className="lp-wrap">
             <p className="lp-eyebrow">Inside the Digital Twin</p>
             <h2>A study partner that learns about you</h2>
@@ -238,19 +175,6 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* call to action */}
-        <section className="lp-cta">
-          <div className="lp-wrap lp-cta-in">
-            <div>
-              <h2>Ready to see where you stand?</h2>
-              <p>Your first test takes about 15 to 20 minutes and builds your twin.</p>
-            </div>
-            <div className="lp-hero-cta">
-              <Link className="lp-btn solid big" to="/register">Create my account</Link>
-              <Link className="lp-btn light big" to="/login">Log in</Link>
-            </div>
-          </div>
-        </section>
       </main>
 
       <footer className="lp-foot">
@@ -261,8 +185,6 @@ export default function LandingPage() {
           </div>
           <nav aria-label="Footer">
             {NAV.map((n) => <a key={n.href} href={n.href}>{n.label}</a>)}
-            <Link to="/login">Log in</Link>
-            <Link to="/register">Register</Link>
           </nav>
         </div>
       </footer>
