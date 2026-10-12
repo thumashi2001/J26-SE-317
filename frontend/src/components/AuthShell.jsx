@@ -1,10 +1,14 @@
+import { Link } from 'react-router-dom';
+import Logo from './Logo.jsx';
+import ThemeToggle from './ThemeToggle.jsx';
+
 // Two-column layout shared by the login and register pages.
 // The left side draws the idea behind the product: memory fades unless you review it.
 export default function AuthShell({ children }) {
   return (
     <div className="auth">
       <section className="auth-art" aria-hidden="true">
-        <div className="auth-brand">AdaptiveLearnSE</div>
+        <div className="auth-brand"><Logo size={40} onDark /></div>
         <h2>Know what you have forgotten before the exam does.</h2>
         <svg viewBox="0 0 420 220" className="curve" role="img">
           <line x1="10" y1="200" x2="410" y2="200" className="axis" />
@@ -23,7 +27,11 @@ export default function AuthShell({ children }) {
         </svg>
         <p className="auth-note">Your digital twin tracks what you know topic by topic, and how fast it fades.</p>
       </section>
-      <section className="auth-form">{children}</section>
+      <section className="auth-form">
+        <ThemeToggle className="corner" />
+        <Link to="/" className="auth-home">&larr; Back to home</Link>
+        {children}
+      </section>
     </div>
   );
 }
