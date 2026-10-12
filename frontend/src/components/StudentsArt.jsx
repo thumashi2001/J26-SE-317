@@ -4,8 +4,8 @@ export default function StudentsArt() {
     <svg viewBox="0 0 480 340" role="img" aria-label="Two smiling students holding books in front of a campus building" className="students-art">
       <defs>
         <linearGradient id="sa-sky" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#bfe9dd" />
-          <stop offset="1" stopColor="#f4fbf8" />
+          <stop offset="0" stopColor="#cfe0fb" />
+          <stop offset="1" stopColor="#f3f7ff" />
         </linearGradient>
       </defs>
       <rect width="480" height="340" rx="22" fill="url(#sa-sky)" />
@@ -14,8 +14,8 @@ export default function StudentsArt() {
 
       {/* campus building */}
       <rect x="86" y="96" width="308" height="190" rx="6" fill="#dfe9f1" />
-      <rect x="74" y="80" width="332" height="24" rx="5" fill="#0e2238" />
-      <rect x="196" y="58" width="88" height="30" rx="5" fill="#1b3a59" />
+      <rect x="74" y="80" width="332" height="24" rx="5" fill="#1f3a68" />
+      <rect x="196" y="58" width="88" height="30" rx="5" fill="#2b4f86" />
       {[104, 150, 196, 242, 288, 334].map((x) => (
         <g key={x}>
           <rect x={x} y="116" width="28" height="30" rx="4" fill="#9fd8c8" />
@@ -33,14 +33,14 @@ export default function StudentsArt() {
       <rect x="418" y="232" width="8" height="54" fill="#7a5a3a" />
       <circle cx="422" cy="220" r="26" fill="#2f9468" />
       <rect x="0" y="286" width="480" height="54" fill="#8fd3c0" />
-      <ellipse cx="240" cy="318" rx="130" ry="9" fill="#0e2238" opacity="0.1" />
+      <ellipse cx="240" cy="318" rx="130" ry="9" fill="#1f3a68" opacity="0.1" />
 
       {/* girl */}
       <path d="M138 150 Q138 112 170 112 Q202 112 202 150 L207 216 Q170 228 133 216 Z" fill="#2b1b17" />
       <rect x="154" y="262" width="12" height="46" rx="5" fill="#c98a5b" />
       <rect x="174" y="262" width="12" height="46" rx="5" fill="#c98a5b" />
-      <ellipse cx="160" cy="310" rx="11" ry="5" fill="#0e2238" />
-      <ellipse cx="180" cy="310" rx="11" ry="5" fill="#0e2238" />
+      <ellipse cx="160" cy="310" rx="11" ry="5" fill="#1f3a68" />
+      <ellipse cx="180" cy="310" rx="11" ry="5" fill="#1f3a68" />
       <path d="M142 184 Q170 172 198 184 L208 266 L132 266 Z" fill="#0f9a78" />
       <rect x="163" y="170" width="14" height="14" rx="4" fill="#c98a5b" />
       <circle cx="170" cy="150" r="26" fill="#c98a5b" />
@@ -57,9 +57,9 @@ export default function StudentsArt() {
       {/* boy */}
       <rect x="288" y="262" width="17" height="46" rx="5" fill="#35495a" />
       <rect x="315" y="262" width="17" height="46" rx="5" fill="#35495a" />
-      <ellipse cx="296" cy="310" rx="13" ry="5" fill="#0e2238" />
-      <ellipse cx="324" cy="310" rx="13" ry="5" fill="#0e2238" />
-      <path d="M280 186 Q310 174 340 186 L348 266 L272 266 Z" fill="#1b3a59" />
+      <ellipse cx="296" cy="310" rx="13" ry="5" fill="#1f3a68" />
+      <ellipse cx="324" cy="310" rx="13" ry="5" fill="#1f3a68" />
+      <path d="M280 186 Q310 174 340 186 L348 266 L272 266 Z" fill="#2b4f86" />
       <path d="M298 178 L310 194 L322 178 Z" fill="#ffffff" />
       <path d="M292 184 L300 262" stroke="#087a63" strokeWidth="6" strokeLinecap="round" />
       <rect x="303" y="170" width="14" height="14" rx="4" fill="#b87444" />

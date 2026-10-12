@@ -7,6 +7,7 @@ import * as forecast from '../controllers/forecastController.js';
 import * as practice from '../controllers/practiceController.js';
 import * as insights from '../controllers/insightsController.js';
 import * as plan from '../controllers/planController.js';
+import * as level from '../controllers/levelController.js';
 
 const router = Router();
 
@@ -23,6 +24,7 @@ router.get('/forecast/:studentId/:topic', forecast.getForecast);
 router.get('/insights/:studentId', insights.getInsights);
 router.get('/behaviour/:studentId', insights.getBehaviour);
 router.get('/plan/:studentId', plan.getPlan);
+router.get('/level/:studentId', level.getLevel);
 router.put('/exam-date', plan.setExamDate);
 router.get('/practice/topics', practice.topics);
 router.post('/practice/start', practice.start);

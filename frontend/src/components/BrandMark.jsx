@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import Logo from './Logo.jsx';
 
 // SLIIT logo (your own file: frontend/public/sliit-logo.png) next to the product name.
 // If the logo file is not there yet, the text "SLIIT" is shown instead.
@@ -15,7 +14,7 @@ export default function BrandMark({ onDark = false }) {
         )}
       </span>
       <span className="bm-divider" aria-hidden="true" />
-      <Logo size={36} onDark={onDark} />
+      <span className="bm-name">AdaptiveLearnSE</span>
     </span>
   );
 }
