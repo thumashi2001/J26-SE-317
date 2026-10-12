@@ -33,3 +33,9 @@ export const getInsights = (studentId) => api(`/c1/insights/${encodeURIComponent
 export const getBehaviour = (studentId) => api(`/c1/behaviour/${encodeURIComponent(studentId)}`);
 
 export const getPracticeTopics = () => api('/c1/practice/topics');
+
+// Study plan: today's tasks, calendar and predicted exam score, built from forgetting, behaviour and the exam date.
+export const getPlan = (studentId) => api(`/c1/plan/${encodeURIComponent(studentId)}`);
+
+// examDate is "YYYY-MM-DD", or null to clear it.
+export const saveExamDate = (studentId, examDate) => api('/c1/exam-date', { method: 'PUT', body: { studentId, examDate } });

@@ -1,14 +1,15 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
-import { getTwin, getAlerts, getPracticeTopics, getInsights, getBehaviour } from '../../services/c1Api.js';
+import { getTwin, getAlerts, getPracticeTopics, getInsights, getBehaviour, getPlan, saveExamDate } from '../../services/c1Api.js';
 import { prettyTopic, scoreBand, topicModule } from '../../utils/topics.js';
 import { TOPIC_INFO } from '../../utils/topicLabels.js';
 import WelcomePopup from '../../components/WelcomePopup.jsx';
 import AnswerStyle from '../../components/AnswerStyle.jsx';
+import TodayPlan from '../../components/TodayPlan.jsx';
+import ExamCalendar from '../../components/ExamCalendar.jsx';
 import './practice.css';
-
-const READ_ICON = { strong: '\u2713', slow_right: '\u23F1', guessing: '\u26A0', revise: '\u21BB', building: '\u2026' };
+import './dashboard.css';
 
 const seenWelcome = () => {
   try {
@@ -26,25 +27,25 @@ const markWelcome = () => {
 };
 
 const LEVEL = {
-  weak: { icon: '\u{1F331}', text: 'Just starting' },
-  fair: { icon: '\u{1F33F}', text: 'Getting there' },
-  strong: { icon: '\u{1F333}', text: 'Strong' },
+  weak: { text: 'Just starting' },
+  fair: { text: 'Getting there' },
+  strong: { text: 'Strong' },
 };
 const FILTERS = [
   { key: 'all', label: 'All' },
-  { key: 'weak', label: '\u{1F331} Just starting' },
-  { key: 'fair', label: '\u{1F33F} Getting there' },
-  { key: 'strong', label: '\u{1F333} Strong' },
+  { key: 'weak', label: 'Just starting' },
+  { key: 'fair', label: 'Getting there' },
+  { key: 'strong', label: 'Strong' },
 ];
-const DOTS = { low: 1, medium: 2, high: 3 };
 const RING = 2 * Math.PI * 26;
 
-// One topic as a card: a progress ring, a level, a few facts and a Practise button.
-function TopicCard({ topic, meta, score, band, info, read, faded, practicable, index }) {
-  const dots = DOTS[(info && info.confidenceLabel ? info.confidenceLabel : '').toLowerCase()] || 0;
-  const sessions = meta.practice_sessions ?? 0;
+// One topic as a card. Only what you need to choose: the ring, the level and a Practise button.
+// Colour follows the level (indigo, blue, teal). Sessions and reliability live on the topic page.
+function TopicCard({ topic, score, band, read, faded, practicable, index }) {
+  const careful = read && (read.key === 'guessing' || read.key === 'revise');
   return (
     <article className={`tp-card ${band}`} style={{ animationDelay: `${Math.min(index, 10) * 40}ms` }}>
+      {careful && <span className="tp-care" title={read.label} aria-label={read.label} />}
       <Link to={`/c1/topic/${topic}`} className="tp-main" aria-label={`${prettyTopic(topic)}, ${Math.round(score)} percent. Open details.`}>
         <svg viewBox="0 0 64 64" className="tp-ring" aria-hidden="true">
           <circle cx="32" cy="32" r="26" className="trk" />
@@ -53,30 +54,15 @@ function TopicCard({ topic, meta, score, band, info, read, faded, practicable, i
         </svg>
         <span className="tp-title">
           <span className="tp-name">{prettyTopic(topic)}</span>
-          <span className="tp-level"><span aria-hidden="true">{LEVEL[band].icon}</span> {LEVEL[band].text}</span>
+          <span className="tp-level">{LEVEL[band].text}{faded ? ' \u00B7 fading' : ''}</span>
         </span>
       </Link>
-      <ul className="tp-facts">
-        <li><span aria-hidden="true">{'\u{1F4DD}'}</span> {sessions} {sessions === 1 ? 'session' : 'sessions'}</li>
-        {info && (
-          <li title={info.confidenceWhy}>
-            <span className="tp-dots" aria-hidden="true">{[1, 2, 3].map((d) => <i key={d} className={d <= dots ? 'on' : ''} />)}</span>
-            Reliability: {info.confidenceLabel}
-          </li>
-        )}
-        {faded && <li><span aria-hidden="true">{'\u{23F3}'}</span> Was {Math.round(meta.score)}% at last practice</li>}
-      </ul>
-      {read && (
-        <div className={`tp-read read-${read.key}`} title={read.tip}>
-          <span aria-hidden="true">{READ_ICON[read.key]}</span> {read.label}
-        </div>
-      )}
       {practicable ? (
         <Link className="tp-go" to={`/c1/practice/${topic}`} aria-label={`Practise ${prettyTopic(topic)}`}>
           Practise <span aria-hidden="true">{'\u2192'}</span>
         </Link>
       ) : (
-        <span className="tp-go off">No practice questions yet</span>
+        <span className="tp-go off">No questions yet</span>
       )}
     </article>
   );
@@ -111,6 +97,9 @@ export default function DashboardPage() {
   const [practicable, setPracticable] = useState([]);
   const [insights, setInsights] = useState(null);
   const [behaviour, setBehaviour] = useState(null);
+  const [plan, setPlan] = useState(null);
+  const [planError, setPlanError] = useState('');
+  const [savingDate, setSavingDate] = useState(false);
   const [error, setError] = useState('');
   const [welcome, setWelcome] = useState(false);
   const [filter, setFilter] = useState('all');
@@ -118,18 +107,20 @@ export default function DashboardPage() {
 
   const load = useCallback(async () => {
     try {
-      const [t, a, pt, ins, beh] = await Promise.all([
+      const [t, a, pt, ins, beh, pl] = await Promise.all([
         getTwin(user.student_id),
         getAlerts(user.student_id),
         getPracticeTopics().catch(() => ({ topics: [] })), // no practice list is not a reason to hide the page
         getInsights(user.student_id).catch(() => null), // the page still works without the extra insights
         getBehaviour(user.student_id).catch(() => null),
+        getPlan(user.student_id).catch(() => null), // the dashboard still works without the plan
       ]);
       setTwin(t);
       setAlerts(a.alerts);
       setPracticable(pt.topics);
       setInsights(ins);
       setBehaviour(beh);
+      setPlan(pl);
       setError('');
     } catch (err) {
       setError(err.message);
@@ -149,6 +140,22 @@ export default function DashboardPage() {
     }
   }, [ready]);
   const closeWelcome = useCallback(() => setWelcome(false), []);
+
+  const onSaveDate = useCallback(
+    async (value) => {
+      setSavingDate(true);
+      setPlanError('');
+      try {
+        await saveExamDate(user.student_id, value);
+        setPlan(await getPlan(user.student_id));
+      } catch (err) {
+        setPlanError(err.message);
+      } finally {
+        setSavingDate(false);
+      }
+    },
+    [user.student_id]
+  );
 
   if (error && !twin)
     return (
@@ -248,43 +255,55 @@ export default function DashboardPage() {
           </div>
         </section>
 
-        <aside className="dash-side">
-          {eng && (
-            <section className="panel side-card">
-              <div className="engage-head">
-                <strong>Engagement</strong>
-                <span className={`tag eng-${eng.label.toLowerCase().replace(' ', '-')}`}>{eng.label}</span>
-              </div>
-              <div className="meter" role="img" aria-label={`Engagement index ${eng.index} out of 100`}>
-                <span style={{ width: `${Math.max(2, eng.index)}%` }} />
-              </div>
-              <p className="muted small">{eng.why}</p>
-            </section>
-          )}
-          <section className="panel side-card">
-            <strong>Alerts</strong>
-            {alerts.length === 0 ? (
-              <p className="muted small">Nothing needs your attention right now.</p>
-            ) : (
-              <ul className="alerts alerts-scroll">
-                {alerts.map((a, i) => (
-                  <li key={i} className={`alert ${a.severity === 'High' ? 'high' : 'medium'}`}>
-                    <span aria-hidden="true">{a.type === 'guessing' ? '\u26A0' : a.type === 'sudden_drop' ? '\u2198' : '\u2757'}</span>
-                    <span>{a.topic ? a.message.replace(a.topic, prettyTopic(a.topic)) : a.message}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
+        <div className="kpis">
+          <section className="kpi k-blue">
+            <span className="kpi-label">Predicted exam level</span>
+            <strong className="kpi-value">{plan ? `${plan.predicted.withPlan}%` : '...'}</strong>
+            <span className="kpi-note">{plan ? `if you follow the plan, ${plan.predicted.ifYouStop}% if you stop` : 'working it out'}</span>
           </section>
-        </aside>
+          <section className="kpi k-teal">
+            <span className="kpi-label">Exam</span>
+            <strong className="kpi-value">{plan && plan.daysLeft !== null ? `${plan.daysLeft} ${plan.daysLeft === 1 ? 'day' : 'days'}` : 'Not set'}</strong>
+            <span className="kpi-note">{plan && plan.examDate ? new Date(plan.examDate + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'long' }) : 'add it in the calendar'}</span>
+          </section>
+          <section className="kpi k-indigo">
+            <span className="kpi-label">Engagement</span>
+            <strong className="kpi-value">{eng ? eng.label : '...'}</strong>
+            <span className="kpi-note">{eng ? `${eng.index} of 100` : ''}</span>
+          </section>
+          <section className="kpi k-sky">
+            <span className="kpi-label">Alerts</span>
+            <strong className="kpi-value">{alerts.length}</strong>
+            <span className="kpi-note">{alerts.length === 0 ? 'nothing needs attention' : alerts[0].topic ? alerts[0].message.replace(alerts[0].topic, prettyTopic(alerts[0].topic)) : alerts[0].message}</span>
+          </section>
+        </div>
       </div>
+
+      <div className="plan-row">
+        <TodayPlan plan={plan} />
+        <ExamCalendar plan={plan} onSave={onSaveDate} saving={savingDate} error={planError} />
+      </div>
+
+      {alerts.length > 0 && (
+        <section className="panel alert-panel">
+          <strong>Alerts</strong>
+          <ul className="alerts">
+            {alerts.map((a, i) => (
+              <li key={i} className={`alert ${a.severity === 'High' ? 'high' : 'medium'}`}>
+                <span aria-hidden="true">{a.type === 'guessing' ? '\u26A0' : a.type === 'sudden_drop' ? '\u2198' : '\u2757'}</span>
+                <span>{a.topic ? a.message.replace(a.topic, prettyTopic(a.topic)) : a.message}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       {behaviour && <AnswerStyle data={behaviour} />}
 
       <div className="tp-head">
         <div>
           <h2>Your topics</h2>
-          <p className="muted small">Scores are your estimated level now, including forgetting since you last practised.</p>
+          <p className="muted small">Colour shows your level now, after forgetting. A dark dot means guessing or needs revision. Open a card for the full story.</p>
         </div>
         <div className="tp-controls">
           <div className="tp-seg" role="group" aria-label="Show topics">
@@ -299,11 +318,6 @@ export default function DashboardPage() {
           </button>
         </div>
       </div>
-      <details className="tp-info">
-        <summary>How to read these cards</summary>
-        <p>The ring shows your estimated score. Select a card to see why, or press Practise.</p>
-        <p>Reliability (the three dots) shows how far you can trust a score, based on how many recent, honest answers we have. It does not show how well you know the topic.</p>
-      </details>
 
       {groups.map((g) => (
         <section key={g.code} className="tp-mod" aria-label={g.name || g.code}>
@@ -321,10 +335,8 @@ export default function DashboardPage() {
                 <TopicCard
                   key={r.topic}
                   topic={r.topic}
-                  meta={r.meta}
                   score={r.score}
                   band={r.band}
-                  info={i}
                   read={reads[r.topic]}
                   faded={!!(i && i.estimatedNow !== null && r.meta.score - r.score >= 1)}
                   practicable={canPractise(r.topic)}
