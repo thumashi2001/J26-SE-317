@@ -25,10 +25,7 @@ export default function C1Card({ data, error, active = null }) {
   return (
     <section className="panel c1a" aria-labelledby="c1a-title">
       <div className="c1a-head">
-        <div>
-          <h3 id="c1a-title">Cognitive Digital Twin</h3>
-          <p className="muted small">Component 1. Totals for all students.</p>
-        </div>
+        <h3 id="c1a-title">Cognitive Digital Twin</h3>
         <span className={`c1a-chip ${data.aiService}`}>AI service {data.aiService}</span>
       </div>
 

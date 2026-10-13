@@ -26,6 +26,7 @@ Component 1: `GET /c1/level/:studentId` returns `{score, stars, label, topics, p
 ## Auth pages
 `components/AuthShell.jsx` plus `pages/auth.css` frame the login and register pages. Keep them as they are.
 
-## Admin dashboard cards (one per component)
-`pages/admin/AdminDashboard.jsx` has a "Components" section. Component 1's card is `components/admin/C1Card.jsx` (data from `GET /admin/c1/summary`, admin only, totals only, no student names or IDs).
-To add your own card: copy `C1Card.jsx` and its css, add an admin-only route under `backend/src/modules/admin/routes/index.js`, and put `<YourCard />` below the C1 card.
+## Admin pages (two pages)
+- **Learning insights** (`/admin`, `pages/admin/AdminDashboard.jsx`): one card per component. Component 1's card is `components/admin/C1Card.jsx` (data from `GET /admin/c1/summary` and `/admin/c1/active`, admin only; names and pictures of active students, no IDs).
+- **Lecturer approvals** (`/admin/lecturers`): approve or reject lecturer registrations.
+To add your own card: copy `C1Card.jsx` and its css, add an admin-only route in `backend/src/modules/admin/routes/index.js`, and put `<YourCard />` below the C1 card on the Learning insights page. To add a whole new admin page, add it to `ADMIN_MENU` in `config/menus.js` and a route in `App.jsx`.

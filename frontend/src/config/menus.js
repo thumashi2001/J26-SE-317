@@ -26,8 +26,8 @@ export const LECTURER_MENU = [
 ];
 
 export const ADMIN_MENU = [
-  { heading: 'Admin' },
-  { to: '/admin', label: 'Overview', end: true },
+  { heading: 'Insights' },
+  { to: '/admin', label: 'Learning insights', end: true },
   { heading: 'People' },
   { to: '/admin/lecturers', label: 'Lecturer approvals' },
   // TEAM: add your admin pages here.
@@ -43,6 +43,6 @@ export const LECTURER_SECTIONS = [
 
 // Cards under "Manage" on the admin overview page.
 export const ADMIN_SECTIONS = [
-  { to: '/admin/lecturers', title: 'Lecturer approvals', text: 'Approve or reject lecturer registrations.' },
+  { to: '/admin/lecturers', title: 'Lecturer approvals', text: 'Approve or reject lecturer registrations.' }, // no longer shown on a page; the sidebar has the links
   // TEAM: add a card for your admin page here.
 ];
