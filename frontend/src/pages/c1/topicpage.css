@@ -35,3 +35,14 @@
 .tc-card h2 { margin: 0 0 2px; }
 .tc-card-wrap .panel { margin: 0; }
 @media (max-width: 1200px) { .tc-row { grid-template-columns: minmax(0, 1fr); } }
+
+.pred-card { display: grid; grid-template-columns: auto 1fr; gap: 22px; align-items: center; margin-top: 16px; --c: var(--primary); }
+.pred-card.likely { --c: var(--strong); }
+.pred-card.unlikely { --c: var(--weak); }
+.pred-num { width: 104px; height: 104px; border-radius: 50%; display: grid; place-items: center; background: color-mix(in srgb, var(--c) 14%, var(--panel)); border: 3px solid var(--c); }
+.pred-num strong { font-family: var(--font-head); font-size: 1.9rem; color: var(--text); }
+.pred-text h2 { margin: 0 0 4px; font-size: 1.05rem; }
+.pred-text p { margin: 0 0 8px; }
+.pred-bar { height: 10px; border-radius: 6px; background: var(--track); overflow: hidden; margin-bottom: 8px; }
+.pred-bar span { display: block; height: 100%; border-radius: 6px; background: var(--c); transition: width 0.6s; }
+@media (max-width: 560px) { .pred-card { grid-template-columns: 1fr; justify-items: start; } }

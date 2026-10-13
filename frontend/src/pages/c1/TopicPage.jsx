@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
-import { getHistory, getInsights, getPlan } from '../../services/c1Api.js';
+import { getHistory, getInsights, getPlan, getPrediction } from '../../services/c1Api.js';
 import { prettyTopic, scoreBand, topicModule, topicLectures } from '../../utils/topics.js';
 import ScoreChart from '../../components/charts/ScoreChart.jsx';
 import WhatIfPanel from '../../components/WhatIfPanel.jsx';
@@ -14,6 +14,7 @@ const minutesText = (sec) => (sec < 60 ? `${Math.round(sec)} s` : sec < 3600 ? `
 const BAND_TEXT = { weak: 'Just starting', fair: 'Getting there', strong: 'Strong' };
 const RING = 2 * Math.PI * 52;
 const DOTS = { low: 1, medium: 2, high: 3 };
+const PRED_TEXT = { likely: 'You will probably get the next question right.', unsure: 'It could go either way. A little practice would help.', unlikely: 'You will probably get the next question wrong. Practise this topic.' };
 
 // One dot per answer (capped), filled for correct answers.
 function AnswerDots({ correct, answered }) {
@@ -44,6 +45,7 @@ export default function TopicPage() {
   const [state, setState] = useState({ status: 'loading' });
   const [info, setInfo] = useState(null); // estimated score now, confidence and the reasons
   const [examDate, setExamDate] = useState(null);
+  const [pred, setPred] = useState(null); // chance of a correct answer from the trained model
 
   useEffect(() => {
     let alive = true;
@@ -62,6 +64,10 @@ export default function TopicPage() {
     getInsights(user.student_id)
       .then((d) => alive && setInfo((d.topics || {})[topic] || null))
       .catch(() => {}); // the page works without the extra explanation
+    setPred(null);
+    getPrediction(user.student_id)
+      .then((d) => alive && setPred((d.topics || {})[topic] || null))
+      .catch(() => {}); // hidden when the AI service is not running
     getPlan(user.student_id)
       .then((p) => {
         const mod = (p.modules || []).find((m) => m.code === topicModule(topic));
@@ -150,6 +156,18 @@ export default function TopicPage() {
           <div className="tt-conf" aria-hidden="true">{[1, 2, 3].map((d) => <i key={d} className={d <= (DOTS[conf] || 0) ? 'on' : ''} />)}</div>
         </div>
       </div>
+
+      {pred && (
+        <section className={`panel pred-card ${pred.band}`} aria-labelledby="pred-title">
+          <div className="pred-num" aria-hidden="true"><strong>{pred.chance}%</strong></div>
+          <div className="pred-text">
+            <h2 id="pred-title">Chance you answer the next question correctly</h2>
+            <p>{PRED_TEXT[pred.band]}</p>
+            <div className="pred-bar" aria-hidden="true"><span style={{ width: `${pred.chance}%` }} /></div>
+            <p className="muted small">Predicted by a trained machine learning model (gradient boosting) from your answers, your speed, your hints and the days since you last practised. It was trained on simulated students, so treat it as a guide. It is not the same as your score above: the score is how much you know, this is the chance on one question, where a lucky guess can also be right.</p>
+          </div>
+        </section>
+      )}
 
       {info && (
         <section className="panel why-panel" aria-labelledby="why-title">
