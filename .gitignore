@@ -65,3 +65,6 @@ desktop.ini
 # Local database data
 mongodb_data/
 neo4j_data/
+
+!ai-services/c1/ml/models/
+!ai-services/c1/ml/models/*
