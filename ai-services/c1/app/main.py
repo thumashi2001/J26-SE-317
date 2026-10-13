@@ -9,6 +9,8 @@ from pydantic import BaseModel
 from services.mastery.calculator import score_diagnostic, update_score
 from services.forgetting.decay import apply_decay
 from services.risk.predictor import predict_risk
+from services.forecast.simulator import forecast
+from ml.service import predict_correct
 
 app = FastAPI(title="C1 Cognitive Digital Twin - AI service")
 
@@ -45,6 +47,35 @@ class RiskRequest(BaseModel):
     events: List[RiskEvent]
 
 
+class ForecastRequest(BaseModel):
+    current_score: float          # 0-100, the topic's stored score
+    days_since_practice: float = 0
+    practice_sessions: int = 0
+    correct: int = 0              # answers correct so far on this topic
+    answered: int = 0             # answers given so far on this topic
+    days_ahead: int = 21          # how many days until the exam
+    sessions_per_week: int = 3    # the "what if" plan
+
+
+class PredictEvent(BaseModel):
+    day: float                    # days since the student's first answer
+    topic: str
+    module: str = "OTHER"
+    source: str = "quiz"
+    session_id: str = ""
+    q_in_session: int = 0
+    question_type: str = "single"
+    correct: int = 0
+    time_sec: float = 30
+    hint_used: int = 0
+    tab_leaves: int = 0
+
+
+class PredictRequest(BaseModel):
+    as_of_day: float
+    events: List[PredictEvent]
+
+
 @app.get("/health")
 def health():
     return {"status": "ok", "service": "c1-ai"}
@@ -65,19 +96,7 @@ def apply_event(req: EventRequest):
 @app.post("/risk/predict")
 def risk_predict(req: RiskRequest):
     out = predict_risk([e.model_dump() for e in req.events], req.as_of_day)
-    return {"student_id": req.student_id, **out}# --- paste: imports (top of app/main.py, with the other imports) ---
-from services.forecast.simulator import forecast
-
-
-# --- paste: model + endpoint (bottom of app/main.py) ---
-class ForecastRequest(BaseModel):
-    current_score: float          # 0-100, the topic's stored score
-    days_since_practice: float = 0
-    practice_sessions: int = 0
-    correct: int = 0              # answers correct so far on this topic
-    answered: int = 0             # answers given so far on this topic
-    days_ahead: int = 21          # how many days until the exam
-    sessions_per_week: int = 3    # the "what if" plan
+    return {"student_id": req.student_id, **out}
 
 
 @app.post("/twin/forecast")
@@ -91,3 +110,10 @@ def twin_forecast(req: ForecastRequest):
         req.days_ahead,
         req.sessions_per_week,
     )
+
+
+@app.post("/twin/predict-correct")
+def twin_predict_correct(req: PredictRequest):
+    """Trained gradient boosting model: chance of a correct answer on each topic the student has practised."""
+    evs = [e.model_dump() if hasattr(e, "model_dump") else e.dict() for e in req.events]
+    return {"model": "gradient_boosting", "topics": predict_correct(evs, req.as_of_day)}
