@@ -70,6 +70,42 @@ export async function aiStatus(aiUrl, fetchFn = fetch) {
   }
 }
 
+// Students who answered a question in the last 7 days, most active first. Name, picture and activity only (no IDs).
+export function activeFrom(events, students, now = new Date()) {
+  const weekAgo = now.getTime() - 7 * DAY_MS;
+  const by = {};
+  for (const e of events) {
+    const t = new Date(e.timestamp).getTime();
+    if (t < weekAgo) continue;
+    const a = (by[e.student_id] = by[e.student_id] || { answers: 0, last: 0 });
+    a.answers += 1;
+    a.last = Math.max(a.last, t);
+  }
+  const info = Object.fromEntries(students.map((s) => [s.student_id, s]));
+  return Object.entries(by)
+    .map(([id, a]) => ({
+      name: (info[id] && info[id].name) || 'Student',
+      semester: (info[id] && info[id].semester) || null,
+      avatar: (info[id] && info[id].avatar) || null,
+      answersThisWeek: a.answers,
+      lastActive: new Date(a.last).toISOString(),
+    }))
+    .sort((a, b) => b.answersThisWeek - a.answersThisWeek || b.lastActive.localeCompare(a.lastActive));
+}
+
+export async function getActive(db, now = new Date()) {
+  const weekAgo = new Date(now.getTime() - 7 * DAY_MS);
+  const events = await db
+    .collection('learning_events')
+    .find({ type: 'quiz_answer', timestamp: { $gte: weekAgo } }, { projection: { student_id: 1, timestamp: 1 } })
+    .toArray();
+  const ids = [...new Set(events.map((e) => e.student_id))];
+  const students = ids.length
+    ? await db.collection('students').find({ student_id: { $in: ids } }, { projection: { student_id: 1, name: 1, semester: 1, avatar: 1 } }).toArray()
+    : [];
+  return { students: activeFrom(events, students, now), generatedAt: now.toISOString() };
+}
+
 export async function getSummary(db, aiUrl, now = new Date()) {
   const [studentCount, states, events, sessionCount] = await Promise.all([
     db.collection('students').countDocuments({}),

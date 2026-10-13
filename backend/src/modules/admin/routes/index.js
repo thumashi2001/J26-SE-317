@@ -14,6 +14,7 @@ router.post('/lecturers/:id/approve', admin.approve);
 router.post('/lecturers/:id/reject', admin.reject);
 
 router.get('/c1/summary', c1.summary); // Component 1 card: totals only
+router.get('/c1/active', c1.active); // students active this week: name, picture, activity
 
 // Other members: add your admin-only routes below this line, for example
 //   router.get('/c3/review-queue', c3.queue);

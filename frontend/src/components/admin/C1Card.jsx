@@ -1,4 +1,6 @@
+import { useState } from 'react';
 import { prettyTopic } from '../../utils/topics.js';
+import Avatar from '../ui/Avatar.jsx';
 import './c1card.css';
 
 const RISK = [
@@ -9,7 +11,12 @@ const RISK = [
 
 // Component 1 (Cognitive Digital Twin) summary for the administrator. Totals only, no student names or IDs.
 // Other components: copy this file for your own card and add it to the admin dashboard.
-export default function C1Card({ data, error }) {
+const SEM = { Y3S1: 'Y3S1', Y3S2: 'Y3S2' };
+const when = (iso) => new Date(iso).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
+const SHOWN = 8;
+
+export default function C1Card({ data, error, active = null }) {
+  const [all, setAll] = useState(false);
   if (error) return <div className="panel c1a"><h3>Cognitive Digital Twin</h3><p className="error" role="alert">{error}</p></div>;
   if (!data) return <div className="panel c1a skeleton" style={{ minHeight: 220 }} />;
 
@@ -30,6 +37,29 @@ export default function C1Card({ data, error }) {
         <div><strong>{data.activeThisWeek}</strong><span>active this week</span></div>
         <div><strong>{data.answers.total}</strong><span>practice answers<br />({data.answers.thisWeek} this week)</span></div>
         <div><strong>{data.averageLevel ? `${data.averageLevel.score}%` : 'None yet'}</strong><span>{data.averageLevel ? `average level, ${data.averageLevel.label}` : 'no diagnostics yet'}</span></div>
+      </div>
+
+      <div className="c1a-active">
+        <h4>Active this week ({active ? active.length : data.activeThisWeek})</h4>
+        {active && active.length === 0 && <p className="muted small">No student has practised in the last 7 days.</p>}
+        {active && active.length > 0 && (
+          <>
+            <ol className="c1a-people">
+              {(all ? active : active.slice(0, SHOWN)).map((p, i) => (
+                <li key={`${p.name}-${i}`}>
+                  <span className="no">{i + 1}</span>
+                  <Avatar name={p.name} src={p.avatar} size={36} />
+                  <span className="who"><strong>{p.name}</strong>{p.semester && <em>{SEM[p.semester] || p.semester}</em>}</span>
+                  <span className="num">{p.answersThisWeek} {p.answersThisWeek === 1 ? 'answer' : 'answers'}</span>
+                  <span className="last">last on {when(p.lastActive)}</span>
+                </li>
+              ))}
+            </ol>
+            {active.length > SHOWN && (
+              <button type="button" className="c1a-more" onClick={() => setAll(!all)}>{all ? 'Show fewer' : `Show all ${active.length}`}</button>
+            )}
+          </>
+        )}
       </div>
 
       <div className="c1a-cols">

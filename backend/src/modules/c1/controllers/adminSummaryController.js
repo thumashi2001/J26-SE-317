@@ -11,3 +11,12 @@ export async function summary(req, res) {
     res.status(err.status || 500).json({ error: err.message });
   }
 }
+
+// GET /admin/c1/active  (administrator only) -> students active in the last 7 days, with name and picture
+export async function active(req, res) {
+  try {
+    res.json(await service.getActive(getDb()));
+  } catch (err) {
+    res.status(err.status || 500).json({ error: err.message });
+  }
+}

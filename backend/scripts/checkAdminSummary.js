@@ -3,7 +3,7 @@ import assert from 'node:assert';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { summarise, modelInfo, aiStatus } from '../src/modules/c1/services/adminSummaryService.js';
+import { summarise, activeFrom, modelInfo, aiStatus } from '../src/modules/c1/services/adminSummaryService.js';
 
 const now = new Date('2026-10-13T10:00:00Z');
 const ago = (d) => new Date(now.getTime() - d * 86400000);
@@ -31,6 +31,16 @@ assert.ok(!JSON.stringify(s).includes('"A"') && !JSON.stringify(s).includes('stu
 const empty = summarise({ studentCount: 0, states: [], events: [], sessionCount: 0, now });
 assert.strictEqual(empty.averageLevel, null);
 assert.deepStrictEqual(empty.weakestTopics, []);
+
+const act = activeFrom(
+  [{ student_id: 'A', timestamp: ago(1) }, { student_id: 'A', timestamp: ago(2) }, { student_id: 'B', timestamp: ago(3) }, { student_id: 'C', timestamp: ago(20) }],
+  [{ student_id: 'A', name: 'Ann', semester: 'Y3S1', avatar: 'data:image/png;base64,AAA' }, { student_id: 'B', name: 'Ben' }, { student_id: 'C', name: 'Old' }],
+  now
+);
+assert.deepStrictEqual(act.map((x) => x.name), ['Ann', 'Ben']); // most active first, the 20 day old answer is left out
+assert.strictEqual(act[0].answersThisWeek, 2);
+assert.strictEqual(act[1].avatar, null);
+assert.ok(!JSON.stringify(act).includes('student_id'), 'no student IDs in the list');
 
 assert.strictEqual(modelInfo('/no/such/file.json'), null);
 const f = path.join(os.tmpdir(), 'res.json');
