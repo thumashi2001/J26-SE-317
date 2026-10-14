@@ -32,6 +32,10 @@ export function AuthProvider({ children }) {
       setDiagnosticDone(null);
       return undefined;
     }
+    if (user.role === 'lecturer' || user.role === 'admin') {
+      setDiagnosticDone(true);
+      return undefined;
+    }
     let alive = true;
     getTwin(user.student_id)
       .then((t) => alive && setDiagnosticDone(!!t.diagnosticCompleted))

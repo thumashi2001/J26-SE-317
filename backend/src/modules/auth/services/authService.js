@@ -26,11 +26,12 @@ function checkPassword(password, stored) {
 }
 
 const publicUser = (s) => ({
-  student_id: s.student_id,
+  student_id: s.student_id || s.staff_id,
+  staff_id: s.staff_id || null,
   name: s.name,
   email: s.email,
-  role: s.role,
-  semester: s.semester,
+  role: s.role || 'student',
+  semester: s.semester || null,
 });
 
 export async function register(db, body) {
@@ -65,20 +66,31 @@ export async function register(db, body) {
 }
 
 export async function login(db, body) {
-  const studentId = String(body.studentId || '').trim().toUpperCase();
+  const identifier = String(body.studentId || body.staffId || '').trim().toUpperCase();
   const password = String(body.password || '');
-  if (!studentId || !password) throw httpError(400, 'Enter your student ID and password');
+  if (!identifier || !password) throw httpError(400, 'Enter your user ID and password');
 
-  const student = await db.collection('students').findOne({ student_id: studentId });
+  let user = await db.collection('students').findOne({ student_id: identifier });
+  if (!user) {
+    user = await db.collection('staff').findOne({ staff_id: identifier });
+  }
+
   // Same message for unknown ID and wrong password so nobody can probe for valid IDs.
-  if (!student || !checkPassword(password, student.password_hash)) {
+  if (!user || !checkPassword(password, user.password_hash)) {
     throw httpError(401, 'Student ID or password is incorrect');
   }
-  return { token: signToken({ sub: studentId, role: student.role }), user: publicUser(student) };
+
+  const role = user.role || 'student';
+  const sub = user.student_id || user.staff_id;
+
+  return { token: signToken({ sub, role }), user: publicUser(user) };
 }
 
-export async function me(db, studentId) {
-  const student = await db.collection('students').findOne({ student_id: studentId });
-  if (!student) throw httpError(401, 'Please log in again');
-  return { user: publicUser(student) };
+export async function me(db, id) {
+  let user = await db.collection('students').findOne({ student_id: id });
+  if (!user) {
+    user = await db.collection('staff').findOne({ staff_id: id });
+  }
+  if (!user) throw httpError(401, 'Please log in again');
+  return { user: publicUser(user) };
 }

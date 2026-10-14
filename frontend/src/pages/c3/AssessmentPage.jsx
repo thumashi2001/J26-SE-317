@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext.jsx';
 import { assessAnswer } from '../../services/c3Api.js';
 import { C3_PRESETS } from './presets.js';
 import MindMapGraph from './components/MindMapGraph.jsx';
@@ -7,6 +9,7 @@ import ConceptDiagnosis from './components/ConceptDiagnosis.jsx';
 import './c3.css';
 
 export default function AssessmentPage() {
+  const { user } = useAuth();
   // Active preset (default to full credit architecture preset)
   const [selectedPresetId, setSelectedPresetId] = useState('arch-full');
 
@@ -120,7 +123,12 @@ export default function AssessmentPage() {
             AdaptiveLearnSE Component 3 • Deterministic Lexical & Rubric-Aware Research Pipeline
           </p>
         </div>
-        <div>
+        <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+          {user?.role === 'lecturer' && (
+            <Link to="/c3/review" className="btn secondary" style={{ width: 'auto', padding: '6px 14px' }}>
+              📋 Review Submissions Queue →
+            </Link>
+          )}
           <span className="c3-badge-research">Research Prototype • Component 3</span>
         </div>
       </div>
@@ -317,13 +325,23 @@ export default function AssessmentPage() {
           {/* Top Score Banner */}
           <div className="c3-result-banner">
             <div>
-              <span className="c3-badge-research" style={{ background: 'rgba(255,255,255,0.2)' }}>
-                {result.pipeline_version} • Single Source of Truth
-              </span>
-              <h2 className="c3-banner-title">Assessment Results</h2>
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
+                <span className="c3-badge-research" style={{ background: 'rgba(255,255,255,0.2)' }}>
+                  {result.pipeline_version} • Single Source of Truth
+                </span>
+                <span className="c3-badge-status pending_review" style={{ background: 'rgba(254,245,231,0.9)' }}>
+                  ⏳ AI Proposed Mark • Pending Lecturer Review
+                </span>
+              </div>
+              <h2 className="c3-banner-title">AI Proposed Assessment</h2>
               <p className="c3-banner-sub">
                 Question: {result.question_id} • Analyzed via Function 1–4 sequential pipeline
               </p>
+              {result.submission_id && (
+                <p className="small" style={{ color: '#bcd0e2', margin: '4px 0 0' }}>
+                  Recorded Submission ID: <code>{result.submission_id}</code>
+                </p>
+              )}
             </div>
 
             <div className="c3-score-display">
@@ -346,7 +364,7 @@ export default function AssessmentPage() {
                 </svg>
                 <div className="c3-score-circle-text">
                   <div className="c3-score-percent">{result.percentage}%</div>
-                  <div className="c3-score-denom-label">Calculated</div>
+                  <div className="c3-score-denom-label">AI Proposed</div>
                 </div>
               </div>
 
@@ -356,11 +374,7 @@ export default function AssessmentPage() {
                   <span className="c3-score-total"> / {result.total_possible_marks}</span>
                 </div>
                 <span className="c3-score-legend">
-                  {result.total_awarded_marks === result.total_possible_marks
-                    ? 'Full Credit Awarded'
-                    : result.total_awarded_marks > 0
-                    ? 'Partial Credit Awarded'
-                    : 'Zero Credit (Unsatisfactory)'}
+                  AI Proposed Mark (Pending Final Lecturer Verification)
                 </span>
               </div>
             </div>

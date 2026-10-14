@@ -125,6 +125,183 @@ test('C3 Module Backend Integration', async (t) => {
     ]);
   });
 
+  // Lecturer & Human-In-The-Loop Workflow Tests
+  const { setDb } = await import('../../../config/db.js');
+  const mockSubmissions = [];
+  const mockResults = [];
+  const testSubId = 'sub-test-1234567890123456';
+
+  const mockDb = {
+    collection(name) {
+      if (name === 'c3_submissions') {
+        return {
+          async insertOne(doc) {
+            const _id = doc._id || testSubId;
+            const saved = { ...doc, _id };
+            mockSubmissions.push(saved);
+            return { insertedId: _id };
+          },
+          async findOne(q) {
+            return mockSubmissions.find(s => {
+              if (q._id && String(s._id) !== String(q._id) && !q.$or) return false;
+              if (q.$or) {
+                return q.$or.some(cond => cond._id && String(s._id) === String(cond._id));
+              }
+              return true;
+            }) || null;
+          },
+          find(q = {}) {
+            let res = mockSubmissions.filter(s => {
+              if (q.student_id && s.student_id !== q.student_id) return false;
+              if (q.status && s.status !== q.status) return false;
+              return true;
+            });
+            return {
+              sort() { return this; },
+              limit() { return this; },
+              async toArray() { return res; }
+            };
+          },
+          async updateOne(q, u) {
+            const item = mockSubmissions.find(s => {
+              if (q._id && String(s._id) === String(q._id)) return true;
+              return false;
+            });
+            if (item && u.$set) Object.assign(item, u.$set);
+            return { matchedCount: item ? 1 : 0 };
+          }
+        };
+      }
+      if (name === 'c3_results') {
+        return {
+          async insertOne(doc) {
+            const _id = doc._id || 'res-test-1234567890123456';
+            const saved = { ...doc, _id };
+            mockResults.push(saved);
+            return { insertedId: _id };
+          },
+          async findOne(q) {
+            return mockResults.find(r => {
+              if (q._id && String(r._id) === String(q._id)) return true;
+              if (q.submission_id && String(r.submission_id) === String(q.submission_id)) return true;
+              if (q.$or) {
+                return q.$or.some(cond => cond.submission_id && String(r.submission_id) === String(cond.submission_id));
+              }
+              return false;
+            }) || null;
+          },
+          find(q = {}) {
+            let res = mockResults;
+            if (q.submission_id && q.submission_id.$in) {
+              res = res.filter(r => q.submission_id.$in.includes(String(r.submission_id)));
+            }
+            return {
+              async toArray() { return res; }
+            };
+          },
+          async updateOne(q, u) {
+            const item = mockResults.find(r => {
+              if (q._id && String(r._id) === String(q._id)) return true;
+              if (q.submission_id && String(r.submission_id) === String(q.submission_id)) return true;
+              return false;
+            });
+            if (item && u.$set) Object.assign(item, u.$set);
+            return { matchedCount: item ? 1 : 0 };
+          }
+        };
+      }
+      return null;
+    }
+  };
+  setDb(mockDb);
+
+  // Seed one submission and result in mock DB
+  mockSubmissions.push({
+    _id: testSubId,
+    student_id: 'student123',
+    question_id: 'SE-ARCH-001',
+    question_text: 'Explain Microservices',
+    student_answer: 'Microservices architecture separates concerns.',
+    status: 'pending_review',
+    submitted_at: new Date(),
+    updated_at: new Date()
+  });
+  mockResults.push({
+    _id: 'res-test-1234567890123456',
+    submission_id: testSubId,
+    student_id: 'student123',
+    question_id: 'SE-ARCH-001',
+    automated_mark: 3,
+    total_possible_marks: 4,
+    percentage: 75.0,
+    ai_evaluation: {
+      question_id: 'SE-ARCH-001',
+      total_awarded_marks: 3,
+      total_possible_marks: 4,
+      percentage: 75.0,
+      marking: { total_awarded_marks: 3, total_possible_marks: 4 }
+    },
+    lecturer_decision: null,
+    final_mark: null,
+    override_reason: null,
+    status: 'pending_review'
+  });
+
+  await t.test('student forbidden from lecturer review endpoints (403)', async () => {
+    const res = await fetchApi(`/submissions/${testSubId}/review`, studentToken, { decision: 'accepted' });
+    assert.strictEqual(res.status, 403);
+    assert.strictEqual(res.data.error, 'You do not have access to this page');
+  });
+
+  await t.test('student forbidden from lecturer finalize endpoint (403)', async () => {
+    const res = await fetchApi(`/submissions/${testSubId}/finalize`, studentToken, {});
+    assert.strictEqual(res.status, 403);
+    assert.strictEqual(res.data.error, 'You do not have access to this page');
+  });
+
+  await t.test('lecturer can list all submissions', async () => {
+    const res = await fetch(`http://127.0.0.1:${port}/api/v1/c3/submissions`, {
+      headers: { Authorization: `Bearer ${lecturerToken}` }
+    });
+    const body = await res.json();
+    assert.strictEqual(res.status, 200);
+    assert.ok(Array.isArray(body.submissions));
+    assert.strictEqual(body.submissions.length, 1);
+    assert.strictEqual(body.submissions[0].status, 'pending_review');
+  });
+
+  await t.test('lecturer override without reason is rejected (400)', async () => {
+    const res = await fetchApi(`/submissions/${testSubId}/review`, lecturerToken, {
+      decision: 'overridden',
+      new_mark: 4,
+      override_reason: ''
+    });
+    assert.strictEqual(res.status, 400);
+    assert.ok(res.data.error.includes('override reason is required'));
+  });
+
+  await t.test('lecturer override with reason preserves original AI mark', async () => {
+    const res = await fetchApi(`/submissions/${testSubId}/review`, lecturerToken, {
+      decision: 'overridden',
+      new_mark: 4,
+      override_reason: 'Excellent understanding demonstrated in sentence 1'
+    });
+    assert.strictEqual(res.status, 200);
+    assert.strictEqual(res.data.result.decision, 'overridden');
+    assert.strictEqual(res.data.result.automated_mark, 3); // Original AI mark preserved!
+    assert.strictEqual(res.data.result.final_mark, 4);     // New Lecturer mark!
+    assert.strictEqual(res.data.result.override_reason, 'Excellent understanding demonstrated in sentence 1');
+    assert.strictEqual(res.data.result.status, 'reviewed');
+  });
+
+  await t.test('lecturer finalize transitions assessment to finalized', async () => {
+    const res = await fetchApi(`/submissions/${testSubId}/finalize`, lecturerToken, {});
+    assert.strictEqual(res.status, 200);
+    assert.strictEqual(res.data.result.status, 'finalized');
+    assert.strictEqual(res.data.result.automated_mark, 3);
+    assert.strictEqual(res.data.result.final_mark, 4);
+    assert.ok(res.data.result.finalized_at);
+  });
 
   // Cleanup
   server.close();

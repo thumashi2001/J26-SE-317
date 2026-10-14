@@ -8,6 +8,8 @@ import ComingSoon from './pages/ComingSoon.jsx';
 import DiagnosticPage from './pages/c1/DiagnosticPage.jsx';
 import DashboardPage from './pages/c1/DashboardPage.jsx';
 import AssessmentPage from './pages/c3/AssessmentPage.jsx';
+import LecturerQueuePage from './pages/c3/LecturerQueuePage.jsx';
+import LecturerReviewPage from './pages/c3/LecturerReviewPage.jsx';
 
 // Each teammate replaces their ComingSoon routes with real pages.
 // Add your routes under your own prefix (/c2, /c3, /c4) and keep this file small.
@@ -23,7 +25,26 @@ export default function App() {
         <Route path="/c1/dashboard" element={<DashboardPage />} />
 
         <Route path="/c2/*" element={<ComingSoon title="Exam Intelligence" owner="Rupasinghe H T N N" />} />
-        <Route path="/c3/*" element={<AssessmentPage />} />
+
+        {/* Component 3: Role-Aware Assessment & Human-In-The-Loop Verification Routes */}
+        <Route path="/c3" element={<AssessmentPage />} />
+        <Route
+          path="/c3/review"
+          element={
+            <ProtectedRoute roles={['lecturer', 'admin']}>
+              <LecturerQueuePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/c3/review/:submissionId"
+          element={
+            <ProtectedRoute roles={['lecturer', 'admin']}>
+              <LecturerReviewPage />
+            </ProtectedRoute>
+          }
+        />
+
         <Route path="/c4/*" element={<ComingSoon title="Adaptive Learning Path" owner="Muthumali W G G A S" />} />
       </Route>
 

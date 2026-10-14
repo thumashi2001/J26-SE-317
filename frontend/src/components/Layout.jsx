@@ -17,19 +17,45 @@ const MENU = [
 export default function Layout() {
   const { user, logout, diagnosticDone } = useAuth();
   const navigate = useNavigate();
-  const initials = user.name
+  const initials = (user?.name || '')
     .split(' ')
     .filter(Boolean)
     .slice(0, 2)
     .map((w) => w[0].toUpperCase())
     .join('');
 
+  const menuItems = [
+    ...(user?.role !== 'lecturer'
+      ? [
+          { heading: 'Digital twin' },
+          { to: '/c1/diagnostic', label: 'Diagnostic test', onlyBeforeDiagnostic: true },
+          { to: '/c1/dashboard', label: 'My learning state' },
+        ]
+      : [
+          { heading: 'Academic Overview' },
+          { to: '/c1/dashboard', label: 'Student Twin Overview' },
+        ]),
+    { heading: 'Exams' },
+    { to: '/c2', label: 'Exam intelligence' },
+    { heading: 'Marking' },
+    ...(user?.role === 'lecturer'
+      ? [
+          { to: '/c3/review', label: 'Review Submissions' },
+          { to: '/c3', label: 'Assessment Pipeline' },
+        ]
+      : [
+          { to: '/c3', label: 'Automated marking' },
+        ]),
+    { heading: 'Study plan' },
+    { to: '/c4', label: 'Adaptive path' },
+  ];
+
   return (
     <div className="shell">
       <aside className="sidebar">
         <div className="side-brand">AdaptiveLearnSE</div>
         <nav>
-          {MENU.filter((m) => !m.onlyBeforeDiagnostic || diagnosticDone === false).map((m, i) =>
+          {menuItems.filter((m) => !m.onlyBeforeDiagnostic || diagnosticDone === false).map((m, i) =>
             m.heading ? (
               <div key={i} className="menu-heading">
                 {m.heading}
@@ -49,9 +75,9 @@ export default function Layout() {
         <div className="side-user">
           <div className="avatar">{initials}</div>
           <div className="side-user-text">
-            <div className="side-name">{user.name}</div>
+            <div className="side-name">{user?.name}</div>
             <div className="side-sub">
-              {user.student_id}, {user.semester}
+              {user?.staff_id || user?.student_id} • {user?.role === 'lecturer' ? 'Lecturer' : user?.semester || 'Student'}
             </div>
           </div>
           <button
