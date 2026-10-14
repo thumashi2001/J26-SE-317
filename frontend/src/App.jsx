@@ -15,6 +15,7 @@ import TopicPage from './pages/c1/TopicPage.jsx';
 import PracticePage from './pages/c1/PracticePage.jsx';
 import ProfilePage from './pages/ProfilePage.jsx';
 import LecturerHome from './pages/lecturer/LecturerHome.jsx';
+import ClassInsights from './pages/lecturer/ClassInsights.jsx';
 import AdminDashboard from './pages/admin/AdminDashboard.jsx';
 import LecturerApprovals from './pages/admin/LecturerApprovals.jsx';
 
@@ -74,7 +75,7 @@ export default function App() {
 
       <Route element={area('lecturer', LECTURER_MENU, 'Lecturer')}>
         <Route path="/lecturer" element={<LecturerHome />} />
-        <Route path="/lecturer/c1/*" element={<ComingSoon title="Class learning state" owner="Component 1" text="Class and student learning state for lecturers." />} />
+        <Route path="/lecturer/c1" element={<ClassInsights />} />
         <Route path="/lecturer/c2/*" element={<ComingSoon title="Exam intelligence" owner="Rupasinghe H T N N" text="Question papers, rubrics and exam patterns." />} />
         <Route path="/lecturer/c3/*" element={<ComingSoon title="Marking review" owner="Edirisinghe T P V K" text="Review automated marks and feedback." />} />
         <Route path="/lecturer/c4/*" element={<ComingSoon title="Adaptive paths" owner="Muthumali W G G A S" text="Study plans recommended to students." />} />
