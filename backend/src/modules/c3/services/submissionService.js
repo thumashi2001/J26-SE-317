@@ -24,21 +24,46 @@ function resultsCol() {
   return getDb().collection('c3_results');
 }
 
+export function detectProvenance(s) {
+  if (!s) return 'student';
+  if (s.is_demo === true) return 'pp1_demo';
+  const qId = String(s.question_id || '').toUpperCase();
+  const sId = String(s.student_id || '').toUpperCase();
+  const status = String(s.status || '');
+  if (status === 'failed' || qId === 'Q1' || sId === 'STUDENT1' || qId.startsWith('TEST_')) {
+    return 'test_fixture';
+  }
+  const knownDemoQIds = ['SE3010-Q01', 'SE-ARCH-001', 'SE2020-Q03', 'SE3040-Q02', 'SE-ARCH-VERIFY-01', 'SE-ARCH-E2E-01'];
+  if (knownDemoQIds.some(k => qId.includes(k))) {
+    return 'pp1_demo';
+  }
+  return 'student';
+}
+
 /**
  * Creates a submission record and associated AI result record.
  * Status starts as 'pending_review' (AI Proposed) — human-in-the-loop requirement.
  */
 export async function createSubmissionWithResult({ studentId, payload, aiResult }) {
   const now = new Date();
+  const isDemo = Boolean(payload.is_demo) || ['SE3010-Q01', 'SE-ARCH-001', 'SE2020-Q03', 'SE3040-Q02'].includes(payload.question_id);
+  const studentAnswerText = payload.student_answer || (
+    aiResult?.selected_labels?.length ? `Selected Option: ${aiResult.selected_labels.join(', ')}` :
+    (payload.selected_option_id || payload.selected_options ? String(payload.selected_option_id || payload.selected_options) : '')
+  );
   const subDoc = {
     student_id: studentId,
     question_id: payload.question_id,
     question_text: payload.question_text,
-    student_answer: payload.student_answer,
-    reference_answer: payload.reference_answer || null,
+    student_answer: studentAnswerText,
+    reference_answer: payload.reference_answer || (aiResult?.correct_labels?.length ? `Correct Option: ${aiResult.correct_labels.join(', ')}` : null),
     expected_concepts: payload.expected_concepts || null,
-    answer_type: payload.answer_type || 'short',
+    options: payload.options || aiResult?.options || null,
+    selected_options: aiResult?.selected_option_ids || payload.selected_options || (payload.selected_option_id ? [payload.selected_option_id] : null),
+    correct_options: aiResult?.correct_option_ids || (payload.correct_answer ? [payload.correct_answer] : null),
+    answer_type: payload.answer_type || aiResult?.answer_type || 'short',
     rubric: payload.rubric || null,
+    is_demo: isDemo,
     status: 'pending_review',
     submitted_at: now,
     updated_at: now,
@@ -144,6 +169,8 @@ export async function listSubmissions({ studentId, role, status }) {
       reviewed_by: r?.reviewed_by || r?.lecturer_id || null,
       reviewed_at: r?.reviewed_at || null,
       finalized_at: r?.finalized_at || null,
+      is_demo: s.is_demo === true || detectProvenance(s) === 'pp1_demo',
+      provenance: detectProvenance(s),
     };
   });
 }
@@ -202,11 +229,16 @@ export async function getSubmissionDetail(submissionId, studentId, role) {
       student_answer: submission.student_answer || '',
       reference_answer: submission.reference_answer || null,
       expected_concepts: submission.expected_concepts || null,
+      options: submission.options || aiEvaluation?.options || null,
+      selected_options: submission.selected_options || aiEvaluation?.selected_option_ids || null,
+      correct_options: submission.correct_options || aiEvaluation?.correct_option_ids || null,
       answer_type: submission.answer_type || 'short',
       rubric: submission.rubric || null,
       status: result?.status || submission.status || 'pending_review',
       submitted_at: submission.submitted_at,
       updated_at: submission.updated_at,
+      is_demo: submission.is_demo === true || detectProvenance(submission) === 'pp1_demo',
+      provenance: detectProvenance(submission),
     },
     result: {
       _id: result ? String(result._id) : null,

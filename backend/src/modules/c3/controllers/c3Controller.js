@@ -1,8 +1,14 @@
 import { resolveStudentId } from '../../../middleware/auth.js';
 import * as aiClient from '../services/aiClient.js';
 import * as submissionSvc from '../services/submissionService.js';
+import * as mcqSvc from '../services/mcqMarkingService.js';
 
 const AI_URL = () => process.env.C3_AI_URL || 'http://127.0.0.1:8003';
+
+function isMcqPayload(payload) {
+  const type = String(payload?.answer_type || '').toLowerCase();
+  return type === 'mcq' || type === 'multiple-choice' || (Boolean(payload?.options) && !payload?.rubric?.criteria?.[0]?.scoring_levels?.some(l => l.required_concepts?.length > 1));
+}
 
 function handle(fn) {
   return async (req, res) => {
@@ -23,6 +29,9 @@ export const analyzeAnswer = handle(async (req) => {
 export const markAnswer = handle(async (req) => {
   const { student_id, ...payload } = req.body || {};
   resolveStudentId(req, student_id);
+  if (isMcqPayload(payload)) {
+    return mcqSvc.evaluateMcqAnswer(payload);
+  }
   return aiClient.markAnswer(AI_URL(), payload);
 });
 
@@ -58,7 +67,12 @@ export const assessAnswer = handle(async (req) => {
     throw err;
   }
 
-  const aiResult = await aiClient.assessAnswer(AI_URL(), payload);
+  let aiResult;
+  if (isMcqPayload(payload)) {
+    aiResult = mcqSvc.evaluateMcqAnswer(payload);
+  } else {
+    aiResult = await aiClient.assessAnswer(AI_URL(), payload);
+  }
 
   // If DB persistence is available, store submission and result
   try {

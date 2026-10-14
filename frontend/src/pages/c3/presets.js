@@ -296,4 +296,47 @@ export const C3_PRESETS = [
       },
     },
   },
+  {
+    id: 'mcq-correct',
+    title: 'Architecture Pattern MCQ — Correct Key (100%)',
+    description: 'Deterministic answer-key evaluation: selects Option B (Microservices). Awards full marks (2/2).',
+    payload: {
+      question_id: 'SE3010-MCQ-01',
+      question_text: 'Which architectural style structures an application as a collection of loosely coupled, independently deployable services?',
+      student_answer: 'Option B',
+      selected_option_id: 'B',
+      correct_answer: 'B',
+      answer_type: 'mcq',
+      max_marks: 2,
+      expected_concepts: ['microservices', 'loosely coupled'],
+      options: [
+        { option_id: 'A', label: 'A', text: 'Monolithic Architecture' },
+        { option_id: 'B', label: 'B', text: 'Microservices Architecture' },
+        { option_id: 'C', label: 'C', text: 'Pipe and Filter Architecture' },
+        { option_id: 'D', label: 'D', text: 'Model-View-Controller (MVC)' },
+      ],
+    },
+  },
+  {
+    id: 'mcq-incorrect',
+    title: 'Architecture Pattern MCQ — Incorrect Key (0%)',
+    description: 'Deterministic answer-key evaluation: selects Option A (Monolith). Awards zero marks (0/2).',
+    payload: {
+      question_id: 'SE3010-MCQ-01',
+      question_text: 'Which architectural style structures an application as a collection of loosely coupled, independently deployable services?',
+      student_answer: 'Option A',
+      selected_option_id: 'A',
+      correct_answer: 'B',
+      answer_type: 'mcq',
+      max_marks: 2,
+      expected_concepts: ['microservices', 'loosely coupled'],
+      options: [
+        { option_id: 'A', label: 'A', text: 'Monolithic Architecture' },
+        { option_id: 'B', label: 'B', text: 'Microservices Architecture' },
+        { option_id: 'C', label: 'C', text: 'Pipe and Filter Architecture' },
+        { option_id: 'D', label: 'D', text: 'Model-View-Controller (MVC)' },
+      ],
+    },
+  },
 ];
+
