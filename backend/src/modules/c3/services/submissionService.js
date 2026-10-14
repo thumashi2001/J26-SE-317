@@ -1,5 +1,6 @@
 import { getDb } from '../../../config/db.js';
 import { ObjectId } from 'mongodb';
+import { syncC3AssessmentToC1 } from '../../../integration/c3-c1/index.js';
 
 function httpError(status, message) {
   const err = new Error(message);
@@ -71,6 +72,19 @@ export async function createSubmissionWithResult({ studentId, payload, aiResult 
   };
 
   const resResult = await resultsCol().insertOne(resDoc);
+
+  // Synchronize initial assessment evidence to C1 (Cognitive Digital Twin)
+  syncC3AssessmentToC1({
+    studentId,
+    submissionId,
+    questionId: payload.question_id,
+    questionText: payload.question_text,
+    score: automatedMark,
+    totalPossible,
+    percentage,
+    conceptMatches: aiResult?.analysis?.concept_matches || [],
+    finalized: false,
+  }).catch(() => {});
 
   return {
     submissionId,
@@ -344,6 +358,23 @@ export async function finalizeSubmission(submissionId, lecturerId) {
       },
     }
   );
+
+  // Synchronize finalized assessment evidence to C1 (Cognitive Digital Twin)
+  const finalPercentage = result.total_possible_marks > 0
+    ? Math.round((Number(result.final_mark) / Number(result.total_possible_marks)) * 1000) / 10
+    : 0;
+
+  syncC3AssessmentToC1({
+    studentId: submission.student_id,
+    submissionId: sId,
+    questionId: submission.question_id,
+    questionText: submission.question_text,
+    score: result.final_mark,
+    totalPossible: result.total_possible_marks,
+    percentage: finalPercentage,
+    conceptMatches: result.ai_evaluation?.analysis?.concept_matches || [],
+    finalized: true,
+  }).catch(() => {});
 
   return {
     submission_id: sId,

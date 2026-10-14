@@ -38,9 +38,26 @@ export const generateMindmap = handle(async (req) => {
   return aiClient.generateMindmap(AI_URL(), payload);
 });
 
+export const unsupportedOcrHandler = handle(async () => {
+  const err = new Error(
+    'Scanned answer OCR processing is currently unsupported. C3 evaluates natural-language text responses directly. Please provide a typed answer.'
+  );
+  err.status = 400;
+  throw err;
+});
+
 export const assessAnswer = handle(async (req) => {
   const { student_id, ...payload } = req.body || {};
   const effectiveStudentId = resolveStudentId(req, student_id);
+
+  if (payload.image || payload.file || payload.scanned_document) {
+    const err = new Error(
+      'Scanned answer OCR processing is currently unsupported. C3 evaluates natural-language text responses directly. Please provide a typed answer.'
+    );
+    err.status = 400;
+    throw err;
+  }
+
   const aiResult = await aiClient.assessAnswer(AI_URL(), payload);
 
   // If DB persistence is available, store submission and result

@@ -19,4 +19,8 @@ router.get('/submissions/:id', controller.getSubmission);
 router.post('/submissions/:id/review', requireRole('lecturer', 'admin'), controller.reviewSubmission);
 router.post('/submissions/:id/finalize', requireRole('lecturer', 'admin'), controller.finalizeSubmission);
 
+// Scanned document / OCR endpoint boundary (explicit unsupported format handling)
+router.post('/upload-scanned', controller.unsupportedOcrHandler);
+router.post('/ocr', controller.unsupportedOcrHandler);
+
 export default router;

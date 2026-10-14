@@ -17,12 +17,22 @@ export async function callAi(aiUrl, path, body) {
   }
   
   if (!res.ok) {
-     let errorMsg = `C3 AI service returned ${res.status} for ${path}`;
-     try {
-       const errBody = await res.json();
-       if (errBody.detail) errorMsg += `: ${JSON.stringify(errBody.detail)}`;
-     } catch(e) {}
-     throw httpError(502, errorMsg);
+    let errorMsg = `C3 AI service returned ${res.status} for ${path}`;
+    const status = res.status >= 500 ? 502 : 400;
+    try {
+      const errBody = await res.json();
+      if (errBody.detail) {
+        if (Array.isArray(errBody.detail)) {
+          const formatted = errBody.detail
+            .map((d) => `${d.loc ? d.loc.slice(1).join('.') : 'field'}: ${d.msg}`)
+            .join('; ');
+          errorMsg = `Validation error (${res.status}): ${formatted}`;
+        } else {
+          errorMsg = `C3 AI service returned ${res.status}: ${typeof errBody.detail === 'string' ? errBody.detail : JSON.stringify(errBody.detail)}`;
+        }
+      }
+    } catch (e) {}
+    throw httpError(status, errorMsg);
   }
   return res.json();
 }

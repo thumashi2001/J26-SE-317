@@ -129,6 +129,7 @@ test('C3 Module Backend Integration', async (t) => {
   const { setDb } = await import('../../../config/db.js');
   const mockSubmissions = [];
   const mockResults = [];
+  const mockLearningEvents = [];
   const testSubId = 'sub-test-1234567890123456';
 
   const mockDb = {
@@ -207,6 +208,14 @@ test('C3 Module Backend Integration', async (t) => {
             });
             if (item && u.$set) Object.assign(item, u.$set);
             return { matchedCount: item ? 1 : 0 };
+          }
+        };
+      }
+      if (name === 'learning_events') {
+        return {
+          async insertOne(doc) {
+            mockLearningEvents.push(doc);
+            return { insertedId: 'event-c1-sync-123' };
           }
         };
       }
@@ -301,6 +310,45 @@ test('C3 Module Backend Integration', async (t) => {
     assert.strictEqual(res.data.result.automated_mark, 3);
     assert.strictEqual(res.data.result.final_mark, 4);
     assert.ok(res.data.result.finalized_at);
+  });
+
+  await t.test('scanned image / OCR upload endpoint explicitly rejects with 400', async () => {
+    const res = await fetchApi('/upload-scanned', studentToken, { file: 'answer.png' });
+    assert.strictEqual(res.status, 400);
+    assert.ok(res.data.error.includes('OCR processing is currently unsupported'));
+  });
+
+  await t.test('assessAnswer with image/scanned document payload explicitly rejects with 400', async () => {
+    const res = await fetchApi('/assess', studentToken, {
+      question_id: 'Q1',
+      question_text: 'Explain Normalization',
+      image: 'data:image/png;base64,...',
+      student_answer: ''
+    });
+    assert.strictEqual(res.status, 400);
+    assert.ok(res.data.error.includes('OCR processing is currently unsupported'));
+  });
+
+  await t.test('C3 to C1 live integration bridge syncs learning event', async () => {
+    mockLearningEvents.length = 0;
+    const { syncC3AssessmentToC1 } = await import('../../../integration/c3-c1/index.js');
+    const syncRes = await syncC3AssessmentToC1({
+      studentId: 'student123',
+      submissionId: testSubId,
+      questionId: 'SE-ARCH-001',
+      questionText: 'Explain Microservices',
+      score: 4,
+      totalPossible: 4,
+      percentage: 100,
+      conceptMatches: [{ concept: 'microservices', status: 'demonstrated' }],
+      finalized: true
+    });
+    assert.strictEqual(syncRes.synced, true);
+    assert.strictEqual(syncRes.topic, 'ds_cloud_microservices');
+    assert.strictEqual(mockLearningEvents.length, 1);
+    assert.strictEqual(mockLearningEvents[0].student_id, 'student123');
+    assert.strictEqual(mockLearningEvents[0].type, 'c3_finalized_assessment');
+    assert.strictEqual(mockLearningEvents[0].score, 4);
   });
 
   // Cleanup
