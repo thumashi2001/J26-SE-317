@@ -95,14 +95,15 @@ export function engagementFrom(events, sessions, now = new Date()) {
 }
 
 export function confidenceFrom(topicEvents, daysSincePractice) {
-  const evidence = topicEvents.reduce((sum, e) => sum + answerReliability(e), 0);
-  const flagged = topicEvents.filter(isFlagged).length;
+  const confirmed = topicEvents.filter((e) => e.lifecycle_stage !== 'provisional');
+  const evidence = confirmed.reduce((sum, e) => sum + answerReliability(e), 0);
+  const flagged = confirmed.filter(isFlagged).length;
   const base = 1 - Math.exp(-evidence / 8);
   const recency = 0.6 + 0.4 * Math.exp(-Math.max(0, daysSincePractice) / 30);
   const value = round(100 * base * recency);
   const label = value >= 70 ? 'High' : value >= 40 ? 'Medium' : 'Low';
 
-  const n = topicEvents.length;
+  const n = confirmed.length;
   let why = `Based on ${plural(n, 'answer', 'answers')}`;
   if (flagged > 0) why += `, ${flagged} of them counted less (left the tab or answered very fast)`;
   why += '.';

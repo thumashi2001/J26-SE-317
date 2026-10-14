@@ -17,6 +17,7 @@ export default function Layout({ menu, roleLabel }) {
   const location = useLocation();
   const [introSeen, setIntroSeen] = useState(false);
   const { usage, todaySeconds } = useUsage(true);
+
   const signOut = () => {
     logout();
     navigate('/login');
@@ -25,26 +26,28 @@ export default function Layout({ menu, roleLabel }) {
   // A student who has not finished the diagnostic keeps the normal layout, but only the test opens.
   // The other menu items are locked and every other page sends her back to the test.
   // The intro popup shows on every fresh login until the test is done.
-  const locked = user.role === 'student' && diagnosticDone === false;
-  if (user.role === 'student' && diagnosticDone === null) return <p className="muted" style={{ padding: 32 }}>Loading...</p>;
+  const locked = user?.role === 'student' && diagnosticDone === false;
+  if (user?.role === 'student' && diagnosticDone === null) return <p className="muted" style={{ padding: 32 }}>Loading...</p>;
   if (locked && location.pathname !== '/c1/diagnostic' && location.pathname !== '/profile') return <Navigate to="/c1/diagnostic" replace />;
+
+  const navList = menu || [];
 
   return (
     <div className="shell">
       <aside className="sidebar">
         <div className="side-brand"><Logo size={36} onDark /></div>
         <Link to="/profile" className="side-user" aria-label="Open my profile">
-          <Avatar name={user.name} src={profile ? profile.avatar : null} size={42} />
+          <Avatar name={user?.name} src={profile ? profile.avatar : null} size={42} />
           <div className="side-user-text">
-            <div className="side-name">{user.name}</div>
+            <div className="side-name">{user?.name}</div>
             <div className="side-sub">
-              {user.role === 'student' ? `${user.student_id}, ${user.semester}` : user.id}
+              {user?.role === 'student' ? `${user.student_id}, ${user.semester}` : user?.staff_id || user?.id}
             </div>
           </div>
         </Link>
         <div className="side-role">{roleLabel}</div>
         <nav>
-          {menu.filter((m) => !m.onlyBeforeDiagnostic || diagnosticDone === false).map((m, i) =>
+          {navList.filter((m) => !m.onlyBeforeDiagnostic || diagnosticDone === false).map((m, i) =>
             m.heading ? (
               <div key={i} className="menu-heading">
                 {m.heading}
@@ -78,7 +81,7 @@ export default function Layout({ menu, roleLabel }) {
           <Outlet context={{ testStarted: !locked || introSeen, usage, todaySeconds }} />
         </ErrorBoundary>
       </main>
-      {locked && !introSeen && <DiagnosticIntro name={user.name} onStart={() => setIntroSeen(true)} onLogout={signOut} />}
+      {locked && !introSeen && <DiagnosticIntro name={user?.name} onStart={() => setIntroSeen(true)} onLogout={signOut} />}
     </div>
   );
 }

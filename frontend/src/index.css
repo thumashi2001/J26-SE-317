@@ -38,7 +38,18 @@
   --font-body: 'Public Sans', 'Segoe UI', system-ui, sans-serif;
 }
 * { box-sizing: border-box; }
-body { margin: 0; font-family: var(--font-body); background: var(--paper); color: var(--text); line-height: 1.5; }
+html {
+  overflow-x: hidden;
+}
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  background: var(--paper);
+  color: var(--text);
+  line-height: 1.5;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
 h1, h2, h3 { font-family: var(--font-head); letter-spacing: -0.01em; line-height: 1.2; }
 h1 { font-size: 1.9rem; margin: 0 0 6px; }
 h2 { font-size: 1.2rem; margin: 28px 0 12px; }
@@ -51,7 +62,14 @@ a { color: var(--link); }
 .hint { font-size: 0.8rem; color: var(--muted); margin-top: -4px; }
 
 /* app shell */
-.shell { display: grid; grid-template-columns: 272px minmax(0, 1fr); min-height: 100vh; }
+.shell {
+  display: grid;
+  grid-template-columns: 272px minmax(0, 1fr);
+  min-height: 100vh;
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: clip;
+}
 .sidebar { background: var(--panel); color: var(--text); border-right: 1px solid var(--line); display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh; }
 .side-brand { padding: 26px 22px 0; }
 .sidebar .logo.on-dark { color: var(--text); }
@@ -72,7 +90,13 @@ a { color: var(--link); }
 .btn-ghost:hover { background: var(--info-bg); }
 .sidebar .theme-toggle.on-dark { background: var(--panel); color: var(--text); border-color: var(--line-strong); }
 .sidebar .theme-toggle.on-dark:hover { background: var(--info-bg); }
-.content { padding: 30px 44px 60px; max-width: none; width: 100%; }
+.content {
+  padding: 30px 44px 60px;
+  max-width: 100%;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
 
 /* shared pieces */
 .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 22px; margin: 14px 0; }

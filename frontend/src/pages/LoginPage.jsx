@@ -32,13 +32,14 @@ export default function LoginPage() {
     <AuthShell>
       <form className="form-block" onSubmit={submit}>
         <h1>Welcome back</h1>
-        <p className="muted">Log in to continue your learning.</p>
+        <p className="muted">Use your student or staff ID and password to sign in.</p>
 
-        <label htmlFor="sid">ID</label>
+        <label htmlFor="sid">Student / Staff ID</label>
         <input
           id="sid"
           value={userId}
           onChange={(e) => setUserId(cleanId(e.target.value))}
+          placeholder="e.g. IT10000001 or SLIITLEC101"
           maxLength={30}
           autoComplete="username"
           required
