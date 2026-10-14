@@ -1,0 +1,10 @@
+.ci-head h1 { margin: 0 0 4px; }
+.ci-head p { margin: 0 0 16px; }
+.ci-sample { margin-bottom: 14px; padding: 10px 14px; border-radius: 12px; background: var(--info-bg); border: 1px dashed var(--primary); color: var(--text-2); font-size: 0.9rem; }
+.ci-attn { margin-top: 22px; padding-top: 16px; border-top: 1px solid var(--line); }
+.ci-tip { margin: 12px 0 0; }
+.ci-attn .c1a-people li { grid-template-columns: 26px 36px minmax(0, 1fr) auto minmax(170px, auto); }
+.ci-attn .c1a-people .last { text-align: right; line-height: 1.35; }
+.ci-attn em.rk.high { background: var(--red-bg); color: var(--red-ink); }
+.ci-attn em.rk.mid { background: var(--amber-bg); color: var(--amber-ink); }
+@media (max-width: 640px) { .ci-attn .c1a-people li { grid-template-columns: 24px 36px 1fr; } .ci-attn .c1a-people .last { text-align: left; } }
