@@ -1,0 +1,64 @@
+
+{
+  "schema_version": "1.0",
+  "description": "Module-specific examination structure configurations for C2.",
+  "structures": [
+    {
+      "module_key": "case_studies_in_software_engineering",
+      "verification_status": "unverified",
+      "source_reference": null,
+      "structure": null
+    },
+    {
+      "module_key": "database_systems",
+      "verification_status": "partially_verified",
+      "source_reference": "sample.pdf",
+      "structure": {
+        "examination_type": "Final Examination",
+        "duration_minutes": 120,
+        "total_marks": 100,
+        "question_count": 4,
+        "questions_to_answer": 4,
+        "marks_per_question": 25,
+        "question_types": [],
+        "topic_distribution": null
+      }
+    },
+    {
+      "module_key": "software_project_management",
+      "verification_status": "unverified",
+      "source_reference": null,
+      "structure": null
+    },
+    {
+      "module_key": "user_experience_engineering",
+      "verification_status": "unverified",
+      "source_reference": null,
+      "structure": null
+    },
+    {
+      "module_key": "application_frameworks",
+      "verification_status": "unverified",
+      "source_reference": null,
+      "structure": null
+    },
+    {
+      "module_key": "distributed_systems",
+      "verification_status": "unverified",
+      "source_reference": null,
+      "structure": null
+    },
+    {
+      "module_key": "software_architecture",
+      "verification_status": "unverified",
+      "source_reference": null,
+      "structure": null
+    },
+    {
+      "module_key": "software_engineering_process_and_quality_management",
+      "verification_status": "unverified",
+      "source_reference": null,
+      "structure": null
+    }
+  ]
+}

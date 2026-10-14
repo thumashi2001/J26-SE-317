@@ -216,6 +216,32 @@ test('C3 Module Backend Integration', async (t) => {
           async insertOne(doc) {
             mockLearningEvents.push(doc);
             return { insertedId: 'event-c1-sync-123' };
+          },
+          async findOne(q) {
+            return mockLearningEvents.find(e => {
+              if (q.submission_id && String(e.submission_id) !== String(q.submission_id)) return false;
+              if (q.student_id && e.student_id !== q.student_id) return false;
+              return true;
+            }) || null;
+          },
+          async findOneAndUpdate(q, u, opts) {
+            let item = mockLearningEvents.find(e => {
+              if (q.submission_id && String(e.submission_id) === String(q.submission_id)) return true;
+              return false;
+            });
+            if (!item && opts && opts.upsert) {
+              item = {
+                _id: 'event-c1-sync-' + (mockLearningEvents.length + 1),
+                ...(u.$setOnInsert || {}),
+                ...(u.$set || {}),
+              };
+              mockLearningEvents.push(item);
+              return { value: item };
+            }
+            if (item && u.$set) {
+              Object.assign(item, u.$set);
+            }
+            return { value: item };
           }
         };
       }
@@ -329,10 +355,84 @@ test('C3 Module Backend Integration', async (t) => {
     assert.ok(res.data.error.includes('OCR processing is currently unsupported'));
   });
 
-  await t.test('C3 to C1 live integration bridge syncs learning event', async () => {
+  await t.test('C3 to C1 live integration bridge syncs provisional learning event', async () => {
     mockLearningEvents.length = 0;
     const { syncC3AssessmentToC1 } = await import('../../../integration/c3-c1/index.js');
     const syncRes = await syncC3AssessmentToC1({
+      studentId: 'student123',
+      submissionId: testSubId,
+      questionId: 'SE-ARCH-001',
+      questionText: 'Explain Microservices',
+      score: 3,
+      totalPossible: 4,
+      percentage: 75,
+      conceptMatches: [{ concept: 'microservices', status: 'demonstrated' }],
+      finalized: false
+    });
+    assert.strictEqual(syncRes.synced, true);
+    assert.strictEqual(syncRes.topic, 'ds_cloud_microservices');
+    assert.strictEqual(syncRes.lifecycle_stage, 'provisional');
+    assert.strictEqual(mockLearningEvents.length, 1);
+    assert.strictEqual(mockLearningEvents[0].student_id, 'student123');
+    assert.strictEqual(mockLearningEvents[0].type, 'c3_automated_assessment');
+    assert.strictEqual(mockLearningEvents[0].lifecycle_stage, 'provisional');
+    assert.strictEqual(mockLearningEvents[0].provisional_score, 3);
+    assert.strictEqual(mockLearningEvents[0].final_score, null);
+  });
+
+  await t.test('repeated provisional sync calls update in-place without duplicate events (idempotency)', async () => {
+    const { syncC3AssessmentToC1 } = await import('../../../integration/c3-c1/index.js');
+    const syncRes2 = await syncC3AssessmentToC1({
+      studentId: 'student123',
+      submissionId: testSubId,
+      questionId: 'SE-ARCH-001',
+      questionText: 'Explain Microservices',
+      score: 3,
+      totalPossible: 4,
+      percentage: 75,
+      conceptMatches: [{ concept: 'microservices', status: 'demonstrated' }],
+      finalized: false
+    });
+    assert.strictEqual(syncRes2.synced, true);
+    // Crucial check: still exactly 1 event!
+    assert.strictEqual(mockLearningEvents.length, 1);
+  });
+
+  await t.test('finalization transitions event to finalized preserving provisional_score and authoritative final_score', async () => {
+    const { syncC3AssessmentToC1 } = await import('../../../integration/c3-c1/index.js');
+    const finalizeRes = await syncC3AssessmentToC1({
+      studentId: 'student123',
+      submissionId: testSubId,
+      questionId: 'SE-ARCH-001',
+      questionText: 'Explain Microservices',
+      score: 4,
+      totalPossible: 4,
+      percentage: 100,
+      conceptMatches: [{ concept: 'microservices', status: 'demonstrated' }],
+      finalized: true,
+      lecturerDecision: 'overridden',
+      overrideReason: 'Full credit for clear architectural explanation',
+      reviewedBy: 'lecturer1'
+    });
+    assert.strictEqual(finalizeRes.synced, true);
+    assert.strictEqual(finalizeRes.lifecycle_stage, 'finalized');
+    // Exactly 1 event, not 2!
+    assert.strictEqual(mockLearningEvents.length, 1);
+    const ev = mockLearningEvents[0];
+    assert.strictEqual(ev.type, 'c3_finalized_assessment');
+    assert.strictEqual(ev.lifecycle_stage, 'finalized');
+    assert.strictEqual(ev.provisional_score, 3); // Original AI proposed mark preserved!
+    assert.strictEqual(ev.final_score, 4);       // Authoritative lecturer mark stored!
+    assert.strictEqual(ev.score, 4);             // Consumer score updated!
+    assert.strictEqual(ev.lecturer_decision, 'overridden');
+    assert.strictEqual(ev.override_reason, 'Full credit for clear architectural explanation');
+    assert.strictEqual(ev.reviewed_by, 'lecturer1');
+    assert.ok(ev.finalized_at);
+  });
+
+  await t.test('repeated finalization calls do not duplicate learning events', async () => {
+    const { syncC3AssessmentToC1 } = await import('../../../integration/c3-c1/index.js');
+    const resync = await syncC3AssessmentToC1({
       studentId: 'student123',
       submissionId: testSubId,
       questionId: 'SE-ARCH-001',
@@ -343,12 +443,8 @@ test('C3 Module Backend Integration', async (t) => {
       conceptMatches: [{ concept: 'microservices', status: 'demonstrated' }],
       finalized: true
     });
-    assert.strictEqual(syncRes.synced, true);
-    assert.strictEqual(syncRes.topic, 'ds_cloud_microservices');
+    assert.strictEqual(resync.synced, true);
     assert.strictEqual(mockLearningEvents.length, 1);
-    assert.strictEqual(mockLearningEvents[0].student_id, 'student123');
-    assert.strictEqual(mockLearningEvents[0].type, 'c3_finalized_assessment');
-    assert.strictEqual(mockLearningEvents[0].score, 4);
   });
 
   // Cleanup

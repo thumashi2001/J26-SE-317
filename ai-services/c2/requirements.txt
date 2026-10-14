@@ -1,1 +1,2 @@
 # Python dependencies for C2 will be selected during implementation.
+PyMuPDF==1.26.5

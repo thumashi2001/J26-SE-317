@@ -47,6 +47,8 @@ checkpoints/
 **/datasets/samples/*
 **/experiments/results/*
 !**/.gitkeep
+# C2 authentic examination papers - keep local only
+ai-services/c2/datasets/authentic/*.pdf
 
 # IDE files
 .vscode/*
@@ -63,3 +65,6 @@ desktop.ini
 # Local database data
 mongodb_data/
 neo4j_data/
+
+!ai-services/c1/ml/models/
+!ai-services/c1/ml/models/*

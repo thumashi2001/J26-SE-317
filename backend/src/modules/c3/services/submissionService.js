@@ -374,6 +374,9 @@ export async function finalizeSubmission(submissionId, lecturerId) {
     percentage: finalPercentage,
     conceptMatches: result.ai_evaluation?.analysis?.concept_matches || [],
     finalized: true,
+    lecturerDecision: result.lecturer_decision,
+    overrideReason: result.override_reason,
+    reviewedBy: result.reviewed_by || lecturerId,
   }).catch(() => {});
 
   return {
