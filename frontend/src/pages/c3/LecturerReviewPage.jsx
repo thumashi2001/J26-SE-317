@@ -70,7 +70,7 @@ export default function LecturerReviewPage() {
             <strong>Error:</strong> {error || 'Submission not found'}
           </div>
         </div>
-        <Link to="/c3/review" className="btn secondary" style={{ width: 'auto' }}>
+        <Link to="/lecturer/c3" className="btn secondary" style={{ width: 'auto' }}>
           ← Back to Submissions Queue
         </Link>
       </div>
@@ -214,10 +214,15 @@ export default function LecturerReviewPage() {
   return (
     <div className="c3-page">
       {/* Navigation Breadcrumb */}
-      <div>
-        <Link to="/c3/review" className="btn-ghost" style={{ width: 'auto', padding: '4px 10px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Link to="/lecturer/c3" className="btn-ghost" style={{ width: 'auto', padding: '4px 10px' }}>
           ← Back to Submissions Queue
         </Link>
+        {(submission.is_demo || submission.provenance === 'pp1_demo') && (
+          <span className="c3-badge-provenance pp1_demo" style={{ fontSize: '0.85rem', padding: '4px 12px' }}>
+            🎯 Controlled PP1 Benchmark Scenario
+          </span>
+        )}
       </div>
 
       {/* Top Header Lead */}
@@ -225,7 +230,7 @@ export default function LecturerReviewPage() {
         <div>
           <h1>Assessment Review & Human-In-The-Loop Verification</h1>
           <p className="muted" style={{ margin: '4px 0 0' }}>
-            Submission ID: {submission._id} • Student: {submission.student_id}
+            Reference: #{submission._id?.slice(-6)} • Student: <strong>{submission.student_id}</strong> • Task: {submission.question_id}
           </p>
         </div>
         <div>

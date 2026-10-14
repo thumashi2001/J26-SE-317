@@ -8,6 +8,8 @@ export default function LecturerQueuePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [statusFilter, setStatusFilter] = useState('');
+  const [provenanceFilter, setProvenanceFilter] = useState('all');
+  const [searchTerm, setSearchTerm] = useState('');
 
   const fetchQueue = async () => {
     setLoading(true);
@@ -27,6 +29,40 @@ export default function LecturerQueuePage() {
     fetchQueue();
   }, [statusFilter]);
 
+  // Provenance counts
+  const pp1DemoCount = submissions.filter(
+    (s) => s.provenance === 'pp1_demo' || s.is_demo
+  ).length;
+  const studentCount = submissions.filter(
+    (s) => (s.provenance === 'student' || !s.provenance) && !s.is_demo && s.status !== 'failed'
+  ).length;
+  const testCount = submissions.filter(
+    (s) => s.provenance === 'test_fixture' || s.status === 'failed'
+  ).length;
+
+  // Filtered by Provenance and Search
+  const filteredSubmissions = submissions.filter((s) => {
+    // Provenance filter
+    if (provenanceFilter === 'pp1_demo') {
+      if (!s.is_demo && s.provenance !== 'pp1_demo') return false;
+    } else if (provenanceFilter === 'student') {
+      if (s.is_demo || s.provenance === 'pp1_demo' || s.provenance === 'test_fixture' || s.status === 'failed') return false;
+    } else if (provenanceFilter === 'test_fixture') {
+      if (s.provenance !== 'test_fixture' && s.status !== 'failed') return false;
+    }
+
+    // Search filter
+    if (searchTerm.trim()) {
+      const term = searchTerm.trim().toLowerCase();
+      const matchQId = (s.question_id || '').toLowerCase().includes(term);
+      const matchSId = (s.student_id || '').toLowerCase().includes(term);
+      const matchText = (s.question_text || '').toLowerCase().includes(term);
+      if (!matchQId && !matchSId && !matchText) return false;
+    }
+
+    return true;
+  });
+
   const totalCount = submissions.length;
   const pendingCount = submissions.filter((s) => s.status === 'pending_review' || !s.status).length;
   const reviewedCount = submissions.filter((s) => s.status === 'reviewed').length;
@@ -43,9 +79,11 @@ export default function LecturerQueuePage() {
           </p>
         </div>
         <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-          <span className="c3-badge-research">Lecturer Verification Gateway</span>
-          <button type="button" className="btn-ghost" onClick={fetchQueue} disabled={loading}>
-            🔄 Refresh
+          <Link to="/c3" className="btn-ghost" style={{ width: 'auto', padding: '6px 14px' }}>
+            ✍️ Open Student Assessment Sandbox →
+          </Link>
+          <button type="button" className="btn secondary" style={{ width: 'auto', padding: '6px 14px' }} onClick={fetchQueue} disabled={loading}>
+            🔄 Refresh Queue
           </button>
         </div>
       </div>
@@ -76,36 +114,89 @@ export default function LecturerQueuePage() {
         </div>
       </div>
 
-      {/* Filter Tabs */}
-      <div className="c3-concept-tabs" style={{ marginBottom: '8px' }}>
-        <button
-          type="button"
-          className={`c3-tab-btn ${statusFilter === '' ? 'active' : ''}`}
-          onClick={() => setStatusFilter('')}
-        >
-          All Submissions ({totalCount})
-        </button>
-        <button
-          type="button"
-          className={`c3-tab-btn ${statusFilter === 'pending_review' ? 'active' : ''}`}
-          onClick={() => setStatusFilter('pending_review')}
-        >
-          Pending Review ({pendingCount})
-        </button>
-        <button
-          type="button"
-          className={`c3-tab-btn ${statusFilter === 'reviewed' ? 'active' : ''}`}
-          onClick={() => setStatusFilter('reviewed')}
-        >
-          Reviewed ({reviewedCount})
-        </button>
-        <button
-          type="button"
-          className={`c3-tab-btn ${statusFilter === 'finalized' ? 'active' : ''}`}
-          onClick={() => setStatusFilter('finalized')}
-        >
-          Finalized ({finalizedCount})
-        </button>
+      {/* Controls Bar: Source Separation & Status Filters */}
+      <div className="panel" style={{ padding: '16px 20px', background: '#ffffff' }}>
+        <div className="c3-filter-row">
+          <div>
+            <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--muted)', marginRight: '10px', textTransform: 'uppercase' }}>
+              Dataset Provenance:
+            </span>
+            <div className="c3-concept-tabs" style={{ display: 'inline-flex', gap: '6px', margin: 0 }}>
+              <button
+                type="button"
+                className={`c3-tab-btn ${provenanceFilter === 'all' ? 'active' : ''}`}
+                onClick={() => setProvenanceFilter('all')}
+              >
+                All Sources ({totalCount})
+              </button>
+              <button
+                type="button"
+                className={`c3-tab-btn ${provenanceFilter === 'pp1_demo' ? 'active' : ''}`}
+                onClick={() => setProvenanceFilter('pp1_demo')}
+                style={provenanceFilter === 'pp1_demo' ? { background: '#6b21a8', borderColor: '#6b21a8', color: '#fff' } : {}}
+              >
+                🎯 PP1 Demo Benchmarks ({pp1DemoCount})
+              </button>
+              <button
+                type="button"
+                className={`c3-tab-btn ${provenanceFilter === 'student' ? 'active' : ''}`}
+                onClick={() => setProvenanceFilter('student')}
+              >
+                👤 Student Submissions ({studentCount})
+              </button>
+              <button
+                type="button"
+                className={`c3-tab-btn ${provenanceFilter === 'test_fixture' ? 'active' : ''}`}
+                onClick={() => setProvenanceFilter('test_fixture')}
+              >
+                🧪 Automated Test Fixtures ({testCount})
+              </button>
+            </div>
+          </div>
+
+          {/* Quick Search */}
+          <div style={{ minWidth: '240px' }}>
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="🔍 Search question, student ID..."
+              style={{ padding: '7px 12px', fontSize: '0.88rem' }}
+            />
+          </div>
+        </div>
+
+        {/* Status Lifecycle Tabs */}
+        <div className="c3-concept-tabs" style={{ marginTop: '12px', borderTop: '1px solid var(--line)', paddingTop: '12px' }}>
+          <button
+            type="button"
+            className={`c3-tab-btn ${statusFilter === '' ? 'active' : ''}`}
+            onClick={() => setStatusFilter('')}
+          >
+            All Lifecycle Stages
+          </button>
+          <button
+            type="button"
+            className={`c3-tab-btn ${statusFilter === 'pending_review' ? 'active' : ''}`}
+            onClick={() => setStatusFilter('pending_review')}
+          >
+            ⏳ Pending Review ({pendingCount})
+          </button>
+          <button
+            type="button"
+            className={`c3-tab-btn ${statusFilter === 'reviewed' ? 'active' : ''}`}
+            onClick={() => setStatusFilter('reviewed')}
+          >
+            🔍 Reviewed ({reviewedCount})
+          </button>
+          <button
+            type="button"
+            className={`c3-tab-btn ${statusFilter === 'finalized' ? 'active' : ''}`}
+            onClick={() => setStatusFilter('finalized')}
+          >
+            ✓ Finalized ({finalizedCount})
+          </button>
+        </div>
       </div>
 
       {/* Error alert */}
@@ -126,20 +217,35 @@ export default function LecturerQueuePage() {
             Loading student submissions...
           </p>
         </div>
-      ) : submissions.length === 0 ? (
+      ) : filteredSubmissions.length === 0 ? (
         <div className="panel" style={{ textAlign: 'center', padding: '48px 24px' }}>
           <h3 style={{ margin: '0 0 8px' }}>No Submissions Found</h3>
-          <p className="muted" style={{ margin: 0 }}>
-            {statusFilter
-              ? `There are currently no submissions matching status "${statusFilter}".`
-              : 'No student submissions have been submitted for evaluation yet.'}
+          <p className="muted" style={{ margin: '0 0 16px' }}>
+            {statusFilter || provenanceFilter !== 'all' || searchTerm
+              ? 'No submissions match the selected criteria or search term.'
+              : 'No student submissions have been recorded yet.'}
           </p>
+          {(statusFilter || provenanceFilter !== 'all' || searchTerm) && (
+            <button
+              type="button"
+              className="btn secondary"
+              style={{ width: 'auto', margin: '0 auto' }}
+              onClick={() => {
+                setStatusFilter('');
+                setProvenanceFilter('all');
+                setSearchTerm('');
+              }}
+            >
+              Reset Filters
+            </button>
+          )}
         </div>
       ) : (
-        <div style={{ overflowX: 'auto' }}>
+        <div className="c3-table-responsive">
           <table className="c3-queue-table">
             <thead>
               <tr>
+                <th>Provenance</th>
                 <th>Student ID</th>
                 <th>Question ID / Task</th>
                 <th>Submitted</th>
@@ -151,7 +257,7 @@ export default function LecturerQueuePage() {
               </tr>
             </thead>
             <tbody>
-              {submissions.map((s) => {
+              {filteredSubmissions.map((s) => {
                 const subDate = s.submitted_at
                   ? new Date(s.submitted_at).toLocaleString(undefined, {
                       dateStyle: 'short',
@@ -159,8 +265,20 @@ export default function LecturerQueuePage() {
                     })
                   : '—';
                 const status = s.status || 'pending_review';
+                const isDemo = s.is_demo || s.provenance === 'pp1_demo';
+                const isTest = s.provenance === 'test_fixture' || s.status === 'failed';
+
                 return (
                   <tr key={s._id}>
+                    <td>
+                      {isDemo ? (
+                        <span className="c3-badge-provenance pp1_demo">🎯 PP1 Demo</span>
+                      ) : isTest ? (
+                        <span className="c3-badge-provenance test_fixture">🧪 Test Run</span>
+                      ) : (
+                        <span className="c3-badge-provenance student">👤 Student</span>
+                      )}
+                    </td>
                     <td>
                       <strong>{s.student_id}</strong>
                     </td>
@@ -169,7 +287,16 @@ export default function LecturerQueuePage() {
                         <strong>{s.question_id || 'SE-DB-001'}</strong>
                       </div>
                       {s.question_text && (
-                        <div className="small muted" style={{ maxWidth: '240px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        <div
+                          className="small muted"
+                          style={{
+                            maxWidth: '260px',
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                          }}
+                          title={s.question_text}
+                        >
                           {s.question_text}
                         </div>
                       )}
@@ -199,6 +326,8 @@ export default function LecturerQueuePage() {
                           ? '🔍 Lecturer Reviewed'
                           : status === 'finalized'
                           ? '✓ Finalized'
+                          : status === 'failed'
+                          ? '⚠️ Incomplete'
                           : status}
                       </span>
                     </td>
@@ -222,11 +351,15 @@ export default function LecturerQueuePage() {
                     </td>
                     <td>
                       <Link
-                        to={`/c3/review/${s._id}`}
-                        className="btn secondary"
-                        style={{ padding: '6px 14px', fontSize: '0.85rem', width: 'auto' }}
+                        to={`/lecturer/c3/${s._id}`}
+                        className={`btn ${status === 'pending_review' ? '' : 'secondary'}`}
+                        style={{ padding: '6px 14px', fontSize: '0.85rem', width: 'auto', whiteSpace: 'nowrap' }}
                       >
-                        {status === 'finalized' ? 'View Final Result' : 'Review & Verify →'}
+                        {status === 'pending_review'
+                          ? 'Review & Verify →'
+                          : status === 'reviewed'
+                          ? 'Finalize Mark →'
+                          : 'View Archive'}
                       </Link>
                     </td>
                   </tr>
