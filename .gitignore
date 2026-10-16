@@ -49,6 +49,11 @@ checkpoints/
 !**/.gitkeep
 # C2 authentic examination papers - keep local only
 ai-services/c2/datasets/authentic/*.pdf
+# C2 lecturer-provided syllabus materials
+/ai-services/c2/datasets/syllabus/
+
+# C2 generated review reports
+/ai-services/c2/outputs/syllabus_reviews/
 
 # IDE files
 .vscode/*
