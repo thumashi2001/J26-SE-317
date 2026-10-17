@@ -64,7 +64,7 @@ export function analyse(events, meta = {}) {
     if (n < MIN_ANSWERS) flags.push('too few answers');
     else {
       if (p > 0.9) flags.push('too easy');
-      if (p < 0.2) flags.push('very hard, check the answer key');
+      if (p < 0.2) flags.push(disc !== null && disc >= 0.3 ? 'very hard but discriminates well (often a select-all question)' : 'very hard, check the answer key');
       if (disc !== null && disc < 0) flags.push('negative discrimination, check the answer key');
       else if (disc !== null && disc < 0.1) flags.push('weak discrimination');
       if (prior && prior !== observed) flags.push(`expected ${prior}, observed ${observed}`);

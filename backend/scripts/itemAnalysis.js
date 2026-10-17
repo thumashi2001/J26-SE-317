@@ -1,5 +1,6 @@
 // Run from the backend folder:
 //   node scripts/itemAnalysis.js            real answers from MongoDB (learning_events)
+//   node scripts/itemAnalysis.js --csv responses.csv   Google Form pilot (see docs/pilot): no database needed
 //   node scripts/itemAnalysis.js --demo     PIPELINE TEST on simulated answers (no database, not evidence)
 // Writes ../docs/c1-item-analysis.csv and prints a summary.
 // A question needs at least 15 first-attempt answers before its numbers are trusted, so collect answers from
@@ -13,6 +14,8 @@ import { analyse, summarise, MIN_ANSWERS } from '../src/modules/c1/services/item
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const demo = process.argv.includes('--demo');
+const csvAt = process.argv.indexOf('--csv');
+const csvFile = csvAt > -1 ? process.argv[csvAt + 1] : null;
 
 // prior band for every question id
 const meta = {};
@@ -24,7 +27,23 @@ for (const m of MODULES) {
 }
 
 let events = [];
-if (demo) {
+if (csvFile) {
+  const { parseCsv, eventsFromResponses, screenCopies } = await import('../src/modules/c1/services/pilotCsv.js');
+  const key = JSON.parse(fs.readFileSync(path.join(here, '..', '..', 'docs', 'pilot', 'pilot-key.json'), 'utf8'));
+  const res = eventsFromResponses(parseCsv(fs.readFileSync(csvFile, 'utf8')), key);
+  events = res.events;
+  console.log(`Pilot file: ${res.respondents} respondents, ${events.length} answers.`);
+  if (!process.argv.includes('--no-screen')) {
+    const sc = screenCopies(events);
+    if (sc.groups.length) {
+      console.log(`SCREENING: ${sc.groups.length} group(s) of near-identical answer sheets found (sheet rows ${sc.groups.map((g) => g.join(', ')).join(' | ')}).`);
+      console.log(`Kept the earliest sheet of each group and left out ${sc.dropped} copies. Use --no-screen to keep everything.`);
+    } else console.log('SCREENING: no near-identical answer sheets found.');
+    events = sc.events;
+  }
+  if (res.missingColumns.length) console.log(`WARNING: no column found for Q${res.missingColumns.join(', Q')}. Is this the right file?`);
+  console.log('');
+} else if (demo) {
   // Simulated class: 300 students, each answers 60 random questions. The chance of a right answer depends on the
   // student's ability and on a question difficulty that is NOT the prior band (it is random around it), so the
   // analysis has something to find. This only proves the script runs end to end.
@@ -57,7 +76,7 @@ console.log(`Flagged for a look: ${sum.flagged}. Mean discrimination: ${sum.mean
 const bad = rows.filter((r) => r.n >= MIN_ANSWERS && r.flags.length).slice(0, 12);
 for (const r of bad) console.log(`${r.question_id}  n=${r.n} p=${r.p} d=${r.discrimination}  ${r.flags.join('; ')}`);
 
-const out = path.join(here, '..', '..', 'docs', demo ? 'c1-item-analysis-DEMO.csv' : 'c1-item-analysis.csv');
+const out = path.join(here, '..', '..', 'docs', demo ? 'c1-item-analysis-DEMO.csv' : csvFile ? 'pilot/c1-item-analysis-pilot.csv' : 'c1-item-analysis.csv');
 const head = ['question_id', 'n', 'p', 'discrimination', 'prior', 'calibrated_p', 'observed', 'flags'];
 fs.mkdirSync(path.dirname(out), { recursive: true });
 fs.writeFileSync(out, [head.join(','), ...rows.map((r) => head.map((h) => `"${Array.isArray(r[h]) ? r[h].join('; ') : r[h] ?? ''}"`).join(','))].join('\n') + '\n');
