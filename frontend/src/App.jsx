@@ -11,6 +11,7 @@ import { useAuth } from './context/AuthContext.jsx';
 import ComingSoon from './pages/ComingSoon.jsx';
 import DiagnosticPage from './pages/c1/DiagnosticPage.jsx';
 import DashboardPage from './pages/c1/DashboardPage.jsx';
+import TopicInsightsPage from './pages/c1/TopicInsightsPage.jsx';
 import TopicPage from './pages/c1/TopicPage.jsx';
 import PracticePage from './pages/c1/PracticePage.jsx';
 import ProfilePage from './pages/ProfilePage.jsx';
@@ -69,6 +70,7 @@ export default function App() {
       <Route element={area('student', STUDENT_MENU, 'Student')}>
         <Route path="/c1/diagnostic" element={<DiagnosticPage />} />
         <Route path="/c1/dashboard" element={<DashboardPage />} />
+        <Route path="/c1/topics" element={<TopicInsightsPage />} />
         <Route path="/c1/topic/:topic" element={<TopicPage />} />
         <Route path="/c1/practice/:topic" element={<PracticePage />} />
 

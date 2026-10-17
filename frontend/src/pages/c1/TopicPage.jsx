@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { getHistory, getInsights, getPlan, getPrediction } from '../../services/c1Api.js';
 import { prettyTopic, scoreBand, topicModule, topicLectures } from '../../utils/topics.js';
@@ -41,7 +41,10 @@ function Segments({ used, total }) {
 
 export default function TopicPage() {
   const { topic } = useParams();
+  const location = useLocation();
   const { user } = useAuth();
+  // where the student came from: Topic insights, or the dashboard by default
+  const back = location.state && location.state.from === '/c1/topics' ? { to: '/c1/topics', text: 'Back to topic insights' } : { to: '/c1/dashboard', text: 'Back to my learning state' };
   const [state, setState] = useState({ status: 'loading' });
   const [info, setInfo] = useState(null); // estimated score now, confidence and the reasons
   const [examDate, setExamDate] = useState(null);
@@ -85,7 +88,7 @@ export default function TopicPage() {
       <div className="panel">
         <h2>This topic did not load</h2>
         <p className="error">{state.message}</p>
-        <Link className="btn" to="/c1/dashboard">Back to my learning state</Link>
+        <Link className="btn" to={back.to}>{back.text}</Link>
       </div>
     );
 
@@ -101,7 +104,7 @@ export default function TopicPage() {
 
   return (
     <div className="topic-page">
-      <Link to="/c1/dashboard" className="btn secondary back">&larr; Back to my learning state</Link>
+      <Link to={back.to} className="btn secondary back">&larr; {back.text}</Link>
 
       <section className={`th-hero ${band}`}>
         <svg viewBox="0 0 130 130" className="th-ring" role="img" aria-label={`Score ${Math.round(shownScore)} percent`}>
