@@ -45,3 +45,33 @@
 .tp-code { background: var(--chip-bg); color: var(--primary-dark); }
 .tp-seg button.on { background: var(--primary); color: #fff; }
 @media (prefers-reduced-motion: reduce) { .tp-card, .tp-ring .fil { animation: none; transition: none; } .tp-card:hover { transform: none; } }
+
+/* short summary cards that point to the Topic insights page */
+.plan-col { display: grid; gap: 18px; align-content: start; min-width: 0; }
+.plan-col > .panel { margin: 0; }
+.glance-card { margin: 0; }
+.glance-card header { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
+.glance-card h2 { margin: 0; font-size: 1.1rem; }
+.glance-link { font-weight: 700; font-size: 0.88rem; color: var(--link); text-decoration: none; }
+.glance-link:hover { text-decoration: underline; }
+.glance-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.glance-list li { --c: var(--strong); }
+.glance-list li.weak { --c: var(--weak); } .glance-list li.fair { --c: var(--fair); } .glance-list li.strong { --c: var(--strong); }
+.glance-list a { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(60px, 1fr) auto; gap: 6px 12px; align-items: center; text-decoration: none; color: inherit; padding: 10px 12px; border-radius: 12px; border: 1px solid color-mix(in srgb, var(--c) 30%, var(--line)); background: color-mix(in srgb, var(--c) 8%, var(--panel)); }
+.glance-list a:hover { border-color: var(--c); }
+.gl-name { font-weight: 700; font-size: 0.92rem; overflow-wrap: anywhere; }
+.gl-bar { height: 8px; border-radius: 6px; background: color-mix(in srgb, var(--c) 18%, var(--panel)); overflow: hidden; }
+.gl-bar i { display: block; height: 100%; background: var(--c); border-radius: 6px; }
+.glance-list b { font-family: var(--font-head); color: var(--c); }
+.glance-list small { grid-column: 1 / -1; font-size: 0.76rem; font-weight: 700; color: var(--c); }
+.gl-head { margin: 4px 0 6px; font-size: 1.02rem; font-weight: 700; }
+
+/* Topic insights page */
+.ti-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; }
+.ti-head h1 { margin: 2px 0 4px; }
+.ti-head p { margin: 0; }
+.ti-counts { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.ti .tp-head h2 { margin-top: 22px; }
+.ti-answer { margin-top: 28px; }
+
+.plan-row > .cal-card { margin-top: 0; }

@@ -7,6 +7,7 @@ export const STUDENT_MENU = [
   { heading: 'Digital twin' },
   { to: '/c1/diagnostic', label: 'Diagnostic test', onlyBeforeDiagnostic: true },
   { to: '/c1/dashboard', label: 'My learning state' },
+  { to: '/c1/topics', label: 'Topic insights' },
   { heading: 'Exams' },
   { to: '/c2', label: 'Exam intelligence' },
   { heading: 'Marking' },
