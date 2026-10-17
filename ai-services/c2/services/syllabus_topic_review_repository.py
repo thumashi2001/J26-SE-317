@@ -141,6 +141,11 @@ class SyllabusTopicReviewRepository:
 
         data = self._load()
         previous = data["reviews"].get(candidate_id)
+        if previous is not None:
+         raise ValueError(
+        "Candidate has already been reviewed. "
+        "Existing decisions cannot be overwritten."
+         )
 
         if previous is not None:
             if (

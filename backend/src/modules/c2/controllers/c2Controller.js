@@ -77,6 +77,11 @@ export async function reviewCandidate(req, res) {
   try {
     const { moduleKey, candidateId } = req.params;
     const { decision, reviewNotes = '' } = req.body || {};
+    if (decision === 'rejected' && !reviewNotes.trim()) {
+  return res.status(400).json({
+    error: 'A rejection reason is required',
+  });
+}
 
     if (!['approved', 'rejected'].includes(decision)) {
       return res.status(400).json({
