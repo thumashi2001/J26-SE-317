@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import ThemeToggle from '../components/ThemeToggle.jsx';
-import BrandMark from '../components/BrandMark.jsx';
+import Logo from '../components/Logo.jsx';
 import LaptopScene from '../components/LaptopScene.jsx';
 import { TOPIC_INFO } from '../utils/topicLabels.js';
 import './landing.css';
@@ -71,7 +71,7 @@ export default function LandingPage() {
 
       <header className="lp-nav">
         <div className="lp-wrap lp-nav-in">
-          <Link to="/" className="lp-brand" aria-label="AdaptiveLearnSE home"><BrandMark onDark /></Link>
+          <Link to="/" className="lp-brand" aria-label="AdaptiveLearnSE home"><Logo size={38} onDark /></Link>
           <nav className={'lp-links' + (open ? ' open' : '')} aria-label="Main">
             {NAV.map((n) => (
               <a key={n.href} href={n.href} onClick={() => setOpen(false)}>{n.label}</a>
@@ -91,7 +91,7 @@ export default function LandingPage() {
         <section className="lp-hero">
           <div className="lp-wrap lp-hero-in">
             <div className="lp-hero-text">
-              <p className="lp-kicker">SLIIT Software Engineering, Year 3</p>
+              <p className="lp-kicker">Built for SLIIT Year 3 Software Engineering students</p>
               <h1>Know what you know.<br /><span>Learn what matters next.</span></h1>
               <p className="lp-lead">
                 AdaptiveLearnSE joins four tools in one place: a digital twin of what you know, exam intelligence, automated marking and an adaptive learning path.
@@ -180,8 +180,8 @@ export default function LandingPage() {
       <footer className="lp-foot">
         <div className="lp-wrap lp-foot-in">
           <div>
-            <BrandMark onDark />
-            <p>A student research project (IT4010, 2026) for SLIIT Software Engineering students. It is not an official SLIIT service.</p>
+            <Logo size={36} onDark />
+            <p>A student research project (2026), specialised for SLIIT Year 3 Software Engineering students. It is not an official SLIIT service.</p>
           </div>
           <nav aria-label="Footer">
             {NAV.map((n) => <a key={n.href} href={n.href}>{n.label}</a>)}
