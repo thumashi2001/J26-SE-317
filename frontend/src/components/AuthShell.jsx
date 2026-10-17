@@ -42,7 +42,7 @@ export default function AuthShell({ children }) {
           <ThemeToggle />
         </div>
         <div className="auth-card">{children}</div>
-        <p className="auth-foot">AdaptiveLearnSE &middot; SLIIT IT4010</p>
+        <p className="auth-foot">AdaptiveLearnSE &middot; Year 3 Software Engineering</p>
       </section>
     </div>
   );
