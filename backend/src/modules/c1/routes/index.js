@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { requireAuth } from '../../../middleware/auth.js';
+import { requireAuth, requireRole } from '../../../middleware/auth.js';
 import * as diagnostic from '../controllers/diagnosticController.js';
 import * as events from '../controllers/eventController.js';
 import * as history from '../controllers/historyController.js';
@@ -9,6 +9,7 @@ import * as insights from '../controllers/insightsController.js';
 import * as plan from '../controllers/planController.js';
 import * as level from '../controllers/levelController.js';
 import * as prediction from '../controllers/predictionController.js';
+import * as classInsights from '../controllers/classInsightsController.js';
 
 const router = Router();
 
@@ -27,6 +28,7 @@ router.get('/behaviour/:studentId', insights.getBehaviour);
 router.get('/plan/:studentId', plan.getPlan);
 router.get('/level/:studentId', level.getLevel);
 router.get('/predict/:studentId', prediction.getPredictions);
+router.get('/class', requireRole('lecturer'), classInsights.classInsights); // lecturer Class insights page
 router.put('/exam-date', plan.setExamDate);
 router.get('/practice/topics', practice.topics);
 router.post('/practice/start', practice.start);
