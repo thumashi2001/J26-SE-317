@@ -134,7 +134,7 @@ export default {
         D(
           'Which statement correctly separates UI from UX?',
           [
-            'UI is the set of elements used to interact; UX is what the user takes away from the whole experience',
+            'UI is the set of elements used to interact; UX is what the user takes away',
             'UI is what the user takes away from the experience; UX is the set of screen elements',
             'UI is about user research only; UX is about colors and fonts only',
             'UI and UX mean exactly the same thing in a project',
@@ -225,10 +225,10 @@ export default {
         S(
           'In Hierarchical Task Analysis, what does a "plan" describe?',
           [
-            'The budget and schedule for the project',
-            'The final visual design of the screen',
-            'How the sub-tasks might be performed in practice, for example for a new or regular user',
-            'The list of users who will test the system',
+            'The budget and the schedule for carrying out the whole project',
+            'The final visual design of each screen of the product',
+            'How sub-tasks might be done, for example by a new user',
+            'The list of users who will test the finished system',
           ],
           2,
           'HTA breaks a goal into sub-tasks, and plans say in what order or under what condition they are done. In the DVD example, a regular user and a new user follow different plans.',
@@ -342,9 +342,9 @@ export default {
         S(
           'What is the purpose of a functional specification document?',
           [
-            'To show the final colors and fonts of the product',
-            'To tell developers how the application will function and what behavior is expected',
-            'To record the results of every usability test',
+            'To show the final colors and fonts of the whole product',
+            'To tell developers how the application should behave',
+            'To record the results of every usability test session',
             'To replace all communication between the team members',
           ],
           1,
@@ -379,9 +379,9 @@ export default {
           'According to Tesler\'s Law, what should designers do with complexity that cannot be removed?',
           [
             'Show all of it to expert users on the main screen',
-            'Spread it equally across every screen',
-            'Move as much of it as possible to back-stage processes, away from the user',
-            'Remove every feature that is complex',
+            'Spread it equally across every screen of the app',
+            'Move as much as possible to back-stage processes',
+            'Remove every feature that is complex or hard to use',
           ],
           2,
           'Every application has some complexity that cannot be simplified. The designer should keep it away from the user to make the interface minimalist and easy to navigate.',
@@ -720,10 +720,10 @@ export default {
         S(
           'What is the key difference of the RITE method?',
           [
-            'The prototype is changed during the study, after 1 to 3 participants meet an issue',
-            'The prototype is changed only after the full study has ended',
-            'It is used only after the product is released',
-            'It uses only questionnaires to collect data',
+            'The prototype is changed during the study, as issues appear',
+            'The prototype is changed only after the full study has finished',
+            'It is used only after the product has been released to users',
+            'It uses only questionnaires to collect data from participants',
           ],
           0,
           'RITE updates the prototype as soon as a usability issue appears, so problems are solved quickly. It came from the gaming division at Microsoft.',
@@ -794,10 +794,10 @@ export default {
         D(
           'What is the System Usability Scale (SUS)?',
           [
-            'A five-item yes or no checklist for expert inspectors',
+            'A five-item yes or no checklist filled in by expert inspectors',
             'A device that tracks where participants look on a screen',
-            'A 10-item questionnaire with five answer options from strongly agree to strongly disagree',
-            'A list of ten design heuristics for walkthroughs',
+            'A 10-item questionnaire with a five-point agreement scale',
+            'A list of ten design heuristics for cognitive walkthroughs',
           ],
           2,
           'SUS is a quick and reliable questionnaire created by John Brooke in 1986. It can be used for hardware, software, mobile devices and websites.',
@@ -876,7 +876,7 @@ export default {
             'Large screens are not important for most products',
             'Mobile users are always more distracted than desktop users',
             'It is cheaper to build than any other approach',
-            'It forces you to decide what matters most and avoids the "kitchen sink" problem',
+            'It forces you to decide what matters most',
           ],
           3,
           'Starting small forces careful selection of features. Large screens still need attention and should not just be scaled-up copies.',
@@ -959,9 +959,9 @@ export default {
         D(
           'What does the "core user experience" of a product mean?',
           [
-            'The most colorful screens of the product',
+            'The most colorful screens of the product on each device',
             'The list of all features ever requested by stakeholders',
-            'The essential features and content that must work on every device or channel',
+            'The essential features that must work on every device',
             'The version of the product made only for desktop users',
           ],
           2,
