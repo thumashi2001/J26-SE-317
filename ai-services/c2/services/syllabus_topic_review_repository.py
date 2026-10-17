@@ -6,6 +6,8 @@ import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 
+from filelock import FileLock, Timeout
+
 from services.syllabus_topic_review_validator import (
     SyllabusTopicReviewValidator,
 )
@@ -13,10 +15,17 @@ from services.syllabus_topic_review_validator import (
 
 class SyllabusTopicReviewRepository:
     """
-    Local JSON repository for manual syllabus topic reviews.
+    Persistent JSON repository for lecturer syllabus reviews.
 
-    Maintains current review records and a history of decisions.
-    This is a development repository, not an authenticated API.
+    Features:
+    - Validated review records
+    - Immutable completed decisions
+    - Review history
+    - Atomic JSON replacement
+    - Cross-process file locking
+
+    This repository does not authenticate users.
+    Authentication is handled by the API layer.
     """
 
     SCHEMA_VERSION = "1.0"
@@ -32,6 +41,8 @@ class SyllabusTopicReviewRepository:
 
         self.storage_path = Path(storage_path)
         self.validator = SyllabusTopicReviewValidator()
+
+        self.lock_path = Path(str(self.storage_path) + ".lock")
 
     def _empty_database(self):
         return {
@@ -124,11 +135,14 @@ class SyllabusTopicReviewRepository:
 
     def save_review(self, record):
         """
-        Save a validated review record.
+        Save a new lecturer review decision.
 
-        A completed decision requires reviewer metadata.
-        The caller is responsible for authenticating the reviewer.
+        Completed decisions cannot be overwritten.
+
+        The file lock protects the entire
+        read-validate-write transaction.
         """
+
         validation = self.validator.validate(record)
 
         if not validation["valid"]:
@@ -139,50 +153,43 @@ class SyllabusTopicReviewRepository:
 
         candidate_id = record["candidate_id"]
 
-        data = self._load()
-        previous = data["reviews"].get(candidate_id)
-        if previous is not None:
-         raise ValueError(
-        "Candidate has already been reviewed. "
-        "Existing decisions cannot be overwritten."
-         )
+        self.storage_path.parent.mkdir(
+            parents=True,
+            exist_ok=True,
+        )
 
-        if previous is not None:
-            if (
-                previous["module_key"] != record["module_key"]
-                or previous["candidate_name"]
-                != record["candidate_name"]
-                or previous["sources"] != record["sources"]
-            ):
-                raise ValueError(
-                    "Candidate identity or source evidence cannot change"
-                )
+        try:
+            with FileLock(str(self.lock_path), timeout=10):
+                data = self._load()
 
-        if (
-            previous is not None
-            and previous == record
-        ):
-            return copy.deepcopy(previous)
+                previous = data["reviews"].get(candidate_id)
 
-        event = {
-            "candidate_id": candidate_id,
-            "module_key": record["module_key"],
-            "previous_decision": (
-                previous["review_decision"]
-                if previous is not None
-                else None
-            ),
-            "new_decision": record["review_decision"],
-            "reviewer_id": record["reviewer_id"],
-            "event_timestamp": datetime.now(
-                timezone.utc
-            ).isoformat(),
-            "review_record": copy.deepcopy(record),
-        }
+                if previous is not None:
+                    raise ValueError(
+                        "Candidate has already been reviewed. "
+                        "Existing decisions cannot be overwritten."
+                    )
 
-        data["reviews"][candidate_id] = copy.deepcopy(record)
-        data["history"].append(event)
+                event = {
+                    "candidate_id": candidate_id,
+                    "module_key": record["module_key"],
+                    "previous_decision": None,
+                    "new_decision": record["review_decision"],
+                    "reviewer_id": record["reviewer_id"],
+                    "event_timestamp": datetime.now(
+                        timezone.utc
+                    ).isoformat(),
+                    "review_record": copy.deepcopy(record),
+                }
 
-        self._save(data)
+                data["reviews"][candidate_id] = copy.deepcopy(record)
+                data["history"].append(event)
+
+                self._save(data)
+
+        except Timeout as error:
+            raise RuntimeError(
+                "Review repository is busy. Please retry."
+            ) from error
 
         return copy.deepcopy(record)
