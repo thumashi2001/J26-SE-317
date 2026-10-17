@@ -37,8 +37,16 @@ Based on the item writing guidelines of Haladyna, Downing and Rodriguez (2002).
 - Every question has an explanation of why the answer is right.
 `node scripts/checkContent.js` checks these rules automatically for every question.
 
-Finding from this check: in some modules the correct option is the longest one more often than chance (25%), which is a hint students can use without knowing the topic: SE3020 48%, SE3050 46%, SE3080 38% (SE3030 is the opposite at 6%).
-Improvement: make the wrong options in those modules as detailed as the right one, then run the check again.
+Finding from this check: in some modules the correct option was the longest one more often than chance (25%), which is a hint students can use without knowing the topic.
+Fix applied: 26 questions had their options reworded (the correct option shortened, or the wrong options made as detailed). No question text, correct answer or explanation was changed.
+
+| Module | Correct option was the longest (before) | After |
+|---|---|---|
+| SE3020 | 48% | 26% |
+| SE3050 | 46% | 31% |
+| SE3080 | 38% | 24% |
+
+(SE3030 is the opposite case at 6%, and the other modules were already between 20% and 31%.)
 
 ## 4. Diagnostic design
 - One question per topic, the question is picked from 3 stored versions.
@@ -59,7 +67,7 @@ For each question the script reports:
 - flags: too easy (p above 0.90), very hard (p below 0.20), weak or negative discrimination (negative usually means the answer key is wrong), expected band differs from observed band.
 A question is only judged with at least 15 first-attempt answers.
 
-Pilot plan: about 15 classmates each practise the same 3 topics (30 questions), so every one of those questions has at least 15 answers. Then run the script and fix the flagged questions.
+Pilot plan: about 20 classmates each do the diagnostic, then practise the same 3 topics twice. A practice quiz uses 7 of the 10 questions of a topic, so two quizzes cover almost all 10, and every question then gets roughly 15 to 20 first-attempt answers. Names are not stored in the analysis, only the student ID inside the app, and the report shows question numbers only.
 Results: **to be filled in** after the pilot.
 
 The script was tested on a small hand-made class with known answers (`node scripts/checkItemAnalysis.js`) and run end to end on simulated answers (`--demo`, a pipeline test, not evidence).
