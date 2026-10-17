@@ -41,6 +41,18 @@ if (csvFile) {
     } else console.log('SCREENING: no near-identical answer sheets found.');
     events = sc.events;
   }
+  // Optional effort screening: --min-score N leaves out respondents who got fewer than N questions fully right.
+  // Random guessing on this form gives about 5 out of 30 (sd about 2), so 10 is a sensible limit.
+  const ms = process.argv.indexOf('--min-score');
+  if (ms > -1) {
+    const limit = Number(process.argv[ms + 1]);
+    const total = {};
+    events.forEach((e) => { total[e.student_id] = (total[e.student_id] || 0) + (e.correct ? 1 : 0); });
+    const low = new Set(Object.keys(total).filter((id) => total[id] < limit));
+    console.log(`EFFORT SCREENING: ${low.size} of ${Object.keys(total).length} respondents scored below ${limit} of ${key.length} (chance level is about ${Math.round(key.reduce((t, k) => t + (k.multi ? 1 / 15 : 0.25), 0))}). Left them out.`);
+    events = events.filter((e) => !low.has(e.student_id));
+    console.log(`Respondents analysed: ${Object.keys(total).length - low.size}${Object.keys(total).length - low.size < 15 ? ' (fewer than 15, so treat the numbers as indicative only)' : ''}`);
+  }
   if (res.missingColumns.length) console.log(`WARNING: no column found for Q${res.missingColumns.join(', Q')}. Is this the right file?`);
   console.log('');
 } else if (demo) {
