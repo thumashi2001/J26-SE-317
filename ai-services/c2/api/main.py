@@ -163,6 +163,72 @@ def get_excluded(
 
 
 # --------------------------------------------------
+# M8 - Module-Wide Review Statistics
+# --------------------------------------------------
+
+@app.get("/reviews/{module_key}/stats")
+def get_review_statistics(
+    module_key: str,
+    x_c2_internal_token: str | None = Header(default=None),
+):
+    require_internal_token(x_c2_internal_token)
+    validate_module(module_key)
+
+    try:
+        report = queue._load_report(module_key)
+
+    except FileNotFoundError:
+        raise HTTPException(
+            status_code=404,
+            detail="Review report not found",
+        )
+
+    candidates = report["review_candidates"]
+
+    # Fetch all saved lecturer decisions for this module.
+    reviews = repository.list_reviews(module_key=module_key)
+
+    # Use candidate IDs to avoid counting duplicate names.
+    valid_candidate_ids = {
+        queue.candidate_id(
+            module_key,
+            candidate["candidate_name"],
+        )
+        for candidate in candidates
+    }
+
+    # Ignore saved reviews that do not belong to this report.
+    reviewed = {
+        review["candidate_id"]: review
+        for review in reviews
+        if review["candidate_id"] in valid_candidate_ids
+    }
+
+    approved = sum(
+        1
+        for review in reviewed.values()
+        if review["review_decision"] == "approved"
+    )
+
+    rejected = sum(
+        1
+        for review in reviewed.values()
+        if review["review_decision"] == "rejected"
+    )
+
+    total = len(valid_candidate_ids)
+    pending = total - approved - rejected
+
+    return {
+        "module_key": module_key,
+        "total": total,
+        "pending": pending,
+        "approved": approved,
+        "rejected": rejected,
+    }
+
+
+# --------------------------------------------------
 # Lecturer Approval / Rejection
 # --------------------------------------------------
 

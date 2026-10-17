@@ -3,8 +3,16 @@ import { api } from './apiClient.js';
 
 const base = '/c2';
 
+// --------------------------------------------------
+// Get Supported Modules
+// --------------------------------------------------
+
 export const getC2Modules = () =>
   api(`${base}/modules`);
+
+// --------------------------------------------------
+// Get Syllabus Review Queue
+// --------------------------------------------------
 
 export const getC2ReviewQueue = (
   moduleKey,
@@ -21,10 +29,27 @@ export const getC2ReviewQueue = (
   );
 };
 
+// --------------------------------------------------
+// Get Excluded Syllabus Candidates
+// --------------------------------------------------
+
 export const getC2ExcludedCandidates = (moduleKey) =>
   api(
     `${base}/reviews/${encodeURIComponent(moduleKey)}/excluded`
   );
+
+// --------------------------------------------------
+// M8 - Get Module-Wide Review Statistics
+// --------------------------------------------------
+
+export const getC2ReviewStatistics = (moduleKey) =>
+  api(
+    `${base}/reviews/${encodeURIComponent(moduleKey)}/stats`
+  );
+
+// --------------------------------------------------
+// Submit Lecturer Approval / Rejection
+// --------------------------------------------------
 
 export const submitC2Review = (
   moduleKey,

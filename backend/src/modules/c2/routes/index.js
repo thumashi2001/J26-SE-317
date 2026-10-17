@@ -20,6 +20,12 @@ router.get(
   controller.listReviewQueue
 );
 
+router.get(
+  '/reviews/:moduleKey/stats',
+  requireRole('lecturer', 'admin'),
+  controller.listReviewStatistics
+);
+
 router.post(
   '/reviews/:moduleKey/:candidateId/decision',
   requireRole('lecturer', 'admin'),

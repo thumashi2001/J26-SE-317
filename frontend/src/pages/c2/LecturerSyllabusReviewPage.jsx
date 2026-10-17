@@ -3,8 +3,10 @@ import { useEffect, useState } from 'react';
 import {
   getC2Modules,
   getC2ReviewQueue,
+  getC2ReviewStatistics,
   submitC2Review,
 } from '../../services/c2Api.js';
+
 import './lecturerSyllabusReview.css';
 
 const PAGE_SIZE = 10;
@@ -35,6 +37,8 @@ export default function LecturerSyllabusReviewPage() {
   const [includeReviewed, setIncludeReviewed] = useState(false);
 
   const [queue, setQueue] = useState(null);
+  const [statistics, setStatistics] = useState(null);
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
@@ -47,6 +51,7 @@ export default function LecturerSyllabusReviewPage() {
 
   const [refreshKey, setRefreshKey] = useState(0);
 
+  // Load supported modules.
   useEffect(() => {
     let active = true;
 
@@ -59,10 +64,15 @@ export default function LecturerSyllabusReviewPage() {
           : [];
 
         setModules(items);
-        if (items.length) setModuleKey(items[0]);
+
+        if (items.length) {
+          setModuleKey(items[0]);
+        }
       })
       .catch((err) => {
-        if (active) setError(err.message);
+        if (active) {
+          setError(err.message || 'Could not load modules.');
+        }
       });
 
     return () => {
@@ -70,6 +80,7 @@ export default function LecturerSyllabusReviewPage() {
     };
   }, []);
 
+  // Load review queue and module-wide statistics.
   useEffect(() => {
     let active = true;
 
@@ -79,19 +90,32 @@ export default function LecturerSyllabusReviewPage() {
       setLoading(true);
       setError('');
       setQueue(null);
+      setStatistics(null);
 
       try {
-        const data = await getC2ReviewQueue(moduleKey, {
-          page,
-          pageSize: PAGE_SIZE,
-          includeReviewed,
-        });
+        const [queueResult, statsResult] = await Promise.all([
+          getC2ReviewQueue(moduleKey, {
+            page,
+            pageSize: PAGE_SIZE,
+            includeReviewed,
+          }),
+          getC2ReviewStatistics(moduleKey),
+        ]);
 
-        if (active) setQueue(data);
+        if (!active) return;
+
+        setQueue(queueResult);
+        setStatistics(statsResult);
       } catch (err) {
-        if (active) setError(err.message);
+        if (active) {
+          setError(
+            err.message || 'Could not load syllabus reviews.'
+          );
+        }
       } finally {
-        if (active) setLoading(false);
+        if (active) {
+          setLoading(false);
+        }
       }
     }
 
@@ -105,18 +129,6 @@ export default function LecturerSyllabusReviewPage() {
   const candidates = queue?.candidates ?? [];
   const totalCandidates = queue?.total_candidates ?? 0;
   const totalPages = Math.max(1, queue?.total_pages ?? 1);
-
-  const pendingOnPage = candidates.filter(
-    (candidate) => candidate.review_decision === 'pending'
-  ).length;
-
-  const approvedOnPage = candidates.filter(
-    (candidate) => candidate.review_decision === 'approved'
-  ).length;
-
-  const rejectedOnPage = candidates.filter(
-    (candidate) => candidate.review_decision === 'rejected'
-  ).length;
 
   function openReview(candidate, action) {
     setSelected(candidate);
@@ -143,7 +155,9 @@ export default function LecturerSyllabusReviewPage() {
     }
 
     if (notes.trim().length > 2000) {
-      setError('Review notes must be 2000 characters or fewer.');
+      setError(
+        'Review notes must be 2000 characters or fewer.'
+      );
       return;
     }
 
@@ -151,17 +165,27 @@ export default function LecturerSyllabusReviewPage() {
     setError('');
 
     try {
-      await submitC2Review(moduleKey, selected.candidate_id, {
-        decision,
-        reviewNotes: notes.trim(),
-      });
+      await submitC2Review(
+        moduleKey,
+        selected.candidate_id,
+        {
+          decision,
+          reviewNotes: notes.trim(),
+        }
+      );
 
       setSelected(null);
       setConfirmed(false);
-      setNotice(`Review saved: ${selected.candidate_name}`);
+      setNotice(
+        `Review saved: ${selected.candidate_name}`
+      );
+
+      // Refresh both the queue and module-wide statistics.
       setRefreshKey((value) => value + 1);
     } catch (err) {
-      setError(err.message || 'Could not save the review.');
+      setError(
+        err.message || 'Could not save the review.'
+      );
     } finally {
       setSaving(false);
     }
@@ -172,34 +196,71 @@ export default function LecturerSyllabusReviewPage() {
       <header className="c2-dashboard-head">
         <h1>Syllabus topic review</h1>
         <p className="muted">
-          Review and verify syllabus topics extracted from lecture
-          materials before they are used for examination intelligence.
+          Review and verify syllabus topics extracted from
+          lecture materials before they are used for
+          examination intelligence.
         </p>
       </header>
 
-      <section className="c2-stats stat-grid" aria-label="Review statistics">
-        <div className="stat" style={{ '--c': 'var(--primary)' }}>
+      {/* M8: Module-wide statistics */}
+      <section
+        className="c2-stats stat-grid"
+        aria-label="Review statistics"
+      >
+        <div
+          className="stat"
+          style={{ '--c': 'var(--primary)' }}
+        >
           <div className="stat-num">
-            {queue ? totalCandidates.toLocaleString() : '—'}
+            {statistics
+              ? statistics.total.toLocaleString()
+              : '—'}
           </div>
           <div className="stat-label">
-            Candidates in selected queue
+            Total candidates
           </div>
         </div>
 
-        <div className="stat" style={{ '--c': 'var(--warn)' }}>
-          <div className="stat-num">{queue ? pendingOnPage : '—'}</div>
-          <div className="stat-label">Pending on this page</div>
+        <div
+          className="stat"
+          style={{ '--c': 'var(--warn)' }}
+        >
+          <div className="stat-num">
+            {statistics
+              ? statistics.pending.toLocaleString()
+              : '—'}
+          </div>
+          <div className="stat-label">
+            Pending reviews
+          </div>
         </div>
 
-        <div className="stat" style={{ '--c': 'var(--good)' }}>
-          <div className="stat-num">{queue ? approvedOnPage : '—'}</div>
-          <div className="stat-label">Approved on this page</div>
+        <div
+          className="stat"
+          style={{ '--c': 'var(--good)' }}
+        >
+          <div className="stat-num">
+            {statistics
+              ? statistics.approved.toLocaleString()
+              : '—'}
+          </div>
+          <div className="stat-label">
+            Approved topics
+          </div>
         </div>
 
-        <div className="stat" style={{ '--c': 'var(--bad)' }}>
-          <div className="stat-num">{queue ? rejectedOnPage : '—'}</div>
-          <div className="stat-label">Rejected on this page</div>
+        <div
+          className="stat"
+          style={{ '--c': 'var(--bad)' }}
+        >
+          <div className="stat-num">
+            {statistics
+              ? statistics.rejected.toLocaleString()
+              : '—'}
+          </div>
+          <div className="stat-label">
+            Rejected topics
+          </div>
         </div>
       </section>
 
@@ -208,7 +269,8 @@ export default function LecturerSyllabusReviewPage() {
           <div>
             <h3>Topic verification queue</h3>
             <p className="muted small">
-              Select a module and inspect each candidate's source evidence.
+              Select a module and inspect each
+              candidate's source evidence.
             </p>
           </div>
 
@@ -216,7 +278,9 @@ export default function LecturerSyllabusReviewPage() {
             type="button"
             className="btn secondary small-btn"
             disabled={loading || saving || !moduleKey}
-            onClick={() => setRefreshKey((value) => value + 1)}
+            onClick={() =>
+              setRefreshKey((value) => value + 1)
+            }
           >
             Refresh
           </button>
@@ -232,6 +296,7 @@ export default function LecturerSyllabusReviewPage() {
                 setModuleKey(event.target.value);
                 setPage(1);
                 setNotice('');
+                setSelected(null);
               }}
             >
               {modules.map((key) => (
@@ -257,25 +322,36 @@ export default function LecturerSyllabusReviewPage() {
         </div>
 
         <div className="c2-info-banner">
-          <strong>Review guidance.</strong> Ranking scores indicate
-          review priority, not topic correctness or model confidence.
-          Check the source evidence before making a decision.
+          <strong>Review guidance.</strong>{' '}
+          Ranking scores indicate review priority,
+          not topic correctness or model confidence.
+          Check the source evidence before making
+          a decision.
         </div>
 
         {notice && (
-          <p className="c2-feedback c2-feedback-success" role="status">
+          <p
+            className="c2-feedback c2-feedback-success"
+            role="status"
+          >
             {notice}
           </p>
         )}
 
         {error && (
-          <p className="c2-feedback c2-feedback-error" role="alert">
+          <p
+            className="c2-feedback c2-feedback-error"
+            role="alert"
+          >
             {error}
           </p>
         )}
 
         {loading && (
-          <div className="c2-loading" role="status">
+          <div
+            className="c2-loading"
+            role="status"
+          >
             Loading syllabus candidates...
           </div>
         )}
@@ -296,7 +372,10 @@ export default function LecturerSyllabusReviewPage() {
 
                 <tbody>
                   {candidates.map((candidate) => {
-                    const reviewed = ['approved', 'rejected'].includes(
+                    const reviewed = [
+                      'approved',
+                      'rejected',
+                    ].includes(
                       candidate.review_decision
                     );
 
@@ -306,9 +385,12 @@ export default function LecturerSyllabusReviewPage() {
                           <strong className="c2-candidate-name">
                             {candidate.candidate_name}
                           </strong>
+
                           <span className="c2-candidate-meta">
-                            {candidate.document_count ?? 0} documents ·{' '}
-                            {candidate.occurrence_count ?? 0} occurrences
+                            {candidate.document_count ?? 0}
+                            {' '}documents ·{' '}
+                            {candidate.occurrence_count ?? 0}
+                            {' '}occurrences
                           </span>
                         </td>
 
@@ -327,17 +409,27 @@ export default function LecturerSyllabusReviewPage() {
                         <td>
                           <details className="c2-evidence">
                             <summary>
-                              View {candidate.sources?.length ?? 0} references
+                              View{' '}
+                              {candidate.sources?.length ?? 0}
+                              {' '}references
                             </summary>
+
                             <ul>
-                              {(candidate.sources || []).map((source, index) => (
-                                <li key={index}>
-                                  <span>{source.filename}</span>
-                                  {source.line_number != null && (
-                                    <small>Line {source.line_number}</small>
-                                  )}
-                                </li>
-                              ))}
+                              {(candidate.sources || []).map(
+                                (source, index) => (
+                                  <li key={index}>
+                                    <span>
+                                      {source.filename}
+                                    </span>
+
+                                    {source.line_number != null && (
+                                      <small>
+                                        Line {source.line_number}
+                                      </small>
+                                    )}
+                                  </li>
+                                )
+                              )}
                             </ul>
                           </details>
                         </td>
@@ -352,7 +444,10 @@ export default function LecturerSyllabusReviewPage() {
                               <button
                                 type="button"
                                 className="btn small-btn c2-approve-btn"
-                                onClick={() => openReview(candidate, 'approved')}
+                                disabled={saving}
+                                onClick={() =>
+                                  openReview(candidate, 'approved')
+                                }
                               >
                                 Approve
                               </button>
@@ -360,7 +455,10 @@ export default function LecturerSyllabusReviewPage() {
                               <button
                                 type="button"
                                 className="btn danger small-btn"
-                                onClick={() => openReview(candidate, 'rejected')}
+                                disabled={saving}
+                                onClick={() =>
+                                  openReview(candidate, 'rejected')
+                                }
                               >
                                 Reject
                               </button>
@@ -383,15 +481,18 @@ export default function LecturerSyllabusReviewPage() {
             <div className="c2-pagination">
               <span className="muted small">
                 Page {page} of {totalPages} ·{' '}
-                {totalCandidates.toLocaleString()} candidates
+                {totalCandidates.toLocaleString()}
+                {' '}candidates
               </span>
 
               <div className="c2-action-group">
                 <button
                   type="button"
                   className="btn secondary small-btn"
-                  disabled={page <= 1 || loading}
-                  onClick={() => setPage((value) => value - 1)}
+                  disabled={page <= 1 || loading || saving}
+                  onClick={() =>
+                    setPage((value) => value - 1)
+                  }
                 >
                   Previous
                 </button>
@@ -399,8 +500,14 @@ export default function LecturerSyllabusReviewPage() {
                 <button
                   type="button"
                   className="btn secondary small-btn"
-                  disabled={page >= totalPages || loading}
-                  onClick={() => setPage((value) => value + 1)}
+                  disabled={
+                    page >= totalPages ||
+                    loading ||
+                    saving
+                  }
+                  onClick={() =>
+                    setPage((value) => value + 1)
+                  }
                 >
                   Next
                 </button>
@@ -410,6 +517,7 @@ export default function LecturerSyllabusReviewPage() {
         )}
       </section>
 
+      {/* Lecturer review confirmation modal */}
       {selected && (
         <div className="c2-modal-overlay">
           <form
@@ -419,16 +527,23 @@ export default function LecturerSyllabusReviewPage() {
             aria-modal="true"
             aria-labelledby="c2-modal-title"
           >
-            <h2 id="c2-modal-title">Confirm topic review</h2>
+            <h2 id="c2-modal-title">
+              Confirm topic review
+            </h2>
 
             <div className="c2-modal-topic">
-              <strong>{selected.candidate_name}</strong>
+              <strong>
+                {selected.candidate_name}
+              </strong>
               <span className="muted small">
                 {formatModule(moduleKey)}
               </span>
             </div>
 
-            <fieldset disabled={saving} className="c2-decision-fieldset">
+            <fieldset
+              disabled={saving}
+              className="c2-decision-fieldset"
+            >
               <legend>Review decision</legend>
 
               <label>
@@ -465,7 +580,9 @@ export default function LecturerSyllabusReviewPage() {
                 maxLength={2000}
                 value={notes}
                 disabled={saving}
-                onChange={(event) => setNotes(event.target.value)}
+                onChange={(event) =>
+                  setNotes(event.target.value)
+                }
                 placeholder="Enter the reason for your decision..."
               />
             </label>
@@ -479,7 +596,8 @@ export default function LecturerSyllabusReviewPage() {
                   setConfirmed(event.target.checked)
                 }
               />
-              I have reviewed this candidate and its source references.
+              I have reviewed this candidate and
+              its source references.
             </label>
 
             <div className="c2-modal-actions">
@@ -501,7 +619,9 @@ export default function LecturerSyllabusReviewPage() {
                   (decision === 'rejected' && !notes.trim())
                 }
               >
-                {saving ? 'Saving...' : `Confirm ${decision}`}
+                {saving
+                  ? 'Saving...'
+                  : `Confirm ${decision}`}
               </button>
             </div>
           </form>

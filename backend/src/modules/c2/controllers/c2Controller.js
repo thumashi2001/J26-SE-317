@@ -19,14 +19,23 @@ function handleError(res, error) {
   return res.status(status).json({ error: message });
 }
 
+// --------------------------------------------------
+// List Supported Modules
+// --------------------------------------------------
+
 export async function listModules(req, res) {
   try {
     const result = await c2Service.getModules();
+
     return res.json(result);
   } catch (error) {
     return handleError(res, error);
   }
 }
+
+// --------------------------------------------------
+// Get Syllabus Review Queue
+// --------------------------------------------------
 
 export async function listReviewQueue(req, res) {
   try {
@@ -61,6 +70,10 @@ export async function listReviewQueue(req, res) {
   }
 }
 
+// --------------------------------------------------
+// Get Excluded Syllabus Candidates
+// --------------------------------------------------
+
 export async function listExcludedCandidates(req, res) {
   try {
     const result = await c2Service.getExcludedCandidates(
@@ -73,22 +86,42 @@ export async function listExcludedCandidates(req, res) {
   }
 }
 
+// --------------------------------------------------
+// M8 - Module-Wide Review Statistics
+// --------------------------------------------------
+
+export async function listReviewStatistics(req, res) {
+  try {
+    const { moduleKey } = req.params;
+
+    const result = await c2Service.getReviewStatistics(
+      moduleKey
+    );
+
+    return res.json(result);
+  } catch (error) {
+    return handleError(res, error);
+  }
+}
+
+// --------------------------------------------------
+// Lecturer Approval / Rejection
+// --------------------------------------------------
+
 export async function reviewCandidate(req, res) {
   try {
     const { moduleKey, candidateId } = req.params;
-    const { decision, reviewNotes = '' } = req.body || {};
-    if (decision === 'rejected' && !reviewNotes.trim()) {
-  return res.status(400).json({
-    error: 'A rejection reason is required',
-  });
-}
 
+    const { decision, reviewNotes = '' } = req.body || {};
+
+    // Validate the review decision.
     if (!['approved', 'rejected'].includes(decision)) {
       return res.status(400).json({
         error: 'Decision must be approved or rejected',
       });
     }
 
+    // Validate review notes before calling trim().
     if (
       typeof reviewNotes !== 'string' ||
       reviewNotes.length > 2000
@@ -98,14 +131,24 @@ export async function reviewCandidate(req, res) {
       });
     }
 
-    // Reviewer ID must come from the authenticated JWT.
+    // Rejected topics require a reason.
+    if (
+      decision === 'rejected' &&
+      !reviewNotes.trim()
+    ) {
+      return res.status(400).json({
+        error: 'A rejection reason is required',
+      });
+    }
+
+    // Reviewer identity comes from the authenticated JWT.
     const reviewerId = req.user.sub;
 
     const result = await c2Service.submitReviewDecision({
       moduleKey,
       candidateId,
       decision,
-      reviewNotes,
+      reviewNotes: reviewNotes.trim(),
       reviewerId,
     });
 

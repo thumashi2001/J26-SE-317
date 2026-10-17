@@ -112,3 +112,11 @@ export function submitReviewDecision({
     },
   });
 }
+
+
+export function getReviewStatistics(moduleKey) {
+  return requestC2(
+    `/reviews/${encodeURIComponent(moduleKey)}/stats`
+  );
+}
+
