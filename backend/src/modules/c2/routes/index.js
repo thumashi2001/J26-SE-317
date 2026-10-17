@@ -1,12 +1,36 @@
+
 import { Router } from 'express';
 import { requireAuth, requireRole } from '../../../middleware/auth.js';
 import * as controller from '../controllers/c2Controller.js';
 
 const router = Router();
 
+// All C2 routes require authentication.
 router.use(requireAuth);
 
-router.get('/modules', controller.listModules);
+// --------------------------------------------------
+// C2 - Shared module information
+// --------------------------------------------------
+
+router.get(
+  '/modules',
+  controller.listModules
+);
+
+// --------------------------------------------------
+// M9.1 - Student Question Bank
+// Available to authenticated students.
+// --------------------------------------------------
+
+router.get(
+  '/questions',
+  controller.listStudentQuestions
+);
+
+// --------------------------------------------------
+// M8 - Lecturer Syllabus Review
+// Restricted to lecturers and administrators.
+// --------------------------------------------------
 
 router.get(
   '/reviews/:moduleKey/excluded',
@@ -15,15 +39,15 @@ router.get(
 );
 
 router.get(
-  '/reviews/:moduleKey',
-  requireRole('lecturer', 'admin'),
-  controller.listReviewQueue
-);
-
-router.get(
   '/reviews/:moduleKey/stats',
   requireRole('lecturer', 'admin'),
   controller.listReviewStatistics
+);
+
+router.get(
+  '/reviews/:moduleKey',
+  requireRole('lecturer', 'admin'),
+  controller.listReviewQueue
 );
 
 router.post(

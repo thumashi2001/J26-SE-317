@@ -13,7 +13,7 @@ from services.syllabus_topic_review_queue import (
 from services.syllabus_topic_review_repository import (
     SyllabusTopicReviewRepository,
 )
-
+from services.student_question_bank import StudentQuestionBank
 
 app = FastAPI(
     title="C2 Exam Intelligence API",
@@ -40,6 +40,7 @@ MODULE_KEYS = [
 # Existing syllabus review repository and queue
 repository = SyllabusTopicReviewRepository()
 queue = SyllabusTopicReviewQueue(repository=repository)
+question_bank = StudentQuestionBank()
 
 
 class ReviewDecisionRequest(BaseModel):
@@ -102,6 +103,37 @@ def list_modules(
     return {
         "modules": MODULE_KEYS,
     }
+
+
+@app.get("/questions")
+def list_student_questions(
+    module_key: str | None = None,
+    page: int = Query(default=1, ge=1),
+    page_size: int = Query(default=10, ge=1, le=100),
+    x_c2_internal_token: str | None = Header(default=None),
+):
+    require_internal_token(x_c2_internal_token)
+
+    if module_key is not None:
+        validate_module(module_key)
+
+    try:
+        return question_bank.list_questions(
+            module_key=module_key,
+            page=page,
+            page_size=page_size,
+        )
+    except FileNotFoundError:
+        raise HTTPException(
+            status_code=404,
+            detail="Question dataset not found",
+        )
+    except ValueError:
+        raise HTTPException(
+            status_code=409,
+            detail="Question dataset is invalid",
+        )
+
 
 
 # --------------------------------------------------

@@ -157,3 +157,44 @@ export async function reviewCandidate(req, res) {
     return handleError(res, error);
   }
 }
+
+
+export async function listStudentQuestions(req, res) {
+  try {
+    const { moduleKey } = req.query;
+
+    const page = Number(req.query.page ?? 1);
+    const pageSize = Number(req.query.pageSize ?? 10);
+
+    if (
+      !Number.isSafeInteger(page) ||
+      page < 1 ||
+      !Number.isSafeInteger(pageSize) ||
+      pageSize < 1 ||
+      pageSize > 100
+    ) {
+      return res.status(400).json({
+        error: 'Invalid pagination parameters',
+      });
+    }
+
+    if (
+      moduleKey !== undefined &&
+      (typeof moduleKey !== 'string' || !moduleKey.trim())
+    ) {
+      return res.status(400).json({
+        error: 'Invalid module key',
+      });
+    }
+
+    const result = await c2Service.getStudentQuestions({
+      moduleKey,
+      page,
+      pageSize,
+    });
+
+    return res.json(result);
+  } catch (error) {
+    return handleError(res, error);
+  }
+}

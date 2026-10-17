@@ -120,3 +120,20 @@ export function getReviewStatistics(moduleKey) {
   );
 }
 
+
+export function getStudentQuestions(
+  { moduleKey, page = 1, pageSize = 10 } = {}
+) {
+  const params = new URLSearchParams({
+    page: String(page),
+    page_size: String(pageSize),
+  });
+
+  if (moduleKey) {
+    params.set('module_key', moduleKey);
+  }
+
+  return requestC2(`/questions?${params.toString()}`);
+}
+
+
