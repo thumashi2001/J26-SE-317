@@ -14,25 +14,19 @@ It should take about 30 to 40 minutes. If you can send it back by [date], I can 
 
 [your name]
 
-Attach: docs/c1-review-sheet.csv (open it in Excel and save as .xlsx before sending).
+Attach: Question-review-sheet.xlsx (the Excel version of docs/c1-review-sheet.csv).
 
 ## 2. Message to classmates (pilot)
 
 Hi everyone,
 
-I need your help to test the practice questions of my research component. It takes about 40 minutes and helps me show real results to the panel.
+I need 30 minutes of your help to test the questions of my research component. It is a Google Form with 30 multiple-choice questions on 3 topics: Project Risk Management, Unit, API and Integration Testing, and Testing and Analysis of UX.
 
-What to do:
-1. Open [app link] and register as a student (use your own ID).
-2. Take the diagnostic test once.
-3. Practise these 3 topics, and do each topic's quiz TWICE: [topic 1], [topic 2], [topic 3].
+Link: [form link]
 
-Please answer on your own, without notes or help, because the data is only useful if it shows what you really know. Your answers are used only for improving the questions, and the report shows question numbers, not names.
-
-Please finish by [date and time]. Thank you!
+Please answer on your own, without notes or searching, because the answers are only useful if they show what you really know. There is no name or email in the form, and the results are used only to improve the questions. Please submit only once, and by [date and time]. Thank you!
 
 ## Notes for you
-- Pick 3 topics that most classmates have already studied, from the same semester.
-- Run `node scripts\itemAnalysis.js` only after the pilot is finished.
-- A question needs at least 15 first-attempt answers before its numbers count. Repeat attempts by the same student are ignored on purpose.
-- If the app is only on your laptop, classmates cannot reach it. Ask your team how to host a test copy (or run it on your laptop in the same Wi-Fi, if the supervisor agrees).
+- How to make the form: see docs/pilot/README.md (10 minutes, no coding).
+- After the deadline: download the responses as CSV and run `node scripts\itemAnalysis.js --csv responses.csv`.
+- A question needs at least 15 answers before its numbers count, so aim for 20 or more classmates.

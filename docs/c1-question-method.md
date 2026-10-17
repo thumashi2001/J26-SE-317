@@ -67,7 +67,10 @@ For each question the script reports:
 - flags: too easy (p above 0.90), very hard (p below 0.20), weak or negative discrimination (negative usually means the answer key is wrong), expected band differs from observed band.
 A question is only judged with at least 15 first-attempt answers.
 
-Pilot plan: about 20 classmates each do the diagnostic, then practise the same 3 topics twice. A practice quiz uses 7 of the 10 questions of a topic, so two quizzes cover almost all 10, and every question then gets roughly 15 to 20 first-attempt answers. Names are not stored in the analysis, only the student ID inside the app, and the report shows question numbers only.
+Pilot plan (Google Form): 30 questions from 3 topics (the 10 practice questions of each) are put into one Google Form, and about 20 classmates answer it once, on their own, in about 30 minutes. The form has no name or email, so the data is anonymous.
+`node scripts/pilotForm.js` writes `docs/pilot/create-form.gs`, which builds the form automatically in Google Forms, and `docs/pilot/pilot-key.json`, the answer key.
+After the responses are in, download the response sheet as CSV and run `node scripts/itemAnalysis.js --csv responses.csv`. This needs no database. The question numbers match the app's question ids, so the result is comparable.
+With about 20 respondents every pilot question has about 20 answers, above the minimum of 15. Because every student answers all 30 questions, discrimination is calculated on a full set of answers.
 Results: **to be filled in** after the pilot.
 
 The script was tested on a small hand-made class with known answers (`node scripts/checkItemAnalysis.js`) and run end to end on simulated answers (`--demo`, a pipeline test, not evidence).
