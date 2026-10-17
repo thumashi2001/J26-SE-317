@@ -80,3 +80,4 @@ neo4j_data/
 
 !ai-services/c1/ml/models/
 !ai-services/c1/ml/models/*
+backend/responses.csv

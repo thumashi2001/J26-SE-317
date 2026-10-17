@@ -10,6 +10,7 @@ const RISK = [
   { key: 'Low', text: 'Low risk', cls: 'low' },
   { key: 'Medium', text: 'Medium risk', cls: 'mid' },
   { key: 'High', text: 'High risk', cls: 'high' },
+  { key: 'none', text: 'Not rated yet (no practice answers)', cls: 'none' },
 ];
 const when = (iso) => new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
 
@@ -23,12 +24,20 @@ export default function ClassInsights() {
     getClassInsights().then(setData).catch(() => setError('Could not load the class insights.'));
   }, []);
 
+  const counts = data ? { ...data.risk, none: data.notRated ?? 0 } : {};
+
   return (
     <div className="ci">
       <header className="ci-head">
         <h1>Class insights</h1>
         <p className="muted">Welcome, {user.name}. This is how your students are learning, and who may need help.</p>
       </header>
+
+      {data && !data.isSample && (
+        <div className="ci-sample" role="note">
+          <strong>All registered students.</strong> Lecturers are not linked to classes yet, so these numbers cover every student who has registered.
+        </div>
+      )}
 
       {data?.isSample && (
         <div className="ci-sample" role="note">
@@ -47,21 +56,24 @@ export default function ClassInsights() {
             <div><strong>{data.diagnosticDone}<small> of {data.students}</small></strong><span>took the diagnostic</span></div>
             <div><strong>{data.activeThisWeek}</strong><span>active this week</span></div>
             <div><strong>{data.answers.total}</strong><span>practice answers<br />({data.answers.thisWeek} this week)</span></div>
-            <div><strong>{data.averageLevel.score}%</strong><span>average level, {data.averageLevel.label}</span></div>
+            <div>{data.averageLevel
+              ? <><strong>{data.averageLevel.score}%</strong><span>average level, {data.averageLevel.label}</span></>
+              : <><strong>-</strong><span>average level, no diagnostics yet</span></>}</div>
           </div>
 
           <div className="c1a-cols">
             <div>
               <h4>Risk of falling behind</h4>
-              <div className="c1a-risk" role="img" aria-label={RISK.map((r) => `${data.risk[r.key]} ${r.text}`).join(', ')}>
-                {RISK.map((r) => data.risk[r.key] > 0 && <span key={r.key} className={r.cls} style={{ flex: data.risk[r.key] }} />)}
+              <div className="c1a-risk" role="img" aria-label={RISK.map((r) => `${counts[r.key]} ${r.text}`).join(', ')}>
+                {RISK.map((r) => counts[r.key] > 0 && <span key={r.key} className={r.cls} style={{ flex: counts[r.key] }} />)}
               </div>
               <ul className="c1a-legend">
-                {RISK.map((r) => <li key={r.key}><i className={r.cls} />{r.text}: <strong>{data.risk[r.key]}</strong></li>)}
+                {RISK.map((r) => <li key={r.key}><i className={r.cls} />{r.text}: <strong>{counts[r.key]}</strong></li>)}
               </ul>
             </div>
             <div>
               <h4>Topics the class finds hardest</h4>
+              {data.weakestTopics.length === 0 && <p className="muted small">Shown once students finish the diagnostic test.</p>}
               <ul className="c1a-weak">
                 {data.weakestTopics.map((t) => (
                   <li key={t.topic}>
@@ -77,6 +89,7 @@ export default function ClassInsights() {
 
           <div className="ci-attn">
             <h4>Students who may need help ({data.needAttention.length})</h4>
+            {data.needAttention.length === 0 && <p className="muted small">No student is marked at risk right now.</p>}
             <ol className="c1a-people">
               {data.needAttention.map((p, i) => (
                 <li key={`${p.name}-${i}`}>
@@ -84,7 +97,7 @@ export default function ClassInsights() {
                   <Avatar name={p.name} size={36} />
                   <span className="who"><strong>{p.name}</strong><em>{p.semester}</em><em className={`rk ${p.risk === 'High' ? 'high' : 'mid'}`}>{p.risk} risk</em></span>
                   <span className="num">level {p.level}%</span>
-                  <span className="last">weakest: {prettyTopic(p.weakest)}<br />last active {when(p.lastActive)}</span>
+                  <span className="last">{p.weakest ? `weakest: ${prettyTopic(p.weakest)}` : ''}<br />{p.lastActive ? `last active ${when(p.lastActive)}` : 'no practice yet'}</span>
                 </li>
               ))}
             </ol>
