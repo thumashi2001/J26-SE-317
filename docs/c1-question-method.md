@@ -78,7 +78,9 @@ Preliminary results (pilot of 17 October 2026, Google Form, 30 questions on Proj
 - Without screening, 3 questions were flagged and the mean discrimination was 0.65. With screening, 13 questions were flagged and the mean discrimination was 0.55. The copied sheets made the questions look easier than they are, which is why the screening step matters.
 - 80% of the expected difficulty bands matched the observed ones.
 - Several select-all questions in the testing topics were very hard (only 7% to 18% answered them fully right) but separated strong from weak students well (discrimination 0.45 to 0.73). They are hard, not wrong, and are candidates for review and, for the twin, partial credit.
-- Next: review the 13 flagged questions with the lecturer, fix them, and repeat with a second group.
+- Effort screening: 15 of the 28 respondents scored below 10 out of 30, where random guessing gives about 5, so half of the group answered at chance level. With them left out (13 respondents, below the minimum of 15) the average share correct rises from 40% to 64%. Most "very hard" flags therefore reflect who answered, not only the questions. The script option `--min-score 10` applies this screening.
+- No question had a clearly wrong key. Three need a check on the lecture slide. Details: `docs/pilot/flagged-questions-review.md`.
+- Next: send the form only to students who studied the modules, add a first question "Have you studied this topic?", and review the 13 flagged questions with the lecturer, fix them, and repeat with a second group.
 
 Final results: **to be filled in** after the review.
 
