@@ -431,3 +431,68 @@ export async function generateC1MockExam(req, res) {
     return handleError(res, error);
   }
 }
+
+// M14.3.3.2 - Lecturer Question Classification Review
+export async function reviewQuestionClassification(req, res) {
+  try {
+    const { questionId } = req.params;
+
+    const {
+      moduleKey,
+      topicId,
+      decision,
+      reviewNotes = '',
+    } = req.body || {};
+
+    if (
+      typeof questionId !== 'string' ||
+      !questionId.trim() ||
+      typeof moduleKey !== 'string' ||
+      !moduleKey.trim() ||
+      typeof topicId !== 'string' ||
+      !topicId.trim()
+    ) {
+      return res.status(400).json({
+        error: 'Valid questionId, moduleKey and topicId are required',
+      });
+    }
+
+    if (!['approved', 'rejected'].includes(decision)) {
+      return res.status(400).json({
+        error: 'Decision must be approved or rejected',
+      });
+    }
+
+    if (
+      typeof reviewNotes !== 'string' ||
+      reviewNotes.length > 2000
+    ) {
+      return res.status(400).json({
+        error: 'Invalid review notes',
+      });
+    }
+
+    if (
+      decision === 'rejected' &&
+      !reviewNotes.trim()
+    ) {
+      return res.status(400).json({
+        error: 'Rejection requires review notes',
+      });
+    }
+
+    const result =
+      await c2Service.submitQuestionClassificationReview({
+        questionId: questionId.trim(),
+        moduleKey: moduleKey.trim(),
+        topicId: topicId.trim(),
+        decision,
+        reviewNotes: reviewNotes.trim(),
+        reviewerId: req.user.sub,
+      });
+
+    return res.json(result);
+  } catch (error) {
+    return handleError(res, error);
+  }
+}

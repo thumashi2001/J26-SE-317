@@ -190,3 +190,28 @@ export function generateSyntheticPracticePreview({
     },
   });
 }
+
+// M14.3.3.2 - Lecturer Question Classification Review
+export function submitQuestionClassificationReview({
+  questionId,
+  moduleKey,
+  topicId,
+  decision,
+  reviewNotes,
+  reviewerId,
+}) {
+  return requestC2(
+    '/question-classification-reviews/decision',
+    {
+      method: 'POST',
+      body: {
+        question_id: questionId,
+        module_key: moduleKey,
+        topic_id: topicId,
+        decision,
+        review_notes: reviewNotes,
+        reviewer_id: reviewerId,
+      },
+    }
+  );
+}

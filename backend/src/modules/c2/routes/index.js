@@ -104,4 +104,12 @@ router.post(
   controller.reviewCandidate
 );
 
+
+// M14.3.3.2 - Lecturer Question Classification Review
+router.post(
+  '/question-classification-reviews/:questionId/decision',
+  requireRole('lecturer', 'admin'),
+  controller.reviewQuestionClassification
+);
+
 export default router;

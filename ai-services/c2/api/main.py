@@ -22,6 +22,9 @@ from services.personalized_mock_exam import PersonalizedMockExam
 from services.synthetic_practice_preview import (
     SyntheticPracticePreview,
 )
+from services.question_classification_review_service import (
+    QuestionClassificationReviewService,
+)
 
 app = FastAPI(
     title="C2 Exam Intelligence API",
@@ -63,6 +66,15 @@ class ReviewDecisionRequest(BaseModel):
     decision: str
     review_notes: str = Field(default="", max_length=2000)
     reviewer_id: str
+
+
+class QuestionClassificationReviewRequest(BaseModel):
+    question_id: str = Field(min_length=1, max_length=200)
+    module_key: str = Field(min_length=1, max_length=100)
+    topic_id: str = Field(min_length=1, max_length=200)
+    decision: str
+    review_notes: str = Field(default="", max_length=2000)
+    reviewer_id: str = Field(min_length=1, max_length=200)
 
 
 def require_internal_token(x_c2_internal_token: str | None):
@@ -526,3 +538,70 @@ def generate_synthetic_practice_preview(
             detail="Synthetic preview generation failed",
         )
 
+
+# --------------------------------------------------
+# M14.3.3.2 - Lecturer Question Classification Review
+# --------------------------------------------------
+
+@app.post("/question-classification-reviews/decision")
+def review_question_classification(
+    request: QuestionClassificationReviewRequest,
+    x_c2_internal_token: str | None = Header(default=None),
+):
+    # Only the trusted Express backend should call this API.
+    require_internal_token(x_c2_internal_token)
+
+    validate_module(request.module_key)
+
+    if request.decision not in ("approved", "rejected"):
+        raise HTTPException(
+            status_code=400,
+            detail="Decision must be approved or rejected",
+        )
+
+    if not re.fullmatch(
+        r"[a-zA-Z0-9:_-]+",
+        request.reviewer_id,
+    ):
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid reviewer ID",
+        )
+
+    if (
+        request.decision == "rejected"
+        and not request.review_notes.strip()
+    ):
+        raise HTTPException(
+            status_code=400,
+            detail="Rejection requires review notes",
+        )
+
+    service = QuestionClassificationReviewService()
+
+    try:
+        saved = service.review(
+            question_id=request.question_id,
+            module_key=request.module_key,
+            topic_id=request.topic_id,
+            decision=request.decision,
+            reviewer_id=request.reviewer_id,
+            review_notes=request.review_notes,
+        )
+
+    except FileNotFoundError:
+        raise HTTPException(
+            status_code=404,
+            detail="Required review dataset not found",
+        )
+
+    except ValueError as error:
+        raise HTTPException(
+            status_code=409,
+            detail=str(error),
+        )
+
+    return {
+        "success": True,
+        "review": saved,
+    }
