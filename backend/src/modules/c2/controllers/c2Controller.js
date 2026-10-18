@@ -1,5 +1,11 @@
 
 import * as c2Service from '../services/c2Service.js';
+import { getDb } from '../../../config/db.js';
+
+import {
+  generateC1PersonalizedMock,
+  C1PersonalizationError,
+} from '../services/c1PersonalizedMockService.js';
 
 function handleError(res, error) {
   console.error('[C2 API]', error.message);
@@ -361,6 +367,67 @@ export async function generateSyntheticPracticePreview(req, res) {
 
     return res.json(result);
   } catch (error) {
+    return handleError(res, error);
+  }
+}
+
+// --------------------------------------------------
+// M14.2.2 - C1 Digital Twin Personalized Mock
+// --------------------------------------------------
+
+export async function generateC1MockExam(req, res) {
+  try {
+    const {
+      moduleKey,
+      targetMarks = 100,
+      maxQuestions = 20,
+      seed = 42,
+    } = req.body || {};
+
+    if (
+      typeof moduleKey !== 'string' ||
+      !moduleKey.trim()
+    ) {
+      return res.status(400).json({
+        error: 'A valid moduleKey is required',
+      });
+    }
+
+    if (
+      !Number.isSafeInteger(targetMarks) ||
+      targetMarks < 1 ||
+      targetMarks > 200 ||
+      !Number.isSafeInteger(maxQuestions) ||
+      maxQuestions < 1 ||
+      maxQuestions > 30 ||
+      !Number.isSafeInteger(seed)
+    ) {
+      return res.status(400).json({
+        error: 'Invalid mock examination parameters',
+      });
+    }
+
+    // Student ID is taken only from the verified JWT.
+    const studentId = req.user.sub;
+
+    const result = await generateC1PersonalizedMock({
+      db: getDb(),
+      studentId,
+      moduleKey: moduleKey.trim(),
+      targetMarks,
+      maxQuestions,
+      seed,
+    });
+
+    return res.json(result);
+  } catch (error) {
+    if (error instanceof C1PersonalizationError) {
+      return res.status(error.status).json({
+        error: error.message,
+      });
+    }
+
+    // Reuse the existing C2 error handler.
     return handleError(res, error);
   }
 }

@@ -57,6 +57,16 @@ router.post(
 );
 
 // --------------------------------------------------
+// M14.2.2 - C1 Personalized Practice Mock
+// --------------------------------------------------
+
+router.post(
+  '/mock-exams/generate-from-twin',
+  requireRole('student'),
+  controller.generateC1MockExam
+);
+
+// --------------------------------------------------
 // M12.4.2 - Staff-Only Synthetic Development Preview
 // --------------------------------------------------
 

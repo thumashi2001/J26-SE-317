@@ -1,0 +1,5 @@
+{
+  "schema_version": "1.0",
+  "description": "Explicitly reviewed mappings from C1 mastery topic keys to C2 verified topic IDs.",
+  "modules": {}
+}
