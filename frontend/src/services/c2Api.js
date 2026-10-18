@@ -39,7 +39,7 @@ export const getC2ExcludedCandidates = (moduleKey) =>
   );
 
 // --------------------------------------------------
-// M8 - Get Module-Wide Review Statistics
+// Get Module-Wide Review Statistics
 // --------------------------------------------------
 
 export const getC2ReviewStatistics = (moduleKey) =>
@@ -64,11 +64,10 @@ export const submitC2Review = (
     }
   );
 
+// --------------------------------------------------
+// M10 - Student Question Bank
+// --------------------------------------------------
 
-  
-/**
- * M10 - Student Question Bank
- */
 export const getC2StudentQuestions = (
   { moduleKey, page = 1, pageSize = 10 } = {}
 ) => {
@@ -83,3 +82,41 @@ export const getC2StudentQuestions = (
 
   return api(`${base}/questions?${params.toString()}`);
 };
+
+// --------------------------------------------------
+// M12.1 - Evidence-Aware Topic Predictions
+// --------------------------------------------------
+
+export const getC2TopicPredictions = (moduleKey) => {
+  const params = new URLSearchParams({
+    moduleKey,
+  });
+
+  return api(
+    `${base}/topic-predictions?${params.toString()}`
+  );
+};
+
+// --------------------------------------------------
+// M12.2 - Personalized Practice Mock Exams
+// --------------------------------------------------
+
+export const generateC2MockExam = ({
+  moduleKey,
+  targetMarks = 100,
+  maxQuestions = 20,
+  preferredTopics = [],
+  difficulty = null,
+  seed = 42,
+}) =>
+  api(`${base}/mock-exams/generate`, {
+    method: 'POST',
+    body: {
+      moduleKey,
+      targetMarks,
+      maxQuestions,
+      preferredTopics,
+      difficulty,
+      seed,
+    },
+  });
