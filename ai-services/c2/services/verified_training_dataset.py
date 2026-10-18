@@ -1,14 +1,26 @@
 
 from collections import Counter
 
+from services.trusted_question_verification import (
+    TrustedQuestionVerification,
+)
+
 
 class VerifiedTrainingDatasetBuilder:
     """
-    Prepare independently verified authentic question labels
-    for supervised topic classification research.
+    Build a training dataset from authentic questions
+    with lecturer-approved topic classifications.
 
-    This class never creates, guesses, or approves labels.
+    Classification JSON flags alone are never
+    accepted as proof of verification.
     """
+
+    def __init__(self, verification=None):
+        self.verification = (
+            verification
+            if verification is not None
+            else TrustedQuestionVerification()
+        )
 
     def build(self, questions, classification_results):
         if not isinstance(questions, list):
@@ -27,7 +39,10 @@ class VerifiedTrainingDatasetBuilder:
 
             question_id = question.get("question_id")
 
-            if not isinstance(question_id, str) or not question_id.strip():
+            if (
+                not isinstance(question_id, str)
+                or not question_id.strip()
+            ):
                 raise ValueError("Invalid question ID")
 
             if question_id in question_index:
@@ -36,6 +51,8 @@ class VerifiedTrainingDatasetBuilder:
                 )
 
             question_index[question_id] = question
+
+        approved_labels = self.verification.approved_labels()
 
         records = []
         excluded = Counter()
@@ -58,8 +75,18 @@ class VerifiedTrainingDatasetBuilder:
 
             question_id = classification.get("question_id")
 
-            if not isinstance(question_id, str):
+            if (
+                not isinstance(question_id, str)
+                or not question_id.strip()
+            ):
                 excluded["missing_question_id"] += 1
+                continue
+
+            if (
+                item.get("question_id") is not None
+                and item["question_id"] != question_id
+            ):
+                excluded["question_id_mismatch"] += 1
                 continue
 
             if question_id in seen_classifications:
@@ -79,14 +106,34 @@ class VerifiedTrainingDatasetBuilder:
                 excluded["non_authentic_source"] += 1
                 continue
 
-            if classification.get("verification_status") != "verified":
-                excluded["not_verified"] += 1
+            approved = approved_labels.get(question_id)
+
+            if approved is None:
+                excluded["not_lecturer_approved"] += 1
                 continue
 
             topic_id = classification.get("topic_id")
+            module_key = classification.get("module_key")
 
-            if not isinstance(topic_id, str) or not topic_id.strip():
+            if (
+                not isinstance(topic_id, str)
+                or not topic_id.strip()
+            ):
                 excluded["missing_topic_label"] += 1
+                continue
+
+            if (
+                not isinstance(module_key, str)
+                or not module_key.strip()
+            ):
+                excluded["missing_module_key"] += 1
+                continue
+
+            if (
+                approved["module_key"] != module_key
+                or approved["topic_id"] != topic_id
+            ):
+                excluded["review_classification_mismatch"] += 1
                 continue
 
             question_text = question.get("question_text")
@@ -100,17 +147,11 @@ class VerifiedTrainingDatasetBuilder:
 
             paper_id = question.get("paper_id")
 
-            if not isinstance(paper_id, str) or not paper_id.strip():
-                excluded["missing_paper_id"] += 1
-                continue
-
-            module_key = classification.get("module_key")
-
             if (
-                not isinstance(module_key, str)
-                or not module_key.strip()
+                not isinstance(paper_id, str)
+                or not paper_id.strip()
             ):
-                excluded["missing_module_key"] += 1
+                excluded["missing_paper_id"] += 1
                 continue
 
             records.append({
@@ -121,9 +162,7 @@ class VerifiedTrainingDatasetBuilder:
                 "question_text": question_text.strip(),
                 "source_type": "authentic",
                 "verification_status": "verified",
-                "classification_method": classification.get(
-                    "classification_method"
-                ),
+                "classification_method": "lecturer_verified",
             })
 
         records.sort(

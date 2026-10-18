@@ -7,16 +7,20 @@ from services.question_classification_pipeline import (
     DEFAULT_OUTPUT_PATH,
     QuestionClassificationPipeline,
 )
+from services.trusted_question_verification import (
+    TrustedQuestionVerification,
+)
 
 
 class StudentQuestionBank:
-    """Read-only access to stored questions and topic classifications."""
+    """Read-only question bank with trusted lecturer verification."""
 
     def __init__(
         self,
         questions_path=None,
         classifications_path=None,
         modules_path=None,
+        verification=None,
     ):
         self.questions_path = Path(
             questions_path or DEFAULT_QUESTIONS_PATH
@@ -27,8 +31,12 @@ class StudentQuestionBank:
         self.pipeline = QuestionClassificationPipeline(
             modules_path=modules_path
         )
+        self.verification = (
+            verification or TrustedQuestionVerification()
+        )
 
-    def _load_json(self, path):
+    @staticmethod
+    def _load_json(path):
         with path.open("r", encoding="utf-8") as file:
             return json.load(file)
 
@@ -53,7 +61,13 @@ class StudentQuestionBank:
             self.classifications_path
         )
 
+        if not isinstance(classification_data, dict):
+            raise ValueError("Invalid classification dataset")
+
         results = classification_data.get("results", [])
+
+        if not isinstance(results, list):
+            raise ValueError("Invalid classification results")
 
         classifications = {}
 
@@ -67,10 +81,19 @@ class StudentQuestionBank:
                 result.get("valid") is True
                 and isinstance(classification, dict)
                 and isinstance(result.get("question_id"), str)
+                and result["question_id"] == classification.get("question_id")
             ):
-                classifications[result["question_id"]] = classification
+                question_id = result["question_id"]
+
+                if question_id in classifications:
+                    raise ValueError(
+                        f"Duplicate classification: {question_id}"
+                    )
+
+                classifications[question_id] = classification
 
         module_mapping = self.pipeline.load_module_mapping()
+        approved_labels = self.verification.approved_labels()
 
         records = []
 
@@ -88,6 +111,16 @@ class StudentQuestionBank:
             question_id = question.get("question_id")
             classification = classifications.get(question_id, {})
 
+            approved = approved_labels.get(question_id)
+
+            is_verified = (
+                question.get("source_type") == "authentic"
+                and approved is not None
+                and approved["module_key"] == question_module
+                and approved["topic_id"] == classification.get("topic_id")
+                and classification.get("module_key") == question_module
+            )
+
             records.append({
                 "question_id": question_id,
                 "module_key": question_module,
@@ -95,14 +128,20 @@ class StudentQuestionBank:
                 "question_text": question.get("question_text"),
                 "marks": question.get("marks"),
                 "marks_status": question.get("marks_status"),
-                "topic_id": classification.get("topic_id"),
-                "classification_method": classification.get(
-                    "classification_method",
-                    "unclassified",
+                "topic_id": (
+                    approved["topic_id"]
+                    if is_verified
+                    else None
                 ),
-                "verification_status": classification.get(
-                    "verification_status",
-                    "unverified",
+                "classification_method": (
+                    "lecturer_verified"
+                    if is_verified
+                    else "unclassified"
+                ),
+                "verification_status": (
+                    "verified"
+                    if is_verified
+                    else "unverified"
                 ),
                 "bloom_level": question.get("bloom_level"),
                 "difficulty": question.get("difficulty"),
