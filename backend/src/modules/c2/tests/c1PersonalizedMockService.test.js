@@ -1,3 +1,4 @@
+
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
@@ -7,6 +8,8 @@ import {
   generateC1PersonalizedMock,
 } from '../services/c1PersonalizedMockService.js';
 
+// These are illustrative test fixtures, not approved
+// production topic mappings.
 const mapping = {
   modules: {
     database_systems: {
@@ -15,6 +18,14 @@ const mapping = {
       Transactions: 'transactions',
     },
   },
+};
+
+const approvedMappingResult = {
+  valid: true,
+  errors: [],
+  mapping: mapping.modules.database_systems,
+  mapped_count: 3,
+  approved_topic_count: 3,
 };
 
 test('maps only weak C1 topics', () => {
@@ -75,7 +86,10 @@ test('detects unavailable verified questions', () => {
     ['sql_queries']
   );
 
-  assert.equal(result.status, 'no_verified_questions');
+  assert.equal(
+    result.status,
+    'no_verified_questions'
+  );
 });
 
 test('reports missing topic mapping', () => {
@@ -84,7 +98,10 @@ test('reports missing topic mapping', () => {
     []
   );
 
-  assert.equal(result.status, 'no_topic_mapping');
+  assert.equal(
+    result.status,
+    'no_topic_mapping'
+  );
 });
 
 test('integrates C1 mastery with C2 generation', async () => {
@@ -95,6 +112,11 @@ test('integrates C1 mastery with C2 generation', async () => {
     studentId: 'student_001',
     moduleKey: 'database_systems',
     mapping,
+
+    // Simulates a successful validation result.
+    // This does not approve the production taxonomy.
+    getApprovedMapping: async () => approvedMappingResult,
+
     getMastery: async () => ({
       available: true,
       topics: [
@@ -102,6 +124,7 @@ test('integrates C1 mastery with C2 generation', async () => {
         { topic: 'Normalization', masteryScore: 85 },
       ],
     }),
+
     generate: async (payload) => {
       capturedPayload = payload;
 
@@ -109,7 +132,10 @@ test('integrates C1 mastery with C2 generation', async () => {
         status: 'partial',
         practice_only: true,
         questions: [
-          { question_id: 'Q1', topic_id: 'sql_queries' },
+          {
+            question_id: 'Q1',
+            topic_id: 'sql_queries',
+          },
         ],
         personalization: {},
       };
@@ -121,8 +147,21 @@ test('integrates C1 mastery with C2 generation', async () => {
     ['sql_queries']
   );
 
-  assert.equal(result.personalization.applied, true);
-  assert.equal(result.personalization.status, 'applied');
+  assert.equal(
+    result.personalization.applied,
+    true
+  );
+
+  assert.equal(
+    result.personalization.status,
+    'applied'
+  );
+
+  assert.equal(
+    result.personalization.mapping_validation.valid,
+    true
+  );
+
   assert.equal(result.practice_only, true);
 });
 
@@ -134,11 +173,15 @@ test('falls back when diagnostic is unavailable', async () => {
     studentId: 'student_001',
     moduleKey: 'database_systems',
     mapping,
+
+    getApprovedMapping: async () => approvedMappingResult,
+
     getMastery: async () => ({
       available: false,
       reason: 'diagnostic_not_completed',
       topics: [],
     }),
+
     generate: async (payload) => {
       capturedPayload = payload;
 
@@ -156,6 +199,87 @@ test('falls back when diagnostic is unavailable', async () => {
     []
   );
 
-  assert.equal(result.personalization.applied, false);
-  assert.equal(result.personalization.status, 'unavailable');
+  assert.equal(
+    result.personalization.applied,
+    false
+  );
+
+  assert.equal(
+    result.personalization.status,
+    'unavailable'
+  );
+
+  assert.equal(
+    result.personalization.c1_diagnostic_integrated,
+    false
+  );
+});
+
+test('blocks personalization when mapping is unverified', async () => {
+  let capturedPayload = null;
+
+  const result = await generateC1PersonalizedMock({
+    db: {},
+    studentId: 'student_001',
+    moduleKey: 'database_systems',
+    mapping,
+
+    getApprovedMapping: async () => ({
+      valid: false,
+      errors: [
+        'C2 taxonomy is not verified: database_systems',
+      ],
+      mapping: {},
+      mapped_count: 0,
+      approved_topic_count: 0,
+    }),
+
+    getMastery: async () => ({
+      available: true,
+      topics: [
+        { topic: 'SQL', masteryScore: 25 },
+      ],
+    }),
+
+    generate: async (payload) => {
+      capturedPayload = payload;
+
+      return {
+        status: 'partial',
+        practice_only: true,
+        questions: [
+          {
+            question_id: 'Q1',
+            topic_id: null,
+          },
+        ],
+        personalization: {},
+      };
+    },
+  });
+
+  assert.deepEqual(
+    capturedPayload.preferred_topics,
+    []
+  );
+
+  assert.equal(
+    result.personalization.applied,
+    false
+  );
+
+  assert.equal(
+    result.personalization.status,
+    'mapping_unverified'
+  );
+
+  assert.equal(
+    result.personalization.mapping_validation.valid,
+    false
+  );
+
+  assert.equal(
+    result.personalization.matched_question_count,
+    0
+  );
 });

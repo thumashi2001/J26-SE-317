@@ -1,12 +1,9 @@
-import { readFileSync } from 'node:fs';
 
 import { getStudentMastery } from './c1MasteryAdapter.js';
 import { generateMockExam } from './c2Service.js';
-
-const mappingPath = new URL(
-  '../config/c1TopicMapping.json',
-  import.meta.url
-);
+import {
+  getApprovedMappingForModule,
+} from './c1TopicMappingValidator.js';
 
 export class C1PersonalizationError extends Error {
   constructor(message, status = 400) {
@@ -79,7 +76,7 @@ export function evaluatePersonalization(
 ) {
   const preferred = new Set(preferredTopics);
 
-  const matchedQuestions = Array.isArray(exam.questions)
+  const matchedQuestions = Array.isArray(exam?.questions)
     ? exam.questions.filter(
         (question) =>
           typeof question.topic_id === 'string' &&
@@ -108,16 +105,46 @@ export async function generateC1PersonalizedMock({
   mapping = null,
   getMastery = getStudentMastery,
   generate = generateMockExam,
+  getApprovedMapping = getApprovedMappingForModule,
 }) {
-  const mastery = await getMastery(db, studentId);
-
-  let topicMapping = mapping;
-
-  if (topicMapping === null) {
-    topicMapping = JSON.parse(
-      readFileSync(mappingPath, 'utf8')
+  if (
+    typeof moduleKey !== 'string' ||
+    !moduleKey.trim()
+  ) {
+    throw new C1PersonalizationError(
+      'A valid module key is required'
     );
   }
+
+  const mastery = await getMastery(db, studentId);
+
+  // The validator checks C1 topic keys against the C1
+  // registry and C2 topic IDs against the verified taxonomy.
+  //
+  // Passing a mapping here is useful for tests, but it
+  // does not bypass the taxonomy validation.
+  const mappingOptions =
+    mapping === null
+      ? undefined
+      : { mappingConfig: mapping };
+
+  const mappingResult = await getApprovedMapping(
+    moduleKey,
+    mappingOptions
+  );
+
+  const approvedMapping =
+    mappingResult.valid
+      ? mappingResult.mapping
+      : {};
+
+  // selectWeakTopics expects a complete mapping config,
+  // not a single module's mapping object.
+  const topicMapping = {
+    modules: {
+      [moduleKey]: approvedMapping,
+    },
+  };
 
   const weakTopics = mastery.available
     ? selectWeakTopics(
@@ -145,27 +172,64 @@ export async function generateC1PersonalizedMock({
     preferredTopics
   );
 
-  const status = !mastery.available
-    ? 'unavailable'
-    : evaluation.status;
+  let status;
+
+  if (!mastery.available) {
+    status = 'unavailable';
+  } else if (!mappingResult.valid) {
+    status = 'mapping_unverified';
+  } else {
+    status = evaluation.status;
+  }
+
+  let reason = null;
+
+  if (status === 'unavailable') {
+    reason = mastery.reason ?? 'C1 mastery is unavailable';
+  } else if (status === 'mapping_unverified') {
+    reason =
+      'No approved C1-to-C2 topic mapping is available';
+  } else if (status === 'no_topic_mapping') {
+    reason =
+      'No mapped C1 topics are below the mastery threshold';
+  } else if (status === 'no_verified_questions') {
+    reason =
+      'No verified exam questions matched the weak topics';
+  }
 
   return {
     ...exam,
+
     personalization: {
       ...exam.personalization,
+
       method: 'c1_digital_twin',
-      c1_diagnostic_integrated: true,
+
+      c1_diagnostic_integrated: Boolean(
+        mastery.available
+      ),
+
       applied: status === 'applied',
+
       status,
-      reason:
-        status === 'unavailable'
-          ? mastery.reason
-          : null,
+      reason,
+
       preferred_topics: preferredTopics,
+
       matched_question_count:
         evaluation.matchedQuestionCount,
+
       mastery_threshold: 60,
+
       mapping_source: 'explicit_reviewed_mapping',
+
+      mapping_validation: {
+        valid: mappingResult.valid,
+        errors: mappingResult.errors ?? [],
+        mapped_count: mappingResult.mapped_count ?? 0,
+        approved_topic_count:
+          mappingResult.approved_topic_count ?? 0,
+      },
     },
   };
 }
