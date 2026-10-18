@@ -1,0 +1,197 @@
+
+{
+  "schema_version": "1.0",
+  "dataset_type": "historical_exam_structure_evidence",
+  "academic_verification_status": "pending",
+  "notes": "Historical observations from supplied sample papers. These do not establish a current official blueprint. Topic labels are descriptive observations, not verified syllabus taxonomy IDs.",
+  "modules": [
+    {
+      "module_key": "database_systems",
+      "module_name": "Database Systems",
+      "source_year": 2023,
+      "source_filename": "IT3020 -Database Systems.pdf",
+      "source_pages": [1],
+      "main_question_count": 4,
+      "total_marks": 100,
+      "duration_minutes": 120,
+      "main_question_marks": [25, 25, 25, 25],
+      "observed_topics": [
+        "SQL queries",
+        "database indexing",
+        "database design"
+      ],
+      "observed_question_formats": [
+        "structured subquestions",
+        "SQL or database problem solving"
+      ],
+      "evidence_note": "Existing C2 partially verified sample-paper profile; check original cover and full paper before academic approval."
+    },
+    {
+      "module_key": "case_studies_software_engineering",
+      "module_name": "Case Studies in Software Engineering",
+      "source_year": 2024,
+      "source_filename": "SE3070-Case Studies in Software Engineering (June Intake)(1).pdf",
+      "source_pages": [1, 2, 3],
+      "main_question_count": 3,
+      "total_marks": 100,
+      "duration_minutes": 120,
+      "main_question_marks": [20, 50, null],
+      "observed_topics": [
+        "case study implementation decisions",
+        "UML use-case and class diagrams",
+        "interaction design",
+        "sequence diagrams",
+        "design patterns"
+      ],
+      "observed_question_formats": [
+        "seen project reflection",
+        "unseen extended case study",
+        "UML diagram construction"
+      ],
+      "evidence_note": "Cover identifies Q1 as seen and Q2-Q3 as unseen; Q1 20 and Q2 50 are visible. Q3 mark allocation requires page-4 confirmation."
+    },
+    {
+      "module_key": "software_project_management",
+      "module_name": "Software Project Management",
+      "source_year": 2024,
+      "source_filename": "SE3080-Software Project Management (June Intake)(1).pdf",
+      "source_pages": [1, 2, 3],
+      "main_question_count": 4,
+      "total_marks": 100,
+      "duration_minutes": 120,
+      "main_question_marks": [35, null, null, null],
+      "observed_topics": [
+        "project selection",
+        "weighted scoring model",
+        "project feasibility and prioritization"
+      ],
+      "observed_question_formats": [
+        "extended business scenario",
+        "weighted scoring table",
+        "justify project choice"
+      ],
+      "evidence_note": "Q1 is 35 marks, including 30-mark scoring model and 5-mark justification. Remaining question mark allocations require inspection."
+    },
+    {
+      "module_key": "user_experience_engineering",
+      "module_name": "User Experience Engineering",
+      "source_year": 2024,
+      "source_filename": "SE3050-User Experience Engineering (June Intake)(1).pdf",
+      "source_pages": [1, 2, 3],
+      "main_question_count": 4,
+      "total_marks": 100,
+      "duration_minutes": 120,
+      "main_question_marks": [25, 25, null, null],
+      "observed_topics": [
+        "UX design",
+        "UX in software lifecycle",
+        "user research",
+        "design thinking",
+        "design sprints",
+        "hierarchical task analysis"
+      ],
+      "observed_question_formats": [
+        "structured short answers",
+        "comparison table",
+        "scenario-based HTA diagram"
+      ],
+      "evidence_note": "Q1 and Q2 each show 25 marks; Q3 and Q4 allocations require inspection."
+    },
+    {
+      "module_key": "application_frameworks",
+      "module_name": "Application Frameworks",
+      "source_year": 2023,
+      "source_filename": "SE3040-Application Framework-2023(1).pdf",
+      "source_pages": [1, 2, 3],
+      "main_question_count": 5,
+      "total_marks": 100,
+      "duration_minutes": 180,
+      "main_question_marks": [10, 20, null, null, null],
+      "observed_topics": [
+        "backend technology selection",
+        "REST API design",
+        "Express middleware",
+        "HTTP status codes"
+      ],
+      "observed_question_formats": [
+        "technology comparison",
+        "code review and debugging",
+        "API scenario"
+      ],
+      "evidence_note": "Q1 10 marks and Q2 20 marks visible; inspect pages 4-5 for Q3-Q5 allocations."
+    },
+    {
+      "module_key": "distributed_systems",
+      "module_name": "Distributed Systems",
+      "source_year": 2023,
+      "source_filename": "SE3020-Distributed Systems-2023(1).pdf",
+      "source_pages": [1, 2, 3],
+      "main_question_count": 4,
+      "total_marks": 100,
+      "duration_minutes": 120,
+      "main_question_marks": [25, 25, null, null],
+      "observed_topics": [
+        "SOA and microservices",
+        "service discovery",
+        "dependability and availability",
+        "fault tolerance",
+        "Java RMI and communication models"
+      ],
+      "observed_question_formats": [
+        "short explanations",
+        "availability calculation",
+        "communication technology selection",
+        "Java code"
+      ],
+      "evidence_note": "Q1 and Q2 each 25 marks visible; inspect remaining pages for Q3-Q4."
+    },
+    {
+      "module_key": "software_architecture",
+      "module_name": "Software Architecture",
+      "source_year": 2025,
+      "source_filename": "SE3030-Software Architecture-2025(1).pdf",
+      "source_pages": [1, 2, 3],
+      "main_question_count": 4,
+      "total_marks": 100,
+      "duration_minutes": 120,
+      "main_question_marks": [25, 25, 25, null],
+      "observed_topics": [
+        "architectural styles",
+        "quality attributes",
+        "architectural trade-offs",
+        "architecture business cycle",
+        "architectural activities",
+        "architecture diagrams"
+      ],
+      "observed_question_formats": [
+        "extended architecture scenario",
+        "justify architecture decisions",
+        "draw architectural diagram",
+        "short theory questions"
+      ],
+      "evidence_note": "Q1-Q3 each 25 marks visible; inspect Q4 before confirming all allocations."
+    },
+    {
+      "module_key": "software_engineering_process_quality_management",
+      "module_name": "Software Engineering Process and Quality Management",
+      "source_year": 2024,
+      "source_filename": "SE3010-Software Engineering Process and Quality Management-2024(1).pdf",
+      "source_pages": [1, 2, 3],
+      "main_question_count": 4,
+      "total_marks": 100,
+      "duration_minutes": 120,
+      "main_question_marks": [30, null, null, null],
+      "observed_topics": [
+        "specification-based test design",
+        "boundary and equivalence analysis",
+        "source code testing"
+      ],
+      "observed_question_formats": [
+        "test-case design from business rules",
+        "decision table",
+        "Java code analysis"
+      ],
+      "evidence_note": "Q1 is 30 marks; inspect pages 4-6 to establish remaining allocations and topics."
+    }
+  ]
+}
