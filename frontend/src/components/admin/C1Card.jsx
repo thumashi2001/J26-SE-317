@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { prettyTopic } from '../../utils/topics.js';
 import Avatar from '../ui/Avatar.jsx';
+import useCountUp from '../../hooks/useCountUp.js';
 import './c1card.css';
 
 const RISK = [
@@ -14,6 +15,28 @@ const RISK = [
 const SEM = { Y3S1: 'Y3S1', Y3S2: 'Y3S2' };
 const when = (iso) => new Date(iso).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
 const SHOWN = 8;
+
+function Tile({ icon, tone, value, suffix = '', of, label, none }) {
+  const n = useCountUp(typeof value === 'number' ? value : null);
+  return (
+    <div className={`c1a-tile ${tone}`}>
+      <span className="ico" aria-hidden="true">{icon}</span>
+      <strong>{typeof value === 'number' ? `${Math.round(n)}${suffix}` : none}{of != null && <small> of {of}</small>}</strong>
+      <span className="lbl">{label}</span>
+    </div>
+  );
+}
+
+// One row of the model comparison. 0.5 on the track is a coin flip, 1 is perfect.
+function ScoreBar({ label, value, tone }) {
+  return (
+    <div className={`mm-row ${tone}`}>
+      <span className="mm-lbl">{label}</span>
+      <div className="mm-track" aria-hidden="true"><i style={{ '--w': `${Math.max(2, Math.min(100, value * 100))}%` }} /><b /></div>
+      <span className="mm-val">{value}</span>
+    </div>
+  );
+}
 
 export default function C1Card({ data, error, active = null }) {
   const [all, setAll] = useState(false);
@@ -30,10 +53,10 @@ export default function C1Card({ data, error, active = null }) {
       </div>
 
       <div className="c1a-tiles">
-        <div><strong>{data.diagnosticDone}<small> of {data.students}</small></strong><span>took the diagnostic</span></div>
-        <div><strong>{data.activeThisWeek}</strong><span>active this week</span></div>
-        <div><strong>{data.answers.total}</strong><span>practice answers<br />({data.answers.thisWeek} this week)</span></div>
-        <div><strong>{data.averageLevel ? `${data.averageLevel.score}%` : 'None yet'}</strong><span>{data.averageLevel ? `average level, ${data.averageLevel.label}` : 'no diagnostics yet'}</span></div>
+        <Tile icon={'\u{1F9ED}'} tone="t1" value={data.diagnosticDone} of={data.students} label="took the diagnostic" />
+        <Tile icon={'\u{26A1}'} tone="t2" value={data.activeThisWeek} label="active this week" />
+        <Tile icon={'\u{270D}\u{FE0F}'} tone="t3" value={data.answers.total} label={`practice answers (${data.answers.thisWeek} this week)`} />
+        <Tile icon={'\u{1F4C8}'} tone="t4" value={data.averageLevel ? data.averageLevel.score : null} suffix="%" none="None yet" label={data.averageLevel ? `average level, ${data.averageLevel.label}` : 'no diagnostics yet'} />
       </div>
 
       <div className="c1a-active">
@@ -90,11 +113,24 @@ export default function C1Card({ data, error, active = null }) {
       </div>
 
       <div className="c1a-model">
-        <h4>Trained model in use</h4>
-        {m ? (
-          <p><strong>{m.name}</strong> predicts the chance of a correct answer. On students it had not seen it scores {m.score} (AUC), against {m.ruleBasedScore} for the rule-based twin. Trained on {m.trainedOn}.</p>
-        ) : (
-          <p className="muted small">Training report not found on this server.</p>
+        <div className="mm-copy">
+          <span className="mm-tag"><i /> Trained model in use</span>
+          {m ? (
+            <>
+              <h4>{m.name}</h4>
+              <p>Predicts the chance that a student answers the next question correctly. Scores are AUC on students the model had not seen, where 0.5 is a coin flip. Trained on {m.trainedOn}.</p>
+            </>
+          ) : (
+            <p>Training report not found on this server.</p>
+          )}
+        </div>
+        {m && (
+          <div className="mm-bars">
+            <div className="mm-big"><strong>{m.score}</strong><span>AUC</span></div>
+            <ScoreBar label={m.name} value={Number(m.score)} tone="hi" />
+            <ScoreBar label="Rule-based twin" value={Number(m.ruleBasedScore)} tone="lo" />
+            <ScoreBar label="Coin flip" value={0.5} tone="base" />
+          </div>
         )}
       </div>
     </section>
