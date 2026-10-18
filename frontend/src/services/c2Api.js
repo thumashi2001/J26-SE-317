@@ -120,3 +120,20 @@ export const generateC2MockExam = ({
       seed,
     },
   });
+
+  // --------------------------------------------------
+// M12.4.3 - Lecturer Synthetic Practice Preview
+// Development-only, staff-authorized backend endpoint.
+// --------------------------------------------------
+
+export const generateC2SyntheticPracticePreview = ({
+  moduleKey,
+  seed = 42,
+}) =>
+  api(`${base}/internal/synthetic-practice-preview`, {
+    method: 'POST',
+    body: {
+      moduleKey,
+      seed,
+    },
+  });

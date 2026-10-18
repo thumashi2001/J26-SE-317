@@ -41,10 +41,11 @@ import AssessmentPage from './pages/c3/AssessmentPage.jsx';
 import LecturerQueuePage from './pages/c3/LecturerQueuePage.jsx';
 import LecturerReviewPage from './pages/c3/LecturerReviewPage.jsx';
 
-// Component 2 - Lecturer Dashboard
+// Component 2 - Lecturer
 import LecturerSyllabusReviewPage from './pages/c2/LecturerSyllabusReviewPage.jsx';
+import LecturerSyntheticPreviewPage from './pages/c2/LecturerSyntheticPreviewPage.jsx';
 
-// Component 2 - Student Exam Intelligence Dashboard (M10)
+// Component 2 - Student
 import StudentExamIntelligencePage from './pages/c2/StudentExamIntelligencePage.jsx';
 
 // --------------------------------------------------
@@ -192,6 +193,14 @@ export default function App() {
         <Route
           path="/lecturer/c1"
           element={<ClassInsights />}
+        />
+
+        {/* Component 2: Synthetic Practice Preview */}
+        {/* Keep this specific route before the wildcard route */}
+
+        <Route
+          path="/lecturer/c2/synthetic-preview"
+          element={<LecturerSyntheticPreviewPage />}
         />
 
         {/* Component 2: Syllabus Review */}
