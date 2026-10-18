@@ -159,4 +159,47 @@ export const generateC2MockFromTwin = ({
     },
   });
 
+// --------------------------------------------------
+// M15.3 - Lecturer Question Classification Review
+// --------------------------------------------------
+
+export const getC2QuestionClassificationReviews = ({
+  moduleKey,
+  page = 1,
+  pageSize = 10,
+  includeReviewed = false,
+} = {}) => {
+  const params = new URLSearchParams({
+    page: String(page),
+    pageSize: String(pageSize),
+    includeReviewed: String(includeReviewed),
+  });
+
+  if (moduleKey) {
+    params.set('moduleKey', moduleKey);
+  }
+
+  return api(
+    `${base}/question-classification-reviews?${params.toString()}`
+  );
+};
+
+export const submitC2QuestionClassificationReview = (
+  questionId,
+  { moduleKey, topicId, decision, reviewNotes = '' }
+) =>
+  api(
+    `${base}/question-classification-reviews/${encodeURIComponent(questionId)}/decision`,
+    {
+      method: 'POST',
+      body: {
+        moduleKey,
+        topicId,
+        decision,
+        reviewNotes,
+      },
+    }
+  );
+
+
   

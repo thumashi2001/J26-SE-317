@@ -496,3 +496,46 @@ export async function reviewQuestionClassification(req, res) {
     return handleError(res, error);
   }
 }
+
+// M15.3 - Lecturer Question Classification Review List
+export async function listQuestionClassificationReviews(req, res) {
+  try {
+    const { moduleKey } = req.query;
+    const page = Number(req.query.page ?? 1);
+    const pageSize = Number(req.query.pageSize ?? 10);
+    const includeReviewed = req.query.includeReviewed === 'true';
+
+    if (
+      !Number.isSafeInteger(page) ||
+      page < 1 ||
+      !Number.isSafeInteger(pageSize) ||
+      pageSize < 1 ||
+      pageSize > 100
+    ) {
+      return res.status(400).json({
+        error: 'Invalid pagination parameters',
+      });
+    }
+
+    if (
+      moduleKey !== undefined &&
+      (typeof moduleKey !== 'string' || !moduleKey.trim())
+    ) {
+      return res.status(400).json({
+        error: 'Invalid module key',
+      });
+    }
+
+    const result =
+      await c2Service.getQuestionClassificationReviews({
+        moduleKey: moduleKey ? moduleKey.trim() : undefined,
+        page,
+        pageSize,
+        includeReviewed,
+      });
+
+    return res.json(result);
+  } catch (error) {
+    return handleError(res, error);
+  }
+}

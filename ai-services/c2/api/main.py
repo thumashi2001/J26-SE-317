@@ -1,8 +1,19 @@
 
+
 import os
 import re
 import secrets
 from datetime import datetime, timezone
+from pathlib import Path
+
+from dotenv import load_dotenv
+
+# Load C2 environment configuration from ai-services/c2/.env.
+# Resolve the path relative to this file so it works
+# regardless of the terminal's current directory.
+C2_ROOT = Path(__file__).resolve().parents[1]
+load_dotenv(dotenv_path=C2_ROOT / ".env")
+
 
 from fastapi import FastAPI, Header, HTTPException, Query
 from pydantic import BaseModel, Field
@@ -605,3 +616,40 @@ def review_question_classification(
         "success": True,
         "review": saved,
     }
+
+
+@app.get("/question-classification-reviews")
+def list_question_classification_reviews(
+    module_key: str | None = None,
+    page: int = Query(default=1, ge=1),
+    page_size: int = Query(default=10, ge=1, le=100),
+    include_reviewed: bool = False,
+    x_c2_internal_token: str | None = Header(default=None),
+):
+    require_internal_token(x_c2_internal_token)
+
+    if module_key is not None:
+        validate_module(module_key)
+
+    service = QuestionClassificationReviewService()
+
+    try:
+        return service.list_review_candidates(
+            module_key=module_key,
+            page=page,
+            page_size=page_size,
+            include_reviewed=include_reviewed,
+        )
+
+    except FileNotFoundError:
+        raise HTTPException(
+            status_code=404,
+            detail="Required review dataset not found",
+        )
+
+    except ValueError as error:
+        raise HTTPException(
+            status_code=409,
+            detail=str(error),
+        )
+

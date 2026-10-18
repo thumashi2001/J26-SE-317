@@ -215,3 +215,26 @@ export function submitQuestionClassificationReview({
     }
   );
 }
+
+// M15.3 - List Question Classification Reviews
+export function getQuestionClassificationReviews({
+  moduleKey,
+  page = 1,
+  pageSize = 10,
+  includeReviewed = false,
+} = {}) {
+  const params = new URLSearchParams({
+    page: String(page),
+    page_size: String(pageSize),
+    include_reviewed: String(includeReviewed),
+  });
+
+  if (moduleKey) {
+    params.set('module_key', moduleKey);
+  }
+
+  return requestC2(
+    `/question-classification-reviews?${params.toString()}`
+  );
+}
+

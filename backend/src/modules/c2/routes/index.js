@@ -106,6 +106,12 @@ router.post(
 
 
 // M14.3.3.2 - Lecturer Question Classification Review
+router.get(
+  '/question-classification-reviews',
+  requireRole('lecturer', 'admin'),
+  controller.listQuestionClassificationReviews
+);
+
 router.post(
   '/question-classification-reviews/:questionId/decision',
   requireRole('lecturer', 'admin'),
