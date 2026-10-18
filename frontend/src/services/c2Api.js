@@ -63,3 +63,23 @@ export const submitC2Review = (
       body: { decision, reviewNotes },
     }
   );
+
+
+  
+/**
+ * M10 - Student Question Bank
+ */
+export const getC2StudentQuestions = (
+  { moduleKey, page = 1, pageSize = 10 } = {}
+) => {
+  const params = new URLSearchParams({
+    page: String(page),
+    pageSize: String(pageSize),
+  });
+
+  if (moduleKey) {
+    params.set('moduleKey', moduleKey);
+  }
+
+  return api(`${base}/questions?${params.toString()}`);
+};
