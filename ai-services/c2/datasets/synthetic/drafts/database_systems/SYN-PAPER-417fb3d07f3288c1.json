@@ -1,0 +1,408 @@
+{
+  "schema_version": "1.0",
+  "dataset_type": "synthetic_exam_paper_draft",
+  "paper_id": "SYN-PAPER-417fb3d07f3288c1",
+  "module_key": "database_systems",
+  "module_name": "Database Systems",
+  "generation_mode": "development_fixture",
+  "source_type": "synthetic",
+  "verification_status": "unverified",
+  "human_review_status": "pending",
+  "release_status": "not_approved",
+  "total_marks": 100,
+  "main_question_count": 4,
+  "questions": [
+    {
+      "number": 1,
+      "total_marks": 25,
+      "subquestions": [
+        {
+          "label": "a",
+          "marks": 5,
+          "question": {
+            "question_id": "SYN-database_systems-98c14e439dbd8d52-Q0002",
+            "module_key": "database_systems",
+            "module_code": "IT3020",
+            "module_name": "Database Systems",
+            "question_text": "Case study: A university database contains Student(student_id, name), Module(module_id, title), and Enrollment(student_id, module_id, grade). Retrieve students enrolled in more than two modules.\nTask: Design a solution involving SQL Queries for a Database Systems problem. Explain your design decisions and expected outcomes.",
+            "topic": "SQL Queries",
+            "marks": 5,
+            "marks_status": "generated",
+            "question_type": "design",
+            "difficulty": "easy",
+            "bloom_level": "create",
+            "source_type": "synthetic",
+            "verification_status": "unverified",
+            "human_review_status": "pending",
+            "generation_provenance": {
+              "generator": "c2_template_generator_v1",
+              "mode": "development_fixture",
+              "batch_id": "98c14e439dbd8d52",
+              "seed": 16599979536204767070,
+              "sequence": 2,
+              "scenario_enricher": "c2_scenario_enricher_v1"
+            },
+            "scenario_id": "database_systems:SQL Queries:1",
+            "scenario_review_status": "pending"
+          }
+        },
+        {
+          "label": "b",
+          "marks": 10,
+          "question": {
+            "question_id": "SYN-database_systems-a58e0ec2843230a3-Q0005",
+            "module_key": "database_systems",
+            "module_code": "IT3020",
+            "module_name": "Database Systems",
+            "question_text": "Case study: Two users attempt to transfer funds from the same bank account simultaneously. Examine isolation and consistency requirements.\nTask: Analyze a scenario involving Transaction Management in Database Systems. Identify potential challenges and explain their consequences.",
+            "topic": "Transaction Management",
+            "marks": 10,
+            "marks_status": "generated",
+            "question_type": "analyze",
+            "difficulty": "easy",
+            "bloom_level": "analyze",
+            "source_type": "synthetic",
+            "verification_status": "unverified",
+            "human_review_status": "pending",
+            "generation_provenance": {
+              "generator": "c2_template_generator_v1",
+              "mode": "development_fixture",
+              "batch_id": "a58e0ec2843230a3",
+              "seed": 16599979536204767075,
+              "sequence": 5,
+              "scenario_enricher": "c2_scenario_enricher_v1"
+            },
+            "scenario_id": "database_systems:Transaction Management:1",
+            "scenario_review_status": "pending"
+          }
+        },
+        {
+          "label": "c",
+          "marks": 10,
+          "question": {
+            "question_id": "SYN-database_systems-a58e0ec2843230a3-Q0003",
+            "module_key": "database_systems",
+            "module_code": "IT3020",
+            "module_name": "Database Systems",
+            "question_text": "Case study: An online store updates inventory and creates an order, but payment processing fails. Explain appropriate rollback behavior.\nTask: Evaluate two possible approaches to Transaction Management within Database Systems. Discuss their strengths, limitations, and suitability.",
+            "topic": "Transaction Management",
+            "marks": 10,
+            "marks_status": "generated",
+            "question_type": "evaluate",
+            "difficulty": "hard",
+            "bloom_level": "evaluate",
+            "source_type": "synthetic",
+            "verification_status": "unverified",
+            "human_review_status": "pending",
+            "generation_provenance": {
+              "generator": "c2_template_generator_v1",
+              "mode": "development_fixture",
+              "batch_id": "a58e0ec2843230a3",
+              "seed": 16599979536204767075,
+              "sequence": 3,
+              "scenario_enricher": "c2_scenario_enricher_v1"
+            },
+            "scenario_id": "database_systems:Transaction Management:2",
+            "scenario_review_status": "pending"
+          }
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "total_marks": 25,
+      "subquestions": [
+        {
+          "label": "a",
+          "marks": 5,
+          "question": {
+            "question_id": "SYN-database_systems-98c14e439dbd8d52-Q0001",
+            "module_key": "database_systems",
+            "module_code": "IT3020",
+            "module_name": "Database Systems",
+            "question_text": "Case study: A retail database contains Product(product_id, category, price) and Sale(sale_id, product_id, quantity). Calculate total sales revenue by category.\nTask: Apply the principles of SQL Queries to a realistic Database Systems scenario. Describe the steps and justify your approach.",
+            "topic": "SQL Queries",
+            "marks": 5,
+            "marks_status": "generated",
+            "question_type": "apply",
+            "difficulty": "easy",
+            "bloom_level": "apply",
+            "source_type": "synthetic",
+            "verification_status": "unverified",
+            "human_review_status": "pending",
+            "generation_provenance": {
+              "generator": "c2_template_generator_v1",
+              "mode": "development_fixture",
+              "batch_id": "98c14e439dbd8d52",
+              "seed": 16599979536204767070,
+              "sequence": 1,
+              "scenario_enricher": "c2_scenario_enricher_v1"
+            },
+            "scenario_id": "database_systems:SQL Queries:2",
+            "scenario_review_status": "pending"
+          }
+        },
+        {
+          "label": "b",
+          "marks": 10,
+          "question": {
+            "question_id": "SYN-database_systems-a58e0ec2843230a3-Q0008",
+            "module_key": "database_systems",
+            "module_code": "IT3020",
+            "module_name": "Database Systems",
+            "question_text": "Case study: Two transactions lock the Orders and Inventory tables in opposite orders. Analyze the resulting concurrency risk.\nTask: Explain the key principles of Transaction Management in the context of Database Systems. Include a relevant example.",
+            "topic": "Transaction Management",
+            "marks": 10,
+            "marks_status": "generated",
+            "question_type": "explain",
+            "difficulty": "medium",
+            "bloom_level": "understand",
+            "source_type": "synthetic",
+            "verification_status": "unverified",
+            "human_review_status": "pending",
+            "generation_provenance": {
+              "generator": "c2_template_generator_v1",
+              "mode": "development_fixture",
+              "batch_id": "a58e0ec2843230a3",
+              "seed": 16599979536204767075,
+              "sequence": 8,
+              "scenario_enricher": "c2_scenario_enricher_v1"
+            },
+            "scenario_id": "database_systems:Transaction Management:3",
+            "scenario_review_status": "pending"
+          }
+        },
+        {
+          "label": "c",
+          "marks": 10,
+          "question": {
+            "question_id": "SYN-database_systems-a58e0ec2843230a3-Q0001",
+            "module_key": "database_systems",
+            "module_code": "IT3020",
+            "module_name": "Database Systems",
+            "question_text": "Case study: An order table stores order_id, customer_id, customer_name, product_id, product_name, quantity, and unit_price. Identify dependencies and propose a normalized design.\nTask: Design a solution involving Database Normalization for a Database Systems problem. Explain your design decisions and expected outcomes.",
+            "topic": "Database Normalization",
+            "marks": 10,
+            "marks_status": "generated",
+            "question_type": "design",
+            "difficulty": "medium",
+            "bloom_level": "create",
+            "source_type": "synthetic",
+            "verification_status": "unverified",
+            "human_review_status": "pending",
+            "generation_provenance": {
+              "generator": "c2_template_generator_v1",
+              "mode": "development_fixture",
+              "batch_id": "a58e0ec2843230a3",
+              "seed": 16599979536204767075,
+              "sequence": 1,
+              "scenario_enricher": "c2_scenario_enricher_v1"
+            },
+            "scenario_id": "database_systems:Database Normalization:1",
+            "scenario_review_status": "pending"
+          }
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "total_marks": 25,
+      "subquestions": [
+        {
+          "label": "a",
+          "marks": 5,
+          "question": {
+            "question_id": "SYN-database_systems-98c14e439dbd8d52-Q0004",
+            "module_key": "database_systems",
+            "module_code": "IT3020",
+            "module_name": "Database Systems",
+            "question_text": "Case study: A library database contains Book(book_id, title), Member(member_id, name), and Loan(book_id, member_id, due_date). Find members with overdue loans.\nTask: Analyze a scenario involving SQL Queries in Database Systems. Identify potential challenges and explain their consequences.",
+            "topic": "SQL Queries",
+            "marks": 5,
+            "marks_status": "generated",
+            "question_type": "analyze",
+            "difficulty": "medium",
+            "bloom_level": "analyze",
+            "source_type": "synthetic",
+            "verification_status": "unverified",
+            "human_review_status": "pending",
+            "generation_provenance": {
+              "generator": "c2_template_generator_v1",
+              "mode": "development_fixture",
+              "batch_id": "98c14e439dbd8d52",
+              "seed": 16599979536204767070,
+              "sequence": 4,
+              "scenario_enricher": "c2_scenario_enricher_v1"
+            },
+            "scenario_id": "database_systems:SQL Queries:3",
+            "scenario_review_status": "pending"
+          }
+        },
+        {
+          "label": "b",
+          "marks": 10,
+          "question": {
+            "question_id": "SYN-database_systems-a58e0ec2843230a3-Q0004",
+            "module_key": "database_systems",
+            "module_code": "IT3020",
+            "module_name": "Database Systems",
+            "question_text": "Case study: A student registration table stores student_id, student_name, module_id, module_title, lecturer_id, and lecturer_name. Examine update anomalies and normalization requirements.\nTask: Explain the key principles of Database Normalization in the context of Database Systems. Include a relevant example.",
+            "topic": "Database Normalization",
+            "marks": 10,
+            "marks_status": "generated",
+            "question_type": "explain",
+            "difficulty": "hard",
+            "bloom_level": "understand",
+            "source_type": "synthetic",
+            "verification_status": "unverified",
+            "human_review_status": "pending",
+            "generation_provenance": {
+              "generator": "c2_template_generator_v1",
+              "mode": "development_fixture",
+              "batch_id": "a58e0ec2843230a3",
+              "seed": 16599979536204767075,
+              "sequence": 4,
+              "scenario_enricher": "c2_scenario_enricher_v1"
+            },
+            "scenario_id": "database_systems:Database Normalization:2",
+            "scenario_review_status": "pending"
+          }
+        },
+        {
+          "label": "c",
+          "marks": 10,
+          "question": {
+            "question_id": "SYN-database_systems-a58e0ec2843230a3-Q0002",
+            "module_key": "database_systems",
+            "module_code": "IT3020",
+            "module_name": "Database Systems",
+            "question_text": "Case study: A ticket booking system receives two requests for the final available seat. Propose a transaction strategy.\nTask: Design a solution involving Transaction Management for a Database Systems problem. Explain your design decisions and expected outcomes.",
+            "topic": "Transaction Management",
+            "marks": 10,
+            "marks_status": "generated",
+            "question_type": "design",
+            "difficulty": "medium",
+            "bloom_level": "create",
+            "source_type": "synthetic",
+            "verification_status": "unverified",
+            "human_review_status": "pending",
+            "generation_provenance": {
+              "generator": "c2_template_generator_v1",
+              "mode": "development_fixture",
+              "batch_id": "a58e0ec2843230a3",
+              "seed": 16599979536204767075,
+              "sequence": 2,
+              "scenario_enricher": "c2_scenario_enricher_v1"
+            },
+            "scenario_id": "database_systems:Transaction Management:4",
+            "scenario_review_status": "pending"
+          }
+        }
+      ]
+    },
+    {
+      "number": 4,
+      "total_marks": 25,
+      "subquestions": [
+        {
+          "label": "a",
+          "marks": 5,
+          "question": {
+            "question_id": "SYN-database_systems-98c14e439dbd8d52-Q0003",
+            "module_key": "database_systems",
+            "module_code": "IT3020",
+            "module_name": "Database Systems",
+            "question_text": "Case study: An employee database contains Employee(emp_id, department_id, salary) and Department(department_id, name). Identify employees earning above their department average.\nTask: Explain the key principles of SQL Queries in the context of Database Systems. Include a relevant example.",
+            "topic": "SQL Queries",
+            "marks": 5,
+            "marks_status": "generated",
+            "question_type": "explain",
+            "difficulty": "hard",
+            "bloom_level": "understand",
+            "source_type": "synthetic",
+            "verification_status": "unverified",
+            "human_review_status": "pending",
+            "generation_provenance": {
+              "generator": "c2_template_generator_v1",
+              "mode": "development_fixture",
+              "batch_id": "98c14e439dbd8d52",
+              "seed": 16599979536204767070,
+              "sequence": 3,
+              "scenario_enricher": "c2_scenario_enricher_v1"
+            },
+            "scenario_id": "database_systems:SQL Queries:4",
+            "scenario_review_status": "pending"
+          }
+        },
+        {
+          "label": "b",
+          "marks": 10,
+          "question": {
+            "question_id": "SYN-database_systems-a58e0ec2843230a3-Q0007",
+            "module_key": "database_systems",
+            "module_code": "IT3020",
+            "module_name": "Database Systems",
+            "question_text": "Case study: A hospital appointment table stores appointment_id, patient_id, patient_name, doctor_id, doctor_name, and clinic_room. Identify redundancy and suitable decomposition.\nTask: Evaluate two possible approaches to Database Normalization within Database Systems. Discuss their strengths, limitations, and suitability.",
+            "topic": "Database Normalization",
+            "marks": 10,
+            "marks_status": "generated",
+            "question_type": "evaluate",
+            "difficulty": "medium",
+            "bloom_level": "evaluate",
+            "source_type": "synthetic",
+            "verification_status": "unverified",
+            "human_review_status": "pending",
+            "generation_provenance": {
+              "generator": "c2_template_generator_v1",
+              "mode": "development_fixture",
+              "batch_id": "a58e0ec2843230a3",
+              "seed": 16599979536204767075,
+              "sequence": 7,
+              "scenario_enricher": "c2_scenario_enricher_v1"
+            },
+            "scenario_id": "database_systems:Database Normalization:3",
+            "scenario_review_status": "pending"
+          }
+        },
+        {
+          "label": "c",
+          "marks": 10,
+          "question": {
+            "question_id": "SYN-database_systems-a58e0ec2843230a3-Q0006",
+            "module_key": "database_systems",
+            "module_code": "IT3020",
+            "module_name": "Database Systems",
+            "question_text": "Case study: A database server crashes after a transaction writes changes but before its commit acknowledgement. Discuss recovery.\nTask: Apply the principles of Transaction Management to a realistic Database Systems scenario. Describe the steps and justify your approach.",
+            "topic": "Transaction Management",
+            "marks": 10,
+            "marks_status": "generated",
+            "question_type": "apply",
+            "difficulty": "medium",
+            "bloom_level": "apply",
+            "source_type": "synthetic",
+            "verification_status": "unverified",
+            "human_review_status": "pending",
+            "generation_provenance": {
+              "generator": "c2_template_generator_v1",
+              "mode": "development_fixture",
+              "batch_id": "a58e0ec2843230a3",
+              "seed": 16599979536204767075,
+              "sequence": 6,
+              "scenario_enricher": "c2_scenario_enricher_v1"
+            },
+            "scenario_id": "database_systems:Transaction Management:5",
+            "scenario_review_status": "pending"
+          }
+        }
+      ]
+    }
+  ],
+  "assembly_provenance": {
+    "builder": "c2_synthetic_paper_builder_v1",
+    "source_batch_id": "7b46dc8242d507fd",
+    "seed": 16599979536204767065,
+    "mode": "development_fixture",
+    "source_paper_id": "SYN-PAPER-4c881603d1138c74",
+    "scenario_enricher": "c2_scenario_enricher_v1"
+  }
+}
