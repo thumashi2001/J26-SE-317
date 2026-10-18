@@ -162,3 +162,14 @@ export function getTopicPredictions(moduleKey) {
     `/topic-predictions?${params.toString()}`
   );
 }
+
+// --------------------------------------------------
+// M12.2.1 - Personalized Practice Mock Examinations
+// --------------------------------------------------
+
+export function generateMockExam(payload) {
+  return requestC2('/mock-exams/generate', {
+    method: 'POST',
+    body: payload,
+  });
+}

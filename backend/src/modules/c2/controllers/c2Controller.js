@@ -252,3 +252,77 @@ export async function listTopicPredictions(req, res) {
     return handleError(res, error);
   }
 }
+
+// --------------------------------------------------
+// M12.2.1 - Personalized Practice Mock Examinations
+// --------------------------------------------------
+
+export async function generateMockExam(req, res) {
+  try {
+    const {
+      moduleKey,
+      targetMarks = 100,
+      maxQuestions = 20,
+      preferredTopics = [],
+      difficulty = null,
+      seed = 42,
+    } = req.body || {};
+
+    if (
+      typeof moduleKey !== 'string' ||
+      !moduleKey.trim()
+    ) {
+      return res.status(400).json({
+        error: 'A valid moduleKey is required',
+      });
+    }
+
+    if (
+      !Number.isSafeInteger(targetMarks) ||
+      targetMarks < 1 ||
+      targetMarks > 200 ||
+      !Number.isSafeInteger(maxQuestions) ||
+      maxQuestions < 1 ||
+      maxQuestions > 30 ||
+      !Number.isSafeInteger(seed)
+    ) {
+      return res.status(400).json({
+        error: 'Invalid mock examination parameters',
+      });
+    }
+
+    if (
+      !Array.isArray(preferredTopics) ||
+      preferredTopics.length > 30 ||
+      preferredTopics.some(
+        (topic) =>
+          typeof topic !== 'string' ||
+          !topic.trim()
+      ) ||
+      (
+        difficulty !== null &&
+        (
+          typeof difficulty !== 'string' ||
+          !difficulty.trim()
+        )
+      )
+    ) {
+      return res.status(400).json({
+        error: 'Invalid personalization preferences',
+      });
+    }
+
+    const result = await c2Service.generateMockExam({
+      module_key: moduleKey.trim(),
+      target_marks: targetMarks,
+      max_questions: maxQuestions,
+      preferred_topics: preferredTopics,
+      difficulty,
+      seed,
+    });
+
+    return res.json(result);
+  } catch (error) {
+    return handleError(res, error);
+  }
+}

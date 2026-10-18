@@ -48,6 +48,14 @@ router.get(
 );
 
 // --------------------------------------------------
+// M12.2.1 - Personalized Practice Mock Examinations
+// --------------------------------------------------
+
+router.post(
+  '/mock-exams/generate',
+  controller.generateMockExam
+);
+// --------------------------------------------------
 // M8 - Lecturer Syllabus Review
 // Restricted to lecturers and administrators.
 // --------------------------------------------------

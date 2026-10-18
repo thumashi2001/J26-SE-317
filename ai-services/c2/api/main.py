@@ -18,6 +18,7 @@ from services.exam_pattern_analyzer import ExamPatternAnalyzer
 from services.evidence_aware_topic_predictor import (
     EvidenceAwareTopicPredictor,
 )
+from services.personalized_mock_exam import PersonalizedMockExam
 
 app = FastAPI(
     title="C2 Exam Intelligence API",
@@ -49,6 +50,9 @@ pattern_analyzer = ExamPatternAnalyzer()
 topic_predictor = EvidenceAwareTopicPredictor(
     analyzer=pattern_analyzer
 )
+
+# M12.2.1 - Personalized mock examination generator
+mock_exam_generator = PersonalizedMockExam()
 
 class ReviewDecisionRequest(BaseModel):
     module_key: str
@@ -431,4 +435,48 @@ def get_topic_predictions(
         raise HTTPException(
             status_code=409,
             detail="Historical examination dataset is invalid",
+        )
+
+    
+# --------------------------------------------------
+# M12.2.1 - Personalized Practice Mock Examinations
+# --------------------------------------------------
+
+class MockExamRequest(BaseModel):
+    module_key: str
+    target_marks: int = Field(default=100, ge=1, le=200)
+    max_questions: int = Field(default=20, ge=1, le=30)
+    preferred_topics: list[str] = Field(default_factory=list)
+    difficulty: str | None = None
+    seed: int = 42
+
+
+@app.post("/mock-exams/generate")
+def generate_mock_exam(
+    request: MockExamRequest,
+    x_c2_internal_token: str | None = Header(default=None),
+):
+    require_internal_token(x_c2_internal_token)
+    validate_module(request.module_key)
+
+    try:
+        return mock_exam_generator.generate(
+            module_key=request.module_key,
+            target_marks=request.target_marks,
+            max_questions=request.max_questions,
+            preferred_topics=request.preferred_topics,
+            difficulty=request.difficulty,
+            seed=request.seed,
+        )
+
+    except FileNotFoundError:
+        raise HTTPException(
+            status_code=404,
+            detail="Question dataset not found",
+        )
+
+    except (ValueError, TypeError, KeyError):
+        raise HTTPException(
+            status_code=409,
+            detail="Mock examination generation failed due to invalid data",
         )
