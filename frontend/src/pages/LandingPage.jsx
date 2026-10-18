@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import ThemeToggle from '../components/ThemeToggle.jsx';
 import Logo from '../components/Logo.jsx';
 import LaptopScene from '../components/LaptopScene.jsx';
+import JoinScene from '../components/JoinScene.jsx';
 import { TOPIC_INFO } from '../utils/topicLabels.js';
 import './landing.css';
 
@@ -41,6 +42,19 @@ function useModules() {
   }, []);
 }
 
+const EXPLORE = ['what you know', 'what you forget', 'how you answer', 'what to study next', 'your exam forecast'];
+
+// Swaps the highlighted words under the "join us" heading. Stays on the first phrase for reduced motion.
+function useRotatingWord(list, ms = 2600) {
+  const [i, setI] = useState(0);
+  useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined;
+    const id = setInterval(() => setI((n) => (n + 1) % list.length), ms);
+    return () => clearInterval(id);
+  }, [list.length, ms]);
+  return { word: list[i], i };
+}
+
 function useReveal() {
   useEffect(() => {
     const els = document.querySelectorAll('.lp-reveal');
@@ -62,6 +76,9 @@ export default function LandingPage() {
   const [sem, setSem] = useState('Y3S1');
   const [open, setOpen] = useState(false);
   useReveal();
+  const { word, i: wordI } = useRotatingWord(EXPLORE);
+  const topicCount = Object.keys(TOPIC_INFO).length;
+  const moduleCount = new Set(Object.values(TOPIC_INFO).map((t) => t.module)).size;
 
   const list = Object.values(modules[sem] || {});
 
@@ -87,24 +104,26 @@ export default function LandingPage() {
       </header>
 
       <main id="main">
-        {/* hero */}
-        <section className="lp-hero">
-          <div className="lp-wrap lp-hero-in">
-            <div className="lp-hero-text">
-              <p className="lp-kicker">Built for SLIIT Year 3 Software Engineering students</p>
-              <h1>Know what you know.<br /><span>Learn what matters next.</span></h1>
-              <p className="lp-lead">
-                AdaptiveLearnSE joins four tools in one place: a digital twin of what you know, exam intelligence, automated marking and an adaptive learning path.
+        {/* join us */}
+        <section className="lp-join" aria-labelledby="lp-join-title">
+          <div className="lp-wrap lp-join-in">
+            <div className="lp-join-text">
+              <p className="lp-join-kicker"><span className="lp-dot" /> Calling all SLIIT 3rd year Software Engineering students</p>
+              <h2 id="lp-join-title">Are you a SLIIT 3rd year Software Engineering student?<br /><span>Join us and let&rsquo;s explore the world of learning.</span></h2>
+              <p className="lp-join-line">
+                Together we will look at <b key={wordI} className="lp-swap">{word}</b>
               </p>
+              <ul className="lp-join-facts">
+                <li><strong>{moduleCount}</strong> modules</li>
+                <li><strong>{topicCount}</strong> topics</li>
+                <li><strong>2</strong> semesters</li>
+              </ul>
               <div className="lp-hero-cta">
                 <Link className="lp-btn solid big" to="/register">Get started</Link>
                 <Link className="lp-btn light big" to="/login">I already have an account</Link>
               </div>
             </div>
-
-            <div className="lp-hero-art">
-              <div className="lp-art-card"><LaptopScene /></div>
-            </div>
+            <div className="lp-join-art"><JoinScene /></div>
           </div>
         </section>
 
@@ -124,6 +143,22 @@ export default function LandingPage() {
                 </li>
               ))}
             </ol>
+          </div>
+        </section>
+
+        {/* hero */}
+        <section className="lp-hero">
+          <div className="lp-wrap lp-hero-in">
+            <div className="lp-hero-text">
+              <h1>Know what you know.<br /><span>Learn what matters next.</span></h1>
+              <p className="lp-lead">
+                AdaptiveLearnSE joins four tools in one place: a digital twin of what you know, exam intelligence, automated marking and an adaptive learning path.
+              </p>
+            </div>
+
+            <div className="lp-hero-art">
+              <div className="lp-art-card"><LaptopScene /></div>
+            </div>
           </div>
         </section>
 

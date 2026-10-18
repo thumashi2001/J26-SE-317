@@ -18,12 +18,23 @@ export default function AdminDashboard() {
 
   return (
     <div>
-      <div className="page-head">
+      <section className="hero ad-hero">
+        <div className="ad-orb" aria-hidden="true" />
         <div>
+          <span className="hero-tag">Administrator area</span>
           <h1>Learning insights</h1>
-          <p className="muted">Welcome back, {user.name}. This is how students are learning across the platform.</p>
+          <p>Welcome back, {user.name}. This is how students are learning across the platform.</p>
         </div>
-      </div>
+        <div className="hero-id ad-stats">
+          {c1 && (
+            <>
+              <span className="small">Registered students</span>
+              <strong>{c1.students}</strong>
+              <span className={`ad-live ${c1.aiService}`}><i /> AI service {c1.aiService}</span>
+            </>
+          )}
+        </div>
+      </section>
 
       <C1Card data={c1} error={c1Error} active={c1Active} />
       {/* Other members: add your own card here, for example <C3Card ... /> */}
