@@ -1,0 +1,194 @@
+
+{
+  "schema_version": "1.0",
+  "expansion_id": "c2_scenario_expansion_v1",
+  "source_type": "synthetic",
+  "verification_status": "unverified",
+  "academic_review_status": "pending",
+  "modules": [
+    {
+      "module_key": "database_systems",
+      "topics": [
+        {
+          "name": "SQL Queries",
+          "scenarios": [
+            "A university registration system stores students, modules, lecturers, and semester enrollments, including students repeating modules.",
+            "A hospital appointment system records patients, doctors, departments, visits, and cancellations across multiple branches.",
+            "An online marketplace tracks customers, sellers, orders, products, returns, and discounts over several financial quarters.",
+            "A transport operator maintains routes, vehicles, drivers, trips, and passenger bookings, including cancelled services."
+          ]
+        },
+        {
+          "name": "Database Indexing",
+          "scenarios": [
+            "A banking system processes millions of transactions while users frequently search accounts by date range and branch.",
+            "A healthcare platform retrieves patient records using patient identifiers, appointment dates, and department filters.",
+            "An e-commerce catalogue receives frequent product updates while shoppers filter by category, price, and availability.",
+            "A university learning platform queries large submission tables by module, student, submission time, and grading status."
+          ]
+        }
+      ]
+    },
+    {
+      "module_key": "case_studies_software_engineering",
+      "topics": [
+        {
+          "name": "Case Study Requirements",
+          "scenarios": [
+            "A municipal council plans an online permit application system involving residents, inspectors, and finance officers.",
+            "A private hospital replaces paper-based laboratory requests with a system shared by clinicians and technicians.",
+            "A logistics company wants to coordinate delivery assignments, customer notifications, and proof of delivery.",
+            "A university plans a research supervision portal supporting students, supervisors, and examination panels."
+          ]
+        },
+        {
+          "name": "UML and Design Decisions",
+          "scenarios": [
+            "A hotel booking platform must coordinate room inventory, payments, cancellations, and administrator overrides.",
+            "A vehicle rental service manages reservations, inspections, late returns, and maintenance schedules.",
+            "A pharmacy inventory platform tracks suppliers, stock batches, expiry dates, and prescription fulfillment.",
+            "A sports tournament system schedules matches, registers teams, records scores, and publishes standings."
+          ]
+        }
+      ]
+    },
+    {
+      "module_key": "software_project_management",
+      "topics": [
+        {
+          "name": "Project Selection",
+          "scenarios": [
+            "A university must prioritize three digital services under a fixed annual technology budget.",
+            "A retail company evaluates competing inventory automation proposals with different costs and delivery timelines.",
+            "A hospital compares patient scheduling projects using operational benefits, implementation risks, and resource constraints.",
+            "A public transport authority evaluates alternative ticketing upgrades with conflicting stakeholder priorities."
+          ]
+        },
+        {
+          "name": "Project Risk and Control",
+          "scenarios": [
+            "A mobile banking project faces changing regulations, a delayed vendor integration, and limited testing capacity.",
+            "A campus management system has missed two milestones because requirements were approved late.",
+            "A distributed development team encounters staff turnover, unstable dependencies, and repeated scope changes.",
+            "A healthcare software project reports rising defect counts while its deployment deadline remains fixed."
+          ]
+        }
+      ]
+    },
+    {
+      "module_key": "user_experience_engineering",
+      "topics": [
+        {
+          "name": "User Research and Design Thinking",
+          "scenarios": [
+            "A public hospital redesigns its appointment website for older adults and first-time smartphone users.",
+            "A university investigates why students abandon its online module registration process.",
+            "A banking application team studies accessibility barriers faced by customers with visual impairments.",
+            "A grocery delivery startup investigates checkout failures among users with unreliable mobile connectivity."
+          ]
+        },
+        {
+          "name": "Hierarchical Task Analysis",
+          "scenarios": [
+            "A railway ticket kiosk requires passengers to select routes, seats, payment methods, and ticket collection options.",
+            "A university portal allows students to submit assignments, verify uploads, and review submission receipts.",
+            "A clinic receptionist uses a patient registration workflow involving identity checks and appointment allocation.",
+            "A delivery driver application supports accepting jobs, navigation, proof of delivery, and exception reporting."
+          ]
+        }
+      ]
+    },
+    {
+      "module_key": "application_frameworks",
+      "topics": [
+        {
+          "name": "REST API and Middleware",
+          "scenarios": [
+            "A campus event application exposes endpoints for event registration, capacity checks, and ticket cancellation.",
+            "A healthcare booking API requires role-based access, request validation, and consistent error responses.",
+            "A food delivery service needs middleware for authentication, request logging, and rate limiting.",
+            "An inventory management API supports pagination, filtering, and controlled updates to product quantities."
+          ]
+        },
+        {
+          "name": "Framework Debugging",
+          "scenarios": [
+            "A web application returns unauthorized responses after a token refresh despite a valid user session.",
+            "A React interface displays stale order information after an asynchronous update request completes.",
+            "An Express application produces duplicate responses because error-handling middleware is ordered incorrectly.",
+            "A database-backed API intermittently fails when concurrent requests modify the same inventory item."
+          ]
+        }
+      ]
+    },
+    {
+      "module_key": "distributed_systems",
+      "topics": [
+        {
+          "name": "Distributed Communication",
+          "scenarios": [
+            "A ride-hailing platform coordinates location updates between drivers, passengers, and dispatch services.",
+            "A university examination platform distributes notifications across independently deployed services.",
+            "A warehouse network exchanges stock updates between regional systems with intermittent connectivity.",
+            "A payment platform processes requests across several services while preserving transaction identifiers."
+          ]
+        },
+        {
+          "name": "Dependability and Fault Tolerance",
+          "scenarios": [
+            "A replicated hospital records service must remain available when one regional server becomes unreachable.",
+            "A ticket booking system experiences partial network failure while processing simultaneous seat reservations.",
+            "A distributed file storage service must recover from node crashes without losing acknowledged uploads.",
+            "An online payment workflow must handle retries after timeouts without charging customers twice."
+          ]
+        }
+      ]
+    },
+    {
+      "module_key": "software_architecture",
+      "topics": [
+        {
+          "name": "Architectural Styles and Trade-offs",
+          "scenarios": [
+            "A small startup considers moving a monolithic ordering application to independently deployed services.",
+            "A national healthcare platform must balance availability, interoperability, security, and maintenance cost.",
+            "A university learning platform expects seasonal traffic spikes during examination submission periods.",
+            "A logistics company compares event-driven and request-response approaches for shipment tracking."
+          ]
+        },
+        {
+          "name": "Architecture Modeling",
+          "scenarios": [
+            "A digital library requires a component view showing search, lending, authentication, and notification services.",
+            "A payment application needs a deployment model separating client devices, application servers, and databases.",
+            "A hospital information system requires interfaces between patient records, laboratories, and billing.",
+            "A travel booking platform needs a sequence model for reservations involving inventory and payment services."
+          ]
+        }
+      ]
+    },
+    {
+      "module_key": "software_engineering_process_quality_management",
+      "topics": [
+        {
+          "name": "Specification-Based Testing",
+          "scenarios": [
+            "A scholarship application accepts candidates based on age, academic results, and income thresholds.",
+            "A booking system applies different cancellation fees depending on the time remaining before departure.",
+            "A loan application validates salary ranges, employment categories, and repayment periods.",
+            "A university grading system converts numeric marks into grade bands using defined boundaries."
+          ]
+        },
+        {
+          "name": "Code-Based Testing",
+          "scenarios": [
+            "An order discount function contains nested conditions for customer status and purchase value.",
+            "A password validation routine uses multiple Boolean conditions and early return statements.",
+            "A shipping cost function contains loops and branches based on weight, distance, and delivery priority.",
+            "A login throttling function tracks failed attempts and applies conditional account lockouts."
+          ]
+        }
+      ]
+    }
+  ]
+}
