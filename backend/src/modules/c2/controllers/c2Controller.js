@@ -326,3 +326,41 @@ export async function generateMockExam(req, res) {
     return handleError(res, error);
   }
 }
+
+// --------------------------------------------------
+// M12.4.2 - Staff-Only Synthetic Development Preview
+// --------------------------------------------------
+
+export async function generateSyntheticPracticePreview(req, res) {
+  try {
+    const {
+      moduleKey,
+      seed = 42,
+    } = req.body || {};
+
+    if (
+      typeof moduleKey !== 'string' ||
+      !moduleKey.trim()
+    ) {
+      return res.status(400).json({
+        error: 'A valid moduleKey is required',
+      });
+    }
+
+    if (!Number.isSafeInteger(seed)) {
+      return res.status(400).json({
+        error: 'seed must be a valid integer',
+      });
+    }
+
+    const result =
+      await c2Service.generateSyntheticPracticePreview({
+        moduleKey: moduleKey.trim(),
+        seed,
+      });
+
+    return res.json(result);
+  } catch (error) {
+    return handleError(res, error);
+  }
+}

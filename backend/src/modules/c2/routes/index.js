@@ -55,6 +55,16 @@ router.post(
   '/mock-exams/generate',
   controller.generateMockExam
 );
+
+// --------------------------------------------------
+// M12.4.2 - Staff-Only Synthetic Development Preview
+// --------------------------------------------------
+
+router.post(
+  '/internal/synthetic-practice-preview',
+  requireRole('lecturer', 'admin'),
+  controller.generateSyntheticPracticePreview
+);
 // --------------------------------------------------
 // M8 - Lecturer Syllabus Review
 // Restricted to lecturers and administrators.

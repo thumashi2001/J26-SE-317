@@ -57,11 +57,11 @@ async function requestC2(path, options = {}) {
         ? data.detail
         : 'C2 request failed';
 
-    const status = [400, 404, 409].includes(
-      response.status
-    )
-      ? response.status
-      : 502;
+    const status = [400, 403, 404, 409].includes(
+  response.status
+)
+  ? response.status
+  : 502;
 
     throw new C2ServiceError(message, status);
   }
@@ -171,5 +171,22 @@ export function generateMockExam(payload) {
   return requestC2('/mock-exams/generate', {
     method: 'POST',
     body: payload,
+  });
+}
+
+// --------------------------------------------------
+// M12.4.2 - Staff-Only Synthetic Development Preview
+// --------------------------------------------------
+
+export function generateSyntheticPracticePreview({
+  moduleKey,
+  seed = 42,
+}) {
+  return requestC2('/internal/synthetic-practice-preview', {
+    method: 'POST',
+    body: {
+      module_key: moduleKey,
+      seed,
+    },
   });
 }
