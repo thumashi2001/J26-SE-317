@@ -137,3 +137,26 @@ export const generateC2SyntheticPracticePreview = ({
       seed,
     },
   });
+
+  
+// --------------------------------------------------
+// M15.1 - C1 Digital Twin Personalized Mock Exams
+// --------------------------------------------------
+
+export const generateC2MockFromTwin = ({
+  moduleKey,
+  targetMarks = 100,
+  maxQuestions = 20,
+  seed = 42,
+}) =>
+  api(`${base}/mock-exams/generate-from-twin`, {
+    method: 'POST',
+    body: {
+      moduleKey,
+      targetMarks,
+      maxQuestions,
+      seed,
+    },
+  });
+
+  
