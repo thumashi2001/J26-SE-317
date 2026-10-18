@@ -1,0 +1,33 @@
+
+{
+  "schema_version": "1.0",
+  "fixture_id": "m11_3_3a_database_systems_integration",
+  "module_key": "database_systems",
+  "module_name": "Database Systems",
+  "total_marks": 100,
+  "structure_verification_status": "development_fixture_unverified",
+  "academic_review_status": "pending",
+  "notes": "Experimental eight-subquestion structure for validating content bank integration. Not a historical examination blueprint.",
+  "questions": [
+    {
+      "number": 1,
+      "total_marks": 25,
+      "subquestion_marks": [10, 15]
+    },
+    {
+      "number": 2,
+      "total_marks": 25,
+      "subquestion_marks": [10, 15]
+    },
+    {
+      "number": 3,
+      "total_marks": 25,
+      "subquestion_marks": [10, 15]
+    },
+    {
+      "number": 4,
+      "total_marks": 25,
+      "subquestion_marks": [10, 15]
+    }
+  ]
+}
