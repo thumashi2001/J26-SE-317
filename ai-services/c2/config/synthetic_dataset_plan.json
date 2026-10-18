@@ -1,0 +1,76 @@
+
+{
+  "schema_version": "1.0",
+  "plan_id": "c2_multi_module_synthetic_dataset_v1",
+  "dataset_type": "synthetic_exam_paper_drafts",
+  "target_total_papers": 160,
+  "papers_per_module": 20,
+  "generation_mode": "development_fixture",
+  "academic_review_required": true,
+  "production_generation_enabled": false,
+  "diversity_policy": {
+    "allow_repeated_question_ids": false,
+    "allow_repeated_question_text": false,
+    "allow_repeated_scenario_ids": false,
+    "minimum_distinct_scenarios_per_module": 20,
+    "minimum_distinct_question_variants_per_module": 20
+  },
+  "modules": [
+    {
+      "module_key": "case_studies_software_engineering",
+      "module_name": "Case Studies in Software Engineering",
+      "semester": "Y3S1",
+      "target_papers": 20,
+      "configuration_status": "requires_academic_verification"
+    },
+    {
+      "module_key": "database_systems",
+      "module_name": "Database Systems",
+      "semester": "Y3S1",
+      "target_papers": 20,
+      "configuration_status": "requires_academic_verification"
+    },
+    {
+      "module_key": "software_project_management",
+      "module_name": "Software Project Management",
+      "semester": "Y3S1",
+      "target_papers": 20,
+      "configuration_status": "requires_academic_verification"
+    },
+    {
+      "module_key": "user_experience_engineering",
+      "module_name": "User Experience Engineering",
+      "semester": "Y3S1",
+      "target_papers": 20,
+      "configuration_status": "requires_academic_verification"
+    },
+    {
+      "module_key": "application_frameworks",
+      "module_name": "Application Frameworks",
+      "semester": "Y3S2",
+      "target_papers": 20,
+      "configuration_status": "requires_academic_verification"
+    },
+    {
+      "module_key": "distributed_systems",
+      "module_name": "Distributed Systems",
+      "semester": "Y3S2",
+      "target_papers": 20,
+      "configuration_status": "requires_academic_verification"
+    },
+    {
+      "module_key": "software_architecture",
+      "module_name": "Software Architecture",
+      "semester": "Y3S2",
+      "target_papers": 20,
+      "configuration_status": "requires_academic_verification"
+    },
+    {
+      "module_key": "software_engineering_process_quality_management",
+      "module_name": "Software Engineering Process and Quality Management",
+      "semester": "Y3S2",
+      "target_papers": 20,
+      "configuration_status": "requires_academic_verification"
+    }
+  ]
+}
