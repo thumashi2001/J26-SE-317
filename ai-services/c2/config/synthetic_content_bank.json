@@ -1,0 +1,275 @@
+
+{
+  "schema_version": "1.0",
+  "bank_id": "c2_evidence_based_content_bank_v1",
+  "dataset_type": "synthetic_question_specifications",
+  "verification_status": "unverified",
+  "academic_review_status": "pending",
+  "generation_mode": "development_fixture",
+  "modules": [
+    {
+      "module_key": "database_systems",
+      "topics": [
+        {
+          "name": "SQL Queries",
+          "question_type": "apply",
+          "response_format": "sql_code",
+          "source_year": 2023,
+          "scenarios": [
+            "A cinema database records films, screenings, ticket purchases, and customers.",
+            "A library database tracks books, members, loans, and overdue returns."
+          ],
+          "tasks": [
+            "Design a SQL query that joins the relevant entities, applies a meaningful filter, and summarizes the result.",
+            "Explain the assumptions behind a SQL query that produces an operational report for this system."
+          ]
+        },
+        {
+          "name": "Database Indexing",
+          "question_type": "analyze",
+          "response_format": "technical_analysis",
+          "source_year": 2023,
+          "scenarios": [
+            "A logistics database has slow queries against a large shipment history.",
+            "A ticketing service experiences increased database reads during major events."
+          ],
+          "tasks": [
+            "Recommend an indexing strategy and justify its impact on query performance and update cost.",
+            "Compare two possible indexing approaches for the workload and explain the trade-offs."
+          ]
+        }
+      ]
+    },
+    {
+      "module_key": "case_studies_software_engineering",
+      "topics": [
+        {
+          "name": "Case Study Requirements",
+          "question_type": "analyze",
+          "response_format": "case_study",
+          "source_year": 2024,
+          "scenarios": [
+            "A municipal council plans a permit approval platform involving applicants, officers, and supervisors.",
+            "A veterinary clinic needs an appointment and treatment history system for multiple branches."
+          ],
+          "tasks": [
+            "Identify the actors and key functional requirements, then justify the main use cases.",
+            "Analyze conflicting stakeholder requirements and recommend a practical resolution."
+          ]
+        },
+        {
+          "name": "UML and Design Decisions",
+          "question_type": "design",
+          "response_format": "uml_diagram",
+          "source_year": 2024,
+          "scenarios": [
+            "A vehicle rental platform manages reservations, availability, payments, and returns.",
+            "A volunteer coordination system assigns people to events based on skills and availability."
+          ],
+          "tasks": [
+            "Develop a UML class diagram with associations and explain your modeling decisions.",
+            "Design a sequence diagram for a critical workflow, including alternate outcomes."
+          ]
+        }
+      ]
+    },
+    {
+      "module_key": "software_project_management",
+      "topics": [
+        {
+          "name": "Project Selection",
+          "question_type": "evaluate",
+          "response_format": "weighted_scoring",
+          "source_year": 2024,
+          "scenarios": [
+            "A university must select between three campus technology projects under a limited budget.",
+            "A software company is prioritizing customer support, analytics, and billing modernization projects."
+          ],
+          "tasks": [
+            "Construct a weighted scoring model with justified criteria and recommend the strongest project.",
+            "Explain how changing stakeholder priorities could alter the project selection decision."
+          ]
+        },
+        {
+          "name": "Project Risk and Control",
+          "question_type": "analyze",
+          "response_format": "management_report",
+          "source_year": 2024,
+          "scenarios": [
+            "A cloud migration project loses two experienced developers shortly before integration testing.",
+            "A public sector application faces repeated requirement changes and supplier delays."
+          ],
+          "tasks": [
+            "Create a risk response plan with priorities, owners, and monitoring actions.",
+            "Analyze the schedule and scope consequences and recommend corrective actions."
+          ]
+        }
+      ]
+    },
+    {
+      "module_key": "user_experience_engineering",
+      "topics": [
+        {
+          "name": "User Research and Design Thinking",
+          "question_type": "analyze",
+          "response_format": "ux_analysis",
+          "source_year": 2024,
+          "scenarios": [
+            "A public transport app is difficult for older adults and first-time smartphone users.",
+            "An online learning portal receives accessibility complaints from students using assistive technology."
+          ],
+          "tasks": [
+            "Propose a user research approach and explain how findings would inform design decisions.",
+            "Apply design thinking stages to identify and validate an improved user experience."
+          ]
+        },
+        {
+          "name": "Hierarchical Task Analysis",
+          "question_type": "design",
+          "response_format": "hta_diagram",
+          "source_year": 2024,
+          "scenarios": [
+            "A patient needs to book, reschedule, or cancel a medical appointment online.",
+            "A commuter must purchase and validate a digital train ticket."
+          ],
+          "tasks": [
+            "Construct a hierarchical task analysis for the primary user goal and explain the plan.",
+            "Identify potential task breakdowns and recommend interaction improvements."
+          ]
+        }
+      ]
+    },
+    {
+      "module_key": "application_frameworks",
+      "topics": [
+        {
+          "name": "REST API and Middleware",
+          "question_type": "apply",
+          "response_format": "api_design",
+          "source_year": 2023,
+          "scenarios": [
+            "A meal ordering platform exposes endpoints for menus, orders, and delivery updates.",
+            "A student attendance application provides authenticated APIs for lecturers and students."
+          ],
+          "tasks": [
+            "Design REST endpoints with appropriate HTTP methods, status codes, and validation.",
+            "Explain how middleware should handle authentication, errors, and request logging."
+          ]
+        },
+        {
+          "name": "Framework Debugging",
+          "question_type": "analyze",
+          "response_format": "code_review",
+          "source_year": 2023,
+          "scenarios": [
+            "A Node.js service sometimes sends duplicate responses after validation failures.",
+            "A web application exposes administrative endpoints without sufficient authorization checks."
+          ],
+          "tasks": [
+            "Describe a plausible implementation defect and propose a corrected Express request-handling flow.",
+            "Identify security and error-handling risks and explain suitable framework-level controls."
+          ]
+        }
+      ]
+    },
+    {
+      "module_key": "distributed_systems",
+      "topics": [
+        {
+          "name": "Distributed Communication",
+          "question_type": "evaluate",
+          "response_format": "technology_comparison",
+          "source_year": 2023,
+          "scenarios": [
+            "A remote irrigation controller sends sensor alerts only when moisture reaches a critical threshold.",
+            "A warehouse monitoring service polls distributed devices for temperature readings."
+          ],
+          "tasks": [
+            "Select an appropriate communication approach and justify the choice using system requirements.",
+            "Compare synchronous requests, polling, and asynchronous callbacks for this application."
+          ]
+        },
+        {
+          "name": "Dependability and Fault Tolerance",
+          "question_type": "apply",
+          "response_format": "calculation_and_explanation",
+          "source_year": 2023,
+          "scenarios": [
+            "A distributed payment gateway must maintain service despite occasional node failures.",
+            "A hospital alert platform uses redundant servers to reduce service interruptions."
+          ],
+          "tasks": [
+            "Given MTBF and MTTR values, calculate availability and interpret the result.",
+            "Recommend redundancy and recovery mechanisms and explain their dependability benefits."
+          ]
+        }
+      ]
+    },
+    {
+      "module_key": "software_architecture",
+      "topics": [
+        {
+          "name": "Architectural Styles and Trade-offs",
+          "question_type": "evaluate",
+          "response_format": "architecture_justification",
+          "source_year": 2025,
+          "scenarios": [
+            "A regional emergency response platform must integrate legacy dispatch systems and mobile clients.",
+            "A growing marketplace must evolve from a single deployable application to support independent teams."
+          ],
+          "tasks": [
+            "Compare suitable architectural styles against quality attributes and justify a recommendation.",
+            "Analyze scalability, maintainability, and deployment trade-offs for two architectural alternatives."
+          ]
+        },
+        {
+          "name": "Architecture Modeling",
+          "question_type": "design",
+          "response_format": "architecture_diagram",
+          "source_year": 2025,
+          "scenarios": [
+            "A digital insurance service integrates claims, policy management, and third-party identity verification.",
+            "A national library network needs interoperable catalog and borrowing services."
+          ],
+          "tasks": [
+            "Produce a high-level component diagram showing responsibilities and communication paths.",
+            "Explain how the proposed architecture supports future evolution and operational quality."
+          ]
+        }
+      ]
+    },
+    {
+      "module_key": "software_engineering_process_quality_management",
+      "topics": [
+        {
+          "name": "Specification-Based Testing",
+          "question_type": "apply",
+          "response_format": "test_case_table",
+          "source_year": 2024,
+          "scenarios": [
+            "A parking fee calculator applies different tariffs by duration and vehicle category.",
+            "A scholarship portal determines eligibility using grades, income bands, and enrollment status."
+          ],
+          "tasks": [
+            "Apply equivalence partitioning and boundary value analysis to derive test cases.",
+            "Create a decision table that covers valid and invalid combinations of business rules."
+          ]
+        },
+        {
+          "name": "Code-Based Testing",
+          "question_type": "analyze",
+          "response_format": "control_flow_analysis",
+          "source_year": 2024,
+          "scenarios": [
+            "A delivery fee calculation program contains nested conditional branches.",
+            "An account access program uses several validation and exception-handling paths."
+          ],
+          "tasks": [
+            "Describe the control-flow graph and determine suitable path coverage requirements.",
+            "Explain how branch coverage and cyclomatic complexity guide test design."
+          ]
+        }
+      ]
+    }
+  ]
+}
