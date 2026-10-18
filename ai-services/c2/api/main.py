@@ -14,6 +14,7 @@ from services.syllabus_topic_review_repository import (
     SyllabusTopicReviewRepository,
 )
 from services.student_question_bank import StudentQuestionBank
+from services.exam_pattern_analyzer import ExamPatternAnalyzer
 
 app = FastAPI(
     title="C2 Exam Intelligence API",
@@ -41,6 +42,7 @@ MODULE_KEYS = [
 repository = SyllabusTopicReviewRepository()
 queue = SyllabusTopicReviewQueue(repository=repository)
 question_bank = StudentQuestionBank()
+pattern_analyzer = ExamPatternAnalyzer()
 
 
 class ReviewDecisionRequest(BaseModel):
@@ -139,6 +141,33 @@ def list_student_questions(
 # --------------------------------------------------
 # Get Syllabus Review Queue
 # --------------------------------------------------
+
+# --------------------------------------------------
+# M11.1 - Historical Exam Pattern Analysis
+# --------------------------------------------------
+
+@app.get("/exam-patterns")
+def get_exam_patterns(
+    module_key: str = Query(...),
+    x_c2_internal_token: str | None = Header(default=None),
+):
+    require_internal_token(x_c2_internal_token)
+    validate_module(module_key)
+
+    try:
+        return pattern_analyzer.analyze(module_key)
+
+    except FileNotFoundError:
+        raise HTTPException(
+            status_code=404,
+            detail="Historical examination dataset not found",
+        )
+
+    except (ValueError, TypeError, KeyError):
+        raise HTTPException(
+            status_code=409,
+            detail="Historical examination dataset is invalid",
+        )
 
 @app.get("/reviews/{module_key}")
 def get_reviews(

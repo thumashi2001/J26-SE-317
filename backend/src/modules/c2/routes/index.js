@@ -28,6 +28,16 @@ router.get(
 );
 
 // --------------------------------------------------
+// M11.1 - Historical Exam Pattern Analysis
+// Available to authenticated users.
+// --------------------------------------------------
+
+router.get(
+  '/exam-patterns',
+  controller.listExamPatterns
+);
+
+// --------------------------------------------------
 // M8 - Lecturer Syllabus Review
 // Restricted to lecturers and administrators.
 // --------------------------------------------------

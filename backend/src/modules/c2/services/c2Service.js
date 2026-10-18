@@ -136,4 +136,16 @@ export function getStudentQuestions(
   return requestC2(`/questions?${params.toString()}`);
 }
 
+// --------------------------------------------------
+// M11.1 - Historical Exam Pattern Analysis
+// --------------------------------------------------
+
+export function getExamPatterns(moduleKey) {
+  const params = new URLSearchParams({
+    module_key: moduleKey,
+  });
+
+  return requestC2(`/exam-patterns?${params.toString()}`);
+}
+
 

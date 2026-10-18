@@ -198,3 +198,30 @@ export async function listStudentQuestions(req, res) {
     return handleError(res, error);
   }
 }
+
+// --------------------------------------------------
+// M11.1 - Historical Exam Pattern Analysis
+// --------------------------------------------------
+
+export async function listExamPatterns(req, res) {
+  try {
+    const { moduleKey } = req.query;
+
+    if (
+      typeof moduleKey !== 'string' ||
+      !moduleKey.trim()
+    ) {
+      return res.status(400).json({
+        error: 'A valid moduleKey is required',
+      });
+    }
+
+    const result = await c2Service.getExamPatterns(
+      moduleKey.trim()
+    );
+
+    return res.json(result);
+  } catch (error) {
+    return handleError(res, error);
+  }
+}
