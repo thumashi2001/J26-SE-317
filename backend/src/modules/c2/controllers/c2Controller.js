@@ -225,3 +225,30 @@ export async function listExamPatterns(req, res) {
     return handleError(res, error);
   }
 }
+
+// --------------------------------------------------
+// M12.1 - Evidence-Aware Topic Predictions
+// --------------------------------------------------
+
+export async function listTopicPredictions(req, res) {
+  try {
+    const { moduleKey } = req.query;
+
+    if (
+      typeof moduleKey !== 'string' ||
+      !moduleKey.trim()
+    ) {
+      return res.status(400).json({
+        error: 'A valid moduleKey is required',
+      });
+    }
+
+    const result = await c2Service.getTopicPredictions(
+      moduleKey.trim()
+    );
+
+    return res.json(result);
+  } catch (error) {
+    return handleError(res, error);
+  }
+}

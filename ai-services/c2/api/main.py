@@ -15,6 +15,9 @@ from services.syllabus_topic_review_repository import (
 )
 from services.student_question_bank import StudentQuestionBank
 from services.exam_pattern_analyzer import ExamPatternAnalyzer
+from services.evidence_aware_topic_predictor import (
+    EvidenceAwareTopicPredictor,
+)
 
 app = FastAPI(
     title="C2 Exam Intelligence API",
@@ -43,7 +46,9 @@ repository = SyllabusTopicReviewRepository()
 queue = SyllabusTopicReviewQueue(repository=repository)
 question_bank = StudentQuestionBank()
 pattern_analyzer = ExamPatternAnalyzer()
-
+topic_predictor = EvidenceAwareTopicPredictor(
+    analyzer=pattern_analyzer
+)
 
 class ReviewDecisionRequest(BaseModel):
     module_key: str
@@ -399,3 +404,31 @@ def save_decision(
         "success": True,
         "review": saved,
     }
+
+
+# --------------------------------------------------
+# M12.1 - Evidence-Aware Topic Predictions
+# --------------------------------------------------
+
+@app.get("/topic-predictions")
+def get_topic_predictions(
+    module_key: str = Query(...),
+    x_c2_internal_token: str | None = Header(default=None),
+):
+    require_internal_token(x_c2_internal_token)
+    validate_module(module_key)
+
+    try:
+        return topic_predictor.predict(module_key)
+
+    except FileNotFoundError:
+        raise HTTPException(
+            status_code=404,
+            detail="Historical examination dataset not found",
+        )
+
+    except (ValueError, TypeError, KeyError):
+        raise HTTPException(
+            status_code=409,
+            detail="Historical examination dataset is invalid",
+        )

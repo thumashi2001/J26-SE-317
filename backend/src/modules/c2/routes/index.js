@@ -9,7 +9,7 @@ const router = Router();
 router.use(requireAuth);
 
 // --------------------------------------------------
-// C2 - Shared module information
+// C2 - Shared Module Information
 // --------------------------------------------------
 
 router.get(
@@ -19,7 +19,7 @@ router.get(
 
 // --------------------------------------------------
 // M9.1 - Student Question Bank
-// Available to authenticated students.
+// Available to authenticated users.
 // --------------------------------------------------
 
 router.get(
@@ -35,6 +35,16 @@ router.get(
 router.get(
   '/exam-patterns',
   controller.listExamPatterns
+);
+
+// --------------------------------------------------
+// M12.1 - Evidence-Aware Topic Predictions
+// Available to authenticated users.
+// --------------------------------------------------
+
+router.get(
+  '/topic-predictions',
+  controller.listTopicPredictions
 );
 
 // --------------------------------------------------

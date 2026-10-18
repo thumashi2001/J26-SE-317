@@ -149,3 +149,16 @@ export function getExamPatterns(moduleKey) {
 }
 
 
+// --------------------------------------------------
+// M12.1 - Evidence-Aware Topic Predictions
+// --------------------------------------------------
+
+export function getTopicPredictions(moduleKey) {
+  const params = new URLSearchParams({
+    module_key: moduleKey,
+  });
+
+  return requestC2(
+    `/topic-predictions?${params.toString()}`
+  );
+}
