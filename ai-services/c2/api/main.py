@@ -19,6 +19,9 @@ from services.evidence_aware_topic_predictor import (
     EvidenceAwareTopicPredictor,
 )
 from services.personalized_mock_exam import PersonalizedMockExam
+from services.synthetic_practice_preview import (
+    SyntheticPracticePreview,
+)
 
 app = FastAPI(
     title="C2 Exam Intelligence API",
@@ -53,7 +56,7 @@ topic_predictor = EvidenceAwareTopicPredictor(
 
 # M12.2.1 - Personalized mock examination generator
 mock_exam_generator = PersonalizedMockExam()
-
+synthetic_preview = SyntheticPracticePreview()
 class ReviewDecisionRequest(BaseModel):
     module_key: str
     candidate_id: str
@@ -480,3 +483,46 @@ def generate_mock_exam(
             status_code=409,
             detail="Mock examination generation failed due to invalid data",
         )
+
+    
+# --------------------------------------------------
+# M12.4.1 - Internal Synthetic Practice Preview
+# --------------------------------------------------
+
+class SyntheticPreviewRequest(BaseModel):
+    module_key: str
+    seed: int = 42
+
+
+@app.post("/internal/synthetic-practice-preview")
+def generate_synthetic_practice_preview(
+    request: SyntheticPreviewRequest,
+    x_c2_internal_token: str | None = Header(default=None),
+):
+    require_internal_token(x_c2_internal_token)
+    validate_module(request.module_key)
+
+    # Explicitly require development-preview enablement.
+    # Never enable this flag in production.
+    if os.environ.get(
+        "C2_ENABLE_SYNTHETIC_PREVIEW",
+        "",
+    ).lower() != "true":
+        raise HTTPException(
+            status_code=403,
+            detail="Synthetic development preview is disabled",
+        )
+
+    try:
+        return synthetic_preview.generate(
+            module_key=request.module_key,
+            seed=request.seed,
+            mode="development_fixture",
+        )
+
+    except (ValueError, TypeError, KeyError):
+        raise HTTPException(
+            status_code=409,
+            detail="Synthetic preview generation failed",
+        )
+
