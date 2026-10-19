@@ -160,6 +160,25 @@ export const generateC2MockFromTwin = ({
   });
 
 // --------------------------------------------------
+// M19.2 - Synthetic Practice (Experimental) Mock Exams
+// --------------------------------------------------
+
+export const generateC2SyntheticMockExam = ({
+  moduleKey,
+  questionCount = 5,
+  seed = 42,
+}) =>
+  api(`${base}/mock-exams/synthetic`, {
+    method: 'POST',
+    body: {
+      moduleKey,
+      questionCount,
+      seed,
+    },
+  });
+
+
+// --------------------------------------------------
 // M15.3 - Lecturer Question Classification Review
 // --------------------------------------------------
 
@@ -217,4 +236,41 @@ export const classifyC2TopicExperimental = ({
       questionText,
       abstentionThreshold,
     },
-  });
+  });
+
+// --------------------------------------------------
+// M19 - Student Practice Mock Attempts
+// --------------------------------------------------
+
+export const submitC2MockAttempt = ({
+  mockId,
+  moduleKey,
+  questions,
+  answers,
+  timeSpentSeconds = 0,
+  sourceType,
+}) =>
+  api(`${base}/mock-exams/attempts`, {
+    method: 'POST',
+    body: {
+      mockId,
+      moduleKey,
+      questions,
+      answers,
+      timeSpentSeconds,
+      ...(sourceType ? { sourceType } : {}),
+    },
+  });
+
+export const getC2MockAttempts = ({ moduleKey } = {}) => {
+  const params = new URLSearchParams();
+  if (moduleKey) {
+    params.set('moduleKey', moduleKey);
+  }
+  const query = params.toString();
+  return api(`${base}/mock-exams/attempts${query ? `?${query}` : ''}`);
+};
+
+export const getC2MockAttempt = (attemptId) =>
+  api(`${base}/mock-exams/attempts/${encodeURIComponent(attemptId)}`);
+

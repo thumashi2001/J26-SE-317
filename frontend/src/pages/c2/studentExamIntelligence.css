@@ -810,3 +810,422 @@
   }
 }
 
+/* -------------------------------------------------- */
+/* M19 Practice Attempt Styles                        */
+/* -------------------------------------------------- */
+
+.c2-active-attempt {
+  margin-top: 24px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+}
+
+.c2-attempt-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+.c2-attempt-topbar h2 {
+  margin: 6px 0 4px;
+  font-size: 1.4rem;
+}
+
+.c2-attempt-stats-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.c2-attempt-timer-pill,
+.c2-attempt-progress-pill {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface-hover, rgba(0, 0, 0, 0.03));
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 8px 14px;
+  min-width: 120px;
+}
+
+.c2-timer-label,
+.c2-progress-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.c2-timer-val,
+.c2-progress-val {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--primary);
+}
+
+.c2-attempt-notice {
+  margin-top: 16px;
+  padding: 12px 16px;
+  background: rgba(234, 179, 8, 0.1);
+  border-left: 4px solid var(--warn, #eab308);
+  border-radius: 8px;
+  font-size: 0.86rem;
+  line-height: 1.5;
+  color: var(--text);
+}
+
+.c2-attempt-questions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin: 24px 0;
+}
+
+.c2-attempt-question-card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 20px;
+}
+
+.c2-attempt-q-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.c2-attempt-q-number {
+  font-weight: 800;
+  font-size: 1.1rem;
+  color: var(--text);
+}
+
+.c2-attempt-q-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.c2-attempt-topic-badge {
+  background: rgba(99, 102, 241, 0.1);
+  color: var(--primary);
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.c2-attempt-marks-badge {
+  background: var(--surface-hover, rgba(0, 0, 0, 0.05));
+  border: 1px solid var(--line);
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.c2-attempt-prompt {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--text);
+  margin: 0 0 16px;
+  white-space: pre-wrap;
+}
+
+.c2-attempt-answer-box {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.c2-answer-label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.c2-answer-label-row label {
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: var(--text);
+}
+
+.c2-answer-length-count {
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.c2-attempt-answer-box textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 0.92rem;
+  font-family: inherit;
+  line-height: 1.55;
+  resize: vertical;
+}
+
+.c2-attempt-answer-box textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15);
+}
+
+.c2-attempt-footer-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+
+/* -------------------------------------------------- */
+/* Attempt History Styles                             */
+/* -------------------------------------------------- */
+
+.c2-attempt-history-section {
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 2px dashed var(--line);
+}
+
+.c2-attempt-history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.c2-attempt-history-header h3 {
+  margin: 0 0 4px;
+  font-size: 1.25rem;
+}
+
+.c2-attempt-cards-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.c2-attempt-history-card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 18px 20px;
+  transition: border-color 0.15s ease;
+}
+
+.c2-attempt-history-card:hover {
+  border-color: var(--primary);
+}
+
+.c2-attempt-card-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.c2-attempt-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.c2-attempt-id-chip {
+  font-family: monospace;
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 4px 8px;
+  background: var(--surface-hover, rgba(0, 0, 0, 0.04));
+  border: 1px solid var(--line);
+  border-radius: 6px;
+}
+
+.c2-attempt-timestamp,
+.c2-attempt-duration {
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.c2-attempt-card-stats {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.c2-attempt-stat-item {
+  font-size: 0.88rem;
+  color: var(--text-2);
+}
+
+.c2-attempt-expanded-details {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+
+.c2-attempt-integrity-box {
+  background: rgba(99, 102, 241, 0.06);
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--text);
+  margin-bottom: 16px;
+}
+
+.c2-attempt-questions-review {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.c2-attempt-q-review-item {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 16px;
+}
+
+.c2-review-q-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.c2-review-q-text {
+  font-size: 0.9rem;
+  line-height: 1.55;
+  margin: 0 0 12px;
+  color: var(--text);
+}
+
+.c2-review-answer-box {
+  background: var(--surface-hover, rgba(0, 0, 0, 0.02));
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+}
+
+.c2-review-answer-label {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.c2-review-student-answer {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--text);
+  white-space: pre-wrap;
+}
+
+.c2-review-marks-result {
+  padding-top: 6px;
+}
+
+.c2-mock-summary-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.c2-attempt-start-btn {
+  background: var(--primary, #6366f1);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 18px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 2px 6px rgba(99, 102, 241, 0.3);
+}
+
+.c2-attempt-start-btn:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+.c2-attempt-success-banner {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-bottom: 24px;
+}
+
+.c2-attempt-success-banner strong {
+  display: block;
+  font-size: 1rem;
+  color: #059669;
+  margin-bottom: 4px;
+}
+
+.c2-attempt-success-banner p {
+  margin: 2px 0;
+  font-size: 0.88rem;
+  color: var(--text);
+}
+
+.c2-attempt-subnote {
+  font-size: 0.82rem !important;
+  color: var(--text-2) !important;
+  margin-top: 4px !important;
+}
+
+.c2-attempt-dismiss-btn {
+  background: transparent;
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  color: #059669;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.c2-attempt-dismiss-btn:hover {
+  background: rgba(16, 185, 129, 0.1);
+}
+
+
+

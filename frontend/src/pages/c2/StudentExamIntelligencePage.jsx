@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 
 import {
   getC2Modules,
@@ -7,9 +7,16 @@ import {
   getC2TopicPredictions,
   generateC2MockExam,
   generateC2MockFromTwin,
+  generateC2SyntheticMockExam,
+  submitC2MockAttempt,
+  getC2MockAttempts,
 } from '../../services/c2Api.js';
 
+import ActiveAttemptView from './components/ActiveAttemptView.jsx';
+import AttemptHistoryView from './components/AttemptHistoryView.jsx';
+
 import './studentExamIntelligence.css';
+
 
 const PAGE_SIZE = 10;
 
@@ -97,6 +104,12 @@ function QuestionCard({
   number,
   practice = false,
 }) {
+  const isSynthetic = question.source_type === 'synthetic';
+  const marksDisplay =
+    question.marks !== null && question.marks !== undefined
+      ? `${question.marks} marks`
+      : 'Unassessed';
+
   return (
     <article className="c2-student-question">
       <div className="c2-student-question-heading">
@@ -107,9 +120,11 @@ function QuestionCard({
 
           <div>
             <span className="c2-student-question-caption">
-              {practice
-                ? 'PRACTICE MOCK QUESTION'
-                : 'EXAMINATION QUESTION'}
+              {isSynthetic
+                ? 'SYNTHETIC PRACTICE QUESTION (EXPERIMENTAL)'
+                : practice
+                  ? 'PRACTICE MOCK QUESTION'
+                  : 'EXAMINATION QUESTION'}
             </span>
 
             <h3>Question {number}</h3>
@@ -117,7 +132,7 @@ function QuestionCard({
         </div>
 
         <span className="c2-student-pill">
-          {question.marks ?? '-'} marks
+          {marksDisplay}
         </span>
       </div>
 
@@ -130,7 +145,7 @@ function QuestionCard({
         <div>
           <span>Topic</span>
           <strong>
-            {display(question.topic_id)}
+            {display(question.topic_id || question.topic)}
           </strong>
         </div>
 
@@ -148,6 +163,15 @@ function QuestionCard({
           </strong>
         </div>
 
+        <div>
+          <span>Verification</span>
+          <strong>
+            {display(
+              question.verification_status || 'unverified'
+            )}
+          </strong>
+        </div>
+
         {!practice && (
           <>
             <div>
@@ -162,15 +186,6 @@ function QuestionCard({
               <strong>
                 {display(
                   question.classification_method
-                )}
-              </strong>
-            </div>
-
-            <div>
-              <span>Verification</span>
-              <strong>
-                {display(
-                  question.verification_status
                 )}
               </strong>
             </div>
@@ -404,32 +419,96 @@ function MockExamPanel({ moduleKey, moduleName }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  const [activeAttempt, setActiveAttempt] = useState(null);
+  const [attempts, setAttempts] = useState([]);
+  const [loadingAttempts, setLoadingAttempts] = useState(false);
+  const [attemptSubmissionNotice, setAttemptSubmissionNotice] = useState(null);
+  const [submittingAttempt, setSubmittingAttempt] = useState(false);
+  const [attemptError, setAttemptError] = useState('');
+
+  const loadAttempts = useCallback(async () => {
+    if (!moduleKey) {
+      setAttempts([]);
+      return;
+    }
+    setLoadingAttempts(true);
+    try {
+      const data = await getC2MockAttempts({ moduleKey });
+      const list = Array.isArray(data) ? data : data?.attempts || [];
+      setAttempts(list);
+    } catch (err) {
+      console.warn('Unable to load attempt history:', err);
+    } finally {
+      setLoadingAttempts(false);
+    }
+  }, [moduleKey]);
+
+  useEffect(() => {
+    loadAttempts();
+  }, [loadAttempts]);
+
   useEffect(() => {
     setMock(null);
     setResultMode(null);
     setError('');
+    setActiveAttempt(null);
+    setAttemptSubmissionNotice(null);
+    setAttemptError('');
+    setSubmittingAttempt(false);
   }, [moduleKey]);
+
+  async function handleSubmitAttempt(payload) {
+    setSubmittingAttempt(true);
+    setAttemptError('');
+    try {
+      const attempt = await submitC2MockAttempt(payload);
+      setActiveAttempt(null);
+      setAttemptSubmissionNotice({
+        attemptId: attempt.attemptId || attempt.attempt_id,
+        submittedAt: attempt.submittedAt || attempt.submitted_at,
+        questionCount: attempt.questionCount || attempt.question_count,
+        status: attempt.status,
+      });
+      loadAttempts();
+      return attempt;
+    } catch (err) {
+      const message =
+        err?.message || 'Failed to submit practice attempt. Please try again.';
+      setAttemptError(message);
+      throw err;
+    } finally {
+      setSubmittingAttempt(false);
+    }
+  }
 
   async function handleGenerate(event) {
     event.preventDefault();
 
     if (!moduleKey || loading) return;
 
-    const marks = Number(targetMarks);
     const maximum = Number(maxQuestions);
+    const requestedMode = generationMode;
 
-    if (
-      !Number.isInteger(marks) ||
-      marks < 1 ||
-      marks > 200 ||
-      !Number.isInteger(maximum) ||
-      maximum < 1 ||
-      maximum > 30
-    ) {
-      setError(
-        'Enter valid target marks and maximum questions.'
-      );
-      return;
+    if (requestedMode === 'synthetic') {
+      if (!Number.isInteger(maximum) || maximum < 1 || maximum > 20) {
+        setError('Enter a valid question count between 1 and 20.');
+        return;
+      }
+    } else {
+      const marks = Number(targetMarks);
+      if (
+        !Number.isInteger(marks) ||
+        marks < 1 ||
+        marks > 200 ||
+        !Number.isInteger(maximum) ||
+        maximum < 1 ||
+        maximum > 30
+      ) {
+        setError(
+          'Enter valid target marks and maximum questions.'
+        );
+        return;
+      }
     }
 
     const preferredTopics = topicsInput
@@ -439,27 +518,34 @@ function MockExamPanel({ moduleKey, moduleName }) {
 
     const options = {
       moduleKey,
-      targetMarks: marks,
+      targetMarks: Number(targetMarks),
       maxQuestions: maximum,
       seed: 42,
     };
-
-    const requestedMode = generationMode;
 
     setLoading(true);
     setError('');
     setMock(null);
     setResultMode(null);
+    setActiveAttempt(null);
 
     try {
-      const response =
-        requestedMode === 'twin'
-          ? await generateC2MockFromTwin(options)
-          : await generateC2MockExam({
-              ...options,
-              preferredTopics,
-              difficulty: difficulty || null,
-            });
+      let response;
+      if (requestedMode === 'synthetic') {
+        response = await generateC2SyntheticMockExam({
+          moduleKey,
+          questionCount: maximum,
+          seed: 42,
+        });
+      } else if (requestedMode === 'twin') {
+        response = await generateC2MockFromTwin(options);
+      } else {
+        response = await generateC2MockExam({
+          ...options,
+          preferredTopics,
+          difficulty: difficulty || null,
+        });
+      }
 
       setMock(response);
       setResultMode(requestedMode);
@@ -526,6 +612,39 @@ function MockExamPanel({ moduleKey, moduleName }) {
   const paperStatus =
     paper?.status ?? mock?.status;
 
+  const isSynthetic =
+    paper?.source_type === 'synthetic' ||
+    resultMode === 'synthetic';
+
+  if (activeAttempt) {
+    return (
+      <section className="c2-student-bank">
+        <ActiveAttemptView
+          paper={activeAttempt}
+          moduleKey={moduleKey}
+          moduleName={moduleName}
+          onSubmitAttempt={handleSubmitAttempt}
+          onSubmitSuccess={(attempt) => {
+            setActiveAttempt(null);
+            setAttemptSubmissionNotice({
+              attemptId: attempt.attemptId || attempt.attempt_id,
+              submittedAt: attempt.submittedAt || attempt.submitted_at,
+              questionCount: attempt.questionCount || attempt.question_count,
+              status: attempt.status,
+            });
+            loadAttempts();
+          }}
+          onCancel={() => {
+            setActiveAttempt(null);
+            setAttemptError('');
+          }}
+          submitting={submittingAttempt}
+          error={attemptError}
+        />
+      </section>
+    );
+  }
+
   return (
     <section className="c2-student-bank">
       <div className="c2-student-bank-header">
@@ -537,12 +656,32 @@ function MockExamPanel({ moduleKey, moduleName }) {
           <h2>Generate a Practice Mock Exam</h2>
 
           <p>
-            Build a practice paper from eligible
-            authentic examination questions for{' '}
-            {moduleName}.
+            Build a practice paper for {moduleName}.
+            Choose authentic questions or synthetic development practice.
           </p>
         </div>
       </div>
+
+      {attemptSubmissionNotice && (
+        <div className="c2-attempt-success-banner" role="status">
+          <div>
+            <strong>Practice Attempt Submitted Successfully!</strong>
+            <p>
+              Attempt ID: <code>{attemptSubmissionNotice.attemptId}</code> • {attemptSubmissionNotice.questionCount} questions recorded.
+            </p>
+            <p className="c2-attempt-subnote">
+              Status: <strong>Pending Marking</strong> (Component 3 automated marking is pending. Marks have not been fabricated).
+            </p>
+          </div>
+          <button
+            type="button"
+            className="c2-attempt-dismiss-btn"
+            onClick={() => setAttemptSubmissionNotice(null)}
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
 
       <form
         className="c2-mock-form"
@@ -558,115 +697,149 @@ function MockExamPanel({ moduleKey, moduleName }) {
             value={generationMode}
             disabled={loading}
             onChange={(event) => {
-              setGenerationMode(event.target.value);
+              const newMode = event.target.value;
+              setGenerationMode(newMode);
+              if (newMode === 'synthetic' && maxQuestions > 20) {
+                setMaxQuestions(5);
+              }
               setMock(null);
               setResultMode(null);
               setError('');
             }}
           >
             <option value="standard">
-              Standard authentic-question practice
+              Standard authentic-question practice (Past papers)
             </option>
 
             <option value="twin">
-              C1 Digital Twin personalized practice
+              C1 Digital Twin personalized practice (Authentic)
+            </option>
+
+            <option value="synthetic">
+              Synthetic Practice (Experimental — All 8 modules)
             </option>
           </select>
 
           <small>
-            Digital Twin mode uses your C1 diagnostic
-            mastery information when verified topic
-            mappings and eligible authentic questions
-            are available.
+            {generationMode === 'synthetic'
+              ? 'Synthetic Practice mode generates questions from the M16 synthetic question bank across all 8 modules. Questions are unverified practice fixtures and marks are unassessed.'
+              : generationMode === 'twin'
+                ? 'Digital Twin mode uses your C1 diagnostic mastery information when verified topic mappings and eligible authentic questions are available.'
+                : 'Standard practice builds papers from verified authentic past-paper questions.'}
           </small>
         </div>
 
-        <div className="c2-mock-field">
-          <label htmlFor="c2-target-marks">
-            Target marks
-          </label>
+        {generationMode === 'synthetic' ? (
+          <div className="c2-mock-field">
+            <label htmlFor="c2-max-questions">
+              Number of synthetic questions
+            </label>
 
-          <input
-            id="c2-target-marks"
-            type="number"
-            min="1"
-            max="200"
-            step="1"
-            value={targetMarks}
-            disabled={loading}
-            onChange={(event) =>
-              setTargetMarks(event.target.value)
-            }
-            required
-          />
-        </div>
-
-        <div className="c2-mock-field">
-          <label htmlFor="c2-max-questions">
-            Maximum questions
-          </label>
-
-          <input
-            id="c2-max-questions"
-            type="number"
-            min="1"
-            max="30"
-            step="1"
-            value={maxQuestions}
-            disabled={loading}
-            onChange={(event) =>
-              setMaxQuestions(event.target.value)
-            }
-            required
-          />
-        </div>
-
-        {generationMode === 'standard' && (
+            <input
+              id="c2-max-questions"
+              type="number"
+              min="1"
+              max="20"
+              step="1"
+              value={maxQuestions}
+              disabled={loading}
+              onChange={(event) =>
+                setMaxQuestions(event.target.value)
+              }
+              required
+            />
+            <small>Select between 1 and 20 synthetic questions.</small>
+          </div>
+        ) : (
           <>
             <div className="c2-mock-field">
-              <label htmlFor="c2-difficulty">
-                Preferred difficulty
-              </label>
-
-              <select
-                id="c2-difficulty"
-                value={difficulty}
-                disabled={loading}
-                onChange={(event) =>
-                  setDifficulty(event.target.value)
-                }
-              >
-                <option value="">
-                  Any difficulty
-                </option>
-                <option value="easy">Easy</option>
-                <option value="medium">Medium</option>
-                <option value="hard">Hard</option>
-              </select>
-            </div>
-
-            <div className="c2-mock-field c2-mock-wide">
-              <label htmlFor="c2-preferred-topics">
-                Preferred topic IDs (optional)
+              <label htmlFor="c2-target-marks">
+                Target marks
               </label>
 
               <input
-                id="c2-preferred-topics"
-                type="text"
-                value={topicsInput}
+                id="c2-target-marks"
+                type="number"
+                min="1"
+                max="200"
+                step="1"
+                value={targetMarks}
                 disabled={loading}
-                placeholder="Enter topic IDs separated by commas"
                 onChange={(event) =>
-                  setTopicsInput(event.target.value)
+                  setTargetMarks(event.target.value)
                 }
+                required
               />
-
-              <small>
-                Topic preferences are prioritized
-                only when supported by eligible,
-                verified topic labels.
-              </small>
             </div>
+
+            <div className="c2-mock-field">
+              <label htmlFor="c2-max-questions">
+                Maximum questions
+              </label>
+
+              <input
+                id="c2-max-questions"
+                type="number"
+                min="1"
+                max="30"
+                step="1"
+                value={maxQuestions}
+                disabled={loading}
+                onChange={(event) =>
+                  setMaxQuestions(event.target.value)
+                }
+                required
+              />
+            </div>
+
+            {generationMode === 'standard' && (
+              <>
+                <div className="c2-mock-field">
+                  <label htmlFor="c2-difficulty">
+                    Preferred difficulty
+                  </label>
+
+                  <select
+                    id="c2-difficulty"
+                    value={difficulty}
+                    disabled={loading}
+                    onChange={(event) =>
+                      setDifficulty(event.target.value)
+                    }
+                  >
+                    <option value="">
+                      Any difficulty
+                    </option>
+                    <option value="easy">Easy</option>
+                    <option value="medium">Medium</option>
+                    <option value="hard">Hard</option>
+                  </select>
+                </div>
+
+                <div className="c2-mock-field c2-mock-wide">
+                  <label htmlFor="c2-preferred-topics">
+                    Preferred topic IDs (optional)
+                  </label>
+
+                  <input
+                    id="c2-preferred-topics"
+                    type="text"
+                    value={topicsInput}
+                    disabled={loading}
+                    placeholder="Enter topic IDs separated by commas"
+                    onChange={(event) =>
+                      setTopicsInput(event.target.value)
+                    }
+                  />
+
+                  <small>
+                    Topic preferences are prioritized
+                    only when supported by eligible,
+                    verified topic labels.
+                  </small>
+                </div>
+              </>
+            )}
           </>
         )}
 
@@ -678,9 +851,11 @@ function MockExamPanel({ moduleKey, moduleName }) {
           >
             {loading
               ? 'Generating practice mock...'
-              : generationMode === 'twin'
-                ? 'Generate Digital Twin Practice'
-                : 'Generate Practice Mock'}
+              : generationMode === 'synthetic'
+                ? 'Generate Synthetic Practice Mock'
+                : generationMode === 'twin'
+                  ? 'Generate Digital Twin Practice'
+                  : 'Generate Practice Mock'}
           </button>
         </div>
       </form>
@@ -697,6 +872,19 @@ function MockExamPanel({ moduleKey, moduleName }) {
 
       {!loading && mock && (
         <div className="c2-mock-results">
+          {isSynthetic && (
+            <div className="c2-evidence-message" style={{ borderLeft: '4px solid #f59e0b', background: 'rgba(245, 158, 11, 0.06)' }}>
+              <h3 style={{ color: '#d97706' }}>🧪 Synthetic Practice Paper (Experimental)</h3>
+              <p>
+                This practice paper contains <strong>M16 synthetic development questions</strong>.
+                These are <strong>NOT authentic past-paper questions</strong> and have not been verified by SLIIT lecturers.
+              </p>
+              <p className="c2-student-muted">
+                Marks and difficulty levels are intentionally <strong>unassessed</strong> to prevent fabricating academic assessment criteria.
+              </p>
+            </div>
+          )}
+
           {resultMode === 'twin' && (
             <div className="c2-evidence-message">
               <h3>Digital Twin Personalization</h3>
@@ -726,7 +914,7 @@ function MockExamPanel({ moduleKey, moduleName }) {
           <div className="c2-mock-summary">
             <div>
               <span className="c2-student-panel-eyebrow">
-                GENERATED PRACTICE PAPER
+                {isSynthetic ? 'SYNTHETIC PRACTICE PAPER' : 'GENERATED PRACTICE PAPER'}
               </span>
 
               <h3>{moduleName}</h3>
@@ -736,15 +924,29 @@ function MockExamPanel({ moduleKey, moduleName }) {
               </p>
             </div>
 
-            <div className="c2-mock-marks">
-              <strong>
-                {totalMarks}/{requestedMarks}
-              </strong>
-              <span>marks</span>
+            <div className="c2-mock-summary-actions">
+              <div className="c2-mock-marks">
+                <strong>
+                  {isSynthetic
+                    ? 'Unassessed'
+                    : `${totalMarks}/${requestedMarks}`}
+                </strong>
+                <span>{isSynthetic ? 'marks status' : 'marks'}</span>
+              </div>
+
+              {questions.length > 0 && (
+                <button
+                  type="button"
+                  className="c2-attempt-start-btn"
+                  onClick={() => setActiveAttempt(paper)}
+                >
+                  ✍️ Start Practice Attempt
+                </button>
+              )}
             </div>
           </div>
 
-          {paperStatus === 'partial' && (
+          {!isSynthetic && paperStatus === 'partial' && (
             <p className="c2-student-warning">
               Partial practice paper: eligible
               questions could not fill the
@@ -797,6 +999,12 @@ function MockExamPanel({ moduleKey, moduleName }) {
           )}
         </div>
       )}
+
+      <AttemptHistoryView
+        attempts={attempts}
+        loading={loadingAttempts}
+        onRefresh={loadAttempts}
+      />
     </section>
   );
 }

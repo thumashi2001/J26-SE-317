@@ -33,6 +33,9 @@ from services.personalized_mock_exam import PersonalizedMockExam
 from services.synthetic_practice_preview import (
     SyntheticPracticePreview,
 )
+from services.synthetic_practice_service import (
+    SyntheticPracticeService,
+)
 from services.question_classification_review_service import (
     QuestionClassificationReviewService,
 )
@@ -75,6 +78,7 @@ topic_predictor = EvidenceAwareTopicPredictor(
 # M12.2.1 - Personalized mock examination generator
 mock_exam_generator = PersonalizedMockExam()
 synthetic_preview = SyntheticPracticePreview()
+synthetic_practice_service = SyntheticPracticeService()
 
 # M17 - Experimental Topic Prediction Service
 experimental_topic_predictor = M17TopicPredictionService()
@@ -514,7 +518,43 @@ def generate_mock_exam(
             detail="Mock examination generation failed due to invalid data",
         )
 
-    
+
+# --------------------------------------------------
+# M19.2 - Synthetic Practice (Experimental) Mock Exams
+# --------------------------------------------------
+
+class SyntheticPracticeRequest(BaseModel):
+    module_key: str
+    question_count: int = Field(default=5, ge=1, le=20)
+    seed: int = 42
+
+
+@app.post("/mock-exams/synthetic")
+def generate_synthetic_practice_mock(
+    request: SyntheticPracticeRequest,
+    x_c2_internal_token: str | None = Header(default=None),
+):
+    require_internal_token(x_c2_internal_token)
+    validate_module(request.module_key)
+
+    try:
+        return synthetic_practice_service.generate_practice_paper(
+            module_key=request.module_key,
+            question_count=request.question_count,
+            seed=request.seed,
+        )
+    except FileNotFoundError:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Synthetic dataset not found for module '{request.module_key}'",
+        )
+    except (ValueError, TypeError, KeyError) as exc:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Synthetic practice paper generation failed: {str(exc)}",
+        )
+
+
 # --------------------------------------------------
 # M12.4.1 - Internal Synthetic Practice Preview
 # --------------------------------------------------

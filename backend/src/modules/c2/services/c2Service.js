@@ -176,6 +176,25 @@ export function generateMockExam(payload) {
 }
 
 // --------------------------------------------------
+// M19.2 - Synthetic Practice (Experimental) Mock Exams
+// --------------------------------------------------
+
+export function generateSyntheticMockExam({
+  moduleKey,
+  questionCount = 5,
+  seed = 42,
+}) {
+  return requestC2('/mock-exams/synthetic', {
+    method: 'POST',
+    body: {
+      module_key: moduleKey,
+      question_count: questionCount,
+      seed,
+    },
+  });
+}
+
+// --------------------------------------------------
 // M12.4.2 - Staff-Only Synthetic Development Preview
 // --------------------------------------------------
 

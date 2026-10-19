@@ -67,6 +67,34 @@ router.post(
 );
 
 // --------------------------------------------------
+// M19.2 - Synthetic Practice (Experimental) Mock Exams
+// --------------------------------------------------
+
+router.post(
+  '/mock-exams/synthetic',
+  controller.generateSyntheticMockExam
+);
+
+// --------------------------------------------------
+// M19 - Student Practice Mock Attempts
+// --------------------------------------------------
+
+router.post(
+  '/mock-exams/attempts',
+  controller.submitMockAttempt
+);
+
+router.get(
+  '/mock-exams/attempts',
+  controller.listMockAttempts
+);
+
+router.get(
+  '/mock-exams/attempts/:attemptId',
+  controller.getMockAttempt
+);
+
+// --------------------------------------------------
 // M12.4.2 - Staff-Only Synthetic Development Preview
 // --------------------------------------------------
 

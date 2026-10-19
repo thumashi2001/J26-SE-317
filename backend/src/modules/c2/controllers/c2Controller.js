@@ -6,6 +6,7 @@ import {
   generateC1PersonalizedMock,
   C1PersonalizationError,
 } from '../services/c1PersonalizedMockService.js';
+import * as mockAttemptService from '../services/mockAttemptService.js';
 
 function handleError(res, error) {
   console.error('[C2 API]', error.message);
@@ -334,6 +335,52 @@ export async function generateMockExam(req, res) {
 }
 
 // --------------------------------------------------
+// M19.2 - Synthetic Practice (Experimental) Mock Exams
+// --------------------------------------------------
+
+export async function generateSyntheticMockExam(req, res) {
+  try {
+    const {
+      moduleKey,
+      questionCount = 5,
+      seed = 42,
+    } = req.body || {};
+
+    if (
+      typeof moduleKey !== 'string' ||
+      !moduleKey.trim()
+    ) {
+      return res.status(400).json({
+        error: 'A valid moduleKey is required',
+      });
+    }
+
+    const count = Number(questionCount);
+    if (!Number.isSafeInteger(count) || count < 1 || count > 20) {
+      return res.status(400).json({
+        error: 'questionCount must be an integer between 1 and 20',
+      });
+    }
+
+    if (!Number.isSafeInteger(Number(seed))) {
+      return res.status(400).json({
+        error: 'seed must be a valid integer',
+      });
+    }
+
+    const result = await c2Service.generateSyntheticMockExam({
+      moduleKey: moduleKey.trim(),
+      questionCount: count,
+      seed: Number(seed),
+    });
+
+    return res.json(result);
+  } catch (error) {
+    return handleError(res, error);
+  }
+}
+
+// --------------------------------------------------
 // M12.4.2 - Staff-Only Synthetic Development Preview
 // --------------------------------------------------
 
@@ -594,4 +641,63 @@ export async function classifyTopicExperimental(req, res) {
     return handleError(res, error);
   }
 }
+
+// --------------------------------------------------
+// M19 - Student Practice Mock Attempts
+// --------------------------------------------------
+
+export async function submitMockAttempt(req, res) {
+  try {
+    const studentId = req.user?.sub;
+    const { mockId, moduleKey, questions, answers, timeSpentSeconds, sourceType } = req.body || {};
+
+    const attempt = await mockAttemptService.submitMockAttempt({
+      studentId,
+      mockId,
+      moduleKey,
+      questions,
+      answers,
+      timeSpentSeconds,
+      sourceType,
+    });
+
+    return res.status(201).json(attempt);
+  } catch (error) {
+    if (error instanceof mockAttemptService.MockAttemptError) {
+      return res.status(error.status).json({ error: error.message });
+    }
+    return handleError(res, error);
+  }
+}
+
+export async function listMockAttempts(req, res) {
+  try {
+    const studentId = req.user?.sub;
+    const { moduleKey } = req.query || {};
+
+    const attempts = await mockAttemptService.listMockAttempts(studentId, moduleKey);
+    return res.json({ attempts });
+  } catch (error) {
+    if (error instanceof mockAttemptService.MockAttemptError) {
+      return res.status(error.status).json({ error: error.message });
+    }
+    return handleError(res, error);
+  }
+}
+
+export async function getMockAttempt(req, res) {
+  try {
+    const studentId = req.user?.sub;
+    const { attemptId } = req.params;
+
+    const attempt = await mockAttemptService.getMockAttempt(attemptId, studentId);
+    return res.json(attempt);
+  } catch (error) {
+    if (error instanceof mockAttemptService.MockAttemptError) {
+      return res.status(error.status).json({ error: error.message });
+    }
+    return handleError(res, error);
+  }
+}
+
 
