@@ -118,4 +118,15 @@ router.post(
   controller.reviewQuestionClassification
 );
 
+// --------------------------------------------------
+// M18.2 - Experimental Topic Classification
+// Restricted to lecturers and administrators.
+// --------------------------------------------------
+
+router.post(
+  '/experimental/classify-topic',
+  requireRole('lecturer', 'admin'),
+  controller.classifyTopicExperimental
+);
+
 export default router;

@@ -1,0 +1,281 @@
+/* Experimental Topic Classifier Component Styles — AdaptiveLearnSE M18 */
+
+.c2-experimental-section {
+  margin-top: 24px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.c2-exp-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.c2-exp-badge-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+.c2-exp-header h3 {
+  margin: 0 0 6px;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.c2-exp-header p {
+  margin: 0;
+  max-width: 800px;
+  line-height: 1.5;
+}
+
+.c2-exp-disclaimer-box {
+  background: rgba(234, 179, 8, 0.1);
+  border-left: 4px solid var(--warn, #eab308);
+  border-radius: 6px;
+  padding: 12px 16px;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--text);
+  margin-bottom: 20px;
+}
+
+.c2-exp-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.c2-exp-form-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.c2-exp-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text);
+  flex: 1;
+}
+
+.c2-exp-field select,
+.c2-exp-field textarea,
+.c2-exp-field input[type="text"],
+.c2-exp-field input[type="number"] {
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 0.9rem;
+  font-family: inherit;
+  transition: border-color 0.15s ease;
+}
+
+.c2-exp-field select:focus,
+.c2-exp-field textarea:focus,
+.c2-exp-field input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15);
+}
+
+.c2-exp-field textarea {
+  resize: vertical;
+  min-height: 110px;
+  line-height: 1.5;
+}
+
+.c2-exp-label-with-count {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.c2-exp-actions-inline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 2px;
+}
+
+.c2-exp-threshold-toggle {
+  display: flex;
+  align-items: center;
+}
+
+.link-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--primary);
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+.link-btn:hover {
+  opacity: 0.85;
+}
+
+.c2-exp-advanced-box {
+  background: var(--surface-hover, rgba(0, 0, 0, 0.02));
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+  padding: 14px 16px;
+  margin-top: -6px;
+}
+
+.small-field {
+  max-width: 240px;
+}
+
+.c2-exp-submit-row {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  margin-top: 4px;
+}
+
+.alert-box.error {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid var(--bad, #ef4444);
+  border-radius: 8px;
+  color: var(--bad, #b91c1c);
+  padding: 12px 16px;
+  font-size: 0.88rem;
+  line-height: 1.4;
+}
+
+/* Prediction Output Card */
+.c2-exp-result-card {
+  margin-top: 24px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.c2-exp-result-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 16px;
+}
+
+.c2-exp-result-head h4 {
+  margin: 4px 0 0;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.c2-exp-result-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.c2-exp-result-metric {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: var(--surface-hover, rgba(0, 0, 0, 0.02));
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px 14px;
+}
+
+.c2-exp-result-metric .stat-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.c2-exp-result-metric strong {
+  font-size: 1.1rem;
+  color: var(--text);
+}
+
+.c2-exp-abstained-explainer {
+  background: rgba(234, 179, 8, 0.1);
+  border: 1px solid var(--warn, #eab308);
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: var(--text);
+  margin-bottom: 14px;
+}
+
+.c2-exp-success-explainer {
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid var(--good, #22c55e);
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: var(--text);
+  margin-bottom: 14px;
+}
+
+.c2-exp-footer-meta {
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+}
+
+.c2-view-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 8px;
+}
+
+.c2-view-tab {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background: none;
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.c2-view-tab:hover {
+  color: var(--text);
+  background: var(--surface-hover, rgba(0, 0, 0, 0.03));
+}
+
+.c2-view-tab.active {
+  color: var(--primary);
+  background: rgba(99, 102, 241, 0.08);
+  border-color: rgba(99, 102, 241, 0.2);
+}

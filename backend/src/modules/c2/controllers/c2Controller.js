@@ -538,4 +538,60 @@ export async function listQuestionClassificationReviews(req, res) {
   } catch (error) {
     return handleError(res, error);
   }
-}
+}
+
+// --------------------------------------------------
+// M18.2 - Experimental Topic Classification
+// --------------------------------------------------
+
+export async function classifyTopicExperimental(req, res) {
+  try {
+    const { moduleKey, questionText, abstentionThreshold } = req.body || {};
+
+    if (
+      typeof moduleKey !== 'string' ||
+      !moduleKey.trim()
+    ) {
+      return res.status(400).json({
+        error: 'A valid moduleKey is required',
+      });
+    }
+
+    if (
+      typeof questionText !== 'string' ||
+      !questionText.trim()
+    ) {
+      return res.status(400).json({
+        error: 'questionText must be a non-empty string',
+      });
+    }
+
+    if (questionText.trim().length > 10000) {
+      return res.status(400).json({
+        error: 'questionText must be 10000 characters or fewer',
+      });
+    }
+
+    let parsedThreshold = undefined;
+    if (abstentionThreshold !== undefined && abstentionThreshold !== null) {
+      const num = Number(abstentionThreshold);
+      if (Number.isNaN(num) || num < 0 || num > 10) {
+        return res.status(400).json({
+          error: 'abstentionThreshold must be a number between 0 and 10',
+        });
+      }
+      parsedThreshold = num;
+    }
+
+    const result = await c2Service.classifyTopicExperimental({
+      moduleKey: moduleKey.trim(),
+      questionText: questionText.trim(),
+      abstentionThreshold: parsedThreshold,
+    });
+
+    return res.json(result);
+  } catch (error) {
+    return handleError(res, error);
+  }
+}
+

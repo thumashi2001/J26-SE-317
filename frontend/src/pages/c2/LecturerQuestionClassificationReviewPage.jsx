@@ -8,6 +8,8 @@ import {
   submitC2QuestionClassificationReview,
 } from '../../services/c2Api.js';
 
+import ExperimentalTopicClassifierSection from './components/ExperimentalTopicClassifierSection.jsx';
+
 import './lecturerQuestionClassificationReview.css';
 
 const PAGE_SIZE = 10;
@@ -79,6 +81,7 @@ function StatusBadge({ question }) {
 export default function LecturerQuestionClassificationReviewPage() {
   const [modules, setModules] = useState([]);
   const [moduleKey, setModuleKey] = useState('');
+  const [activeTab, setActiveTab] = useState('queue');
   const [page, setPage] = useState(1);
   const [includeReviewed, setIncludeReviewed] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -453,16 +456,49 @@ export default function LecturerQuestionClassificationReviewPage() {
         </div>
       </section>
 
-      {/* Review queue */}
-      <section className="panel c2-main-panel">
-        <div className="c2-panel-heading">
-          <div>
-            <h3>Question Classification Queue</h3>
-            <p className="muted small">
-              Authentic past paper questions and their
-              proposed syllabus classifications.
-            </p>
-          </div>
+      {/* Workflow Mode Tabs */}
+      <div className="c2-view-tabs" role="tablist" aria-label="Review Workflow Tabs">
+        <button
+          type="button"
+          role="tab"
+          aria-selected={activeTab === 'queue'}
+          className={`c2-view-tab ${activeTab === 'queue' ? 'active' : ''}`}
+          onClick={() => setActiveTab('queue')}
+        >
+          Authentic Question Review Queue
+        </button>
+
+        <button
+          type="button"
+          role="tab"
+          aria-selected={activeTab === 'classifier'}
+          className={`c2-view-tab ${activeTab === 'classifier' ? 'active' : ''}`}
+          onClick={() => setActiveTab('classifier')}
+        >
+          Experimental AI Topic Classifier Demo (M17)
+        </button>
+      </div>
+
+      {activeTab === 'classifier' && (
+        <ExperimentalTopicClassifierSection
+          modules={modules}
+          activeModuleKey={moduleKey}
+          onSelectModule={setModuleKey}
+        />
+      )}
+
+      {activeTab === 'queue' && (
+        <>
+          {/* Review queue */}
+          <section className="panel c2-main-panel">
+            <div className="c2-panel-heading">
+              <div>
+                <h3>Question Classification Queue</h3>
+                <p className="muted small">
+                  Authentic past paper questions and their
+                  proposed syllabus classifications.
+                </p>
+              </div>
 
           <button
             type="button"
@@ -895,6 +931,8 @@ export default function LecturerQuestionClassificationReviewPage() {
           </>
         )}
       </section>
+      </>
+      )}
 
       {/* Review modal */}
       {selected && (

@@ -201,5 +201,20 @@ export const submitC2QuestionClassificationReview = (
     }
   );
 
+// --------------------------------------------------
+// M18.2 - Experimental Topic Classification
+// --------------------------------------------------
 
-  
+export const classifyC2TopicExperimental = ({
+  moduleKey,
+  questionText,
+  abstentionThreshold,
+}) =>
+  api(`${base}/experimental/classify-topic`, {
+    method: 'POST',
+    body: {
+      moduleKey,
+      questionText,
+      abstentionThreshold,
+    },
+  });

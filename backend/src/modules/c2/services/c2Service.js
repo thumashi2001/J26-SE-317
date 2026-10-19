@@ -12,6 +12,7 @@ export class C2ServiceError extends Error {
 
 async function requestC2(path, options = {}) {
   const token = process.env.C2_INTERNAL_TOKEN;
+  const baseUrl = process.env.C2_API_URL || 'http://127.0.0.1:8002';
 
   if (!token) {
     throw new C2ServiceError(
@@ -23,7 +24,7 @@ async function requestC2(path, options = {}) {
   let response;
 
   try {
-    response = await fetch(`${C2_API_URL}${path}`, {
+    response = await fetch(`${baseUrl}${path}`, {
       method: options.method || 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -57,11 +58,11 @@ async function requestC2(path, options = {}) {
         ? data.detail
         : 'C2 request failed';
 
-    const status = [400, 403, 404, 409].includes(
-  response.status
-)
-  ? response.status
-  : 502;
+    const status = [400, 403, 404, 409, 503].includes(
+      response.status
+    )
+      ? response.status
+      : 502;
 
     throw new C2ServiceError(message, status);
   }
@@ -236,5 +237,21 @@ export function getQuestionClassificationReviews({
   return requestC2(
     `/question-classification-reviews?${params.toString()}`
   );
+}
+
+// M18.2 - Experimental Topic Classification
+export function classifyTopicExperimental({
+  moduleKey,
+  questionText,
+  abstentionThreshold,
+}) {
+  return requestC2('/api/v1/experimental/classify-topic', {
+    method: 'POST',
+    body: {
+      module_key: moduleKey,
+      question_text: questionText,
+      abstention_threshold: abstentionThreshold,
+    },
+  });
 }
 
