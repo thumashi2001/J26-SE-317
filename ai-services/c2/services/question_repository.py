@@ -68,8 +68,35 @@ def build_question_repository(paper):
         question_number = question["question_number"]
         parent_id = f"Q{question_number}"
 
-        for part in question.get("subquestions", []):
-            add_part(part, question_number, parent_id)
+        subquestions = question.get("subquestions", [])
+        if subquestions:
+            for part in subquestions:
+                add_part(part, question_number, parent_id)
+        else:
+            part_id = parent_id
+            record = {
+                "question_id": f"{paper_id}-{part_id}",
+                "paper_id": paper_id,
+                "module_code": metadata.get("module_code"),
+                "module_name": metadata.get("module_name"),
+                "calendar_year": metadata.get("calendar_year"),
+                "semester": metadata.get("semester"),
+                "question_number": question_number,
+                "part_id": part_id,
+                "parent_id": None,
+                "question_text": question.get("text", ""),
+                "context": question.get("context", question.get("text", "")),
+                "marks": question.get("marks"),
+                "marks_status": question.get(
+                    "marks_status", "unknown"
+                ),
+                "topic": None,
+                "bloom_level": None,
+                "difficulty": None,
+                "source_type": source.get("source_type"),
+                "source_filename": source.get("filename"),
+            }
+            records.append(record)
 
     return {
         "schema_version": "1.0",

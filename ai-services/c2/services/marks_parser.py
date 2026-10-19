@@ -53,6 +53,12 @@ def assign_marks(question):
 
     parts = question.get("subquestions", [])
 
+    if not parts:
+        marks, status = _annotate(question.get("text", ""))
+        result["marks"] = marks
+        result["marks_status"] = status
+        return result
+
     for index, part in enumerate(parts):
         part_copy = {
             **part,

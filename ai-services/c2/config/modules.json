@@ -6,7 +6,7 @@
   "modules": [
     {
       "module_key": "case_studies_software_engineering",
-      "module_code": null,
+      "module_code": "SE3070",
       "module_name": "Case Studies in Software Engineering",
       "semester": 1,
       "topics": [],
@@ -15,6 +15,9 @@
     {
       "module_key": "database_systems",
       "module_code": "IT3020",
+      "aliases": [
+        "SE3060"
+      ],
       "module_name": "Database Systems",
       "semester": 1,
       "topics": [],
@@ -22,7 +25,7 @@
     },
     {
       "module_key": "software_project_management",
-      "module_code": null,
+      "module_code": "SE3080",
       "module_name": "Software Project Management",
       "semester": 1,
       "topics": [],
@@ -30,7 +33,7 @@
     },
     {
       "module_key": "user_experience_engineering",
-      "module_code": null,
+      "module_code": "SE3050",
       "module_name": "User Experience Engineering",
       "semester": 1,
       "topics": [],
@@ -38,7 +41,7 @@
     },
     {
       "module_key": "application_frameworks",
-      "module_code": null,
+      "module_code": "SE3040",
       "module_name": "Application Frameworks",
       "semester": 2,
       "topics": [],
@@ -46,7 +49,7 @@
     },
     {
       "module_key": "distributed_systems",
-      "module_code": null,
+      "module_code": "SE3020",
       "module_name": "Distributed Systems",
       "semester": 2,
       "topics": [],
@@ -54,7 +57,7 @@
     },
     {
       "module_key": "software_architecture",
-      "module_code": null,
+      "module_code": "SE3030",
       "module_name": "Software Architecture",
       "semester": 2,
       "topics": [],
@@ -62,7 +65,7 @@
     },
     {
       "module_key": "software_engineering_process_quality_management",
-      "module_code": null,
+      "module_code": "SE3010",
       "module_name": "Software Engineering Process and Quality Management",
       "semester": 2,
       "topics": [],

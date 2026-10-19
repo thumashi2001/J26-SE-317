@@ -53,6 +53,7 @@ ai-services/c2/datasets/syllabus/**/*.pdf
 ai-services/c2/datasets/syllabus/**/*.pptx
 ai-services/c2/datasets/syllabus/**/*.ppt
 # C2 authentic examination papers - keep local only
+ai-services/c2/datasets/authentic/**/*.pdf
 ai-services/c2/datasets/authentic/*.pdf
 # C2 lecturer-provided syllabus materials
 /ai-services/c2/datasets/syllabus/

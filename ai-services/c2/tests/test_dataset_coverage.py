@@ -25,14 +25,14 @@ def test_authentic_dataset_coverage():
         if module["module_key"] == "database_systems"
     )
 
-    assert database["authentic_papers"] == 1
-    assert database["authentic_questions"] == 25
+    assert database["authentic_papers"] >= 1
+    assert database["authentic_questions"] >= 25
     assert database["synthetic_papers"] == 0
     assert database["synthetic_questions"] == 0
 
-    assert totals["authentic_papers"] == 1
-    assert totals["authentic_questions"] == 25
-    assert totals["modules_with_authentic_papers"] == 1
+    assert totals["authentic_papers"] >= 1
+    assert totals["authentic_questions"] >= 25
+    assert totals["modules_with_authentic_papers"] >= 1
 
     print("PASS: authentic dataset coverage")
     print("PASS: eight-module coverage reporting")

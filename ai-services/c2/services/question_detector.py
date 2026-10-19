@@ -2,7 +2,7 @@ import re
 
 
 QUESTION_PATTERN = re.compile(
-    r"(?im)^\s*(?:question\s+|q\s*)(\d{1,2}|[IVX]+)\s*[:.\-]?\s*$"
+    r"(?im)^\s*(?:(?:[qQoO]|Q[^\w\s]{1,5})?(?:uestion|apstion|[^\w\s]{1,5}stion|\bQ)\s*([oO\d]{1,2}|[IVX]+)\b\s*[:.\-–—_]?\s*(?:(?:\[|\()?\s*\d+\s*marks?(?:\]|\))?)?\s*(?:[-–—_].*)?|Part\s+A\b)\s*$"
 )
 
 
@@ -22,10 +22,10 @@ ROMAN_NUMERALS = {
 
 def normalize_question_number(value: str):
     """
-    Convert labels such as 01, 1, I and IV
+    Convert labels such as 01, 1, o1, I and IV
     into integer question numbers.
     """
-    value = value.strip().upper()
+    value = value.strip().upper().replace("O", "0")
 
     if value.isdigit():
         return int(value)
@@ -41,10 +41,12 @@ def detect_questions(text: str) -> list:
     matches = []
 
     for match in QUESTION_PATTERN.finditer(text):
-
-        question_number = normalize_question_number(
-            match.group(1)
-        )
+        val = match.group(1)
+        if val is None:
+            # Matched "Part A"
+            question_number = 0
+        else:
+            question_number = normalize_question_number(val)
 
         if question_number is not None:
             matches.append(
@@ -56,12 +58,20 @@ def detect_questions(text: str) -> list:
                 }
             )
 
+    # Filter out duplicate question numbers (e.g. repeated page headers)
+    seen = set()
+    unique_matches = []
+    for m in matches:
+        if m["question_number"] not in seen:
+            seen.add(m["question_number"])
+            unique_matches.append(m)
+
     questions = []
 
-    for index, match in enumerate(matches):
+    for index, match in enumerate(unique_matches):
 
-        if index + 1 < len(matches):
-            end = matches[index + 1]["start"]
+        if index + 1 < len(unique_matches):
+            end = unique_matches[index + 1]["start"]
         else:
             end = len(text)
 
@@ -77,4 +87,4 @@ def detect_questions(text: str) -> list:
             }
         )
 
-    return questions
+    return questions

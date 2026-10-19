@@ -290,13 +290,16 @@ class QuestionClassificationReviewService:
                 "Unknown or ambiguous module"
             )
 
-        module_code = matching_modules[0].get(
-            "module_code"
-        )
+        matching_module = matching_modules[0]
+        module_code = matching_module.get("module_code")
+        aliases = matching_module.get("aliases", [])
+        valid_codes = {module_code} if module_code else set()
+        if isinstance(aliases, list):
+            valid_codes.update(aliases)
 
         if (
-            not module_code
-            or question.get("module_code") != module_code
+            not valid_codes
+            or question.get("module_code") not in valid_codes
         ):
             raise ValueError(
                 "Question does not belong to selected module"
@@ -425,6 +428,10 @@ class QuestionClassificationReviewService:
 
             if key and code:
                 code_to_module[code] = key
+
+            if key and isinstance(module.get("aliases"), list):
+                for alias in module.get("aliases"):
+                    code_to_module[alias] = key
 
         if (
             module_key is not None

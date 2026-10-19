@@ -37,6 +37,13 @@ class StudentQuestionBank:
 
     @staticmethod
     def _load_json(path):
+        if not path.exists():
+            raise FileNotFoundError(
+                f"Question repository file not found at '{path}'. "
+                "The authentic question repository has not been generated yet. "
+                "Run 'python scripts/ingest_authentic_dataset.py' to extract authentic questions "
+                "from authorized past-paper PDFs in datasets/authentic/."
+            )
         with path.open("r", encoding="utf-8") as file:
             return json.load(file)
 

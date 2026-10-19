@@ -32,7 +32,8 @@ def parse_paper(pdf_path):
 
     metadata = extract_metadata(
         pdf["pages"][0]["text"],
-        page_count=pdf["page_count"]
+        page_count=pdf["page_count"],
+        filename=pdf_path.name
     )
 
     raw_questions = detect_questions(pdf["text"])

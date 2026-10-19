@@ -73,20 +73,23 @@ class QuestionClassificationPipeline:
                 raise ValueError("Invalid module_key in configuration")
 
             # Unknown module codes are allowed in M4 configuration.
-            if module_code is None:
-                continue
+            if module_code is not None:
+                if not isinstance(module_code, str) or not module_code.strip():
+                    raise ValueError(
+                        f"Invalid module_code for {module_key}"
+                    )
 
-            if not isinstance(module_code, str) or not module_code.strip():
-                raise ValueError(
-                    f"Invalid module_code for {module_key}"
-                )
+                if module_code in mapping:
+                    raise ValueError(
+                        f"Duplicate module code: {module_code}"
+                    )
 
-            if module_code in mapping:
-                raise ValueError(
-                    f"Duplicate module code: {module_code}"
-                )
+                mapping[module_code] = module_key
 
-            mapping[module_code] = module_key
+            # Support aliases (e.g. SE3060 alongside IT3020 for database_systems)
+            for alias in module.get("aliases", []):
+                if isinstance(alias, str) and alias.strip() and alias not in mapping:
+                    mapping[alias] = module_key
 
         return mapping
 
