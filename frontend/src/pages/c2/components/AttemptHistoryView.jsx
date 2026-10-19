@@ -8,7 +8,12 @@ function formatDuration(seconds) {
   return `${mins}m ${secs}s`;
 }
 
-export default function AttemptHistoryView({ attempts = [], loading, onRefresh }) {
+export default function AttemptHistoryView({
+  attempts = [],
+  loading,
+  onRefresh,
+  onSelectAttempt,
+}) {
   const [expandedId, setExpandedId] = useState(null);
 
   function toggleExpand(attemptId) {
@@ -79,7 +84,17 @@ export default function AttemptHistoryView({ attempts = [], loading, onRefresh }
                     </span>
                   </div>
 
-                  <div className="c2-attempt-card-action">
+                  <div className="c2-attempt-card-action" style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                    {typeof onSelectAttempt === 'function' && (
+                      <button
+                        type="button"
+                        className="btn primary small-btn"
+                        onClick={() => onSelectAttempt(attempt)}
+                        title="Open this attempt in Stage 5 Results & Feedback view"
+                      >
+                        Open Full Result ➔
+                      </button>
+                    )}
                     <button
                       type="button"
                       className="btn secondary small-btn"
