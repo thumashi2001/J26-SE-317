@@ -161,3 +161,7 @@
 .tp-avg.weak { --c: var(--weak); } .tp-avg.fair { --c: var(--fair); } .tp-avg.strong { --c: var(--strong); }
 .tp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 16px; }
 /* topic card styles live in dashboard.css */
+
+.quiz-level { font-size: .8rem; font-weight: 700; padding: 4px 12px; border-radius: 999px; background: #e0f2fe; color: #075985; }
+.quiz-level-medium { background: #fef3c7; color: #92400e; }
+.quiz-level-hard { background: #fee2e2; color: #991b1b; }
