@@ -61,6 +61,9 @@ class EvidenceAwareTopicPredictor:
                 "topic_id": item["topic_id"],
                 "question_count": count,
                 "extracted_marks": item["extracted_marks"],
+                "papers_count": item.get("papers_count", 0),
+                "paper_coverage": item.get("paper_coverage", 0.0),
+                "yearly_occurrences": item.get("yearly_occurrences", {}),
                 "share_of_verified_questions": round(
                     count / verified_count, 4
                 ) if verified_count else None,
@@ -82,6 +85,13 @@ class EvidenceAwareTopicPredictor:
                 )
             ]
 
+        provisional_count = topics.get("provisional_classified_questions", 0)
+        provisional_coverage = (
+            round(provisional_count / total_questions, 4)
+            if total_questions > 0
+            else 0.0
+        )
+
         return {
             "module_key": module_key,
             "analysis_type": "evidence_aware_topic_priorities",
@@ -92,16 +102,30 @@ class EvidenceAwareTopicPredictor:
                 "authentic_questions": total_questions,
                 "distinct_papers": distinct_papers,
                 "distinct_years": distinct_years,
+                "unavailable_years": analysis.get("unavailable_years", []),
                 "verified_topic_questions": verified_count,
-                "unverified_topic_questions": topics[
-                    "without_verified_topic"
-                ],
+                "provisional_topic_questions": provisional_count,
+                "unverified_topic_questions": topics.get(
+                    "without_verified_topic", 0
+                ),
                 "verified_topic_coverage": coverage,
+                "provisional_topic_coverage": provisional_coverage,
+                "papers_inventory": analysis.get("papers_inventory", []),
+                "questions_with_extracted_marks": analysis.get("marks", {}).get(
+                    "questions_with_extracted_marks", 0
+                ),
+                "sum_of_extracted_question_marks": analysis.get("marks", {}).get(
+                    "sum_of_extracted_question_marks", 0
+                ),
+                "ambiguous_marks_questions": analysis.get("marks", {}).get(
+                    "ambiguous_marks_questions", 0
+                ),
                 "excluded_synthetic_questions": analysis[
                     "excluded"
                 ]["synthetic_questions"],
             },
             "topic_statistics": topic_statistics,
+            "provisional_topic_summary": topics.get("provisional_statistics", []),
             "study_priorities": study_priorities,
             "limitations": limitations,
             "disclaimer": (
@@ -112,3 +136,4 @@ class EvidenceAwareTopicPredictor:
                 "topic appearance."
             ),
         }
+

@@ -113,7 +113,9 @@ class QuestionClassificationPipeline:
                 "question_id": question.get("question_id"),
                 "module_key": module_key,
                 "question_text": question.get("question_text"),
+                "source_type": question.get("source_type"),
             })
+
 
         return prepared
 

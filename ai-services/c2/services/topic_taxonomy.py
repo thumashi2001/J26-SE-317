@@ -95,11 +95,22 @@ class TopicTaxonomy:
         return self.taxonomies
 
     def get_module_taxonomy(self, module_key):
+        alias_map = {
+            "case_studies_in_software_engineering": "case_studies_software_engineering",
+            "case_studies_software_engineering": "case_studies_in_software_engineering",
+            "software_engineering_process_and_quality_management": "software_engineering_process_quality_management",
+            "software_engineering_process_quality_management": "software_engineering_process_and_quality_management",
+        }
+        target_keys = {module_key}
+        if module_key in alias_map:
+            target_keys.add(alias_map[module_key])
+
         for taxonomy in self.taxonomies:
-            if taxonomy["module_key"] == module_key:
+            if taxonomy["module_key"] in target_keys:
                 return taxonomy
 
         return None
+
 
     def get_topics(self, module_key):
         taxonomy = self.get_module_taxonomy(module_key)

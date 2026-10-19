@@ -199,10 +199,16 @@ class TopicClassificationValidator:
                 )
 
                 if matching_topic is None:
-                    errors.append(
-                        f"Unknown topic_id for module: {topic_id}"
-                    )
+                    if method == "m17_provisional" or topic_id.startswith("provisional_"):
+                        warnings.append(
+                            f"Provisional topic identifier '{topic_id}' is not yet established in module taxonomy; requires lecturer review."
+                        )
+                    else:
+                        errors.append(
+                            f"Unknown topic_id for module: {topic_id}"
+                        )
                 else:
+
                     if (
                         subtopic is not None
                         and subtopic not in matching_topic["subtopics"]

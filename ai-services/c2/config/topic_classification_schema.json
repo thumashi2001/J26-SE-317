@@ -35,9 +35,12 @@
         "manual",
         "rule_based",
         "ml_model",
+        "m17_provisional",
+        "verified",
         "hybrid"
       ]
     },
+
     "confidence_score": {
       "type": ["number", "null"],
       "minimum": 0.0,

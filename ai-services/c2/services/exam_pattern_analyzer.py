@@ -115,38 +115,62 @@ class ExamPatternAnalyzer:
 
         # Avoid counting duplicate repository records twice.
         unique_questions = {}
-
         for question in selected:
             question_id = question.get("question_id")
-
             if isinstance(question_id, str) and question_id:
                 unique_questions.setdefault(question_id, question)
 
         selected = list(unique_questions.values())
 
+        # Avoid double-counting parent questions and their child subquestions.
+        parent_ids = {q.get("parent_id") for q in selected if q.get("parent_id")}
+        leaf_questions = [
+            q for q in selected
+            if q.get("question_id") not in parent_ids
+        ]
+        selected = leaf_questions
+
         paper_ids = set()
+        paper_metadata = {}
         years = Counter()
         marks_distribution = Counter()
         topic_counts = Counter()
+        topic_papers = defaultdict(set)
+        topic_yearly = defaultdict(lambda: Counter())
         topic_marks = defaultdict(float)
+
+        provisional_topic_counts = Counter()
+        provisional_confidence = defaultdict(list)
+        provisional_display_names = {}
 
         total_extracted_marks = 0
         questions_with_valid_marks = 0
         verified_topic_questions = 0
+        provisional_topic_questions = 0
         unclassified_questions = 0
 
         for question in selected:
             paper_id = question.get("paper_id")
+            year = question.get("calendar_year")
+            marks = self._valid_marks(question)
 
             if paper_id:
-                paper_ids.add(str(paper_id))
-
-            year = question.get("calendar_year")
+                pid_str = str(paper_id)
+                paper_ids.add(pid_str)
+                if pid_str not in paper_metadata:
+                    paper_metadata[pid_str] = {
+                        "paper_id": pid_str,
+                        "calendar_year": year,
+                        "source_filename": question.get("source_filename"),
+                        "question_count": 0,
+                        "extracted_marks_sum": 0,
+                    }
+                paper_metadata[pid_str]["question_count"] += 1
+                if marks is not None:
+                    paper_metadata[pid_str]["extracted_marks_sum"] += marks
 
             if isinstance(year, int) and not isinstance(year, bool):
                 years[str(year)] += 1
-
-            marks = self._valid_marks(question)
 
             if marks is not None:
                 questions_with_valid_marks += 1
@@ -169,17 +193,59 @@ class ExamPatternAnalyzer:
             ):
                 verified_topic_questions += 1
                 topic_counts[topic_id] += 1
+                if paper_id:
+                    topic_papers[topic_id].add(str(paper_id))
+                if isinstance(year, int) and not isinstance(year, bool):
+                    topic_yearly[topic_id][str(year)] += 1
 
                 if marks is not None:
                     topic_marks[topic_id] += marks
+            elif (
+                isinstance(topic_id, str)
+                and topic_id.strip()
+                and verification_status != "verified"
+            ):
+                # Provisional AI topic proposal
+                provisional_topic_questions += 1
+                provisional_topic_counts[topic_id] += 1
+                conf = classification.get("confidence_score") or classification.get("raw_confidence_score")
+                if conf is not None:
+                    provisional_confidence[topic_id].append(conf)
+                candidate_name = classification.get("candidate_topic") or topic_id
+                provisional_display_names[topic_id] = candidate_name
             else:
                 unclassified_questions += 1
+
+        distinct_years = sorted(years.keys())
+
+        # Year span and unavailable examination years
+        if distinct_years:
+            try:
+                min_yr = int(distinct_years[0])
+                max_yr = int(distinct_years[-1])
+                full_span = [str(y) for y in range(min_yr, max_yr + 1)]
+                unavailable_years = [y for y in full_span if y not in distinct_years]
+            except (ValueError, TypeError):
+                unavailable_years = []
+        else:
+            unavailable_years = []
+
+        total_papers_count = len(paper_ids)
 
         topic_statistics = [
             {
                 "topic_id": topic_id,
                 "question_count": count,
                 "extracted_marks": topic_marks[topic_id],
+                "papers_count": len(topic_papers[topic_id]),
+                "paper_coverage": round(
+                    len(topic_papers[topic_id]) / total_papers_count, 4
+                ) if total_papers_count > 0 else 0.0,
+                # Explicit occurrences for every available year (0 if none in that year)
+                "yearly_occurrences": {
+                    yr: topic_yearly[topic_id].get(yr, 0)
+                    for yr in distinct_years
+                },
             }
             for topic_id, count in sorted(
                 topic_counts.items(),
@@ -187,7 +253,20 @@ class ExamPatternAnalyzer:
             )
         ]
 
-        distinct_years = sorted(years.keys())
+        provisional_statistics = [
+            {
+                "topic_id": topic_id,
+                "candidate_name": provisional_display_names.get(topic_id, topic_id),
+                "question_count": count,
+                "average_confidence": round(
+                    sum(provisional_confidence[topic_id]) / len(provisional_confidence[topic_id]), 4
+                ) if provisional_confidence[topic_id] else None,
+            }
+            for topic_id, count in sorted(
+                provisional_topic_counts.items(),
+                key=lambda item: (-item[1], item[0]),
+            )
+        ]
 
         limitations = []
 
@@ -226,13 +305,21 @@ class ExamPatternAnalyzer:
             "source_filter": "authentic",
             "total_questions": len(selected),
             "distinct_papers": len(paper_ids),
+            "paper_ids": sorted(list(paper_ids)),
             "distinct_years": distinct_years,
+            "unavailable_years": unavailable_years,
             "questions_by_year": dict(sorted(years.items())),
+            "papers_inventory": sorted(
+                list(paper_metadata.values()),
+                key=lambda p: (p.get("calendar_year") or 0, p.get("paper_id") or ""),
+            ),
             "marks": {
                 "questions_with_extracted_marks":
                     questions_with_valid_marks,
                 "sum_of_extracted_question_marks":
                     total_extracted_marks,
+                "ambiguous_marks_questions":
+                    len(selected) - questions_with_valid_marks,
                 "distribution": dict(
                     sorted(
                         marks_distribution.items(),
@@ -243,9 +330,14 @@ class ExamPatternAnalyzer:
             "topics": {
                 "verified_classified_questions":
                     verified_topic_questions,
+                "provisional_classified_questions":
+                    provisional_topic_questions,
                 "without_verified_topic":
+                    unclassified_questions + provisional_topic_questions,
+                "unclassified_questions":
                     unclassified_questions,
                 "statistics": topic_statistics,
+                "provisional_statistics": provisional_statistics,
             },
             "excluded": {
                 "synthetic_questions": excluded_synthetic,
@@ -258,3 +350,4 @@ class ExamPatternAnalyzer:
             ),
             "limitations": limitations,
         }
+

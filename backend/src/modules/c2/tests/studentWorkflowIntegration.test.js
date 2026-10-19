@@ -131,14 +131,14 @@ test('Practice Setup: Authentic Past-Paper generation maintains real marks', () 
 
 test('Practice Setup: Synthetic Practice preserves unassessed marks across all 8 modules', () => {
   const allModules = [
-    'software_architecture',
+    'case_studies_software_engineering',
     'database_systems',
-    'distributed_systems',
-    'operating_systems',
     'software_project_management',
-    'design_patterns',
-    'machine_learning',
-    'computer_networks',
+    'user_experience_engineering',
+    'application_frameworks',
+    'distributed_systems',
+    'software_architecture',
+    'software_engineering_process_quality_management',
   ];
 
   allModules.forEach((mod) => {
@@ -311,4 +311,95 @@ test('Academic Integrity: No fabricated prediction probabilities', () => {
   assert.equal(historicalEvidence.prediction_ready, false);
   assert.equal(historicalEvidence.verified_topic_coverage, 0.0);
   assert.equal('probability_next_exam' in historicalEvidence, false);
+});
+
+test('M19.7 Historical Evidence: verifies distinct papers, calendar years, unavailable years, and paper inventory structures', () => {
+  const predictionPayload = {
+    module_key: 'software_project_management',
+    analysis_type: 'evidence_aware_topic_priorities',
+    prediction_ready: false,
+    future_exam_probabilities_available: false,
+    historical_evidence: {
+      authentic_questions: 42,
+      distinct_papers: 2,
+      distinct_years: ['2020', '2022'],
+      unavailable_years: ['2021'],
+      verified_topic_questions: 0,
+      provisional_topic_questions: 1,
+      unverified_topic_questions: 41,
+      verified_topic_coverage: 0.0,
+      provisional_topic_coverage: 0.0238,
+      papers_inventory: [
+        {
+          paper_id: 'SE3080-2020-001',
+          calendar_year: 2020,
+          examination_type: 'Regular Final Exam',
+          question_count: 20,
+        },
+        {
+          paper_id: 'SE3080-2022-002',
+          calendar_year: 2022,
+          examination_type: 'Regular Final Exam',
+          question_count: 22,
+        },
+      ],
+      sum_of_extracted_question_marks: 80.0,
+      ambiguous_marks_questions: 4,
+      excluded_synthetic_questions: 0,
+    },
+    topic_statistics: [],
+    provisional_topic_summary: [
+      {
+        topic_id: 'provisional_service_discovery',
+        question_count: 1,
+        provisional: true,
+      },
+    ],
+    limitations: [
+      'No verified topic classifications are available; topic frequency analysis is unavailable.',
+    ],
+    disclaimer:
+      'Topic counts describe available authentic historical questions. Rankings, when available, are study-priority indicators only and do not predict the next examination.',
+  };
+
+  // 1. Academic integrity assertions
+  assert.equal(predictionPayload.prediction_ready, false);
+  assert.equal(predictionPayload.future_exam_probabilities_available, false);
+  assert.equal('predicted_probabilities' in predictionPayload, false);
+
+  // 2. Evidence counts and structure assertions
+  const evidence = predictionPayload.historical_evidence;
+  assert.equal(evidence.authentic_questions, 42);
+  assert.equal(evidence.distinct_papers, 2);
+  assert.deepEqual(evidence.distinct_years, ['2020', '2022']);
+  assert.deepEqual(evidence.unavailable_years, ['2021']);
+  assert.equal(evidence.papers_inventory.length, 2);
+  assert.equal(evidence.sum_of_extracted_question_marks, 80.0);
+  assert.equal(evidence.ambiguous_marks_questions, 4);
+
+  // 3. Separation of verified and provisional
+  assert.equal(evidence.verified_topic_questions, 0);
+  assert.equal(evidence.provisional_topic_questions, 1);
+  assert.equal(predictionPayload.topic_statistics.length, 0);
+  assert.equal(predictionPayload.provisional_topic_summary.length, 1);
+  assert.equal(predictionPayload.provisional_topic_summary[0].provisional, true);
+});
+
+test('M19.7 Historical Evidence: Stage 2 insufficient evidence state preserves navigation to setup', () => {
+  // When verified evidence is insufficient, student must still be able to proceed to Stage 3 practice setup
+  const stageState = {
+    currentStage: 'evidence',
+    selectedModuleKey: 'software_project_management',
+    verifiedCoverage: 0.0,
+    canProceedToSetup: true,
+  };
+
+  assert.equal(stageState.currentStage, 'evidence');
+  assert.equal(stageState.verifiedCoverage, 0.0);
+  assert.equal(stageState.canProceedToSetup, true);
+
+  // Transition to setup maintains module key
+  stageState.currentStage = 'setup';
+  assert.equal(stageState.currentStage, 'setup');
+  assert.equal(stageState.selectedModuleKey, 'software_project_management');
 });

@@ -15,6 +15,7 @@ import ExamIntelligenceStepper from './components/ExamIntelligenceStepper.jsx';
 import ActiveAttemptView from './components/ActiveAttemptView.jsx';
 import AttemptResultView from './components/AttemptResultView.jsx';
 import AttemptHistoryView from './components/AttemptHistoryView.jsx';
+import HistoricalTopicEvidenceSection from './components/HistoricalTopicEvidenceSection.jsx';
 
 import './studentExamIntelligence.css';
 
@@ -842,136 +843,14 @@ export default function StudentExamIntelligencePage() {
       {/* STAGE 2 — TOPIC PREDICTIONS & HISTORICAL EVIDENCE        */}
       {/* ======================================================== */}
       {stage === 'evidence' && (
-        <section className="c2-student-bank" aria-label="Stage 2: Topic Evidence and Historical Analysis">
-          <div className="c2-student-bank-header">
-            <div>
-              <span className="c2-student-panel-eyebrow">STAGE 2 — HISTORICAL EVIDENCE</span>
-              <h2>Historical Examination Topic Evidence</h2>
-              <p>
-                Descriptive analysis of verified past-paper questions for {currentModuleName}.
-              </p>
-            </div>
-
-            <button
-              type="button"
-              className="btn primary"
-              onClick={() => setStage('setup')}
-            >
-              Configure Practice Mock (Stage 3) ➔
-            </button>
-          </div>
-
-          {/* Academic Integrity Disclaimer Banner */}
-          <div className="c2-attempt-integrity-box">
-            <strong>Critical Academic Integrity Requirement:</strong>
-            <p style={{ margin: '4px 0 0' }}>
-              Future-exam predictive machine learning (M20) is currently under active research.
-              The distributions and study priorities displayed below represent <strong>descriptive historical frequencies</strong> from
-              available authentic past papers. They do <strong>NOT</strong> represent probability percentages of appearing on the next examination.
-            </p>
-          </div>
-
-          {predictionLoading && (
-            <div className="c2-student-loading" role="status">
-              Loading historical topic evidence...
-            </div>
-          )}
-
-          {predictionError && (
-            <div className="c2-student-error" role="alert">
-              <strong>Unable to load topic evidence</strong>
-              <p>{predictionError}</p>
-            </div>
-          )}
-
-          {!predictionLoading && prediction && (
-            <>
-              {/* Stat Cards */}
-              <div className="c2-evidence-grid">
-                <StatCard
-                  label="Authentic questions"
-                  value={evidence?.authentic_questions ?? 0}
-                  note="Available historical questions"
-                  tone="blue"
-                />
-                <StatCard
-                  label="Past papers"
-                  value={evidence?.distinct_papers ?? 0}
-                  note="Distinct source papers"
-                  tone="teal"
-                />
-                <StatCard
-                  label="Verified topic labels"
-                  value={evidence?.verified_topic_questions ?? 0}
-                  note="Academically verified classifications"
-                  tone="indigo"
-                />
-                <StatCard
-                  label="Topic coverage"
-                  value={coveragePercent}
-                  note="Verified share of authentic questions"
-                  tone="sky"
-                />
-              </div>
-
-              {/* Study priorities or insufficient evidence message */}
-              {prediction.prediction_ready === true ? (
-                <div className="c2-evidence-message">
-                  <h3>Historical Topic Frequencies & Study Priorities</h3>
-                  <p>
-                    These priorities describe historical topic frequency from verified examination questions.
-                    They are not probabilities of appearing in the next examination.
-                  </p>
-
-                  {Array.isArray(prediction.study_priorities) && prediction.study_priorities.length > 0 && (
-                    <div className="c2-priority-list">
-                      {prediction.study_priorities.map((topic, index) => (
-                        <div className="c2-priority-item" key={topic.topic_id || index}>
-                          <strong>
-                            {topic.rank ?? index + 1}. {display(topic.topic_id)}
-                          </strong>
-                          <span>{topic.question_count ?? 0} historical questions</span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <div className="c2-evidence-message">
-                  <h3>Insufficient Evidence for Topic Ranking</h3>
-                  <p>
-                    Available historical papers and verified classifications do not yet support a defensible topic ranking for {currentModuleName}.
-                  </p>
-                  <p className="c2-student-muted">
-                    You can still generate practice mock examinations using authentic questions or synthetic development fixtures.
-                  </p>
-                </div>
-              )}
-
-              {/* Limitations */}
-              {Array.isArray(prediction.limitations) && prediction.limitations.length > 0 && (
-                <div className="c2-evidence-limitations">
-                  <h3>Evidence Limitations</h3>
-                  <ul>
-                    {prediction.limitations.map((lim, idx) => (
-                      <li key={idx}>{typeof lim === 'string' ? lim : JSON.stringify(lim)}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              <div style={{ marginTop: 24, display: 'flex', justifyContent: 'flex-end' }}>
-                <button
-                  type="button"
-                  className="btn primary"
-                  onClick={() => setStage('setup')}
-                >
-                  Proceed to Practice Setup (Stage 3) ➔
-                </button>
-              </div>
-            </>
-          )}
-        </section>
+        <HistoricalTopicEvidenceSection
+          prediction={prediction}
+          predictionLoading={predictionLoading}
+          predictionError={predictionError}
+          currentModuleName={currentModuleName}
+          moduleCode={selectedModule?.module_code || selectedModule?.moduleCode}
+          onProceedToSetup={() => setStage('setup')}
+        />
       )}
 
       {/* ======================================================== */}
