@@ -62,6 +62,8 @@ ai-services/c2/datasets/authentic/*.pdf
 
 ai-services/c2/outputs/syllabus_reviews/
 
+/ai-services/c2/datasets/synthetic/m16/
+
 ai-services/c2/outputs/question_classification_reviews/
 # IDE files
 .vscode/*
