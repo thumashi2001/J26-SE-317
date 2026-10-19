@@ -244,6 +244,11 @@ export default function PracticePage() {
       {back}
       <div className="quiz-head">
         <h1>{prettyTopic(topic)}</h1>
+        {session.level && (
+          <span className={`quiz-level quiz-level-${session.level.toLowerCase()}`} title="Questions are chosen for your level on this topic">
+            Your level: {session.level}
+          </span>
+        )}
       </div>
 
       <div className="quiz-progress">
