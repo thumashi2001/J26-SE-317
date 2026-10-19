@@ -36,6 +36,10 @@ from services.synthetic_practice_preview import (
 from services.question_classification_review_service import (
     QuestionClassificationReviewService,
 )
+from services.m17_topic_prediction_service import (
+    M17TopicPredictionService,
+    ModelNotFoundError,
+)
 
 app = FastAPI(
     title="C2 Exam Intelligence API",
@@ -71,6 +75,9 @@ topic_predictor = EvidenceAwareTopicPredictor(
 # M12.2.1 - Personalized mock examination generator
 mock_exam_generator = PersonalizedMockExam()
 synthetic_preview = SyntheticPracticePreview()
+
+# M17 - Experimental Topic Prediction Service
+experimental_topic_predictor = M17TopicPredictionService()
 class ReviewDecisionRequest(BaseModel):
     module_key: str
     candidate_id: str
@@ -651,5 +658,41 @@ def list_question_classification_reviews(
         raise HTTPException(
             status_code=409,
             detail=str(error),
+        )
+
+
+# --------------------------------------------------
+# M17.6 - Experimental Synthetic Topic Classification
+# --------------------------------------------------
+
+class ExperimentalTopicClassificationRequest(BaseModel):
+    module_key: str = Field(min_length=1, max_length=100)
+    question_text: str = Field(min_length=1, max_length=10000)
+    abstention_threshold: float | None = Field(default=None, ge=0.0, le=10.0)
+
+
+@app.post("/api/v1/experimental/classify-topic")
+def classify_topic_experimental(
+    request: ExperimentalTopicClassificationRequest,
+    x_c2_internal_token: str | None = Header(default=None),
+):
+    require_internal_token(x_c2_internal_token)
+    validate_module(request.module_key)
+
+    try:
+        return experimental_topic_predictor.predict(
+            module_key=request.module_key,
+            question_text=request.question_text,
+            threshold=request.abstention_threshold,
+        )
+    except ModelNotFoundError as e:
+        raise HTTPException(
+            status_code=503,
+            detail=f"Topic classification model not available: {str(e)}",
+        )
+    except ValueError as e:
+        raise HTTPException(
+            status_code=400,
+            detail=str(e),
         )
 

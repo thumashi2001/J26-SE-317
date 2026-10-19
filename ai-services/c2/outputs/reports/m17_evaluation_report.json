@@ -1,0 +1,926 @@
+{
+  "schema_version": "1.0",
+  "milestone": "M17",
+  "report_name": "M17 Topic Classification Model Evaluation Report",
+  "created_at": "2026-10-19T07:40:45.865812+00:00",
+  "academic_verification": {
+    "synthetic_development_evaluation": "completed",
+    "authentic_examination_evaluation": "NOT PERFORMED",
+    "status": "unverified",
+    "disclaimer": "All models trained and evaluated on M16 synthetic development data. Evaluation results cannot establish accuracy on authentic examination papers. No authentic examination papers were used in training or tuning."
+  },
+  "data_integrity": {
+    "counts": {
+      "train": 576,
+      "validation": 128,
+      "test": 96,
+      "total": 800
+    },
+    "scenario_isolation": {
+      "train_scenarios": 144,
+      "val_scenarios": 32,
+      "test_scenarios": 24,
+      "disjoint": true
+    },
+    "template_family_risk": {
+      "train_val_overlap_count": 100,
+      "train_test_overlap_count": 84,
+      "val_test_overlap_count": 48,
+      "risk_flagged": true,
+      "explanation": "Template families share task phrasing across distinct scenarios because M16 splits at the scenario group level to retain all 5 topics across splits. Model evaluation on synthetic data may exhibit higher performance than on novel unseen phrasing."
+    },
+    "status": "passed"
+  },
+  "baseline_comparison_validation": {
+    "baseline_a": {
+      "name": "TF-IDF + Logistic Regression",
+      "model_type": "logistic_regression",
+      "overall_macro_f1": 1.0,
+      "overall_accuracy": 1.0,
+      "overall_macro_precision": 1.0,
+      "overall_macro_recall": 1.0,
+      "overall_weighted_f1": 1.0,
+      "total_inference_time_seconds": 0.0185,
+      "per_module": {
+        "application_frameworks": {
+          "macro_f1": 1.0,
+          "accuracy": 1.0,
+          "macro_precision": 1.0,
+          "macro_recall": 1.0,
+          "weighted_f1": 1.0
+        },
+        "case_studies_software_engineering": {
+          "macro_f1": 1.0,
+          "accuracy": 1.0,
+          "macro_precision": 1.0,
+          "macro_recall": 1.0,
+          "weighted_f1": 1.0
+        },
+        "database_systems": {
+          "macro_f1": 1.0,
+          "accuracy": 1.0,
+          "macro_precision": 1.0,
+          "macro_recall": 1.0,
+          "weighted_f1": 1.0
+        },
+        "distributed_systems": {
+          "macro_f1": 1.0,
+          "accuracy": 1.0,
+          "macro_precision": 1.0,
+          "macro_recall": 1.0,
+          "weighted_f1": 1.0
+        },
+        "software_architecture": {
+          "macro_f1": 1.0,
+          "accuracy": 1.0,
+          "macro_precision": 1.0,
+          "macro_recall": 1.0,
+          "weighted_f1": 1.0
+        },
+        "software_engineering_process_quality_management": {
+          "macro_f1": 1.0,
+          "accuracy": 1.0,
+          "macro_precision": 1.0,
+          "macro_recall": 1.0,
+          "weighted_f1": 1.0
+        },
+        "software_project_management": {
+          "macro_f1": 1.0,
+          "accuracy": 1.0,
+          "macro_precision": 1.0,
+          "macro_recall": 1.0,
+          "weighted_f1": 1.0
+        },
+        "user_experience_engineering": {
+          "macro_f1": 1.0,
+          "accuracy": 1.0,
+          "macro_precision": 1.0,
+          "macro_recall": 1.0,
+          "weighted_f1": 1.0
+        }
+      }
+    },
+    "baseline_b": {
+      "name": "TF-IDF + Linear Support Vector Machine",
+      "model_type": "linear_svc",
+      "overall_macro_f1": 1.0,
+      "overall_accuracy": 1.0,
+      "overall_macro_precision": 1.0,
+      "overall_macro_recall": 1.0,
+      "overall_weighted_f1": 1.0,
+      "total_inference_time_seconds": 0.0113,
+      "per_module": {
+        "application_frameworks": {
+          "macro_f1": 1.0,
+          "accuracy": 1.0,
+          "macro_precision": 1.0,
+          "macro_recall": 1.0,
+          "weighted_f1": 1.0
+        },
+        "case_studies_software_engineering": {
+          "macro_f1": 1.0,
+          "accuracy": 1.0,
+          "macro_precision": 1.0,
+          "macro_recall": 1.0,
+          "weighted_f1": 1.0
+        },
+        "database_systems": {
+          "macro_f1": 1.0,
+          "accuracy": 1.0,
+          "macro_precision": 1.0,
+          "macro_recall": 1.0,
+          "weighted_f1": 1.0
+        },
+        "distributed_systems": {
+          "macro_f1": 1.0,
+          "accuracy": 1.0,
+          "macro_precision": 1.0,
+          "macro_recall": 1.0,
+          "weighted_f1": 1.0
+        },
+        "software_architecture": {
+          "macro_f1": 1.0,
+          "accuracy": 1.0,
+          "macro_precision": 1.0,
+          "macro_recall": 1.0,
+          "weighted_f1": 1.0
+        },
+        "software_engineering_process_quality_management": {
+          "macro_f1": 1.0,
+          "accuracy": 1.0,
+          "macro_precision": 1.0,
+          "macro_recall": 1.0,
+          "weighted_f1": 1.0
+        },
+        "software_project_management": {
+          "macro_f1": 1.0,
+          "accuracy": 1.0,
+          "macro_precision": 1.0,
+          "macro_recall": 1.0,
+          "weighted_f1": 1.0
+        },
+        "user_experience_engineering": {
+          "macro_f1": 1.0,
+          "accuracy": 1.0,
+          "macro_precision": 1.0,
+          "macro_recall": 1.0,
+          "weighted_f1": 1.0
+        }
+      }
+    },
+    "selected_model": "logistic_regression",
+    "selection_rationale": "Tie in validation Macro-F1 (1.0000 vs 1.0000). Logistic Regression selected via deterministic tie-breaker for native well-calibrated prediction probabilities."
+  },
+  "abstention_analysis": {
+    "recommended_threshold": 0.38,
+    "score_type": "calibrated_probability",
+    "coverage_accuracy_curve": [
+      {
+        "threshold": 0.2,
+        "retained_count": 128,
+        "abstained_count": 0,
+        "coverage": 1.0,
+        "accuracy_retained": 1.0
+      },
+      {
+        "threshold": 0.25,
+        "retained_count": 128,
+        "abstained_count": 0,
+        "coverage": 1.0,
+        "accuracy_retained": 1.0
+      },
+      {
+        "threshold": 0.3,
+        "retained_count": 128,
+        "abstained_count": 0,
+        "coverage": 1.0,
+        "accuracy_retained": 1.0
+      },
+      {
+        "threshold": 0.32,
+        "retained_count": 128,
+        "abstained_count": 0,
+        "coverage": 1.0,
+        "accuracy_retained": 1.0
+      },
+      {
+        "threshold": 0.35,
+        "retained_count": 127,
+        "abstained_count": 1,
+        "coverage": 0.9922,
+        "accuracy_retained": 1.0
+      },
+      {
+        "threshold": 0.38,
+        "retained_count": 120,
+        "abstained_count": 8,
+        "coverage": 0.9375,
+        "accuracy_retained": 1.0
+      },
+      {
+        "threshold": 0.4,
+        "retained_count": 108,
+        "abstained_count": 20,
+        "coverage": 0.8438,
+        "accuracy_retained": 1.0
+      },
+      {
+        "threshold": 0.42,
+        "retained_count": 89,
+        "abstained_count": 39,
+        "coverage": 0.6953,
+        "accuracy_retained": 1.0
+      },
+      {
+        "threshold": 0.45,
+        "retained_count": 38,
+        "abstained_count": 90,
+        "coverage": 0.2969,
+        "accuracy_retained": 1.0
+      },
+      {
+        "threshold": 0.5,
+        "retained_count": 0,
+        "abstained_count": 128,
+        "coverage": 0.0,
+        "accuracy_retained": 0.0
+      }
+    ]
+  },
+  "final_test_evaluation": {
+    "model_type": "logistic_regression",
+    "n_test_samples": 96,
+    "test_macro_f1": 1.0,
+    "test_accuracy": 1.0,
+    "test_macro_precision": 1.0,
+    "test_macro_recall": 1.0,
+    "test_weighted_f1": 1.0,
+    "test_inference_time_seconds": 0.0111,
+    "per_module": {
+      "application_frameworks": {
+        "macro_f1": 1.0,
+        "accuracy": 1.0,
+        "macro_precision": 1.0,
+        "macro_recall": 1.0,
+        "weighted_f1": 1.0,
+        "per_topic": {
+          "Asynchronous Operations and Event-Driven Services": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1_score": 0.0,
+            "support": 0
+          },
+          "Authentication and Security Middleware": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1_score": 1.0,
+            "support": 8
+          },
+          "Framework Debugging": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1_score": 0.0,
+            "support": 0
+          },
+          "Full-Stack State Management and Data Binding": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1_score": 0.0,
+            "support": 0
+          },
+          "REST API and Middleware": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1_score": 1.0,
+            "support": 4
+          }
+        },
+        "confusion_matrix": [
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            8,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            4
+          ]
+        ],
+        "classes": [
+          "Asynchronous Operations and Event-Driven Services",
+          "Authentication and Security Middleware",
+          "Framework Debugging",
+          "Full-Stack State Management and Data Binding",
+          "REST API and Middleware"
+        ]
+      },
+      "case_studies_software_engineering": {
+        "macro_f1": 1.0,
+        "accuracy": 1.0,
+        "macro_precision": 1.0,
+        "macro_recall": 1.0,
+        "weighted_f1": 1.0,
+        "per_topic": {
+          "Architectural Refactoring and Quality Evaluation": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1_score": 0.0,
+            "support": 0
+          },
+          "Case Study Requirements": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1_score": 1.0,
+            "support": 4
+          },
+          "Sequence Diagrams and Interaction Modeling": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1_score": 1.0,
+            "support": 4
+          },
+          "Software Design Patterns": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1_score": 0.0,
+            "support": 0
+          },
+          "UML and Design Decisions": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1_score": 1.0,
+            "support": 4
+          }
+        },
+        "confusion_matrix": [
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            4,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            4,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            4
+          ]
+        ],
+        "classes": [
+          "Architectural Refactoring and Quality Evaluation",
+          "Case Study Requirements",
+          "Sequence Diagrams and Interaction Modeling",
+          "Software Design Patterns",
+          "UML and Design Decisions"
+        ]
+      },
+      "database_systems": {
+        "macro_f1": 1.0,
+        "accuracy": 1.0,
+        "macro_precision": 1.0,
+        "macro_recall": 1.0,
+        "weighted_f1": 1.0,
+        "per_topic": {
+          "Database Indexing": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1_score": 0.0,
+            "support": 0
+          },
+          "Database Normalization and Schema Design": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1_score": 0.0,
+            "support": 0
+          },
+          "Query Optimization and Execution Plans": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1_score": 1.0,
+            "support": 4
+          },
+          "SQL Queries": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1_score": 1.0,
+            "support": 8
+          },
+          "Transaction Concurrency and Recovery": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1_score": 0.0,
+            "support": 0
+          }
+        },
+        "confusion_matrix": [
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            4,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            8,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        ],
+        "classes": [
+          "Database Indexing",
+          "Database Normalization and Schema Design",
+          "Query Optimization and Execution Plans",
+          "SQL Queries",
+          "Transaction Concurrency and Recovery"
+        ]
+      },
+      "distributed_systems": {
+        "macro_f1": 1.0,
+        "accuracy": 1.0,
+        "macro_precision": 1.0,
+        "macro_recall": 1.0,
+        "weighted_f1": 1.0,
+        "per_topic": {
+          "Dependability and Fault Tolerance": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1_score": 1.0,
+            "support": 4
+          },
+          "Distributed Caching and Data Partitioning": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1_score": 1.0,
+            "support": 4
+          },
+          "Distributed Communication": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1_score": 0.0,
+            "support": 0
+          },
+          "Distributed Consensus and Replication": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1_score": 1.0,
+            "support": 4
+          },
+          "Service Discovery and Load Balancing": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1_score": 0.0,
+            "support": 0
+          }
+        },
+        "confusion_matrix": [
+          [
+            4,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            4,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            4,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        ],
+        "classes": [
+          "Dependability and Fault Tolerance",
+          "Distributed Caching and Data Partitioning",
+          "Distributed Communication",
+          "Distributed Consensus and Replication",
+          "Service Discovery and Load Balancing"
+        ]
+      },
+      "software_architecture": {
+        "macro_f1": 1.0,
+        "accuracy": 1.0,
+        "macro_precision": 1.0,
+        "macro_recall": 1.0,
+        "weighted_f1": 1.0,
+        "per_topic": {
+          "Architectural Styles and Trade-offs": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1_score": 0.0,
+            "support": 0
+          },
+          "Architecture Evaluation and Review Methods": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1_score": 0.0,
+            "support": 0
+          },
+          "Architecture Modeling": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1_score": 1.0,
+            "support": 4
+          },
+          "Microservice Decomposition and Domain-Driven Boundaries": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1_score": 1.0,
+            "support": 8
+          },
+          "Quality Attribute Scenarios and Tactics": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1_score": 0.0,
+            "support": 0
+          }
+        },
+        "confusion_matrix": [
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            4,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            8,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        ],
+        "classes": [
+          "Architectural Styles and Trade-offs",
+          "Architecture Evaluation and Review Methods",
+          "Architecture Modeling",
+          "Microservice Decomposition and Domain-Driven Boundaries",
+          "Quality Attribute Scenarios and Tactics"
+        ]
+      },
+      "software_engineering_process_quality_management": {
+        "macro_f1": 1.0,
+        "accuracy": 1.0,
+        "macro_precision": 1.0,
+        "macro_recall": 1.0,
+        "weighted_f1": 1.0,
+        "per_topic": {
+          "Code-Based Testing": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1_score": 0.0,
+            "support": 0
+          },
+          "Integration and System Test Strategy": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1_score": 1.0,
+            "support": 4
+          },
+          "Software Process Models and Agile Quality Assurance": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1_score": 0.0,
+            "support": 0
+          },
+          "Software Quality Metrics and Defect Tracking": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1_score": 1.0,
+            "support": 4
+          },
+          "Specification-Based Testing": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1_score": 1.0,
+            "support": 4
+          }
+        },
+        "confusion_matrix": [
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            4,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            4,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            4
+          ]
+        ],
+        "classes": [
+          "Code-Based Testing",
+          "Integration and System Test Strategy",
+          "Software Process Models and Agile Quality Assurance",
+          "Software Quality Metrics and Defect Tracking",
+          "Specification-Based Testing"
+        ]
+      },
+      "software_project_management": {
+        "macro_f1": 1.0,
+        "accuracy": 1.0,
+        "macro_precision": 1.0,
+        "macro_recall": 1.0,
+        "weighted_f1": 1.0,
+        "per_topic": {
+          "Activity Scheduling and Critical Path Analysis": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1_score": 1.0,
+            "support": 4
+          },
+          "Agile Project Governance and Sprint Management": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1_score": 1.0,
+            "support": 4
+          },
+          "Effort and Cost Estimation": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1_score": 1.0,
+            "support": 4
+          },
+          "Project Risk and Control": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1_score": 0.0,
+            "support": 0
+          },
+          "Project Selection": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1_score": 0.0,
+            "support": 0
+          }
+        },
+        "confusion_matrix": [
+          [
+            4,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            4,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            4,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        ],
+        "classes": [
+          "Activity Scheduling and Critical Path Analysis",
+          "Agile Project Governance and Sprint Management",
+          "Effort and Cost Estimation",
+          "Project Risk and Control",
+          "Project Selection"
+        ]
+      },
+      "user_experience_engineering": {
+        "macro_f1": 1.0,
+        "accuracy": 1.0,
+        "macro_precision": 1.0,
+        "macro_recall": 1.0,
+        "weighted_f1": 1.0,
+        "per_topic": {
+          "Accessibility and Inclusive Interface Design": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1_score": 0.0,
+            "support": 0
+          },
+          "Hierarchical Task Analysis": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1_score": 1.0,
+            "support": 4
+          },
+          "Interaction Prototyping and Wireframe Specification": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1_score": 1.0,
+            "support": 4
+          },
+          "Usability Evaluation and Heuristic Inspection": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1_score": 1.0,
+            "support": 4
+          },
+          "User Research and Design Thinking": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1_score": 0.0,
+            "support": 0
+          }
+        },
+        "confusion_matrix": [
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            4,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            4,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            4,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        ],
+        "classes": [
+          "Accessibility and Inclusive Interface Design",
+          "Hierarchical Task Analysis",
+          "Interaction Prototyping and Wireframe Specification",
+          "Usability Evaluation and Heuristic Inspection",
+          "User Research and Design Thinking"
+        ]
+      }
+    }
+  }
+}
