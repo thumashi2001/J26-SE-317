@@ -1,4 +1,5 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
+import { getC2PredictionReadiness } from '../../../services/c2Api.js';
 
 function displayTopicName(topicId) {
   if (!topicId) return 'Unclassified';
@@ -9,6 +10,34 @@ function displayTopicName(topicId) {
     .join(' ');
 }
 
+const READINESS_INFO = {
+  insufficient_evidence: {
+    label: 'Insufficient Historical Evidence',
+    badgeClass: 'badge-insufficient_evidence',
+    desc: 'Fewer than 3 authentic past papers or fewer than 2 distinct calendar years are currently available.',
+  },
+  awaiting_lecturer_verification: {
+    label: 'Awaiting Lecturer Verification',
+    badgeClass: 'badge-awaiting_lecturer_verification',
+    desc: 'Authentic past-paper questions are ingested, but course lecturers have not yet verified topic assignments.',
+  },
+  historical_analysis_ready: {
+    label: 'Historical Analysis Ready',
+    badgeClass: 'badge-historical_analysis_ready',
+    desc: 'Descriptive past-paper topic frequencies are verified and ready for historical trend analysis.',
+  },
+  experimental_prediction_ready: {
+    label: 'Experimental Prediction Ready',
+    badgeClass: 'badge-experimental_prediction_ready',
+    desc: 'Sufficient independent historical sessions exist for experimental baseline evaluation.',
+  },
+  validated_prediction_ready: {
+    label: 'Validated Prediction Ready',
+    badgeClass: 'badge-validated_prediction_ready',
+    desc: 'Prediction models have passed chronological walk-forward validation on independent historical exams.',
+  },
+};
+
 export default function HistoricalTopicEvidenceSection({
   prediction,
   predictionLoading,
@@ -16,9 +45,17 @@ export default function HistoricalTopicEvidenceSection({
   currentModuleName,
   moduleCode,
   onProceedToSetup,
+  onSelectPreferredTopic,
+  targetPeriod = 'next_session',
+  onChangeTargetPeriod,
 }) {
   const [selectedYearFilter, setSelectedYearFilter] = useState('all');
+  const [selectedBaseline, setSelectedBaseline] = useState('baseline_b'); // 'baseline_a' | 'baseline_b' | 'baseline_c'
+  const [showDiagnostics, setShowDiagnostics] = useState(false);
+  const [diagnosticsData, setDiagnosticsData] = useState(null);
+  const [loadingDiagnostics, setLoadingDiagnostics] = useState(false);
 
+  // Evidence extraction
   const evidence = prediction?.historical_evidence;
   const verifiedQuestions = evidence?.verified_topic_questions ?? 0;
   const totalQuestions = evidence?.authentic_questions ?? 0;
@@ -35,7 +72,33 @@ export default function HistoricalTopicEvidenceSection({
   const verifiedCoveragePercent = `${Math.round(verifiedCoverage * 100)}%`;
   const isRankingReady = prediction?.prediction_ready === true;
 
-  // Filter topics or year occurrences if user picks a specific year
+  // Readiness status
+  const readiness = prediction?.prediction_readiness || {};
+  const readinessStatus = readiness.readiness_status || prediction?.status || 'awaiting_lecturer_verification';
+  const readinessMeta = READINESS_INFO[readinessStatus] || READINESS_INFO.awaiting_lecturer_verification;
+
+  // Prediction models
+  const predictionModels = prediction?.prediction_models || {};
+  const currentModelData = predictionModels[selectedBaseline];
+
+  // Lazy load diagnostics matrix on toggle
+  useEffect(() => {
+    if (showDiagnostics && !diagnosticsData && !loadingDiagnostics) {
+      setLoadingDiagnostics(true);
+      getC2PredictionReadiness()
+        .then((res) => {
+          setDiagnosticsData(res?.modules || {});
+        })
+        .catch((err) => {
+          console.warn('Failed to fetch prediction readiness diagnostics:', err);
+        })
+        .finally(() => {
+          setLoadingDiagnostics(false);
+        });
+    }
+  }, [showDiagnostics, diagnosticsData, loadingDiagnostics]);
+
+  // Topic stats filter
   const topicStats = useMemo(() => {
     const stats = prediction?.topic_statistics || [];
     if (selectedYearFilter === 'all') return stats;
@@ -59,6 +122,14 @@ export default function HistoricalTopicEvidenceSection({
     );
   }, [topicStats, selectedYearFilter]);
 
+  const handleTopicClick = (topicId) => {
+    if (typeof onSelectPreferredTopic === 'function') {
+      onSelectPreferredTopic(topicId);
+    } else if (typeof onProceedToSetup === 'function') {
+      onProceedToSetup();
+    }
+  };
+
   return (
     <section
       className="c2-student-bank c2-evidence-section"
@@ -68,13 +139,23 @@ export default function HistoricalTopicEvidenceSection({
       <div className="c2-student-bank-header">
         <div>
           <span className="c2-student-panel-eyebrow">
-            STAGE 2 — AUTHENTIC HISTORICAL EVIDENCE
+            STAGE 2 — EXAM TOPIC PREDICTIONS & HISTORICAL EVIDENCE
           </span>
-          <h2>Historical Examination Topic Evidence</h2>
+          <h2>Evidence-Aware Examination Topic Intelligence</h2>
           <p>
             Curriculum-grounded evidence from verified past examination papers
             for <strong>{currentModuleName}</strong> {moduleCode ? `(${moduleCode})` : ''}.
           </p>
+
+          {/* Prediction Readiness Badge */}
+          <div className="c2-readiness-badge-row">
+            <span className={`c2-readiness-badge ${readinessMeta.badgeClass}`}>
+              ● {readinessMeta.label}
+            </span>
+            <small style={{ color: 'var(--muted)' }}>
+              {readinessMeta.desc}
+            </small>
+          </div>
         </div>
 
         <button
@@ -86,13 +167,108 @@ export default function HistoricalTopicEvidenceSection({
         </button>
       </div>
 
+      {/* Target Examination Period Bar & Diagnostics Toggle */}
+      <div className="c2-period-selector-bar">
+        <label htmlFor="targetPeriodSelect">Target Examination Period:</label>
+        <select
+          id="targetPeriodSelect"
+          value={targetPeriod}
+          onChange={(e) => {
+            if (typeof onChangeTargetPeriod === 'function') {
+              onChangeTargetPeriod(e.target.value);
+            }
+          }}
+        >
+          <option value="upcoming_unconfirmed">Upcoming Examination — Date Not Confirmed (Default)</option>
+          <option value="end_semester">Next Regular End-Semester Examination</option>
+          <option value="historical_backtest_scenario">Historical Backtest Scenario (Research Evaluation Only)</option>
+        </select>
+
+        <button
+          type="button"
+          className="c2-diagnostics-toggle-btn"
+          onClick={() => setShowDiagnostics((prev) => !prev)}
+        >
+          {showDiagnostics ? 'Hide Readiness Summary ✕' : '📊 Evidence & Readiness Summary (All Modules)'}
+        </button>
+      </div>
+
+      {targetPeriod === 'historical_backtest_scenario' && (
+        <div className="c2-backtest-banner" style={{ background: '#f0f9ff', border: '1px solid #bae6fd', color: '#0369a1', padding: '10px 14px', borderRadius: 8, margin: '12px 0', fontSize: '0.85rem' }}>
+          <strong>🔬 Historical Evaluation Backtest Scenario:</strong> This scenario evaluates prediction models on historical past papers for research purposes. To ensure zero future-data leakage, all model features are constructed strictly using sessions prior to the target session.
+        </div>
+      )}
+
+      {/* Non-Sensitive Evidence & Readiness Summary (All 8 Modules) */}
+      {showDiagnostics && (
+        <div className="c2-diagnostics-matrix-panel" role="region" aria-label="Evidence Readiness Summary">
+          <div className="c2-diagnostics-head">
+            <h4>Evidence & Prediction Readiness Summary: 8 Year 3 Modules</h4>
+            <span className="pill status-neutral">Read-Only Research Audit</span>
+          </div>
+          <p className="c2-diagnostics-note">
+            Authentic examination evidence audit across all eight SLIIT Year 3 Software Engineering modules.
+            Under research guidelines, machine learning topic prediction is strictly suppressed until taxonomies and question classifications are verified by academic staff.
+            This summary is non-sensitive and read-only.
+          </p>
+
+          {loadingDiagnostics ? (
+            <p className="c2-student-muted">Loading module readiness reports...</p>
+          ) : diagnosticsData ? (
+            <div className="c2-table-wrap">
+              <table className="c2-diagnostics-table">
+                <thead>
+                  <tr>
+                    <th>Module Key</th>
+                    <th>Authentic Papers</th>
+                    <th>Calendar Years</th>
+                    <th>Verified Questions</th>
+                    <th>Readiness Status</th>
+                    <th>Permitted Outputs</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {Object.entries(diagnosticsData).map(([key, item]) => {
+                    const isCurrent = key === prediction?.module_key;
+                    const meta = READINESS_INFO[item.readiness_status] || READINESS_INFO.awaiting_lecturer_verification;
+                    return (
+                      <tr key={key} className={isCurrent ? 'current-row' : ''}>
+                        <td>
+                          <strong>{displayTopicName(key)}</strong>
+                          {isCurrent && <span style={{ marginLeft: 6, color: 'var(--primary)', fontWeight: 700 }}> (Current)</span>}
+                        </td>
+                        <td>{item.distinct_historical_papers} papers</td>
+                        <td>{item.available_years?.join(', ') || 'None'}</td>
+                        <td>
+                          {item.verified_question_count} / {item.total_eligible_question_count} ({Math.round((item.evidence_coverage || 0) * 100)}%)
+                        </td>
+                        <td>
+                          <span className={`c2-readiness-badge ${meta.badgeClass}`} style={{ fontSize: '0.7rem', padding: '2px 8px' }}>
+                            {meta.label}
+                          </span>
+                        </td>
+                        <td>
+                          <small>{item.permitted_outputs?.join(', ') || 'None'}</small>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <p className="c2-student-muted">Unable to load full diagnostics matrix.</p>
+          )}
+        </div>
+      )}
+
       {/* Critical Academic Integrity Disclaimer Banner */}
       <div className="c2-attempt-integrity-box">
         <strong>Critical Research & Academic Integrity Standard:</strong>
         <p style={{ margin: '4px 0 0' }}>
-          Future-exam predictive machine learning (M20) is under active research.
+          Future-exam predictive machine learning is evaluated on strictly chronological historical splits.
           The distributions and metrics displayed below represent{' '}
-          <strong>descriptive historical frequencies</strong> derived from SLIIT authentic past-paper questions.
+          <strong>descriptive historical frequencies</strong> derived from authentic past-paper questions.
           They do <strong>NOT</strong> represent probability percentages of appearing on upcoming examinations.
         </p>
       </div>
@@ -227,6 +403,86 @@ export default function HistoricalTopicEvidenceSection({
             )}
           </div>
 
+          {/* PREDICTION BASELINES & MODELS STATUS */}
+          <div className="c2-evidence-panel">
+            <div className="c2-panel-head-row">
+              <div>
+                <h3>Examination Topic Prediction Baselines (M20 Framework)</h3>
+                <p className="c2-panel-desc">
+                  Three modular prediction baselines with chronological walk-forward evaluation gates.
+                </p>
+              </div>
+            </div>
+
+            <div className="c2-baseline-tabs">
+              <button
+                type="button"
+                className={`c2-baseline-tab ${selectedBaseline === 'baseline_a' ? 'active' : ''}`}
+                onClick={() => setSelectedBaseline('baseline_a')}
+              >
+                Baseline A: Historical Frequency
+              </button>
+              <button
+                type="button"
+                className={`c2-baseline-tab ${selectedBaseline === 'baseline_b' ? 'active' : ''}`}
+                onClick={() => setSelectedBaseline('baseline_b')}
+              >
+                Baseline B: Recency-Weighted Frequency (λ=0.75)
+              </button>
+              <button
+                type="button"
+                className={`c2-baseline-tab ${selectedBaseline === 'baseline_c' ? 'active' : ''}`}
+                onClick={() => setSelectedBaseline('baseline_c')}
+              >
+                Baseline C: Regularized Statistical Model
+              </button>
+            </div>
+
+            {currentModelData?.status === 'model_not_trained' ? (
+              <div className="c2-model-unavailability-card">
+                <h5>Model Status: Not Trained (Honest Readiness Gate)</h5>
+                <p>
+                  {currentModelData.academic_integrity_notice ||
+                    'Model training is inhibited to preserve scientific integrity. Topic prediction requires approved syllabus taxonomies and lecturer-verified examination labels.'}
+                </p>
+                {currentModelData.missing_requirements?.length > 0 && (
+                  <div>
+                    <strong>Prerequisites pending fulfillment:</strong>
+                    <ul className="c2-missing-reqs-list">
+                      {currentModelData.missing_requirements.map((req, i) => (
+                        <li key={i}>{req}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            ) : currentModelData?.predictions?.length > 0 ? (
+              <div className="c2-topic-frequency-bars">
+                {currentModelData.predictions.map((p, idx) => (
+                  <div className="c2-topic-bar-item c2-topic-clickable" key={p.topic_id} onClick={() => handleTopicClick(p.topic_id)}>
+                    <div className="c2-topic-bar-meta">
+                      <span className="c2-topic-rank">#{idx + 1}</span>
+                      <strong className="c2-topic-title">{p.topic_name || displayTopicName(p.topic_id)}</strong>
+                      <span className="c2-topic-count">
+                        Score: <strong>{p.score}</strong> ({p.score_type})
+                      </span>
+                      <button
+                        type="button"
+                        className="c2-select-topic-btn"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleTopicClick(p.topic_id);
+                        }}
+                      >
+                        Practice Topic ➔
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+          </div>
+
           {/* MAIN EVIDENCE CONTENT: Ranked Topics or Insufficient Evidence Banner */}
           {isRankingReady ? (
             <div className="c2-evidence-panel">
@@ -235,7 +491,7 @@ export default function HistoricalTopicEvidenceSection({
                   <h3>Historical Topic Frequencies & Study Priorities</h3>
                   <p className="c2-panel-desc">
                     Descriptive frequencies from {verifiedQuestions} verified examination questions across {distinctPapers} authentic papers.
-                    Relative bar widths represent historical occurrence counts.
+                    Relative bar widths represent historical occurrence counts. Click any topic to focus your practice.
                   </p>
                 </div>
 
@@ -277,7 +533,12 @@ export default function HistoricalTopicEvidenceSection({
                     : null;
 
                   return (
-                    <div className="c2-topic-bar-item" key={topic.topic_id || index}>
+                    <div
+                      className="c2-topic-bar-item c2-topic-clickable"
+                      key={topic.topic_id || index}
+                      onClick={() => handleTopicClick(topic.topic_id)}
+                      title="Click to practice this topic in Stage 3"
+                    >
                       <div className="c2-topic-bar-meta">
                         <span className="c2-topic-rank">
                           #{topic.rank ?? index + 1}
@@ -289,6 +550,16 @@ export default function HistoricalTopicEvidenceSection({
                           <strong>{count}</strong> {count === 1 ? 'question' : 'questions'}
                           {shareOfVerified && ` (${shareOfVerified} of verified)`}
                         </span>
+                        <button
+                          type="button"
+                          className="c2-select-topic-btn"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleTopicClick(topic.topic_id);
+                          }}
+                        >
+                          Practice Topic ➔
+                        </button>
                       </div>
 
                       <div className="c2-topic-bar-track">
@@ -428,7 +699,7 @@ export default function HistoricalTopicEvidenceSection({
             </div>
           )}
 
-          {/* Provisional AI Classification Transparency Section (if any provisional topics exist) */}
+          {/* Provisional AI Classification Transparency Section */}
           {Array.isArray(prediction?.provisional_topic_summary) &&
             prediction.provisional_topic_summary.length > 0 && (
               <div className="c2-provisional-panel">

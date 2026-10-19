@@ -87,14 +87,31 @@ export const getC2StudentQuestions = (
 // M12.1 - Evidence-Aware Topic Predictions
 // --------------------------------------------------
 
-export const getC2TopicPredictions = (moduleKey) => {
+export const getC2TopicPredictions = (moduleKey, targetPeriod = null) => {
   const params = new URLSearchParams({
     moduleKey,
   });
+  if (targetPeriod) {
+    params.set('targetPeriod', targetPeriod);
+  }
 
   return api(
     `${base}/topic-predictions?${params.toString()}`
   );
+};
+
+// --------------------------------------------------
+// M20 - Prediction Readiness and Evaluation Diagnostics
+// --------------------------------------------------
+
+export const getC2PredictionReadiness = (moduleKey = null) => {
+  const params = moduleKey ? `?moduleKey=${encodeURIComponent(moduleKey)}` : '';
+  return api(`${base}/predictions/readiness${params}`);
+};
+
+export const getC2PredictionEvaluation = (moduleKey) => {
+  const params = new URLSearchParams({ moduleKey });
+  return api(`${base}/predictions/evaluation?${params.toString()}`);
 };
 
 // --------------------------------------------------

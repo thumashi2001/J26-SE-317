@@ -29,6 +29,8 @@ from services.exam_pattern_analyzer import ExamPatternAnalyzer
 from services.evidence_aware_topic_predictor import (
     EvidenceAwareTopicPredictor,
 )
+from services.prediction_readiness_service import PredictionReadinessAssessor
+from services.chronological_prediction_evaluator import ChronologicalPredictionEvaluator
 from services.personalized_mock_exam import PersonalizedMockExam
 from services.synthetic_practice_preview import (
     SyntheticPracticePreview,
@@ -71,8 +73,12 @@ repository = SyllabusTopicReviewRepository()
 queue = SyllabusTopicReviewQueue(repository=repository)
 question_bank = StudentQuestionBank()
 pattern_analyzer = ExamPatternAnalyzer()
+readiness_assessor = PredictionReadinessAssessor(analyzer=pattern_analyzer)
+prediction_evaluator = ChronologicalPredictionEvaluator(readiness_assessor=readiness_assessor)
 topic_predictor = EvidenceAwareTopicPredictor(
-    analyzer=pattern_analyzer
+    analyzer=pattern_analyzer,
+    readiness_assessor=readiness_assessor,
+    evaluator=prediction_evaluator,
 )
 
 # M12.2.1 - Personalized mock examination generator
@@ -454,13 +460,14 @@ def save_decision(
 @app.get("/topic-predictions")
 def get_topic_predictions(
     module_key: str = Query(...),
+    target_period: str | None = Query(default=None),
     x_c2_internal_token: str | None = Header(default=None),
 ):
     require_internal_token(x_c2_internal_token)
     validate_module(module_key)
 
     try:
-        return topic_predictor.predict(module_key)
+        return topic_predictor.predict(module_key, target_period=target_period)
 
     except FileNotFoundError:
         raise HTTPException(
@@ -473,6 +480,39 @@ def get_topic_predictions(
             status_code=409,
             detail="Historical examination dataset is invalid",
         )
+
+
+# --------------------------------------------------
+# M20 - Prediction Readiness and Diagnostics
+# --------------------------------------------------
+
+@app.get("/predictions/readiness")
+def get_prediction_readiness(
+    module_key: str | None = Query(default=None),
+    x_c2_internal_token: str | None = Header(default=None),
+):
+    require_internal_token(x_c2_internal_token)
+    if module_key is not None:
+        validate_module(module_key)
+        return readiness_assessor.assess_module(module_key)
+
+    result = readiness_assessor.assess_all_modules()
+    result["academic_integrity_notice"] = (
+        "Readiness states reflect independent historical examination evidence, "
+        "taxonomy approval, and authentic lecturer verification. "
+        "Predictions are blocked until rigorous empirical standards are satisfied."
+    )
+    return result
+
+
+@app.get("/predictions/evaluation")
+def get_prediction_evaluation(
+    module_key: str = Query(...),
+    x_c2_internal_token: str | None = Header(default=None),
+):
+    require_internal_token(x_c2_internal_token)
+    validate_module(module_key)
+    return prediction_evaluator.evaluate(module_key)
 
     
 # --------------------------------------------------

@@ -48,6 +48,20 @@ router.get(
 );
 
 // --------------------------------------------------
+// M20 - Prediction Readiness and Diagnostics
+// --------------------------------------------------
+
+router.get(
+  '/predictions/readiness',
+  controller.getPredictionReadiness
+);
+
+router.get(
+  '/predictions/evaluation',
+  controller.getPredictionEvaluation
+);
+
+// --------------------------------------------------
 // M12.2.1 - Personalized Practice Mock Examinations
 // --------------------------------------------------
 

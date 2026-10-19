@@ -154,14 +154,35 @@ export function getExamPatterns(moduleKey) {
 // M12.1 - Evidence-Aware Topic Predictions
 // --------------------------------------------------
 
-export function getTopicPredictions(moduleKey) {
+export function getTopicPredictions(moduleKey, targetPeriod = null) {
   const params = new URLSearchParams({
     module_key: moduleKey,
   });
+  if (targetPeriod) {
+    params.set('target_period', targetPeriod);
+  }
 
   return requestC2(
     `/topic-predictions?${params.toString()}`
   );
+}
+
+// --------------------------------------------------
+// M20 - Prediction Readiness and Diagnostics
+// --------------------------------------------------
+
+export function getPredictionReadiness(moduleKey = null) {
+  const path = moduleKey
+    ? `/predictions/readiness?module_key=${encodeURIComponent(moduleKey)}`
+    : '/predictions/readiness';
+  return requestC2(path);
+}
+
+export function getPredictionEvaluation(moduleKey) {
+  const params = new URLSearchParams({
+    module_key: moduleKey,
+  });
+  return requestC2(`/predictions/evaluation?${params.toString()}`);
 }
 
 // --------------------------------------------------

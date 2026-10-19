@@ -184,6 +184,7 @@ export default function StudentExamIntelligencePage() {
   const [prediction, setPrediction] = useState(null);
   const [predictionLoading, setPredictionLoading] = useState(false);
   const [predictionError, setPredictionError] = useState('');
+  const [targetPeriod, setTargetPeriod] = useState('upcoming_unconfirmed');
 
   // Stage 3: Practice mock exam configuration
   const [generationMode, setGenerationMode] = useState('standard'); // 'standard' | 'twin' | 'synthetic'
@@ -277,7 +278,7 @@ export default function StudentExamIntelligencePage() {
       setPredictionLoading(true);
       setPredictionError('');
       try {
-        const data = await getC2TopicPredictions(moduleKey);
+        const data = await getC2TopicPredictions(moduleKey, targetPeriod);
         if (active) setPrediction(data);
       } catch (err) {
         if (active) {
@@ -292,7 +293,7 @@ export default function StudentExamIntelligencePage() {
     return () => {
       active = false;
     };
-  }, [moduleKey, refresh]);
+  }, [moduleKey, targetPeriod, refresh]);
 
   // --------------------------------------------------
   // 4. Load Question Bank Explorer
@@ -850,6 +851,12 @@ export default function StudentExamIntelligencePage() {
           currentModuleName={currentModuleName}
           moduleCode={selectedModule?.module_code || selectedModule?.moduleCode}
           onProceedToSetup={() => setStage('setup')}
+          targetPeriod={targetPeriod}
+          onChangeTargetPeriod={(period) => setTargetPeriod(period)}
+          onSelectPreferredTopic={(topicId) => {
+            setTopicsInput(topicId);
+            setStage('setup');
+          }}
         />
       )}
 

@@ -2236,6 +2236,243 @@
   padding-top: 8px;
 }
 
+/* ======================================================== */
+/* M20 — Evidence-Aware Topic Prediction Intelligence Styles */
+/* ======================================================== */
+
+.c2-readiness-badge-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+
+.c2-readiness-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.c2-readiness-badge.badge-insufficient_evidence {
+  background: rgba(239, 68, 68, 0.12);
+  color: #dc2626;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.c2-readiness-badge.badge-awaiting_lecturer_verification {
+  background: rgba(245, 158, 11, 0.15);
+  color: #b45309;
+  border: 1px solid rgba(245, 158, 11, 0.35);
+}
+
+.c2-readiness-badge.badge-historical_analysis_ready {
+  background: rgba(59, 130, 246, 0.12);
+  color: #2563eb;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.c2-readiness-badge.badge-experimental_prediction_ready {
+  background: rgba(147, 51, 234, 0.12);
+  color: #7c3aed;
+  border: 1px solid rgba(147, 51, 234, 0.3);
+}
+
+.c2-readiness-badge.badge-validated_prediction_ready {
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.c2-period-selector-bar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  padding: 12px 18px;
+  border-radius: 12px;
+  margin: 12px 0 18px;
+}
+
+.c2-period-selector-bar label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.c2-period-selector-bar select {
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--text);
+  font-size: 0.86rem;
+}
+
+.c2-diagnostics-toggle-btn {
+  margin-left: auto;
+  font-size: 0.82rem;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--primary);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.c2-diagnostics-toggle-btn:hover {
+  background: var(--chip-bg);
+  border-color: var(--primary);
+}
+
+/* Lecturer / Research Diagnostics Matrix */
+.c2-diagnostics-matrix-panel {
+  border-radius: 14px;
+  padding: 20px;
+  background: var(--panel);
+  border: 1px solid var(--primary);
+  margin-bottom: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.c2-diagnostics-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.c2-diagnostics-head h4 {
+  margin: 0;
+  font-size: 1.05rem;
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.c2-diagnostics-note {
+  font-size: 0.82rem;
+  color: var(--muted);
+  margin: 0 0 16px;
+  line-height: 1.5;
+}
+
+.c2-diagnostics-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+}
+
+.c2-diagnostics-table th {
+  text-align: left;
+  padding: 8px 10px;
+  background: var(--surface);
+  border-bottom: 2px solid var(--line);
+  font-weight: 700;
+}
+
+.c2-diagnostics-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: middle;
+}
+
+.c2-diagnostics-table tr.current-row {
+  background: rgba(59, 130, 246, 0.06);
+}
+
+/* Prediction Baselines and Model Selection */
+.c2-baseline-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.c2-baseline-tab {
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--text-2);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.c2-baseline-tab.active {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+.c2-model-unavailability-card {
+  border-radius: 12px;
+  padding: 18px 20px;
+  background: var(--surface);
+  border: 1px dashed rgba(245, 158, 11, 0.4);
+  margin-top: 12px;
+}
+
+.c2-model-unavailability-card h5 {
+  margin: 0 0 6px;
+  font-size: 0.92rem;
+  color: #b45309;
+}
+
+.c2-model-unavailability-card p {
+  margin: 0 0 10px;
+  font-size: 0.84rem;
+  color: var(--text-2);
+  line-height: 1.5;
+}
+
+.c2-missing-reqs-list {
+  margin: 6px 0 0;
+  padding-left: 20px;
+  font-size: 0.82rem;
+  color: #b45309;
+}
+
+.c2-topic-clickable {
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.c2-topic-clickable:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.06);
+}
+
+.c2-select-topic-btn {
+  font-size: 0.72rem;
+  padding: 3px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--primary);
+  background: transparent;
+  color: var(--primary);
+  cursor: pointer;
+  font-weight: 600;
+  margin-left: auto;
+}
+
+.c2-select-topic-btn:hover {
+  background: var(--primary);
+  color: white;
+}
+
 
 
 

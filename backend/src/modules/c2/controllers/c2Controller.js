@@ -239,7 +239,7 @@ export async function listExamPatterns(req, res) {
 
 export async function listTopicPredictions(req, res) {
   try {
-    const { moduleKey } = req.query;
+    const { moduleKey, targetPeriod, target_period } = req.query;
 
     if (
       typeof moduleKey !== 'string' ||
@@ -250,8 +250,54 @@ export async function listTopicPredictions(req, res) {
       });
     }
 
+    const period = targetPeriod || target_period || null;
+
     const result = await c2Service.getTopicPredictions(
-      moduleKey.trim()
+      moduleKey.trim(),
+      period
+    );
+
+    return res.json(result);
+  } catch (error) {
+    return handleError(res, error);
+  }
+}
+
+// --------------------------------------------------
+// M20 - Prediction Readiness and Diagnostics
+// --------------------------------------------------
+
+export async function getPredictionReadiness(req, res) {
+  try {
+    const { moduleKey, module_key } = req.query;
+    const targetModule = moduleKey || module_key || null;
+
+    const result = await c2Service.getPredictionReadiness(
+      targetModule ? targetModule.trim() : null
+    );
+
+    return res.json(result);
+  } catch (error) {
+    return handleError(res, error);
+  }
+}
+
+export async function getPredictionEvaluation(req, res) {
+  try {
+    const { moduleKey, module_key } = req.query;
+    const targetModule = moduleKey || module_key;
+
+    if (
+      typeof targetModule !== 'string' ||
+      !targetModule.trim()
+    ) {
+      return res.status(400).json({
+        error: 'A valid moduleKey is required',
+      });
+    }
+
+    const result = await c2Service.getPredictionEvaluation(
+      targetModule.trim()
     );
 
     return res.json(result);
