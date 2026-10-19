@@ -1,0 +1,30 @@
+{
+  "protocol": "se-path-multi-v2",
+  "reward_definition_version": "se-path-multi-v2-reward-1",
+  "dim": 101,
+  "n_topics": 46,
+  "n_actions": 184,
+  "action_types": [
+    "practice",
+    "revision",
+    "quiz",
+    "coding"
+  ],
+  "action_layout": "type_index * n_topics + topic_index",
+  "extras": [
+    "mean_mastery",
+    "frac_mastered",
+    "elapsed_env_step_frac",
+    "recent_accuracy",
+    "recent_accuracy_observed",
+    "engagement_completion_rate",
+    "engagement_observed",
+    "exam_urgency",
+    "exam_date_known"
+  ],
+  "catalogue_hash": "95aaba520a28a494e9d6fed0c30de5999b6d47f376368424fb211acb434a1622",
+  "same_features_as": "se-path-multi-v1",
+  "reward_is_not": "se-path-multi-v1-reward-1",
+  "no_prior_strength": true,
+  "coding_content_ids": []
+}
