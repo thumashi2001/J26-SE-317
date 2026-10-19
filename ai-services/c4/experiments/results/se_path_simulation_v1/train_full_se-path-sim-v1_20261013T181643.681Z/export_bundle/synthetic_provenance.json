@@ -1,0 +1,14 @@
+{
+  "domain": "se_simulation",
+  "exported_at_utc": "2026-10-13T18:32:42.296749+00:00",
+  "generator": "se-sim-1.0.0",
+  "label": "simulation_only",
+  "not_assistments": true,
+  "not_real_se_students": true,
+  "pass_probability_claims": false,
+  "production_integration": false,
+  "protocol": "se-path-sim-v1",
+  "readiness_claims": false,
+  "source_run": "/content/drive/MyDrive/AdaptiveLearnSE/c4_runs/se_path_sim_v1/train_full_se-path-sim-v1_20261013T181643.681Z",
+  "synthetic": true
+}
