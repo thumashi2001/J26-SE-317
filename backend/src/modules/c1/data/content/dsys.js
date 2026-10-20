@@ -133,10 +133,10 @@ export default {
         D(
           'A company splits its web application into presentation, business and data tiers. Which is a disadvantage of this tiering?',
           [
-            'Code can no longer be reused',
-            'The system cannot be scaled',
-            'Communication overhead and complexity increase',
-            'Fault tolerance becomes impossible',
+            'Code can no longer be reused across the tiers',
+            'The system cannot be scaled at any tier',
+            'Communication overhead and complexity go up',
+            'Fault tolerance becomes impossible in a tiered system',
           ],
           2,
           'Tiering helps reuse, scalability, integrity and fault tolerance. The costs are more communication overhead, possible message loss, security risks and extra complexity.',
@@ -189,7 +189,7 @@ export default {
           'How does Java RMI differ from basic RPC?',
           [
             'RMI handles only procedure calls and ignores objects',
-            'RMI works with remote objects and object references, but RPC does not',
+            'RMI works with remote objects, but RPC does not',
             'RMI needs no interface, but RPC always needs one',
             'RMI works only inside a single JVM',
           ],
@@ -224,10 +224,10 @@ export default {
         S(
           'A client needs temperature updates only when the value changes. Polling wastes resources. What is a better design?',
           [
-            'Register a callback so the server calls the client when the value changes',
-            'Block the client until the server finishes a long job',
-            'Ask the server every second until the value differs',
-            'Use two separate clients that both poll the server',
+            'Register a callback so the server notifies the client on change',
+            'Block the client until the server finishes a long job each time',
+            'Ask the server every second until the value is different',
+            'Use two separate clients that both poll the server in turn',
           ],
           0,
           'With a callback the client registers with the server, and the server calls back when the event happens. Polling repeats requests, and blocking wastes the client.',
@@ -236,10 +236,10 @@ export default {
         S(
           'In JMS, which pair correctly describes the two messaging domains?',
           [
-            'Point-to-point sends each message to many consumers, and publish-subscribe to one',
-            'Point-to-point uses queues with one consumer per message, and publish-subscribe uses topics with many consumers',
-            'Both domains use topics, but only publish-subscribe uses queues',
-            'Both domains deliver every message to all consumers',
+            'Point-to-point sends each message to many consumers, and publish-subscribe sends each message to only one',
+            'Point-to-point uses queues with one receiver per message, and publish-subscribe uses topics',
+            'Both domains use topics, but only publish-subscribe also uses queues for delivery',
+            'Both domains deliver every message to all consumers that are connected',
           ],
           1,
           'Point-to-point is built on queues and each message has only one consumer. Publish-subscribe uses a topic and each message can reach many consumers.',
@@ -353,10 +353,10 @@ export default {
         S(
           'How do local and remote EJB interfaces differ?',
           [
-            'Local passes by value across JVMs, and remote passes by reference inside one JVM',
-            'Local is for calls inside the same JVM with parameters by reference, and remote is for calls across JVMs with parameters by value',
-            'Local is only for entity beans, and remote is only for session beans',
-            'Both pass parameters by reference, but only remote needs an annotation',
+            'Local passes parameters by value across JVMs, and remote passes parameters by reference inside one JVM',
+            'Local is for calls in the same JVM (by reference), and remote is for calls across JVMs (by value)',
+            'Local is only for entity beans, and remote is only for session beans, with no other differences',
+            'Both pass parameters by reference, but only the remote interface needs an annotation in the bean class',
           ],
           1,
           'A local interface (@Local) is used inside the same JVM with parameters by reference. A remote interface (@Remote) is used across JVMs and parameters are serialized, so they are passed by value.',
@@ -401,9 +401,9 @@ export default {
         S(
           'Which is a known drawback of JSON compared with XML?',
           [
-            'It cannot be read by people',
+            'It cannot be read by people without a special tool',
             'It has no namespaces and no built-in validation',
-            'It is slower and heavier than XML',
+            'It is slower and heavier than XML in practice',
             'It works only with the Java language',
           ],
           1,
@@ -487,7 +487,7 @@ export default {
         D(
           'How is a message-driven EJB invoked?',
           [
-            'Asynchronously by messages, not through local or remote interfaces',
+            'Asynchronously, when a message arrives',
             'Directly by clients through a remote interface',
             'Only by another bean in the same JVM',
             'By a web browser through a WAR file',
@@ -506,10 +506,10 @@ export default {
         S(
           'Why do traditional RPC frameworks cause firewall problems on the Internet?',
           [
-            'Each server component uses its own port, so admins must open many holes in the firewall',
-            'They send all data in plain text, which firewalls always block',
-            'They use one shared port, which firewalls cannot filter',
-            'They never use TCP, so firewalls drop the traffic',
+            'Each component uses its own port, so many firewall holes are needed',
+            'They send all data in plain text, which firewalls always block outright',
+            'They use one shared port, which firewalls therefore cannot filter at all',
+            'They never use TCP, so firewalls drop all of their traffic by default',
           ],
           0,
           'RPC frameworks give each server component its own port. For Internet access an administrator would have to open one hole per component, and they are reluctant to do that.',
@@ -566,9 +566,9 @@ export default {
         S(
           'How do orchestration and choreography differ?',
           [
-            'Choreography uses a central coordinator, and orchestration does not',
-            'Orchestration is controlled by one coordinator, and choreography has no central coordinator',
-            'Both always require a central coordinator',
+            'Choreography uses a central coordinator for the whole flow, and orchestration does not',
+            'Orchestration has one central coordinator, and choreography has none',
+            'Both styles always require a central coordinator to run',
             'Orchestration can only be used with REST services',
           ],
           1,
@@ -684,9 +684,9 @@ export default {
           'A team adds more machines to its pool of resources when load grows. What is this called?',
           [
             'Vertical scaling (scale up)',
-            'Horizontal scaling (scale out)',
-            'Virtual storage',
-            'Self-healing',
+            'Scaling out (horizontal)',
+            'Virtual storage pooling',
+            'Self-healing of failed nodes',
           ],
           1,
           'Horizontal scaling adds more machines or instances (scale out). Vertical scaling adds CPU or RAM to an existing machine (scale up).',
@@ -708,9 +708,9 @@ export default {
           'Which description matches grid computing?',
           [
             'Tightly coupled identical machines on one LAN acting as one server',
-            'A single machine with more CPU and RAM',
+            'A single machine upgraded with more CPU and RAM',
             'A browser that runs all processing on the client',
-            'Loosely coupled, heterogeneous resources from many organisations in different places',
+            'Loosely coupled, mixed resources shared by many organisations',
           ],
           3,
           'Grids are autonomous, dynamic resources contributed by multiple organisations. They are loosely coupled and geographically dispersed. Clusters are usually linked over a LAN and appear as one server.',
@@ -793,10 +793,10 @@ export default {
         D(
           'What does a service registry hold in a microservices system?',
           [
-            'The private databases of all services',
-            'The source code of every service',
-            'The microservice instances and their locations',
-            'The passwords of all users',
+            'The private databases of all of the services',
+            'The full source code of every single service',
+            'The service instances and where they run',
+            'The passwords of all users of the system',
           ],
           2,
           'A service registry holds the microservice instances and their locations. Service discovery is the process of finding the available services.',

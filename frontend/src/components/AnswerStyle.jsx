@@ -73,9 +73,16 @@ export default function AnswerStyle({ data }) {
             <div className="as-side as-row2" aria-hidden="true">Mostly wrong</div>
           </div>
           {building.length > 0 && (
-            <p className="muted small as-building">
-              Still getting there: {building.map(([t]) => prettyTopic(t)).join(', ')}. A mix of right and wrong answers.
-            </p>
+            <div className="as-building">
+              <span className="as-b-icon" aria-hidden="true">{'\u{1F331}'}</span>
+              <div>
+                <strong>Still getting there</strong>
+                <p>Your answers in these topics are a mix of right and wrong, so there is no clear pattern yet. A few more quizzes will show it.</p>
+                <div className="as-chips">
+                  {building.map(([t]) => <span key={t} className="as-chip">{prettyTopic(t)}</span>)}
+                </div>
+              </div>
+            </div>
           )}
         </>
       )}

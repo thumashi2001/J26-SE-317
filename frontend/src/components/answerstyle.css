@@ -39,7 +39,10 @@
 .as-chip { font-size: 0.82rem; font-weight: 600; padding: 3px 11px; border-radius: 20px; background: var(--panel); border: 1px solid var(--line-strong); }
 .as-tip { margin: 0; font-size: 0.86rem; color: var(--text-2); }
 .as-none { margin: 8px 0 0; font-size: 0.86rem; color: var(--muted); }
-.as-building { margin: 10px 0 0; }
+.as-building { display: flex; gap: 14px; align-items: flex-start; margin: 16px 0 0; padding: 14px 16px; border-radius: 16px; background: color-mix(in srgb, var(--fair) 10%, var(--panel)); border: 1px solid color-mix(in srgb, var(--fair) 35%, var(--line)); }
+.as-building strong { font-family: var(--font-head); font-size: 1rem; }
+.as-building p { margin: 4px 0 0; font-size: 0.88rem; color: var(--text-2); }
+.as-b-icon { flex: none; display: grid; place-items: center; width: 42px; height: 42px; border-radius: 12px; font-size: 1.4rem; background: color-mix(in srgb, var(--fair) 20%, var(--panel)); }
 @media (max-width: 640px) {
   .as-axes { display: none; }
   .as-grid { grid-template-columns: 1fr; grid-template-areas: 'a' 'b' 'c' 'd'; }

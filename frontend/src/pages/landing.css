@@ -175,3 +175,58 @@
 @keyframes lsplus { 0% { opacity: 0; transform: translateY(8px); } 30% { opacity: 1; } 100% { opacity: 0; transform: translateY(-14px); } }
 .laptop-scene .ls-badge.on rect { fill: #16315a; }
 @media (prefers-reduced-motion: reduce) { .laptop-scene * { animation: none !important; } }
+
+/* join us: animated world */
+.lp-join { position: relative; overflow: hidden; color: #fff; background: radial-gradient(900px 500px at 85% 10%, rgba(79, 143, 240, 0.35), transparent 60%), radial-gradient(700px 400px at 0% 100%, rgba(169, 201, 255, 0.14), transparent 60%), linear-gradient(160deg, var(--lp-ink), var(--lp-ink-2)); }
+.lp-join::before { content: ''; position: absolute; inset: 0; background-image: radial-gradient(rgba(255, 255, 255, 0.09) 1px, transparent 1px); background-size: 26px 26px; mask-image: linear-gradient(to bottom, #000 40%, transparent); pointer-events: none; }
+.lp-join-in { position: relative; }
+.lp-join-in { display: grid; grid-template-columns: 1.05fr 1fr; gap: 40px; align-items: center; padding-top: 72px; padding-bottom: 72px; }
+.lp-join-kicker { display: inline-flex; align-items: center; gap: 10px; margin: 0 0 16px; font-size: 0.82rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #ffe29a; }
+.lp-dot { width: 10px; height: 10px; border-radius: 50%; background: #ffd166; box-shadow: 0 0 0 0 rgba(255, 209, 102, 0.7); animation: lpping 1.8s ease-out infinite; }
+@keyframes lpping { to { box-shadow: 0 0 0 14px rgba(255, 209, 102, 0); } }
+.lp-sec.lp-join h2, .lp-join h2 { color: #fff; font-size: clamp(1.9rem, 3.8vw, 3rem); line-height: 1.1; margin: 0 0 18px; letter-spacing: -0.02em; }
+.lp-join h2 span { background: linear-gradient(90deg, #cfe0ff, #ffe29a); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.lp-join-line { margin: 0 0 6px; font-size: 1.25rem; color: #dbe8fb; }
+.lp-swap { display: inline-block; color: #ffe29a; animation: lpswap 0.5s ease both; }
+@keyframes lpswap { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+.lp-join-sub { margin: 0 0 20px; color: #b7c9e6; }
+.lp-join-facts { list-style: none; display: flex; flex-wrap: wrap; gap: 10px; padding: 0; margin: 0 0 26px; }
+.lp-join-facts li { background: rgba(255, 255, 255, 0.09); border: 1px solid rgba(255, 255, 255, 0.18); border-radius: 999px; padding: 7px 16px; font-size: 0.92rem; color: #dbe8fb; }
+.lp-join-facts strong { color: #fff; font-family: var(--font-head); margin-right: 4px; }
+.lp-join-art { display: flex; justify-content: center; }
+
+.js-stage { position: relative; width: min(100%, 440px); aspect-ratio: 1; }
+.js-globe { position: absolute; inset: 15%; width: 70%; height: 70%; filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.45)); animation: jsbob 6s ease-in-out infinite; }
+@keyframes jsbob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+.js-glow { animation: jsglow 4s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+@keyframes jsglow { 0%, 100% { transform: scale(0.97); opacity: 0.5; } 50% { transform: scale(1.04); opacity: 1; } }
+.js-land { animation: jsland 22s linear infinite; }
+@keyframes jsland { to { transform: translateX(-292px); } }
+.js-grid ellipse.m1, .js-grid ellipse.m2, .js-grid ellipse.m3 { transform-box: fill-box; transform-origin: center; animation: jsmer 8s linear infinite; }
+.js-grid ellipse.m2 { animation-delay: -2.7s; }
+.js-grid ellipse.m3 { animation-delay: -5.4s; }
+@keyframes jsmer { 0% { transform: scaleX(1); } 50% { transform: scaleX(0.02); } 100% { transform: scaleX(1); } }
+.js-ping { transform-box: fill-box; transform-origin: center; animation: jsping 2s ease-out infinite; }
+@keyframes jsping { from { transform: scale(1); opacity: 1; } to { transform: scale(3.2); opacity: 0; } }
+
+.js-orbit { position: absolute; inset: 2%; border: 1.5px dashed rgba(255, 255, 255, 0.3); border-radius: 50%; }
+.js-arm { position: absolute; inset: 0; animation: jsspin 32s linear infinite; }
+.js-chip { position: absolute; top: 0; left: 50%; transform: translate(-50%, -50%); white-space: nowrap; background: #fff; color: var(--lp-ink); font-weight: 700; font-size: 0.78rem; padding: 7px 13px; border-radius: 999px; box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35); animation: jsunspin 32s linear infinite; }
+@keyframes jsspin { to { transform: rotate(360deg); } }
+@keyframes jsunspin { from { transform: translate(-50%, -50%) rotate(0); } to { transform: translate(-50%, -50%) rotate(-360deg); } }
+
+.js-star { position: absolute; width: 5px; height: 5px; border-radius: 50%; background: #fff; animation: jstwinkle 3s ease-in-out infinite; }
+.js-star.s1 { left: 4%; top: 18%; } .js-star.s2 { right: 6%; top: 10%; animation-delay: -1s; } .js-star.s3 { left: 12%; bottom: 10%; animation-delay: -2s; }
+.js-star.s4 { right: 10%; bottom: 20%; animation-delay: -0.5s; } .js-star.s5 { left: 46%; top: -2%; animation-delay: -1.5s; } .js-star.s6 { right: -2%; top: 52%; animation-delay: -2.4s; }
+@keyframes jstwinkle { 0%, 100% { opacity: 0.2; transform: scale(0.8); } 50% { opacity: 1; transform: scale(1.5); } }
+
+@media (max-width: 980px) {
+  .lp-join-in { grid-template-columns: 1fr; padding-top: 52px; padding-bottom: 56px; }
+  .js-stage { max-width: 380px; }
+}
+@media (max-width: 600px) { .js-chip { font-size: 0.68rem; padding: 5px 9px; } .lp-join-line { font-size: 1.08rem; } }
+@media (prefers-reduced-motion: reduce) {
+  .js-globe, .js-glow, .js-land, .js-grid ellipse, .js-ping, .js-arm, .js-chip, .js-star, .lp-dot, .lp-swap { animation: none !important; }
+  .js-arm { transform: rotate(calc(var(--i) * 90deg)); }
+  .js-chip { transform: translate(-50%, -50%) rotate(calc(var(--i) * -90deg)); }
+}

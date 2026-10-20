@@ -11,10 +11,12 @@ import { useAuth } from './context/AuthContext.jsx';
 import ComingSoon from './pages/ComingSoon.jsx';
 import DiagnosticPage from './pages/c1/DiagnosticPage.jsx';
 import DashboardPage from './pages/c1/DashboardPage.jsx';
+import TopicInsightsPage from './pages/c1/TopicInsightsPage.jsx';
 import TopicPage from './pages/c1/TopicPage.jsx';
 import PracticePage from './pages/c1/PracticePage.jsx';
 import ProfilePage from './pages/ProfilePage.jsx';
 import LecturerHome from './pages/lecturer/LecturerHome.jsx';
+import ClassInsights from './pages/lecturer/ClassInsights.jsx';
 import AdminDashboard from './pages/admin/AdminDashboard.jsx';
 import LecturerApprovals from './pages/admin/LecturerApprovals.jsx';
 import AssessmentPage from './pages/c3/AssessmentPage.jsx';
@@ -68,6 +70,7 @@ export default function App() {
       <Route element={area('student', STUDENT_MENU, 'Student')}>
         <Route path="/c1/diagnostic" element={<DiagnosticPage />} />
         <Route path="/c1/dashboard" element={<DashboardPage />} />
+        <Route path="/c1/topics" element={<TopicInsightsPage />} />
         <Route path="/c1/topic/:topic" element={<TopicPage />} />
         <Route path="/c1/practice/:topic" element={<PracticePage />} />
 
@@ -83,7 +86,7 @@ export default function App() {
       {/* Lecturer Area */}
       <Route element={area(['lecturer', 'admin'], LECTURER_MENU, 'Lecturer')}>
         <Route path="/lecturer" element={<LecturerHome />} />
-        <Route path="/lecturer/c1/*" element={<ComingSoon title="Class learning state" owner="Component 1" text="Class and student learning state for lecturers." />} />
+        <Route path="/lecturer/c1" element={<ClassInsights />} />
         <Route path="/lecturer/c2/*" element={<ComingSoon title="Exam intelligence" owner="Rupasinghe H T N N" text="Question papers, rubrics and exam patterns." />} />
 
         {/* Component 3: Lecturer Marking Review & Finalization */}

@@ -143,12 +143,37 @@ export default function ExamCalendar({ plan, onSave, savingModule, error }) {
         </table>
       )}
 
-      {plan && plan.predicted && (
-        <p className="cal-predict">
-          If you follow this plan your topics average about <strong>{plan.predicted.withPlan}%</strong> by each exam day{plan.hasExamDates ? '' : ' (2 weeks while no exam date is set)'}.
-          If you stop, about <strong>{plan.predicted.ifYouStop}%</strong>.
-        </p>
-      )}
+      {plan && plan.predicted && (() => {
+        const withPlan = plan.predicted.withPlan;
+        const stop = plan.predicted.ifYouStop;
+        const gain = Math.max(0, withPlan - stop);
+        const pct = (v) => `${Math.max(4, Math.min(100, v))}%`;
+        return (
+          <div className="cal-forecast" role="group" aria-label="Forecast by exam day">
+            <p className="cf-title">Your forecast by exam day</p>
+            <div className="cf-row">
+              <div className="cf-box up">
+                <span className="cf-lab">If you follow the plan</span>
+                <strong>{withPlan}%</strong>
+                <span className="cf-bar" aria-hidden="true"><i style={{ width: pct(withPlan) }} /></span>
+              </div>
+              <div className="cf-gain" aria-label={`${gain} points better`}>
+                <span aria-hidden="true">{'\u2192'}</span>
+                <b>+{gain}</b>
+                <small>points</small>
+              </div>
+              <div className="cf-box down">
+                <span className="cf-lab">If you stop</span>
+                <strong>{stop}%</strong>
+                <span className="cf-bar" aria-hidden="true"><i style={{ width: pct(stop) }} /></span>
+              </div>
+            </div>
+            <p className="cf-foot">
+              Average of your topics{plan.hasExamDates ? ' on each exam day.' : ' in 2 weeks (no exam date is set yet).'} Small daily quizzes keep what you know from fading.
+            </p>
+          </div>
+        );
+      })()}
     </section>
   );
 }
