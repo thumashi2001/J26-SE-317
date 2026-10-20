@@ -24,6 +24,7 @@ const publicStudent = (s) => ({
 
 const publicStaff = (s) => ({
   id: s.staff_id,
+  staff_id: s.staff_id,
   name: s.name,
   email: s.email,
   role: s.role,
@@ -103,7 +104,7 @@ export async function registerLecturer(db, body) {
 }
 
 export async function login(db, body) {
-  const id = normaliseId(body.userId || body.studentId);
+  const id = normaliseId(body.userId || body.studentId || body.staffId);
   const password = String(body.password || '');
   if (!id || !password) throw httpError(400, 'Enter your ID and password');
 
@@ -127,12 +128,15 @@ export async function login(db, body) {
 }
 
 export async function me(db, user) {
-  if (user.role === 'student') {
-    const student = await db.collection('students').findOne({ student_id: user.sub });
+  const sub = typeof user === 'string' ? user : user?.sub;
+  const role = typeof user === 'string' ? null : user?.role;
+
+  if (role === 'student' || (!role && kindOf(sub) === 'student')) {
+    const student = await db.collection('students').findOne({ student_id: sub });
     if (!student) throw httpError(401, 'Please log in again');
     return { user: publicStudent(student) };
   }
-  const person = await db.collection('staff').findOne({ staff_id: user.sub });
+  const person = await db.collection('staff').findOne({ staff_id: sub });
   if (!person) throw httpError(401, 'Please log in again');
   if (person.status !== 'approved') throw httpError(403, 'Your account is not approved');
   return { user: publicStaff(person) };
