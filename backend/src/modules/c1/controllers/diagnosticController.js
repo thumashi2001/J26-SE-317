@@ -27,10 +27,10 @@ export const getDiagnostic = handle(async (req) => {
 });
 
 export const submitDiagnostic = handle(async (req) => {
-  const { studentId: supplied, answers } = req.body || {};
+  const { studentId: supplied, answers, timedOut, totalSec } = req.body || {};
   if (!Array.isArray(answers)) throw badRequest('answers[] is required');
   const studentId = resolveStudentId(req, supplied);
-  return service.submitDiagnostic(getDb(), studentId, answers, AI_URL());
+  return service.submitDiagnostic(getDb(), studentId, answers, AI_URL(), { timedOut: timedOut === true, totalSec: Number.isFinite(Number(totalSec)) ? Math.round(Number(totalSec)) : null });
 });
 
 export const getTwin = handle(async (req) => {

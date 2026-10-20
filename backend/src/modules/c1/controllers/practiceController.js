@@ -35,5 +35,12 @@ export const answer = handle(async (req) => {
   return service.answerQuestion(getDb(), studentId, b, AI_URL());
 });
 
+export const hint = handle(async (req) => {
+  const b = req.body || {};
+  if (!b.sessionId || !b.questionId) throw badRequest('sessionId and questionId are required');
+  const studentId = resolveStudentId(req, b.studentId);
+  return service.useHint(getDb(), studentId, b);
+});
+
 // Which topics can be practised, so the screens only offer a Practise button where it works.
 export const topics = handle(async () => ({ topics: service.practiceTopics() }));
