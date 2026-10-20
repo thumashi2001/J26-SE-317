@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { prettyTopic } from '../../utils/topics.js';
 import {
   getSimScenarios,
   getSimDemoReady,
@@ -7,13 +8,14 @@ import {
   predictSimPath,
   predictSimResponse,
 } from './c4Api.js';
+import { visibleError } from './studentCopy.js';
 
 function ResultBlock({ title, loading, error, empty, children }) {
   return (
     <div className="panel c4-sim-result">
       <h3>{title}</h3>
       {loading && <p className="muted small">Running synthetic prediction…</p>}
-      {error && <p className="error">{error}</p>}
+      {error && <p className="error">{visibleError(error)}</p>}
       {!loading && !error && empty && (
         <p className="muted small">No result yet — pick a scenario and run.</p>
       )}
@@ -22,16 +24,21 @@ function ResultBlock({ title, loading, error, empty, children }) {
   );
 }
 
-function MetaLine({ out }) {
+function SyntheticNote({ out }) {
   if (!out) return null;
   return (
     <p className="muted small">
-      synthetic={String(out.synthetic ?? out.synthetic_scenario != null)} · simulation_only=
-      {String(out.simulation_only)} · demo_not_persisted={String(out.demo_not_persisted)} ·{' '}
-      {out.protocol}
-      {out.semester ? ` · semester ${out.semester}` : ''}
+      Synthetic data only. This result is not saved to your study record.
+      {out.semester ? ` Semester ${out.semester}.` : ''}
     </p>
   );
+}
+
+function scorePercent(value) {
+  if (value == null || !Number.isFinite(Number(value))) return '—';
+  const n = Number(value);
+  const pct = n <= 1 ? n * 100 : n;
+  return `${pct.toFixed(1)}%`;
 }
 
 export default function SimulationDemoPanel() {
@@ -61,8 +68,7 @@ export default function SimulationDemoPanel() {
       setReady(null);
       setScenarios(null);
       setLoadError(
-        err.message ||
-          'Could not load simulation demo metadata (Node proxy or login may be unavailable)'
+        err.message || 'Could not load the simulation demo. You may need to sign in again.'
       );
     }
   }, []);
@@ -153,22 +159,19 @@ export default function SimulationDemoPanel() {
     <div className="c4-sim-demo">
       <h2>Synthetic simulation demo</h2>
       <p className="muted">
-        These controls call the imported C4 <strong>v1 simulation models</strong> through an
-        authenticated Node proxy. Inputs are synthetic scenarios — not your C1 twin, and nothing
-        is written to student records. The Adaptive learning path tab remains the operational
-        heuristic study plan.
+        This demo uses made-up learner data. It is not your study plan, and nothing here is saved
+        to your account. Results are experimental and are not validated student performance.
       </p>
       <p className="muted small">
-        Prediction probabilities are <strong>not</strong> model accuracy. The 55% synthetic
-        pass-label cutoff is not an institutional rule.
+        A probability here is not a measure of how accurate the model is. The synthetic pass
+        cutoff is not a university rule.
       </p>
 
       {loadError && (
         <div className="panel">
-          <p className="error">{loadError}</p>
+          <p className="error">{visibleError(loadError)}</p>
           <p className="muted small">
-            Service unavailable for the demo proxy. Check Node is running on the Vite-proxied
-            port (3000), you are logged in, and C4 AI is on 8004.
+            The simulation demo is unavailable. Check that you are signed in, then try again.
           </p>
           <button type="button" className="btn secondary" onClick={refreshMeta}>
             Retry
@@ -186,28 +189,19 @@ export default function SimulationDemoPanel() {
             Refresh status
           </button>
         </div>
-        <p className="muted small">
-          Path protocol: {ready?.path?.protocol || '—'} · Supervised:{' '}
-          {ready?.supervised?.protocol || '—'} · Catalogue:{' '}
-          {(ready?.catalogue_hash || '').slice(0, 12) || '—'}…
-        </p>
         {(ready?.path_error || ready?.supervised_error) && (
-          <p className="muted small">
-            {ready.path_error ? `Path: ${ready.path_error.message}. ` : ''}
-            {ready.supervised_error ? `Supervised: ${ready.supervised_error.message}.` : ''} Start{' '}
-            <code>uvicorn</code> on port 8004 if needed.
-          </p>
+          <p className="muted small">The simulation models are not ready.</p>
         )}
         {!modelsReady && !loadError && (
           <p className="muted small">
-            Predictions stay disabled until both path and supervised v1 models report ready.
+            Predictions stay unavailable until the simulation models are ready.
           </p>
         )}
       </div>
 
       <div className="c4-sim-grid">
         <div className="panel">
-          <h3>1. Path suggestion (MaskablePPO)</h3>
+          <h3>1. Suggested next topic</h3>
           <label className="c4-label">
             Synthetic scenario (includes Y3S1 and Y3S2)
             <select value={pathId} onChange={(e) => setPathId(e.target.value)}>
@@ -219,9 +213,9 @@ export default function SimulationDemoPanel() {
               ))}
             </select>
           </label>
-          <p className="muted small">{pathScenario?.description}</p>
+          <p className="muted small">Made-up learner data for this demo. Not a real student record.</p>
           {pathScenario?.semester && (
-            <p className="muted small">Semester mask: {pathScenario.semester} only.</p>
+            <p className="muted small">Includes only topics from semester {pathScenario.semester}.</p>
           )}
           <button
             type="button"
@@ -235,12 +229,10 @@ export default function SimulationDemoPanel() {
             {pathOut && (
               <>
                 <p>
-                  <strong>{pathOut.topic_id}</strong> (index {pathOut.action_index})
+                  <strong>{pathOut.topic_id ? prettyTopic(pathOut.topic_id) : 'No topic returned'}</strong>
                 </p>
-                <MetaLine out={pathOut} />
-                <p className="muted small">
-                  Seed {pathOut.seed} · Not a live student recommendation.
-                </p>
+                <SyntheticNote out={pathOut} />
+                <p className="muted small">Not a recommendation for your account.</p>
               </>
             )}
           </ResultBlock>
@@ -259,7 +251,7 @@ export default function SimulationDemoPanel() {
               ))}
             </select>
           </label>
-          <p className="muted small">{responseScenario?.description}</p>
+          <p className="muted small">Made-up practice history for this demo. Not a real student record.</p>
           <button
             type="button"
             className="btn"
@@ -277,12 +269,14 @@ export default function SimulationDemoPanel() {
             {responseOut && (
               <>
                 <p>
-                  <strong>p_correct = {(responseOut.p_correct * 100).toFixed(1)}%</strong>
+                  <strong>
+                    Estimated chance of a correct answer: {(responseOut.p_correct * 100).toFixed(1)}%
+                  </strong>
                 </p>
-                <MetaLine out={responseOut} />
+                <SyntheticNote out={responseOut} />
                 <p className="muted small">
-                  Predicted probability for a synthetic attempt — not model accuracy and not a
-                  real student result. Model: {responseOut.selected_model}
+                  This is a prediction for made-up data. It is not a real student result and not a
+                  measure of model accuracy.
                 </p>
               </>
             )}
@@ -290,9 +284,9 @@ export default function SimulationDemoPanel() {
         </div>
 
         <div className="panel">
-          <h3>3–4. Mock-exam score &amp; pass probability</h3>
+          <h3>3–4. Synthetic quiz score and pass chance</h3>
           <label className="c4-label">
-            Synthetic exam scenario (Y3S1 / Y3S2)
+            Synthetic quiz scenario
             <select value={examId} onChange={(e) => setExamId(e.target.value)}>
               {(scenarios?.exam || []).map((s) => (
                 <option key={s.id} value={s.id}>
@@ -302,7 +296,7 @@ export default function SimulationDemoPanel() {
               ))}
             </select>
           </label>
-          <p className="muted small">{examScenario?.description}</p>
+          <p className="muted small">Made-up practice totals for this demo. Not a real exam record.</p>
           <div className="c4-actions">
             <button
               type="button"
@@ -339,19 +333,13 @@ export default function SimulationDemoPanel() {
               <>
                 <p>
                   <strong>
-                    raw = {examOut.exam_score_raw?.toFixed?.(4) ?? examOut.exam_score_raw}
+                    Estimated score:{' '}
+                    {scorePercent(examOut.exam_score_clipped_display ?? examOut.exam_score_raw)}
                   </strong>
-                  {examOut.exam_score_clipped_display != null && (
-                    <>
-                      {' '}
-                      · display clip = {examOut.exam_score_clipped_display.toFixed(4)}
-                    </>
-                  )}
                 </p>
-                <MetaLine out={examOut} />
+                <SyntheticNote out={examOut} />
                 <p className="muted small">
-                  Fraction-correct scale [0,1] under the synthetic generator. Not a real module
-                  exam mark. Model: {examOut.selected_model}
+                  This is a fraction correct on made-up data, not a university exam mark.
                 </p>
               </>
             )}
@@ -365,14 +353,14 @@ export default function SimulationDemoPanel() {
             {passOut && (
               <>
                 <p>
-                  <strong>p_pass = {(passOut.p_pass * 100).toFixed(1)}%</strong>
+                  <strong>
+                    Estimated chance of passing this synthetic quiz: {(passOut.p_pass * 100).toFixed(1)}%
+                  </strong>
                 </p>
-                <MetaLine out={passOut} />
+                <SyntheticNote out={passOut} />
                 <p className="muted small">
-                  Probability that synthetic mock fraction-correct ≥ {passOut.pass_threshold}. The{' '}
-                  <strong>55% synthetic pass-label cutoff is not an institutional rule</strong>.
-                  Classification probability threshold {passOut.classification_prob_threshold} is
-                  separate. real_exam_validation={String(passOut.real_exam_validation)}.
+                  This uses a synthetic cutoff, not a university rule. It is not a validated result
+                  for real students.
                 </p>
               </>
             )}

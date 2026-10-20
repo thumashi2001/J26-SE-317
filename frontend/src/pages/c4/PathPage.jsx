@@ -13,36 +13,26 @@ import {
 import SimulationDemoPanel from './SimulationDemoPanel.jsx';
 import ExamPanel from './ExamPanel.jsx';
 import FeedbackPanel from './FeedbackPanel.jsx';
+import {
+  activityKindLabel,
+  activityOpenLabel,
+  activityStatusLabel,
+  actionTypeLabel,
+  planRefreshNote,
+  revisionReason,
+  studentReason,
+  unavailableReason,
+  visibleError,
+} from './studentCopy.js';
 import './c4.css';
-
-function statusLabel(status) {
-  if (status === 'practice_verified') return 'Verified practice (session finished)';
-  if (status === 'practice_observed') return 'Practice in progress (not complete)';
-  if (status === 'self_reported_complete') return 'Marked done (self-reported)';
-  if (status === 'overdue') return 'Overdue';
-  return 'Up next';
-}
 
 const TABS = [
   { id: 'plan', label: 'Study plan' },
   { id: 'progress', label: 'Progress' },
   { id: 'exams', label: 'Mock quizzes' },
   { id: 'feedback', label: 'Feedback' },
-  { id: 'sim', label: 'Model simulation demo' },
+  { id: 'sim', label: 'Simulation demo' },
 ];
-
-function kindLabel(kind) {
-  if (kind === 'c1_revision') return 'Revision';
-  if (kind === 'c4_quiz') return 'Quiz';
-  if (kind === 'c1_practice') return 'Practice';
-  return kind || 'Activity';
-}
-
-function openLabel(kind) {
-  if (kind === 'c1_revision') return 'Open revision';
-  if (kind === 'c4_quiz') return 'Open quiz';
-  return 'Open practice';
-}
 
 export default function PathPage() {
   const { user } = useAuth();
@@ -156,7 +146,7 @@ export default function PathPage() {
       const created = await createPath(body);
       setPath(created);
       if (created.reused) setInfo('Showing your existing active path.');
-      else setInfo('Created a daily study plan from your C1 twin (heuristic ranking).');
+      else setInfo('Created a daily study plan from your current mastery.');
     } catch (err) {
       setError(err.message);
     } finally {
@@ -175,7 +165,7 @@ export default function PathPage() {
       setInfo(
         updated.progress?.duplicate
           ? 'Already marked done.'
-          : 'Self-reported complete. Use Refresh after C1 practice for verified completion.'
+          : 'Marked done (self-reported). Refresh after practice to record a verified completion.'
       );
     } catch (err) {
       setError(err.message);
@@ -216,7 +206,7 @@ export default function PathPage() {
         expectedUpdatedAt: path.updatedAt,
       });
       setPath(updated);
-      setInfo(updated.refreshNote || 'Refreshed from C1.');
+      setInfo(planRefreshNote(updated.refreshNote));
     } catch (err) {
       setError(err.message);
     } finally {
@@ -241,11 +231,12 @@ export default function PathPage() {
     <div className="c4-path">
       <h1>Adaptive learning path</h1>
       <p className="muted">
-        Personalized daily study plan from your C1 learner state, plus practice links, mock quizzes,
-        and feedback. Operational ranking uses the named heuristic — not RL.
+        A personal daily study plan from your current mastery, with practice, topic review,
+        practice quizzes, and feedback. The daily order uses a simple priority rule. An
+        experimental recommendation is shown only when one is available.
       </p>
 
-      <div className="c4-tabs" role="tablist" aria-label="C4 sections">
+      <div className="c4-tabs" role="tablist" aria-label="Study sections">
         {TABS.map((t) => (
           <button
             key={t.id}
@@ -268,7 +259,7 @@ export default function PathPage() {
         <>
           {error && (
             <div className="panel">
-              <p className="error">{error}</p>
+              <p className="error">{visibleError(error)}</p>
               {diagnosticBlocked && (
                 <p>
                   <Link className="btn" to="/c1/diagnostic">
@@ -288,8 +279,8 @@ export default function PathPage() {
             <div className="panel">
               <h2>Create your daily study plan</h2>
               <p className="muted">
-                Uses C1 twin mastery (0–100) and practice eligibility. Durations are planning
-                estimates.
+                Uses your mastery scores (0–100) and which topics you can practise. Durations are
+                planning estimates.
               </p>
               <div className="c4-sim-form">
                 <label className="c4-label">
@@ -354,8 +345,8 @@ export default function PathPage() {
             <>
               <div className="panel c4-meta">
                 <div>
-                  <span className="chip">{path.strategy}</span>
-                  <span className="muted small"> revision {path.revision}</span>
+                  <span className="chip">Priority plan</span>
+                  <span className="muted small"> Plan version {path.revision}</span>
                 </div>
                 <div className="c4-overview" aria-label="Plan overview">
                   <span className="chip">
@@ -371,95 +362,60 @@ export default function PathPage() {
                   )}
                 </div>
                 <p className="muted small">
-                  Snapshot{' '}
+                  Learner profile{' '}
                   {path.sourceSnapshotAt ? new Date(path.sourceSnapshotAt).toLocaleString() : '—'}
                   {path.sourceSnapshot?.insights_available === false
-                    ? ' · C1 insights unavailable; ranked from twin scores'
+                    ? ' · Learner insights unavailable; ranked from saved mastery scores'
                     : ''}
                 </p>
                 {path.multiActionPolicy?.activated && path.multiActionPolicy?.protocol === 'se-path-multi-v2' ? (
-                  <div className="panel c4-reco" aria-label="se-path-multi-v2 next activity">
+                  <div className="panel c4-reco" aria-label="Experimental next activity">
                     <h3>Next activity</h3>
                     <p>
                       <strong>{prettyTopic(path.multiActionPolicy.topic)}</strong>
-                      <span className="chip">{path.multiActionPolicy.action_type}</span>
-                      <span className="chip">se-path-multi-v2 · synthetic validation</span>
+                      <span className="chip">{actionTypeLabel(path.multiActionPolicy.action_type)}</span>
+                      <span className="chip">Experimental recommendation</span>
                     </p>
                     <p className="muted small">
-                      MaskablePPO selected this eligible practice, revision, or quiz. Seed{' '}
-                      {path.multiActionPolicy.selected_seed ?? '—'}, revision{' '}
-                      {path.multiActionPolicy.training_revision || '—'}. The checkpoint passed its
-                      declared simulator floor for simulated mastery change. This is not classification
-                      accuracy and not a real-student learning result. Calendar dates and time budgets
-                      stay on weakest_stored_mastery_v1.
+                      Suggested from an experimental model trained on synthetic practice. This is not
+                      a measured result for real students. Dates and time budgets on the plan still
+                      follow a simple priority rule.
                     </p>
                     {path.multiActionPolicy.launch_path ? (
                       <Link className="btn" to={path.multiActionPolicy.launch_path}>
                         Open selected activity
                       </Link>
                     ) : null}
-                    <p className="muted small">
-                      Catalogue {(path.multiActionPolicy.catalogue_hash || '').slice(0, 12)}… · checkpoint{' '}
-                      {(path.multiActionPolicy.checkpoint_sha256 || '').slice(0, 12)}…
-                    </p>
                   </div>
                 ) : (
                   <p className="muted small">
-                    se-path-multi-v2 was not used
-                    {path.multiActionPolicy?.reason ? ` (${path.multiActionPolicy.reason})` : ''}. The
-                    list below is the heuristic plan, or an older experimental practice pin. It is not an
-                    RL action.
+                    No experimental recommendation is available. The list below uses a simple
+                    priority rule based on your weaker topics. It is not a model-chosen action.
                   </p>
                 )}
                 {path.modelRecommendation?.ok && path.modelRecommendation.recommended_topic ? (
-                  <div className="panel c4-reco" aria-label="Experimental next practice recommendation">
-                    <h3>Experimental next practice</h3>
+                  <div className="panel c4-reco" aria-label="Experimental recommendation">
+                    <h3>Experimental recommendation</h3>
                     <p>
                       <strong>{prettyTopic(path.modelRecommendation.recommended_topic)}</strong>
-                      <span className="chip">se-path-sim-v1 · experimental</span>
+                      <span className="chip">Experimental recommendation</span>
                       {path.nextActivityTopic === path.modelRecommendation.recommended_topic && (
-                        <span className="chip ok">pinned on plan</span>
+                        <span className="chip ok">Shown first on your plan</span>
                       )}
                     </p>
                     <p className="muted small">
-                      Simulation-trained experimental recommendation for the next eligible practice
-                      topic. Calendar dates and time budgets still use weakest_stored_mastery_v1 —
-                      not an RL multi-day forecast. Not real-exam validated.
+                      Suggested next practice from an experimental model. Dates and time budgets
+                      still follow a simple priority rule. This is not a validated exam result.
                     </p>
                     <Link className="btn" to={path.modelRecommendation.launch_path}>
                       Start next practice
                     </Link>
-                    <details className="c4-details">
-                      <summary>Serving assumptions &amp; provenance</summary>
-                      <p className="muted small">
-                        Protocol {path.modelRecommendation.protocol} · catalogue{' '}
-                        {(path.modelRecommendation.catalogue_hash || '').slice(0, 12)}… · input{' '}
-                        {path.modelRecommendation.input_timestamp
-                          ? new Date(path.modelRecommendation.input_timestamp).toLocaleString()
-                          : '—'}
-                      </p>
-                      <p className="muted small">
-                        step_frac ≈ deduplicated quiz_answer attempts since episode start ÷ 40
-                        (Mark done never counted) — a serving approximation of training attempt
-                        units; training/serving mismatch is <em>not</em> claimed eliminated.{' '}
-                        <strong>
-                          prior_strength = {path.liveModelEpisode?.prior_strength ?? 0.45}
-                        </strong>{' '}
-                        is an <em>assumed</em> protocol constant, not measured student data.
-                        Fallback ranking stays weakest_stored_mastery_v1 when the model is
-                        unavailable.
-                      </p>
-                    </details>
                   </div>
                 ) : path.multiActionPolicy?.activated &&
                   path.multiActionPolicy?.protocol === 'se-path-multi-v2' ? null : (
                   <p className="muted small">
-                    Path model fallback ({path.modelRecommendation?.fallback || 'weakest_stored_mastery_v1'}
-                    ):{' '}
-                    {path.modelRecommendation?.reason ||
-                      path.modelEstimates?.path?.reason ||
-                      'unavailable — heuristic plan remains in use.'}{' '}
-                    This fallback is not an RL action.
+                    Recommendations are unavailable, so this plan keeps a simple priority rule based
+                    on your weaker topics. This is not a model-chosen action.
                   </p>
                 )}
                 <details className="c4-details">
@@ -481,25 +437,16 @@ export default function PathPage() {
                         {path.engagement.observedInProgress}. Self-report is not verified practice.
                       </p>
                       {path.activityTypeLimits?.coding_exercise?.scheduled === false && (
-                        <p>{path.activityTypeLimits.coding_exercise.reason}</p>
+                        <p>Coding exercises are not available yet.</p>
                       )}
                     </div>
                   ) : (
                     <p className="muted small">Engagement summary unavailable.</p>
                   )}
                 </details>
-                <details className="c4-details">
-                  <summary>Live model estimate status</summary>
-                  <p className="muted small">
-                    {path.modelEstimates
-                      ? `Path inputs: ${path.modelEstimates.path?.usable ? 'usable' : 'unavailable'} (${path.modelEstimates.path?.code}). Supervised response: blocked (no item difficulty). ${path.modelEstimates.label || ''}`
-                      : 'No estimate payload.'}{' '}
-                    Operational daily plan uses weakest_stored_mastery_v1 — not RL.
-                  </p>
-                </details>
                 <div className="c4-actions">
                   <button type="button" className="btn secondary" disabled={busy} onClick={onRefresh}>
-                    Refresh from C1
+                    Refresh progress
                   </button>
                   <button type="button" className="btn secondary" disabled={busy} onClick={onReplan}>
                     Replan
@@ -596,19 +543,19 @@ export default function PathPage() {
                       {today.activities.map((a) => (
                         <li key={a.activity_id}>
                           <strong>{prettyTopic(a.topic)}</strong>
-                          <span className="chip">{a.status || 'scheduled'}</span>
+                          <span className="chip">{activityStatusLabel(a.status)}</span>
                           {a.next_activity && (
-                            <span className="chip ok">next {kindLabel(a.kind).toLowerCase()}</span>
+                            <span className="chip ok">Next {activityKindLabel(a.kind).toLowerCase()}</span>
                           )}
                           <span className="muted small">
                             {' '}
-                            · ~{a.estimated_minutes} min (estimate) · {a.priority_reason}
+                            · ~{a.estimated_minutes} min (estimate) · {studentReason(a.priority_reason)}
                           </span>
                           <div className="c4-item-actions">
                             <Link className="btn" to={a.launch_path}>
                               {a.next_activity && a.kind === 'c1_practice'
                                 ? 'Start next practice'
-                                : openLabel(a.kind)}
+                                : activityOpenLabel(a.kind)}
                             </Link>
                           </div>
                         </li>
@@ -663,7 +610,7 @@ export default function PathPage() {
                             </span>
                             <div className="c4-item-actions">
                               <Link className="btn" to={a.launchPath}>
-                                {openLabel(a.kind)}
+                                {activityOpenLabel(a.kind)}
                               </Link>
                             </div>
                           </li>
@@ -692,7 +639,7 @@ export default function PathPage() {
                         .map((a) => (
                           <li key={a.activityId}>
                             <strong>{prettyTopic(a.topic)}</strong>
-                            <span className="chip">{statusLabel(a.status)}</span>
+                            <span className="chip">{activityStatusLabel(a.status)}</span>
                             <span className="muted small">
                               {' '}
                               · {a.completedAt ? new Date(a.completedAt).toLocaleString() : ''}
@@ -712,7 +659,7 @@ export default function PathPage() {
                     {schedule.unscheduled.map((u) => (
                       <li key={u.activity_id}>
                         <strong>{prettyTopic(u.topic)}</strong>
-                        <span className="muted"> — {u.reason}</span>
+                        <span className="muted"> — {unavailableReason(u.reason)}</span>
                       </li>
                     ))}
                   </ul>
@@ -726,10 +673,10 @@ export default function PathPage() {
               <div className="panel c4-meta">
                 <p className="muted small">
                   Overdue: {schedule?.summary?.overdueCount ?? 0} · Completed:{' '}
-                  {schedule?.summary?.completedCount ?? 0} · Path revision {path.revision}
+                  {schedule?.summary?.completedCount ?? 0} · Plan version {path.revision}
                 </p>
                 <p className="muted small">
-                  C1 snapshot:{' '}
+                  Learner profile:{' '}
                   {path.sourceSnapshotAt
                     ? new Date(path.sourceSnapshotAt).toLocaleString()
                     : '—'}
@@ -738,13 +685,12 @@ export default function PathPage() {
                     : ''}
                 </p>
                 <p className="muted small">
-                  Statuses distinguish self-reported completion, practice participation
-                  (observed), and finished verified C1 practice sessions. No invented
-                  improvement charts.
+                  Statuses show self-reported completion, practice in progress, and verified
+                  finished practice. Completion is not shown as an improvement score.
                 </p>
                 <div className="c4-actions">
                   <button type="button" className="btn secondary" disabled={busy} onClick={onRefresh}>
-                    Refresh from C1
+                    Refresh progress
                   </button>
                   <button type="button" className="btn secondary" disabled={busy} onClick={onReplan}>
                     Replan from latest mastery
@@ -757,15 +703,13 @@ export default function PathPage() {
                   <li key={a.activityId} className="panel c4-item" data-status={a.status}>
                     <div className="c4-item-head">
                       <strong>{prettyTopic(a.topic)}</strong>
-                      <span className="chip">{kindLabel(a.kind)}</span>
-                      <span className="chip">{statusLabel(a.status)}</span>
+                      <span className="chip">{activityKindLabel(a.kind)}</span>
+                      <span className="chip">{activityStatusLabel(a.status)}</span>
                       {a.nextActivity && (
-                        <span className="chip ok">
-                          next · {a.nextActivitySource || 'model'}
-                        </span>
+                        <span className="chip ok">Experimental recommendation</span>
                       )}
                     </div>
-                    <p className="muted small">{a.recommendationReason}</p>
+                    <p className="muted small">{studentReason(a.recommendationReason)}</p>
                     {a.scheduledDate && (
                       <p className="muted small">
                         Scheduled {a.scheduledDate}
@@ -776,19 +720,18 @@ export default function PathPage() {
                     )}
                     {a.rankScore != null && (
                       <p className="muted small">
-                        Rank score at plan time: {a.rankScore}
-                        {a.scoreSource ? ` (${a.scoreSource})` : ''} on C1 0–100 scale
+                        Mastery used for planning: {a.rankScore} out of 100
                       </p>
                     )}
                     {a.completionKind && (
                       <p className="muted small">
-                        Completion: {a.completionKind}
                         {a.completionKind === 'self_reported'
-                          ? ' (not an assessed C1 result)'
-                          : ''}
-                        {a.completionKind === 'practice_observed'
-                          ? ' — finish the C1 practice session to verify'
-                          : ''}
+                          ? 'Marked done (self-reported, not a verified practice result)'
+                          : a.completionKind === 'practice_observed'
+                            ? 'Practice in progress — finish the practice session to verify'
+                            : a.completionKind === 'practice_verified'
+                              ? 'Verified practice (session finished)'
+                              : activityStatusLabel(a.status)}
                         {a.completedAt
                           ? ` · ${new Date(a.completedAt).toLocaleString()}`
                           : ''}
@@ -796,12 +739,12 @@ export default function PathPage() {
                     )}
                     {a.practiceEvidence?.sessionId && (
                       <p className="muted small">
-                        Linked C1 session: {a.practiceEvidence.sessionId}
+                        Practice session
                         {a.practiceEvidence.finishedAt
-                          ? ` · finished ${new Date(a.practiceEvidence.finishedAt).toLocaleString()}`
+                          ? ` finished ${new Date(a.practiceEvidence.finishedAt).toLocaleString()}`
                           : a.practiceEvidence.inProgress
-                            ? ' · in progress'
-                            : ''}
+                            ? ' in progress'
+                            : ' recorded'}
                         {a.practiceEvidence.answered != null && a.practiceEvidence.total != null
                           ? ` · ${a.practiceEvidence.answered}/${a.practiceEvidence.total} answered`
                           : ''}
@@ -814,7 +757,7 @@ export default function PathPage() {
                     )}
                     <div className="c4-item-actions">
                       <Link className="btn" to={a.launchPath}>
-                        {openLabel(a.kind)}
+                        {activityOpenLabel(a.kind)}
                       </Link>
                       {(a.status === 'pending' ||
                         a.status === 'overdue' ||
@@ -840,7 +783,7 @@ export default function PathPage() {
                     {path.unavailable.map((u) => (
                       <li key={u.topic}>
                         <strong>{prettyTopic(u.topic)}</strong>
-                        <span className="muted"> — {u.reason}</span>
+                        <span className="muted"> — {unavailableReason(u.reason)}</span>
                       </li>
                     ))}
                   </ul>
@@ -855,7 +798,7 @@ export default function PathPage() {
                   <ul className="c4-unavailable">
                     {revisions.map((r) => (
                       <li key={r.revisionId}>
-                        Rev {r.revision} · {r.reason} ·{' '}
+                        Plan version {r.revision} · {revisionReason(r.reason)} ·{' '}
                         {r.archivedAt ? new Date(r.archivedAt).toLocaleString() : '—'}
                       </li>
                     ))}

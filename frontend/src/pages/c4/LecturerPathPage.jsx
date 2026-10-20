@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { getLecturerScope } from './c4Api.js';
+import { lecturerAccessMessage } from './studentCopy.js';
 import './c4.css';
 
 /**
@@ -21,7 +22,7 @@ export default function LecturerPathPage() {
       setScope(body);
     } catch (err) {
       setScope(null);
-      setError(err.message || 'Could not check lecturer access');
+      setError(lecturerAccessMessage(err.message || 'Could not check lecturer access'));
     } finally {
       setLoading(false);
     }
@@ -49,7 +50,7 @@ export default function LecturerPathPage() {
         cannot mark work complete or open private feedback.
       </p>
 
-      {loading && <p className="muted">Checking access scope…</p>}
+      {loading && <p className="muted">Checking access…</p>}
 
       {error && (
         <div className="panel">
@@ -65,14 +66,13 @@ export default function LecturerPathPage() {
       {!loading && !error && (
         <div className="panel">
           <p className="chip">Not operational</p>
-          <p>{scope?.reason || 'Lecturer scope is unavailable.'}</p>
+          <p>{lecturerAccessMessage(scope?.reason)}</p>
           <p className="muted small">
-            Student search is disabled. C4 does not load every registered student, and a student
-            ID typed here would not grant access.
+            Student search is unavailable until students are assigned to your account.
           </p>
           <label className="c4-label">
             Student ID
-            <input type="text" disabled value="" placeholder="Unavailable until a roster is approved" />
+            <input type="text" disabled value="" placeholder="Unavailable until students are assigned" />
           </label>
         </div>
       )}

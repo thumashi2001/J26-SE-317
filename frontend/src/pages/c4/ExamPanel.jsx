@@ -9,6 +9,7 @@ import {
   saveExamAnswers,
   submitExam,
 } from './c4Api.js';
+import { attemptStatusLabel, examContentNote, examSourceCopy, visibleError } from './studentCopy.js';
 
 function formatRemain(ms) {
   if (ms <= 0) return '0:00';
@@ -109,7 +110,7 @@ export default function ExamPanel({ focusTopic = null }) {
       setActive(attempt);
       setAnswers(attempt.answers || {});
       setQIndex(0);
-      setInfo('Quiz started from C1 practice bank (not a C2 past paper).');
+      setInfo('Practice quiz started.');
       await load();
     } catch (err) {
       setError(err.message);
@@ -196,14 +197,13 @@ export default function ExamPanel({ focusTopic = null }) {
     <div className="c4-exam">
       <h2>Mock quizzes</h2>
       <p className="muted">
-        Source: <strong>C1 practice bank</strong> (snapshotted into a C4 attempt). Not a C2 past
-        paper and not a university module exam.
+        Questions come from your practice bank. This is not a past paper and not a university exam.
       </p>
 
       {error && (
         <div className="panel">
           <p className="error" role="alert">
-            {error}
+            {visibleError(error)}
           </p>
           <button type="button" className="btn secondary" onClick={load}>
             Retry
@@ -213,7 +213,7 @@ export default function ExamPanel({ focusTopic = null }) {
       {info && <p className="muted small">{info}</p>}
 
       <div className="panel">
-        <h3>Start a practice-bank quiz</h3>
+        <h3>Start a practice quiz</h3>
         <div className="c4-sim-form c4-exam-settings">
           <label className="c4-label">
             Questions (3–40)
@@ -239,13 +239,13 @@ export default function ExamPanel({ focusTopic = null }) {
           </label>
         </div>
         <p className="muted small">
-          Eligible topics come from your C1 twin and semester. Timing and grading are enforced on
-          the server.
+          Topics come from your current mastery and semester. Timing and grading are checked when
+          you submit.
         </p>
         {focusTopic ? (
           <p className="muted small">
-            Quiz topic from the plan link: <strong>{prettyTopic(focusTopic)}</strong> ({focusTopic}
-            ). Starting uses only this topic when it is eligible for your semester.
+            Quiz topic from your plan: <strong>{prettyTopic(focusTopic)}</strong>. Starting uses
+            only this topic when it is available for your semester.
           </p>
         ) : (
           <p className="muted small">
@@ -254,24 +254,21 @@ export default function ExamPanel({ focusTopic = null }) {
           </p>
         )}
         <ul className="c4-unavailable">
-          {(sources?.sources || []).map((s) => (
-            <li key={s.id}>
-              <strong>{s.label}</strong>
-              <span className="muted">
-                {' '}
-                — {s.available ? 'Available' : 'Unavailable'}. {s.description}
-              </span>
-            </li>
-          ))}
+          {(sources?.sources || []).map((s) => {
+            const copy = examSourceCopy(s);
+            return (
+              <li key={s.id}>
+                <strong>{copy.label}</strong>
+                <span className="muted"> — {copy.detail}</span>
+              </li>
+            );
+          })}
         </ul>
         {c2 && !c2.available && (
-          <p className="muted small">
-            C2 past papers: unavailable (no delivery API). The start button below uses the practice
-            bank only.
-          </p>
+          <p className="muted small">Past papers are currently unavailable.</p>
         )}
         <button type="button" className="btn" disabled={busy} onClick={start}>
-          {busy ? 'Starting…' : 'Start practice-bank mock quiz'}
+          {busy ? 'Starting…' : 'Start practice quiz'}
         </button>
       </div>
 
@@ -284,7 +281,7 @@ export default function ExamPanel({ focusTopic = null }) {
             {attempts.map((a) => (
               <li key={a.attemptId}>
                 <button type="button" className="btn secondary" disabled={busy} onClick={() => open(a.attemptId)}>
-                  <span className="chip">{a.status}</span>
+                  <span className="chip">{attemptStatusLabel(a.status)}</span>
                   {a.result ? ` ${a.result.scorePercent}%` : ''} · {a.questionCount} Q ·{' '}
                   {a.createdAt ? new Date(a.createdAt).toLocaleString() : ''}
                 </button>
@@ -298,7 +295,7 @@ export default function ExamPanel({ focusTopic = null }) {
         <div className="panel c4-exam-active">
           <div className="c4-exam-toolbar">
             <h3>
-              Attempt · {active.status}
+              Attempt · {attemptStatusLabel(active.status)}
             </h3>
             {remainMs != null && active.status === 'in_progress' && (
               <span
@@ -310,30 +307,33 @@ export default function ExamPanel({ focusTopic = null }) {
               </span>
             )}
           </div>
-          <p className="muted small">{active.contentNote}</p>
+          {examContentNote(active.contentNote) && (
+            <p className="muted small">{examContentNote(active.contentNote)}</p>
+          )}
           {active.examBlueprint && (
             <p className="muted small">
-              Blueprint: weak topics first, round-robin across topics. Difficulty adaptation
-              unavailable — items have no difficulty metadata.
+              Questions start with weaker topics and are balanced across topics. Difficulty is not
+              adjusted, because these questions have no difficulty level.
             </p>
           )}
 
           <details className="c4-details" open={showPreExam} onToggle={(e) => setShowPreExam(e.target.open)}>
-            <summary>Pre-exam estimate for this quiz (heuristic)</summary>
+            <summary>Estimated score before you start</summary>
             {active.preExamModel?.assessment?.practice_quiz?.usable ? (
               <div className="c4-sim-result">
                 <p className="muted small">
-                  <span className="chip">heuristic · not a trained model</span>{' '}
-                  {active.preExamModel.assessment.practice_quiz.supported_meaning ||
-                    'Mean of topic prior accuracies for this quiz’s questions.'}
+                  <span className="chip">Estimate · not a trained model</span> Average of your
+                  earlier accuracy on the topics in this quiz.
                 </p>
                 <p className="muted small">
-                  Frozen at {active.preExamModel?.frozen_at || '—'} (cutoff{' '}
-                  {active.preExamModel?.prediction_cutoff_utc || '—'}). Never updated from quiz
-                  answers.
+                  Saved when the quiz started
+                  {active.preExamModel?.frozen_at
+                    ? ` (${new Date(active.preExamModel.frozen_at).toLocaleString()})`
+                    : ''}
+                  . Not updated from your answers.
                 </p>
                 <p>
-                  Heuristic predicted score:{' '}
+                  Estimated score:{' '}
                   <strong>
                     {Math.round(
                       (active.preExamModel.assessment.practice_quiz.predicted_score ?? 0) * 100
@@ -343,83 +343,68 @@ export default function ExamPanel({ focusTopic = null }) {
                   <span className="muted small">
                     {' '}
                     · {active.preExamModel.assessment.practice_quiz.question_count ?? active.questionCount}{' '}
-                    questions · product target{' '}
+                    questions · practice target{' '}
                     {Math.round(
                       (active.preExamModel.assessment.practice_quiz.practice_quiz_score_target ??
                         0.6) * 100
                     )}
-                    % (not institutional)
+                    % (not a university pass mark)
                   </span>
                 </p>
                 <p>
-                  Meets practice-quiz target (0.6 decision rule, not a probability):{' '}
+                  Meets the practice-quiz target (a score rule, not a probability):{' '}
                   <strong>
                     {active.preExamModel.assessment.practice_quiz.predicted_pass ? 'Yes' : 'No'}
                   </strong>
                 </p>
-                <p className="muted small">
-                  Pass probability for this quiz: insufficient evidence. No model is trained to
-                  output P(pass) on this practice-bank blueprint.
-                </p>
+                <p className="muted small">Not enough information to estimate pass probability.</p>
                 {active.preExamModel.assessment.practice_quiz.cold_start ? (
                   <p className="muted small">
-                    <strong>Cold start:</strong> no prior practice answers before this attempt —
-                    every question uses the explicit <strong>50% default</strong> (not observed
-                    performance).
+                    This estimate uses a <strong>50% default</strong> for every question because
+                    there are no earlier practice answers. That default is not an observed score.
                   </p>
                 ) : (active.preExamModel.assessment.practice_quiz.questions_using_default_prior ||
                     0) > 0 ? (
                   <p className="muted small">
-                    Partial defaults:{' '}
-                    {active.preExamModel.assessment.practice_quiz.questions_using_default_prior}/
-                    {active.preExamModel.assessment.practice_quiz.question_count} questions use the
-                    explicit <strong>50% default</strong> (no prior attempts on that topic).
+                    {active.preExamModel.assessment.practice_quiz.questions_using_default_prior} of{' '}
+                    {active.preExamModel.assessment.practice_quiz.question_count} questions use a{' '}
+                    <strong>50% default</strong> because those topics have no earlier practice.
                   </p>
                 ) : null}
               </div>
             ) : (
-              <p className="muted small">
-                Frozen at {active.preExamModel?.frozen_at || '—'}.{' '}
-                {active.preExamModel?.assessment?.practice_quiz?.reason ||
-                  'This-quiz estimate unavailable.'}
-              </p>
+              <p className="muted small">Estimated score is unavailable for this quiz.</p>
             )}
             <details className="c4-details">
-              <summary>Technical detail (experimental readiness model)</summary>
+              <summary>Experimental readiness estimate</summary>
               {active.preExamModel?.assessment?.exam?.usable ? (
                 <div className="c4-sim-result">
                   <p className="muted small">
-                    {active.preExamModel.assessment.exam.supported_meaning}
+                    <span className="chip">Experimental recommendation</span> This uses a model
+                    trained on synthetic data. It estimates a different score from this quiz and is
+                    not a validated student result.
                   </p>
                   <p>
-                    Simulation-trained readiness:{' '}
+                    Estimated readiness:{' '}
                     <strong>
                       {Math.round(
                         (active.preExamModel.assessment.exam.predicted_score ?? 0) * 100
                       )}
                       %
                     </strong>
-                    <span className="muted small"> · different target from this quiz</span>
                   </p>
                   <p className="muted small">
-                    Pass P≈
+                    Synthetic pass estimate:{' '}
                     {Math.round(
                       (active.preExamModel.assessment.exam.pass_probability ?? 0) * 100
                     )}
-                    % · synthetic label cutoff{' '}
-                    {active.preExamModel.assessment.exam.pass_label_threshold ?? 0.55} (not
-                    institutional)
+                    %. This uses a synthetic cutoff, not a university rule, and it is not your
+                    chance of passing this quiz.
                   </p>
                 </div>
               ) : (
-                <p className="muted small">
-                  {active.preExamModel?.assessment?.exam?.reason ||
-                    'Experimental readiness estimate unavailable.'}
-                </p>
+                <p className="muted small">Experimental readiness estimate unavailable.</p>
               )}
-              <p className="muted small">
-                Next-answer response model remains unavailable (no C1 item difficulty).
-              </p>
             </details>
           </details>
 
@@ -536,29 +521,21 @@ export default function ExamPanel({ focusTopic = null }) {
               </p>
               {active.preExamModel?.assessment?.practice_quiz?.usable && (
                 <p className="muted small">
-                  Frozen heuristic estimate (not a trained model) was{' '}
+                  Estimated score before you started was{' '}
                   {Math.round(
                     (active.preExamModel.assessment.practice_quiz.predicted_score ?? 0) * 100
                   )}
                   %
                   {active.preExamModel.assessment.practice_quiz.cold_start
-                    ? ' (cold-start 50% defaults)'
-                    : ''}{' '}
-                  (target{' '}
-                  {Math.round(
-                    (active.preExamModel.assessment.practice_quiz.practice_quiz_score_target ??
-                      0.6) * 100
-                  )}
-                  %). Observed score above is from this attempt only.
+                    ? ' (using a 50% default where there was no earlier practice)'
+                    : ''}
+                  . That estimate is not a trained model. The score above is your actual result on
+                  this attempt.
                 </p>
               )}
-              {active.predictionOutcome && (
-                <p className="muted small">
-                  Prediction/outcome pair stored for future evaluation (no answer leakage into
-                  features).
-                </p>
+              {examContentNote(active.result.note) && (
+                <p className="muted small">{examContentNote(active.result.note)}</p>
               )}
-              <p className="muted small">{active.result.note}</p>
               {active.result.finalizedReason === 'time_limit_exceeded' && (
                 <p className="muted small">Finalized because the time limit was reached.</p>
               )}
@@ -573,7 +550,9 @@ export default function ExamPanel({ focusTopic = null }) {
               {weakTopics.length > 0 && (
                 <div>
                   <h4>Suggested next practice</h4>
-                  <p className="muted small">Based on observed weak topics in this quiz (not a live model estimate).</p>
+                  <p className="muted small">
+                    Based on topics you found harder in this quiz. This is not a model recommendation.
+                  </p>
                   <ul className="c4-day-list">
                     {weakTopics.map((t) => (
                       <li key={t}>
@@ -584,14 +563,11 @@ export default function ExamPanel({ focusTopic = null }) {
                     ))}
                   </ul>
                   <p className="muted small">
-                    Replan your study plan after practice so weak topics can influence heuristic ranking.
+                    Replan your study plan after practice so these topics can move up the list.
                   </p>
                 </div>
               )}
-              <p className="muted small">
-                Live model-predicted score/pass remain unavailable until required inputs exist
-                (shown as usable:false in pre-exam notes).
-              </p>
+              <p className="muted small">Not enough information to estimate pass probability.</p>
             </div>
           )}
         </div>

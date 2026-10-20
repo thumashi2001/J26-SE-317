@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { listFeedback, submitFeedback } from './c4Api.js';
+import { feedbackTargetLabel, visibleError } from './studentCopy.js';
 
 export default function FeedbackPanel() {
   const [items, setItems] = useState([]);
@@ -40,7 +41,7 @@ export default function FeedbackPanel() {
       });
       setProblem('');
       setSuggestion('');
-      setInfo('Thanks — feedback saved to your C4 record.');
+      setInfo('Thanks — your feedback has been saved.');
       await load();
     } catch (err) {
       setError(err.message);
@@ -53,13 +54,13 @@ export default function FeedbackPanel() {
     <div className="c4-feedback">
       <h2>Feedback</h2>
       <p className="muted">
-        Rate usefulness and report problems or suggestions. Stored only in C4 feedback records for
-        your account. For PP1 verification, include “PP1 test” in the problem or suggestion text.
+        Rate how useful this was, and tell us about a problem or a suggestion. Feedback is saved
+        to your account.
       </p>
       {error && (
         <div className="panel">
           <p className="error" role="alert">
-            {error}
+            {visibleError(error)}
           </p>
           <button type="button" className="btn secondary" onClick={load}>
             Retry load
@@ -74,8 +75,8 @@ export default function FeedbackPanel() {
           <select value={target} onChange={(e) => setTarget(e.target.value)}>
             <option value="study_plan">Study plan</option>
             <option value="mock_exam">Mock quiz</option>
-            <option value="simulation_demo">Model simulation demo</option>
-            <option value="overall">Overall C4</option>
+            <option value="simulation_demo">Simulation demo</option>
+            <option value="overall">Overall</option>
           </select>
         </label>
         <label className="c4-label">
@@ -109,7 +110,7 @@ export default function FeedbackPanel() {
           <ul className="c4-unavailable">
             {items.map((it) => (
               <li key={it.feedbackId}>
-                <strong>{it.target}</strong>
+                <strong>{feedbackTargetLabel(it.target)}</strong>
                 {it.usefulness != null ? ` · ${it.usefulness}/5` : ''}
                 {it.problem ? ` · ${it.problem}` : ''}
               </li>
