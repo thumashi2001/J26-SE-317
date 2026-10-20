@@ -1,0 +1,83 @@
+{
+  "domain": "se_simulation",
+  "exam_score_test": {
+    "mae": 0.07643764690160464,
+    "n": 300,
+    "pred_mean": 0.5519008666595792,
+    "pred_std": 0.16622084937022918,
+    "rmse": 0.09688271045571374,
+    "y_mean": 0.5624074074074075,
+    "y_std": 0.1811049631185115
+  },
+  "generator_version": "se_supervised_gen_v0",
+  "loaded_contract_mode": "full",
+  "loaded_selection": {
+    "domain": "se_simulation",
+    "exam_score": {
+      "name": "ridge_regression",
+      "primary_metric": "mae",
+      "val_metrics": {
+        "mae": 0.08241833727718875,
+        "n": 300,
+        "pred_mean": 0.5336668180160974,
+        "pred_std": 0.1591931477979567,
+        "rmse": 0.10316841432793439,
+        "y_mean": 0.5411111111111111,
+        "y_std": 0.17595275144759584
+      }
+    },
+    "generator_version": "se_supervised_gen_v0",
+    "pass": {
+      "name": "logistic_regression",
+      "pass_threshold": 0.55,
+      "primary_metric": "log_loss",
+      "val_metrics": {
+        "brier": 0.14216364278767563,
+        "log_loss": 0.43119058724587056,
+        "n": 300,
+        "pred_mean": 0.4882130803195219,
+        "prevalence": 0.49666666666666665,
+        "roc_auc": 0.8843504155740255
+      }
+    },
+    "primary_scenario": "baseline",
+    "protocol": "se-supervised-sim-v0",
+    "real_exam_validation": false,
+    "response": {
+      "name": "hist_gradient_boosting_classifier",
+      "primary_metric": "log_loss",
+      "val_metrics": {
+        "brier": 0.21327592486465474,
+        "log_loss": 0.6145887086372498,
+        "n": 13748,
+        "pred_mean": 0.5084976621937548,
+        "prevalence": 0.5040733197556008,
+        "roc_auc": 0.7198541696561643
+      }
+    },
+    "simulation_only": true,
+    "synthetic": true
+  },
+  "master_seed": 42,
+  "note": "One-shot final test on learner-disjoint synthetic test split. Not real SE validation.",
+  "pass_test": {
+    "brier": 0.11823830866951529,
+    "log_loss": 0.3707106595500493,
+    "n": 300,
+    "pred_mean": 0.538365722108507,
+    "prevalence": 0.5766666666666667,
+    "roc_auc": 0.9158436120340449
+  },
+  "protocol": "se-supervised-sim-v0",
+  "real_exam_validation": false,
+  "response_test": {
+    "brier": 0.21149596653961536,
+    "log_loss": 0.6108464383474955,
+    "n": 14194,
+    "pred_mean": 0.513649260454515,
+    "prevalence": 0.5123291531633084,
+    "roc_auc": 0.7253318964517081
+  },
+  "simulation_only": true,
+  "synthetic": true
+}
