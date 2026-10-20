@@ -2,6 +2,7 @@ import { resolveStudentId } from '../../../middleware/auth.js';
 import * as aiClient from '../services/aiClient.js';
 import * as submissionSvc from '../services/submissionService.js';
 import * as mcqSvc from '../services/mcqMarkingService.js';
+import * as batchSvc from '../services/batchMarkingService.js';
 
 const AI_URL = () => process.env.C3_AI_URL || 'http://127.0.0.1:8003';
 
@@ -127,3 +128,50 @@ export const finalizeSubmission = handle(async (req) => {
   const result = await submissionSvc.finalizeSubmission(id, req.user.sub);
   return { result };
 });
+
+export const createBatchSetup = handle(async (req) => {
+  return batchSvc.createBatchSetup({
+    lecturerId: req.user.sub,
+    setupData: req.body,
+  });
+});
+
+export const listBatchSetups = handle(async (req) => {
+  const setups = await batchSvc.listBatchSetups({
+    lecturerId: req.user.sub,
+    role: req.user.role,
+  });
+  return { setups };
+});
+
+export const getBatchSetup = handle(async (req) => {
+  const { id } = req.params;
+  return batchSvc.getBatchSetup(id, req.user.role);
+});
+
+export const validateBatchAnswers = handle(async (req) => {
+  const { setup_id, items } = req.body || {};
+  return batchSvc.validateBatchAnswers({
+    setupId: setup_id,
+    items,
+  });
+});
+
+export const processBatchMarking = handle(async (req) => {
+  const { setup_id, items } = req.body || {};
+  return batchSvc.processBatchMarking({
+    lecturerId: req.user.sub,
+    setupId: setup_id,
+    items,
+    aiUrl: AI_URL(),
+  });
+});
+
+export const finalizeBatchSubmissions = handle(async (req) => {
+  const { batchId } = req.params;
+  return batchSvc.finalizeBatchSubmissions({
+    lecturerId: req.user.sub,
+    batchId,
+  });
+});
+

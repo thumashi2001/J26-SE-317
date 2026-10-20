@@ -55,6 +55,7 @@ export async function createSubmissionWithResult({ studentId, payload, aiResult 
     student_id: studentId,
     question_id: payload.question_id,
     question_text: payload.question_text,
+    batch_id: payload.batch_id || null,
     student_answer: studentAnswerText,
     reference_answer: payload.reference_answer || (aiResult?.correct_labels?.length ? `Correct Option: ${aiResult.correct_labels.join(', ')}` : null),
     expected_concepts: payload.expected_concepts || null,
@@ -69,34 +70,97 @@ export async function createSubmissionWithResult({ studentId, payload, aiResult 
     updated_at: now,
   };
 
-  const subRes = await submissionsCol().insertOne(subDoc);
-  const submissionId = String(subRes.insertedId);
-
   const automatedMark = aiResult?.total_awarded_marks ?? aiResult?.marking?.total_awarded_marks ?? 0;
   const totalPossible = aiResult?.total_possible_marks ?? aiResult?.marking?.total_possible_marks ?? 0;
   const percentage = aiResult?.percentage ?? (totalPossible > 0 ? Math.round((automatedMark / totalPossible) * 1000) / 10 : 0);
 
-  const resDoc = {
-    submission_id: submissionId,
-    student_id: studentId,
-    question_id: payload.question_id,
-    question_text: payload.question_text,
-    automated_mark: automatedMark,
-    total_possible_marks: totalPossible,
-    percentage: percentage,
-    ai_evaluation: aiResult,
-    lecturer_decision: null,
-    final_mark: null,
-    override_reason: null,
-    reviewed_by: null,
-    reviewed_at: null,
-    finalized_at: null,
-    status: 'pending_review',
-    created_at: now,
-    updated_at: now,
-  };
+  // Check if a submission already exists for this student in this batch to prevent duplicates
+  let existingSub = null;
+  if (payload.batch_id && studentId) {
+    existingSub = await submissionsCol().findOne({
+      student_id: studentId,
+      batch_id: payload.batch_id,
+    });
+  }
 
-  const resResult = await resultsCol().insertOne(resDoc);
+  let submissionId;
+  let resultId;
+
+  if (existingSub) {
+    submissionId = String(existingSub._id);
+    await submissionsCol().updateOne(
+      { _id: existingSub._id },
+      { $set: { ...subDoc, submitted_at: existingSub.submitted_at, updated_at: now } }
+    );
+
+    const existingRes = await resultsCol().findOne({ submission_id: submissionId });
+    if (existingRes) {
+      resultId = String(existingRes._id);
+      await resultsCol().updateOne(
+        { _id: existingRes._id },
+        {
+          $set: {
+            automated_mark: automatedMark,
+            total_possible_marks: totalPossible,
+            percentage: percentage,
+            ai_evaluation: aiResult,
+            status: 'pending_review',
+            updated_at: now,
+          },
+        }
+      );
+    } else {
+      const resDoc = {
+        submission_id: submissionId,
+        student_id: studentId,
+        question_id: payload.question_id,
+        question_text: payload.question_text,
+        batch_id: payload.batch_id || null,
+        automated_mark: automatedMark,
+        total_possible_marks: totalPossible,
+        percentage: percentage,
+        ai_evaluation: aiResult,
+        lecturer_decision: null,
+        final_mark: null,
+        override_reason: null,
+        reviewed_by: null,
+        reviewed_at: null,
+        finalized_at: null,
+        status: 'pending_review',
+        created_at: now,
+        updated_at: now,
+      };
+      const resResult = await resultsCol().insertOne(resDoc);
+      resultId = String(resResult.insertedId);
+    }
+  } else {
+    const subRes = await submissionsCol().insertOne(subDoc);
+    submissionId = String(subRes.insertedId);
+
+    const resDoc = {
+      submission_id: submissionId,
+      student_id: studentId,
+      question_id: payload.question_id,
+      question_text: payload.question_text,
+      batch_id: payload.batch_id || null,
+      automated_mark: automatedMark,
+      total_possible_marks: totalPossible,
+      percentage: percentage,
+      ai_evaluation: aiResult,
+      lecturer_decision: null,
+      final_mark: null,
+      override_reason: null,
+      reviewed_by: null,
+      reviewed_at: null,
+      finalized_at: null,
+      status: 'pending_review',
+      created_at: now,
+      updated_at: now,
+    };
+
+    const resResult = await resultsCol().insertOne(resDoc);
+    resultId = String(resResult.insertedId);
+  }
 
   // Synchronize initial assessment evidence to C1 (Cognitive Digital Twin)
   syncC3AssessmentToC1({
@@ -113,7 +177,7 @@ export async function createSubmissionWithResult({ studentId, payload, aiResult 
 
   return {
     submissionId,
-    resultId: String(resResult.insertedId),
+    resultId,
   };
 }
 
@@ -121,13 +185,16 @@ export async function createSubmissionWithResult({ studentId, payload, aiResult 
  * Lists submissions.
  * Students only see their own submissions; lecturers see all submissions.
  */
-export async function listSubmissions({ studentId, role, status }) {
+export async function listSubmissions({ studentId, role, status, batchId }) {
   const query = {};
   if (role !== 'lecturer' && role !== 'admin') {
     query.student_id = studentId;
   }
   if (status) {
     query.status = status;
+  }
+  if (batchId) {
+    query.batch_id = batchId;
   }
 
   const submissions = await submissionsCol()
