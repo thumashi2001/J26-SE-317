@@ -38,6 +38,8 @@ class LLMResponse(BaseModel):
     is_success: bool = True
     error_message: str | None = None
     is_real_execution: bool = False
+    retries: int = 0
+    cached: bool = False
 
 
 class BaseLLMProvider(ABC):

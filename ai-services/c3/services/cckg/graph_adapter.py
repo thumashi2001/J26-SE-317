@@ -99,13 +99,25 @@ CANONICAL_QUESTION_MAP = {
 }
 
 
+class CCKGUnavailableError(RuntimeError):
+    """Raised in strict mode when live Neo4j cannot be reached."""
+
+
 class CCKGGraphAdapter:
     """Graph Adapter providing unified GraphRAG queries across live Neo4j and in-memory store."""
 
-    def __init__(self, uri: str | None = None, user: str | None = None, password: str | None = None):
+    def __init__(
+        self,
+        uri: str | None = None,
+        user: str | None = None,
+        password: str | None = None,
+        strict: bool | None = None,
+    ):
+        # strict: fail instead of silently using the in-memory ontology (required for real experiments)
+        self.strict = strict if strict is not None else os.getenv("C3_CCKG_STRICT", "0") == "1"
         self.uri = uri or os.getenv("NEO4J_URI", "bolt://127.0.0.1:7687")
         self.user = user or os.getenv("NEO4J_USER", "neo4j")
-        self.password = password or os.getenv("NEO4J_PASSWORD", "change-me-in-development")
+        self.password = password or os.getenv("NEO4J_PASSWORD", "change-me-in-development")  # matches docker-compose.yml
         self._driver = None
         self._is_live_neo4j = False
         self._init_connection()
@@ -122,11 +134,23 @@ class CCKGGraphAdapter:
             logger.info(f"Connected to live Neo4j CCKG at {self.uri}")
         except Exception as e:
             self._is_live_neo4j = False
+            if self.strict:
+                raise CCKGUnavailableError(f"Live Neo4j required (strict mode) but not reachable at {self.uri}: {e}") from e
             logger.info(f"Live Neo4j not reachable ({e}). Using canonical in-memory CCKG store.")
 
     @property
     def is_live(self) -> bool:
         return self._is_live_neo4j
+
+    def status(self) -> dict[str, Any]:
+        """Backend state for diagnostics; counts reflect the in-memory ontology actually loaded."""
+        return {
+            "is_live_neo4j": self._is_live_neo4j,
+            "backend": "neo4j_live" if self._is_live_neo4j else "in_memory_cckg_ontology",
+            "strict": self.strict,
+            "modules_count": len(CANONICAL_MODULES),
+            "concepts_count": len(CANONICAL_CONCEPTS),
+        }
 
     def close(self):
         if self._driver:

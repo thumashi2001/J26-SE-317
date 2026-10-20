@@ -2,19 +2,22 @@
 AdaptiveLearnSE Component 3 — LLM Provider Service Package
 """
 from .base import BaseLLMProvider, LLMRequest, LLMResponse, LLMUsage
-from .factory import get_llm_provider, list_available_providers
+from .cache import CachedLLMProvider
+from .factory import UnknownProviderError, get_llm_provider, list_available_providers
+from .gemini_provider import GeminiProvider
 from .local_provider import LocalLLMProvider
-from .mock_provider import MockLLMProvider
 from .openai_provider import OpenAIProvider
 
 __all__ = [
     "BaseLLMProvider",
+    "CachedLLMProvider",
+    "GeminiProvider",
     "LLMRequest",
     "LLMResponse",
     "LLMUsage",
-    "MockLLMProvider",
-    "OpenAIProvider",
     "LocalLLMProvider",
+    "OpenAIProvider",
+    "UnknownProviderError",
     "get_llm_provider",
-    "list_available_providers"
+    "list_available_providers",
 ]

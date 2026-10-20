@@ -1,185 +1,297 @@
 """
-Unit tests for Provider-Neutral LLM & Vector Architecture
-Validates LLMRequest/Response contracts, MockLLMProvider calibration, factory fallback,
-Ollama real-execution error handling and model verification, real sentence embeddings,
-and runtime diagnostic exposure without credentials leakage.
+Unit tests for the real LLM provider layer: request/response contracts, Gemini and OpenAI providers
+(HTTP layer stubbed so tests run offline and free), Ollama provider, retry helper, response cache
+and the provider factory. Live calls are covered by the `live_llm` tests in test_live_providers.py.
 """
 
 from unittest.mock import MagicMock, patch
 
+import httpx
+import pytest
+
 from services.llm.base import LLMRequest, LLMResponse, LLMUsage
-from services.llm.factory import get_llm_provider, list_available_providers
+from services.llm.cache import CachedLLMProvider
+from services.llm.factory import UnknownProviderError, get_llm_provider, list_available_providers
+from services.llm.gemini_provider import GeminiProvider, strip_json_fence
+from services.llm.http_utils import post_json_with_retry
 from services.llm.local_provider import LocalLLMProvider
-from services.llm.mock_provider import MockLLMProvider
 from services.llm.openai_provider import OpenAIProvider
-from services.rag.vector_store import CurriculumVectorStore, RealSentenceTransformerEmbedding
 
 
-class TestLLMBaseContracts:
-    def test_llm_request_creation(self):
-        req = LLMRequest(
-            prompt="Test prompt",
-            model="mock-gpt4o",
-            temperature=0.2,
-            max_tokens=256,
-            response_format="json"
-        )
-        assert req.prompt == "Test prompt"
-        assert req.model == "mock-gpt4o"
+def gemini_body(text, finish="STOP", model="gemini-test-001"):
+    return {
+        "candidates": [{"content": {"parts": [{"text": text}]}, "finishReason": finish}],
+        "usageMetadata": {"promptTokenCount": 10, "candidatesTokenCount": 5, "totalTokenCount": 15},
+        "modelVersion": model,
+    }
+
+
+class TestContracts:
+    def test_llm_request_defaults(self):
+        req = LLMRequest(prompt="hi")
+        assert req.model == "default"
         assert req.response_format == "json"
 
-    def test_llm_response_creation(self):
-        usage = LLMUsage(prompt_tokens=50, completion_tokens=25, total_tokens=75, estimated_cost_usd=0.0)
-        res = LLMResponse(
-            raw_content='{"total_awarded_mark": 8.5}',
-            parsed_json={"total_awarded_mark": 8.5},
-            model_identifier="mock-gpt4o",
-            provider_name="mock",
-            usage=usage,
-            latency_ms=12.5,
-            is_success=True,
-            is_real_execution=False
-        )
-        assert res.is_success is True
+    def test_llm_request_rejects_bad_temperature(self):
+        with pytest.raises(ValueError):
+            LLMRequest(prompt="x", temperature=5.0)
+
+    def test_llm_response_real_flag_defaults_false(self):
+        res = LLMResponse(raw_content="x", model_identifier="m", provider_name="p", usage=LLMUsage())
         assert res.is_real_execution is False
-        assert res.parsed_json["total_awarded_mark"] == 8.5
-        assert res.usage.total_tokens == 75
+        assert res.cached is False
 
 
-class TestMockLLMProvider:
-    def test_mock_provider_health(self):
-        provider = MockLLMProvider()
-        health = provider.health_check()
-        assert health["status"] == "healthy"
-        assert health["is_real_execution"] is False
-        assert "mock-gpt4o" in health["supported_models"]
-
-    def test_mock_generation_json(self):
-        provider = MockLLMProvider()
-        req = LLMRequest(
-            prompt="Question: Explain testing.\nReference Answer: Testing is verifying software.\nMaximum Marks: 10\nStudent Answer:\nTesting is verifying software.\nProvide JSON with total_awarded_mark.",
-            model="mock-gpt4o",
-            response_format="json"
-        )
-        res = provider.generate(req)
-        assert res.is_success is True
+class TestGeminiProvider:
+    def test_unconfigured_provider_fails_explicitly(self):
+        res = GeminiProvider(api_key="").generate(LLMRequest(prompt="x"))
+        assert res.is_success is False
         assert res.is_real_execution is False
-        assert res.parsed_json is not None
-        assert "total_awarded_mark" in res.parsed_json
-        assert res.latency_ms > 0
+        assert "GEMINI_API_KEY" in res.error_message
 
-    def test_mock_generation_irrelevant_distractor(self):
-        provider = MockLLMProvider()
-        req = LLMRequest(
-            prompt="Question: Explain testing.\nReference Answer: Testing is verifying software.\nMaximum Marks: 10\nStudent Answer:\nThe Roman Empire was a post-Republican period of ancient Rome.\nProvide JSON with total_awarded_mark.",
-            model="mock-gpt4o",
-            response_format="json"
-        )
-        res = provider.generate(req)
+    def test_success_parses_json_and_usage(self):
+        provider = GeminiProvider(api_key="test-key", model="gemini-test-001")
+        body = gemini_body('{"total_awarded_mark": 7.5}')
+        with patch("services.llm.gemini_provider.post_json_with_retry", return_value=(body, 0)) as post:
+            res = provider.generate(LLMRequest(prompt="grade"))
         assert res.is_success is True
+        assert res.is_real_execution is True
+        assert res.parsed_json == {"total_awarded_mark": 7.5}
+        assert res.usage.total_tokens == 15
+        assert res.model_identifier == "gemini-test-001"
+        payload = post.call_args.kwargs["payload"]
+        assert payload["generationConfig"]["responseMimeType"] == "application/json"
+        assert payload["generationConfig"]["maxOutputTokens"] >= 2048
+        assert post.call_args.args[0].endswith("/models/gemini-test-001:generateContent")
+
+    def test_code_fenced_json_is_accepted(self):
+        provider = GeminiProvider(api_key="test-key")
+        body = gemini_body('```json\n{"a": 1}\n```')
+        with patch("services.llm.gemini_provider.post_json_with_retry", return_value=(body, 0)):
+            res = provider.generate(LLMRequest(prompt="x"))
+        assert res.parsed_json == {"a": 1}
+
+    def test_invalid_json_is_a_failure_not_a_silent_pass(self):
+        provider = GeminiProvider(api_key="test-key")
+        with patch("services.llm.gemini_provider.post_json_with_retry", return_value=(gemini_body("nope"), 0)):
+            res = provider.generate(LLMRequest(prompt="x"))
+        assert res.is_success is False
+        assert res.parsed_json is None
+        assert "not valid JSON" in res.error_message
+
+    def test_empty_candidates_reports_block_reason(self):
+        provider = GeminiProvider(api_key="test-key")
+        body = {"candidates": [], "promptFeedback": {"blockReason": "SAFETY"}}
+        with patch("services.llm.gemini_provider.post_json_with_retry", return_value=(body, 0)):
+            res = provider.generate(LLMRequest(prompt="x"))
+        assert res.is_success is False
+        assert "SAFETY" in res.error_message
+
+    def test_truncated_output_is_not_success(self):
+        provider = GeminiProvider(api_key="test-key")
+        body = gemini_body('{"a": 1}', finish="MAX_TOKENS")
+        with patch("services.llm.gemini_provider.post_json_with_retry", return_value=(body, 0)):
+            res = provider.generate(LLMRequest(prompt="x"))
+        assert res.is_success is False
+        assert "MAX_TOKENS" in res.error_message
+
+    def test_http_error_returns_failure(self):
+        provider = GeminiProvider(api_key="test-key")
+        with patch("services.llm.gemini_provider.post_json_with_retry", side_effect=httpx.ConnectError("down")):
+            res = provider.generate(LLMRequest(prompt="x"))
+        assert res.is_success is False
         assert res.is_real_execution is False
-        # Distractor should receive 0.0 marks
-        assert res.parsed_json["total_awarded_mark"] == 0.0
+        assert "ConnectError" in res.error_message
+
+    def test_verify_model(self):
+        provider = GeminiProvider(api_key="test-key", model="gemini-a")
+        models = [
+            {"name": "models/gemini-a", "supportedGenerationMethods": ["generateContent"]},
+            {"name": "models/embed-b", "supportedGenerationMethods": ["embedContent"]},
+        ]
+        with patch.object(provider, "list_models", return_value=models):
+            assert provider.verify_model() == (True, "ok")
+            assert provider.verify_model("embed-b")[0] is False
+            assert "not found" in provider.verify_model("nope")[1]
+
+    def test_strip_json_fence(self):
+        assert strip_json_fence('```json\n{"x":1}\n```') == '{"x":1}'
+        assert strip_json_fence('{"x":1}') == '{"x":1}'
+
+
+class TestOpenAIProvider:
+    def test_unconfigured_provider_fails_explicitly(self):
+        res = OpenAIProvider(api_key="").generate(LLMRequest(prompt="x"))
+        assert res.is_success is False
+        assert "OPENAI_API_KEY" in res.error_message
+
+    def test_success(self):
+        provider = OpenAIProvider(api_key="sk-test-1234567890", model="gpt-test")
+        body = {
+            "choices": [{"message": {"content": '{"m": 3}'}, "finish_reason": "stop"}],
+            "usage": {"prompt_tokens": 4, "completion_tokens": 2, "total_tokens": 6},
+            "model": "gpt-test-2026",
+        }
+        with patch("services.llm.openai_provider.post_json_with_retry", return_value=(body, 1)) as post:
+            res = provider.generate(LLMRequest(prompt="x"))
+        assert res.is_success and res.is_real_execution
+        assert res.parsed_json == {"m": 3}
+        assert res.retries == 1
+        assert res.usage.total_tokens == 6
+        assert post.call_args.kwargs["payload"]["model"] == "gpt-test"
+
+    def test_unparseable_json_is_a_failure(self):
+        provider = OpenAIProvider(api_key="sk-test-1234567890")
+        body = {"choices": [{"message": {"content": "plain prose"}, "finish_reason": "stop"}]}
+        with patch("services.llm.openai_provider.post_json_with_retry", return_value=(body, 0)):
+            res = provider.generate(LLMRequest(prompt="x"))
+        assert res.is_success is False
+        assert "not valid JSON" in res.error_message
+
+    def test_malformed_response_shape_is_failure(self):
+        provider = OpenAIProvider(api_key="sk-test-1234567890")
+        with patch("services.llm.openai_provider.post_json_with_retry", return_value=({"choices": []}, 0)):
+            res = provider.generate(LLMRequest(prompt="x"))
+        assert res.is_success is False
+
+
+class TestRetryHelper:
+    def test_retries_on_429_then_succeeds(self, monkeypatch):
+        monkeypatch.setattr("services.llm.http_utils.time.sleep", lambda s: None)
+        calls = {"n": 0}
+
+        def handler(request):
+            calls["n"] += 1
+            if calls["n"] < 3:
+                return httpx.Response(429, headers={"retry-after": "0"})
+            return httpx.Response(200, json={"ok": True})
+
+        client = httpx.Client(transport=httpx.MockTransport(handler))
+        body, retries = post_json_with_retry("http://x", headers={}, payload={}, timeout=1, client=client)
+        assert body == {"ok": True}
+        assert retries == 2
+
+    def test_gives_up_after_max_retries(self, monkeypatch):
+        monkeypatch.setattr("services.llm.http_utils.time.sleep", lambda s: None)
+        client = httpx.Client(transport=httpx.MockTransport(lambda r: httpx.Response(503)))
+        with pytest.raises(httpx.HTTPStatusError):
+            post_json_with_retry("http://x", headers={}, payload={}, timeout=1, max_retries=2, client=client)
+
+    def test_non_retryable_error_raises_immediately(self):
+        calls = {"n": 0}
+
+        def handler(request):
+            calls["n"] += 1
+            return httpx.Response(400)
+
+        client = httpx.Client(transport=httpx.MockTransport(handler))
+        with pytest.raises(httpx.HTTPStatusError):
+            post_json_with_retry("http://x", headers={}, payload={}, timeout=1, client=client)
+        assert calls["n"] == 1
+
+
+class _CountingProvider(GeminiProvider):
+    def __init__(self, succeed=True):
+        super().__init__(api_key="k", model="m")
+        self.calls = 0
+        self.succeed = succeed
+
+    def generate(self, request):
+        self.calls += 1
+        return LLMResponse(
+            raw_content="{}",
+            parsed_json={},
+            model_identifier="m",
+            provider_name="gemini",
+            is_success=self.succeed,
+            is_real_execution=self.succeed,
+        )
+
+
+class TestResponseCache:
+    def test_second_identical_request_is_served_from_cache(self, tmp_path):
+        inner = _CountingProvider()
+        cached = CachedLLMProvider(inner, tmp_path / "c.jsonl")
+        first = cached.generate(LLMRequest(prompt="same"))
+        second = cached.generate(LLMRequest(prompt="same"))
+        assert inner.calls == 1
+        assert first.cached is False and second.cached is True
+        again = CachedLLMProvider(_CountingProvider(), tmp_path / "c.jsonl")
+        assert again.generate(LLMRequest(prompt="same")).cached is True
+
+    def test_different_prompt_misses(self, tmp_path):
+        inner = _CountingProvider()
+        cached = CachedLLMProvider(inner, tmp_path / "c.jsonl")
+        cached.generate(LLMRequest(prompt="a"))
+        cached.generate(LLMRequest(prompt="b"))
+        assert inner.calls == 2
+
+    def test_failures_are_never_cached(self, tmp_path):
+        inner = _CountingProvider(succeed=False)
+        cached = CachedLLMProvider(inner, tmp_path / "c.jsonl")
+        cached.generate(LLMRequest(prompt="x"))
+        cached.generate(LLMRequest(prompt="x"))
+        assert inner.calls == 2
 
 
 class TestLocalOllamaProvider:
     def test_ollama_daemon_offline_returns_explicit_failure(self):
-        """When local Ollama is offline, provider must return non-silent failure with is_real_execution=False."""
         provider = LocalLLMProvider(base_url="http://127.0.0.1:99999", default_model="llama3.2")
-        req = LLMRequest(prompt="Test assessment", model="llama3.2")
-        res = provider.generate(req)
+        res = provider.generate(LLMRequest(prompt="Test assessment", model="llama3.2"))
         assert res.is_success is False
         assert res.is_real_execution is False
         assert "offline or unreachable" in res.error_message
 
     def test_ollama_missing_model_returns_explicit_failure(self):
-        """When Ollama is online but requested model is missing, fail explicitly with pull instruction."""
         provider = LocalLLMProvider(base_url="http://127.0.0.1:11434", default_model="llama3.2")
-        # Mock daemon online returning empty model list
-        with patch.object(provider, "is_available", return_value=True), \
-             patch.object(provider, "get_installed_models", return_value=["qwen2.5:7b"]):
-            req = LLMRequest(prompt="Test assessment", model="llama3.2")
-            res = provider.generate(req)
-            assert res.is_success is False
-            assert res.is_real_execution is False
-            assert "not installed in local Ollama daemon" in res.error_message
-            assert "ollama pull llama3.2" in res.error_message
-
-    def test_ollama_successful_inference_sets_real_flag(self):
-        """When Ollama generates response, is_real_execution must be True."""
-        provider = LocalLLMProvider(base_url="http://127.0.0.1:11434", default_model="llama3.2")
-        mock_response = MagicMock()
-        mock_response.status_code = 200
-        mock_response.json.return_value = {
-            "response": '{"total_awarded_mark": 9.0}',
-            "prompt_eval_count": 80,
-            "eval_count": 40
-        }
-        mock_response.raise_for_status = MagicMock()
-
-        with patch.object(provider, "is_available", return_value=True), \
-             patch.object(provider, "is_model_installed", return_value=True), \
-             patch("httpx.Client.post", return_value=mock_response):
-            req = LLMRequest(prompt="Assess answer", model="llama3.2", response_format="json")
-            res = provider.generate(req)
-            assert res.is_success is True
-            assert res.is_real_execution is True
-            assert res.model_identifier == "llama3.2"
-            assert res.parsed_json == {"total_awarded_mark": 9.0}
-            assert res.usage.total_tokens == 120
-
-
-class TestVectorStoreAndEmbeddings:
-    def test_real_embedding_adapter_offline_handling(self):
-        """When sentence_transformers is absent, RealSentenceTransformerEmbedding reports offline status safely."""
-        adapter = RealSentenceTransformerEmbedding()
-        diag = adapter.diagnostics()
-        assert diag["model_name"] == "sentence-transformers/all-MiniLM-L6-v2"
-        assert diag["expected_dim"] == 384
-        if not adapter.is_loaded:
-            assert "offline" in diag["status"]
-
-    def test_vector_store_retrieval_and_diagnostics(self):
-        """CurriculumVectorStore retrieves relevant chunks and exposes diagnostic metadata."""
-        vstore = CurriculumVectorStore()
-        diag = vstore.diagnostics()
-        assert diag["status"] == "ready"
-        assert diag["documents_indexed"] >= 5
-        assert "tfidf" in diag["active_backend"] or "sentence-transformers" in diag["active_backend"]
-
-        # Test query retrieval
-        hits = vstore.retrieve("high cohesion and loose coupling in software architecture", top_k=2)
-        assert len(hits) > 0
-        assert "relevance_score" in hits[0]
-        assert hits[0]["relevance_score"] > 0
-        assert "embedding_backend" in hits[0]
-
-
-class TestLLMFactoryAndSafety:
-    def test_factory_returns_mock_by_default(self):
-        provider = get_llm_provider("mock")
-        assert isinstance(provider, MockLLMProvider)
-
-    def test_factory_fallback_on_unsupported(self):
-        provider = get_llm_provider("non_existent_provider_123")
-        assert isinstance(provider, MockLLMProvider)
-
-    def test_openai_provider_reports_missing_key_safely(self, monkeypatch):
-        monkeypatch.delenv("OPENAI_API_KEY", raising=False)
-        provider = OpenAIProvider()
-        health = provider.health_check()
-        assert "pending_credentials" in health["status"]
-        # Ensure it does NOT crash or expose secrets
-        req = LLMRequest(prompt="Test", model="gpt-4o")
-        res = provider.generate(req)
+        with (
+            patch.object(provider, "is_available", return_value=True),
+            patch.object(provider, "get_installed_models", return_value=["qwen2.5:7b"]),
+        ):
+            res = provider.generate(LLMRequest(prompt="Test assessment", model="llama3.2"))
         assert res.is_success is False
         assert res.is_real_execution is False
-        assert "OPENAI_API_KEY" in res.error_message
+        assert "not installed in local Ollama daemon" in res.error_message
+        assert "ollama pull llama3.2" in res.error_message
 
-    def test_list_available_providers(self):
-        providers = list_available_providers()
-        assert len(providers) >= 3
-        names = [p["provider"] for p in providers]
-        assert "calibrated-mock" in names
-        assert "openai" in names
-        assert "local-ollama" in names
+    def test_ollama_successful_inference_sets_real_flag(self):
+        provider = LocalLLMProvider(base_url="http://127.0.0.1:11434", default_model="llama3.2")
+        response = MagicMock()
+        response.status_code = 200
+        response.json.return_value = {
+            "response": '{"total_awarded_mark": 9.0}',
+            "prompt_eval_count": 80,
+            "eval_count": 40,
+        }
+        response.raise_for_status = MagicMock()
+        with (
+            patch.object(provider, "is_available", return_value=True),
+            patch.object(provider, "is_model_installed", return_value=True),
+            patch("httpx.Client.post", return_value=response),
+        ):
+            res = provider.generate(LLMRequest(prompt="Assess answer", model="llama3.2", response_format="json"))
+        assert res.is_success is True
+        assert res.is_real_execution is True
+        assert res.parsed_json == {"total_awarded_mark": 9.0}
+        assert res.usage.total_tokens == 120
+
+
+class TestFactory:
+    def test_default_provider_is_gemini(self, monkeypatch):
+        monkeypatch.delenv("C3_LLM_PROVIDER", raising=False)
+        assert isinstance(get_llm_provider(), GeminiProvider)
+
+    def test_env_selects_openai(self, monkeypatch):
+        monkeypatch.setenv("C3_LLM_PROVIDER", "openai")
+        assert isinstance(get_llm_provider(), OpenAIProvider)
+
+    def test_ollama_alias_selects_local(self):
+        assert isinstance(get_llm_provider("ollama"), LocalLLMProvider)
+
+    def test_unknown_provider_raises_instead_of_falling_back(self):
+        with pytest.raises(UnknownProviderError):
+            get_llm_provider("mock")
+
+    def test_list_available_providers_has_no_mock(self):
+        names = [p["provider"] for p in list_available_providers()]
+        assert names == ["gemini", "openai", "local-ollama"]
