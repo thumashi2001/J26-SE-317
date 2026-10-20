@@ -57,6 +57,19 @@ export default function LecturerApprovals() {
       <h1>Lecturer approvals</h1>
       <p className="muted">Lecturers cannot log in until you approve them.</p>
 
+      <section className="stat-grid" aria-label="Summary">
+        {[
+          { label: 'Waiting for approval', key: 'pending', color: 'var(--fair)' },
+          { label: 'Approved lecturers', key: 'approved', color: 'var(--strong)' },
+          { label: 'Rejected', key: 'rejected', color: 'var(--weak)' },
+        ].map((c) => (
+          <div key={c.key} className="stat" style={{ '--c': c.color }}>
+            <div className="stat-num">{all ? count(c.key) : '...'}</div>
+            <div className="stat-label">{c.label}</div>
+          </div>
+        ))}
+      </section>
+
       <div className="tabs" role="tablist">
         {TABS.map((t) => (
           <button key={t.key} role="tab" aria-selected={tab === t.key} className={tab === t.key ? 'on' : ''} onClick={() => setTab(t.key)}>

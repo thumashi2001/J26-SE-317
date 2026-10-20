@@ -20,7 +20,7 @@ const toInputDate = (d) => {
 };
 const fmt = (d) => d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 
-export default function WhatIfPanel({ topic }) {
+export default function WhatIfPanel({ topic, savedExamDate = null }) {
   const { user } = useAuth();
   const today = useMemo(startOfToday, []);
   const minDate = useMemo(() => toInputDate(new Date(today.getTime() + DAY_MS)), [today]);
@@ -28,6 +28,11 @@ export default function WhatIfPanel({ topic }) {
 
   const [examDate, setExamDate] = useState(toInputDate(new Date(today.getTime() + DEFAULT_DAYS * DAY_MS)));
   const [perWeek, setPerWeek] = useState(3);
+
+  // use the exam date saved in the calendar when there is one (and it is inside the forecast range)
+  useEffect(() => {
+    if (savedExamDate && savedExamDate >= minDate && savedExamDate <= maxDate) setExamDate(savedExamDate);
+  }, [savedExamDate, minDate, maxDate]);
   const [state, setState] = useState({ status: 'loading' });
 
   // days until the chosen exam date, or null while the date field is empty or out of range
@@ -59,8 +64,10 @@ export default function WhatIfPanel({ topic }) {
 
   return (
     <section className="panel whatif" aria-labelledby="whatif-title">
+      <h2 id="whatif-title" style={{ margin: '0 0 2px' }}>What if I study?</h2>
       <p className="muted small">
         See where this topic could be on exam day. The forecast uses the same forgetting and learning rules as your twin.
+        {savedExamDate ? ' It starts from the exam date in your calendar.' : ''}
       </p>
 
       <div className="whatif-controls">

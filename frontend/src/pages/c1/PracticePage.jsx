@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { startPractice, answerPractice } from '../../services/c1Api.js';
+import { startPractice, answerPractice, hintPractice } from '../../services/c1Api.js';
+import Celebration from '../../components/Celebration.jsx';
 import { prettyTopic } from '../../utils/topics.js';
 import './practice.css';
 
@@ -21,6 +22,7 @@ export default function PracticePage() {
   const [picked, setPicked] = useState([]);
   const [feedback, setFeedback] = useState(null); // set after the student checks an answer
   const [busy, setBusy] = useState(false);
+  const [hintBusy, setHintBusy] = useState(false);
   const [error, setError] = useState('');
   const shownAt = useRef(Date.now());
   const startedFor = useRef(null);
@@ -119,8 +121,22 @@ export default function PracticePage() {
   const q = finished ? null : session.questions[index];
   const answeredCount = Math.min(index, total);
 
+  const useHint = async () => {
+    setHintBusy(true);
+    setError('');
+    try {
+      const res = await hintPractice({ sessionId: session.sessionId, questionId: q.id });
+      setSession((s) => ({ ...s, questions: s.questions.map((x) => (x.id === q.id ? { ...x, hinted: true, hidden: res.hidden } : x)) }));
+      setPicked((p) => p.filter((x) => !res.hidden.includes(x)));
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setHintBusy(false);
+    }
+  };
+
   const toggle = (i) => {
-    if (locked) return;
+    if (locked || (q.hidden || []).includes(i)) return;
     if (q.multi) setPicked((p) => (p.includes(i) ? p.filter((x) => x !== i) : [...p, i].sort()));
     else setPicked([i]);
   };
@@ -168,11 +184,24 @@ export default function PracticePage() {
   // ---- summary
   if (finished) {
     const gained = Math.round((session.scoreNow - session.scoreStart) * 10) / 10;
+    const complete = answeredCount >= total;
+    const good = complete && session.correctCount / total >= 0.7; // 5 of 7 or better
+    const perfect = complete && session.correctCount === total;
     return (
       <div>
+        {good && <Celebration perfect={perfect} />}
         {back}
         <div className="quiz-head"><h1>{prettyTopic(topic)}</h1></div>
-        <section className="quiz-card quiz-summary" aria-live="polite">
+        <section className={'quiz-card quiz-summary' + (good ? ' celebrate' : '')} aria-live="polite">
+          {good && (
+            <div className="cele-banner">
+              <span className="cele-emoji" aria-hidden="true">{perfect ? '\u{1F3C6}' : '\u{1F389}'}</span>
+              <div>
+                <strong>{perfect ? 'Perfect score!' : 'Great work!'}</strong>
+                <span>{perfect ? 'You got every question right. Keep this up!' : 'You are getting stronger in this topic. Keep going!'}</span>
+              </div>
+            </div>
+          )}
           <div className="quiz-big">{session.correctCount} of {answeredCount < total ? answeredCount : total}</div>
           <p className="muted">questions fully correct</p>
           {answeredCount < total && (
@@ -248,12 +277,16 @@ export default function PracticePage() {
           {q.options.map((text, i) => {
             const isPicked = picked.includes(i);
             const isRight = rightSet.includes(i);
+            const removed = (q.hidden || []).includes(i);
             let cls = 'quiz-opt';
+            if (removed) cls += ' removed';
             if (q.multi) cls += ' multi';
             if (locked) cls += ' locked';
             if (!locked && isPicked) cls += ' picked';
             let tag = '';
-            if (locked && isRight) {
+            if (removed) {
+              tag = 'Removed by hint';
+            } else if (locked && isRight) {
               cls += ' right';
               tag = isPicked ? 'Correct, you chose it' : 'Correct answer, you missed it';
               if (!isPicked) cls += ' missed';
@@ -268,17 +301,32 @@ export default function PracticePage() {
                     type={q.multi ? 'checkbox' : 'radio'}
                     name={`q-${q.id}`}
                     checked={isPicked}
-                    disabled={locked}
+                    disabled={locked || removed}
                     onChange={() => toggle(i)}
                   />
                   <span className="quiz-letter" aria-hidden="true">{LETTERS[i]}</span>
                   <span className="quiz-text"><span className="sr-only">Option {LETTERS[i]}: </span>{text}</span>
-                  {tag && <span className="quiz-tag">{isRight ? '✓ ' : '✗ '}{tag}</span>}
+                  {tag && <span className="quiz-tag">{removed ? '\u2212 ' : isRight ? '✓ ' : '✗ '}{tag}</span>}
                 </label>
               </li>
             );
           })}
         </ul>
+
+        {!q.multi && !locked && (
+          <div className="hint-row">
+            {q.hinted ? (
+              <span className="hint-used">&#x1F4A1; Hint used: two wrong options were removed. This answer will raise your score about half as much.</span>
+            ) : (
+              <>
+                <button type="button" className="btn secondary hint-btn" onClick={useHint} disabled={hintBusy}>
+                  <span aria-hidden="true">&#x1F4A1;</span> 50/50 hint
+                </button>
+                <span className="muted small">Removes two wrong options. A correct answer then raises your score about half as much.</span>
+              </>
+            )}
+          </div>
+        )}
 
         {error && <p className="error" role="alert">{error}</p>}
 
@@ -304,6 +352,7 @@ export default function PracticePage() {
                 You left this tab {feedback.tabLeaves === 1 ? 'once' : `${feedback.tabLeaves} times`} during this question, so this answer counts a little less toward your confidence score.
               </p>
             )}
+            {feedback.hintUsed && <p className="fb-away">You used the hint, so this answer counts about half toward your score.</p>}
             {feedback.correct && feedback.gainWeight < 1 && (
               <p className="fb-away">This correct answer raised your score by less than usual, because you left the tab or answered very fast.</p>
             )}

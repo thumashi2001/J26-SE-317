@@ -14,6 +14,8 @@ const MUTED = 'var(--muted)';
 const GRID = 'var(--track)';
 const LINE = 'var(--primary)';
 const WEAK = 30;
+const STRONG = 60;
+const bandColor = (v) => (v < WEAK ? 'var(--weak)' : v < STRONG ? 'var(--fair)' : 'var(--strong)');
 
 const fmtDate = (t) =>
   new Date(t).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
@@ -63,10 +65,23 @@ export default function ScoreChart({ points }) {
   const prev = active > 0 ? points[active - 1] : null;
   const tipLeft = a ? `${(x(active) / W) * 100}%` : 0;
 
+  const first = points[0];
+  const best = Math.max(...points.map((p) => p.score));
+  const change = Math.round((last.score - first.score) * 10) / 10;
+  const area = `M${x(0)},${y(0)} ` + points.map((p, i) => `L${x(i)},${y(p.score)}`).join(' ') + ` L${x(points.length - 1)},${y(0)} Z`;
+  const uid = 'sc' + points.length + '-' + last.version;
+
   return (
     <figure className="chart">
+      <div className="chart-stats">
+        <div><small>Now</small><strong style={{ color: bandColor(last.score) }}>{last.score}%</strong></div>
+        <div><small>Best so far</small><strong>{best}%</strong></div>
+        <div><small>Since the start</small><strong className={change >= 0 ? 'up' : 'down'}>{change >= 0 ? '\u25B2 +' : '\u25BC '}{change}</strong></div>
+        <div><small>Updates</small><strong>{points.length}</strong></div>
+      </div>
       <div className="chart-key" aria-hidden="true">
         <span><i className="key-solid" /> Score after an answer</span>
+        <span><i className="key-dot weak" /> Weak <i className="key-dot fair" /> Getting there <i className="key-dot strong" /> Strong</span>
         <span><i className="key-dashed" /> Fading while not practised</span>
       </div>
 
@@ -78,6 +93,15 @@ export default function ScoreChart({ points }) {
           onPointerMove={nearest}
           onPointerLeave={() => setActive(null)}
         >
+          <defs>
+            <linearGradient id={`${uid}-a`} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stopColor="var(--primary)" stopOpacity="0.32" />
+              <stop offset="1" stopColor="var(--primary)" stopOpacity="0.02" />
+            </linearGradient>
+            <clipPath id={`${uid}-c`}><rect className="chart-reveal" x={PAD.left} y="0" width={W - PAD.left} height={H} /></clipPath>
+          </defs>
+          <rect x={PAD.left} y={y(WEAK)} width={innerW} height={y(0) - y(WEAK)} fill="var(--weak)" opacity="0.08" />
+          <rect x={PAD.left} y={y(100)} width={innerW} height={y(STRONG) - y(100)} fill="var(--strong)" opacity="0.08" />
           {ticks.map((t) => (
             <g key={t}>
               <line x1={PAD.left} x2={W - PAD.right} y1={y(t)} y2={y(t)} stroke={GRID} strokeWidth="1" />
@@ -95,12 +119,16 @@ export default function ScoreChart({ points }) {
 
           {active !== null && <line x1={x(active)} x2={x(active)} y1={PAD.top} y2={H - PAD.bottom} stroke={MUTED} strokeWidth="1" />}
 
-          <path d={fade.join(' ')} fill="none" stroke={LINE} strokeWidth="2" strokeDasharray="5 5" opacity="0.7" />
-          <path d={solid.join(' ')} fill="none" stroke={LINE} strokeWidth="2" />
+          <g clipPath={`url(#${uid}-c)`}>
+            <path d={area} fill={`url(#${uid}-a)`} />
+            <path d={fade.join(' ')} fill="none" stroke={LINE} strokeWidth="2.5" strokeDasharray="5 5" opacity="0.75" />
+            <path d={solid.join(' ')} fill="none" stroke={LINE} strokeWidth="3" strokeLinecap="round" />
+          </g>
 
           {points.map((p, i) => (
             <g key={p.version}>
-              <circle cx={x(i)} cy={y(p.score)} r={active === i ? 7 : 5} fill={LINE} stroke="var(--panel)" strokeWidth="2" />
+              {i === points.length - 1 && <circle className="chart-pulse" cx={x(i)} cy={y(p.score)} r="9" fill={bandColor(p.score)} />}
+              <circle cx={x(i)} cy={y(p.score)} r={active === i ? 8 : 6} fill={bandColor(p.score)} stroke="var(--panel)" strokeWidth="2.5" />
               <circle
                 cx={x(i)}
                 cy={y(p.score)}
@@ -115,9 +143,10 @@ export default function ScoreChart({ points }) {
             </g>
           ))}
 
-          <text x={Math.min(x(points.length - 1), W - PAD.right - 4)} y={y(last.score) - 12} textAnchor="end" fontSize="13" fontWeight="600" fill={INK}>
-            {last.score}%
-          </text>
+          <g transform={`translate(${Math.min(x(points.length - 1), W - PAD.right - 24)} ${Math.max(PAD.top + 10, y(last.score) - 26)})`}>
+            <rect x="-24" y="-13" width="48" height="24" rx="12" fill={bandColor(last.score)} />
+            <text textAnchor="middle" y="4" fontSize="13" fontWeight="700" fill="#fff">{last.score}%</text>
+          </g>
         </svg>
 
         {a && (

@@ -1,15 +1,15 @@
 import { prettyTopic } from '../utils/topics.js';
 import './answerstyle.css';
 
-const HEAD_ICON = { Steady: '✓', Careful: '✓', Rushing: '⚠', Struggling: '⚠', Guessing: '⚠' };
+const HEAD_ICON = { Steady: '\u{1F3AF}', Careful: '\u{1F50D}', Rushing: '\u26A1', Struggling: '\u{1F9D7}', Guessing: '\u{1F3B2}' };
 const TONE = { Steady: 'good', Careful: 'good', Rushing: 'warn', Struggling: 'warn', Guessing: 'bad' };
 
 // Speed on one side, correctness on the other: where each topic sits.
 const CELLS = [
-  { key: 'quick_right', icon: '✓', title: 'Strong and quick', tone: 'good', tip: 'You know these. Try mixed or timed practice.' },
-  { key: 'slow_right', icon: '⏱', title: 'Knows it, needs speed', tone: 'info', tip: 'Right but slow. Short quizzes build speed.' },
-  { key: 'quick_wrong', icon: '⚠', title: 'Guessing or careless', tone: 'bad', tip: 'Slow down and read all four options.' },
-  { key: 'slow_wrong', icon: '↻', title: 'Needs revision', tone: 'warn', tip: 'Read your notes first, then retry.' },
+  { key: 'quick_right', icon: '\u{1F680}', title: 'Strong and quick', tone: 'good', tip: 'You know these. Try mixed or timed practice.' },
+  { key: 'slow_right', icon: '\u{1F422}', title: 'Knows it, needs speed', tone: 'info', tip: 'Right but slow. Short quizzes build speed.' },
+  { key: 'quick_wrong', icon: '\u{1F3B2}', title: 'Guessing or careless', tone: 'bad', tip: 'Slow down and read all four options.' },
+  { key: 'slow_wrong', icon: '\u{1F4DA}', title: 'Needs revision', tone: 'warn', tip: 'Read your notes first, then retry.' },
 ];
 
 export default function AnswerStyle({ data }) {
@@ -31,10 +31,10 @@ export default function AnswerStyle({ data }) {
 
       {ready && (
         <div className="as-tiles">
-          <div className="as-tile"><span>{data.medianSec} s</span><small>Typical time per question</small></div>
-          <div className="as-tile"><span>{data.fast}</span><small>Very fast answers</small></div>
-          <div className="as-tile"><span>{data.slow}</span><small>Very slow answers</small></div>
-          <div className="as-tile"><span>{data.accuracy}%</span><small>Answers right</small></div>
+          <div className="as-tile"><span className="as-ti" aria-hidden="true">{'\u23F1'}</span><span>{data.medianSec} s</span><small>Typical time per question</small></div>
+          <div className="as-tile"><span className="as-ti" aria-hidden="true">{'\u{1F407}'}</span><span>{data.fast}</span><small>Very fast answers</small></div>
+          <div className="as-tile"><span className="as-ti" aria-hidden="true">{'\u{1F40C}'}</span><span>{data.slow}</span><small>Very slow answers</small></div>
+          <div className="as-tile"><span className="as-ti" aria-hidden="true">{'\u{1F3AF}'}</span><span>{data.accuracy}%</span><small>Answers right</small></div>
         </div>
       )}
 
@@ -73,9 +73,16 @@ export default function AnswerStyle({ data }) {
             <div className="as-side as-row2" aria-hidden="true">Mostly wrong</div>
           </div>
           {building.length > 0 && (
-            <p className="muted small as-building">
-              Still getting there: {building.map(([t]) => prettyTopic(t)).join(', ')}. A mix of right and wrong answers.
-            </p>
+            <div className="as-building">
+              <span className="as-b-icon" aria-hidden="true">{'\u{1F331}'}</span>
+              <div>
+                <strong>Still getting there</strong>
+                <p>Your answers in these topics are a mix of right and wrong, so there is no clear pattern yet. A few more quizzes will show it.</p>
+                <div className="as-chips">
+                  {building.map(([t]) => <span key={t} className="as-chip">{prettyTopic(t)}</span>)}
+                </div>
+              </div>
+            </div>
           )}
         </>
       )}

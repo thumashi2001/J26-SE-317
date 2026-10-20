@@ -1,13 +1,13 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
-import { getTwin, getAlerts, getPracticeTopics, getInsights, getBehaviour } from '../../services/c1Api.js';
+import { getTwin, getAlerts, getPracticeTopics, getInsights, getBehaviour, getPlan, saveExamDate } from '../../services/c1Api.js';
 import { prettyTopic, scoreBand } from '../../utils/topics.js';
 import WelcomePopup from '../../components/WelcomePopup.jsx';
-import AnswerStyle from '../../components/AnswerStyle.jsx';
+import TodayPlan from '../../components/TodayPlan.jsx';
+import ExamCalendar from '../../components/ExamCalendar.jsx';
 import './practice.css';
-
-const READ_ICON = { strong: '\u2713', slow_right: '\u23F1', guessing: '\u26A0', revise: '\u21BB', building: '\u2026' };
+import './dashboard.css';
 
 const seenWelcome = () => {
   try {
@@ -23,6 +23,8 @@ const markWelcome = () => {
     /* ignore */
   }
 };
+
+const LEVEL_TEXT = { weak: 'Just starting', fair: 'Getting there', strong: 'Strong' };
 
 function Ring({ value }) {
   const r = 52;
@@ -53,23 +55,28 @@ export default function DashboardPage() {
   const [practicable, setPracticable] = useState([]);
   const [insights, setInsights] = useState(null);
   const [behaviour, setBehaviour] = useState(null);
+  const [plan, setPlan] = useState(null);
+  const [planError, setPlanError] = useState('');
+  const [savingDate, setSavingDate] = useState(null);
   const [error, setError] = useState('');
   const [welcome, setWelcome] = useState(false);
 
   const load = useCallback(async () => {
     try {
-      const [t, a, pt, ins, beh] = await Promise.all([
+      const [t, a, pt, ins, beh, pl] = await Promise.all([
         getTwin(user.student_id),
         getAlerts(user.student_id),
         getPracticeTopics().catch(() => ({ topics: [] })), // no practice list is not a reason to hide the page
         getInsights(user.student_id).catch(() => null), // the page still works without the extra insights
         getBehaviour(user.student_id).catch(() => null),
+        getPlan(user.student_id).catch(() => null), // the dashboard still works without the plan
       ]);
       setTwin(t);
       setAlerts(a.alerts);
       setPracticable(pt.topics);
       setInsights(ins);
       setBehaviour(beh);
+      setPlan(pl);
       setError('');
     } catch (err) {
       setError(err.message);
@@ -89,6 +96,22 @@ export default function DashboardPage() {
     }
   }, [ready]);
   const closeWelcome = useCallback(() => setWelcome(false), []);
+
+  const onSaveDate = useCallback(
+    async (module, value) => {
+      setSavingDate(module);
+      setPlanError('');
+      try {
+        await saveExamDate(user.student_id, module, value);
+        setPlan(await getPlan(user.student_id));
+      } catch (err) {
+        setPlanError(err.message);
+      } finally {
+        setSavingDate(null);
+      }
+    },
+    [user.student_id]
+  );
 
   if (error && !twin)
     return (
@@ -124,6 +147,12 @@ export default function DashboardPage() {
   const canPractise = (t) => practicable.includes(t);
   // lowest score among the topics that have practice questions
   const weakest = topics.filter(([t]) => canPractise(t)).sort((x, y) => shown(x[0], x[1]) - shown(y[0], y[1]))[0];
+
+  // the three lowest topics, for the short list on this page (the full list is on Topic insights)
+  const lowest = topics
+    .map(([t, m]) => ({ topic: t, score: shown(t, m) }))
+    .sort((x, y) => x.score - y.score)
+    .slice(0, 3);
 
   const firstName = (user.name || '').split(' ')[0];
   const reads = behaviour && behaviour.topics ? behaviour.topics : {};
@@ -172,84 +201,81 @@ export default function DashboardPage() {
           </div>
         </section>
 
-        <aside className="dash-side">
-          {eng && (
-            <section className="panel side-card">
-              <div className="engage-head">
-                <strong>Engagement</strong>
-                <span className={`tag eng-${eng.label.toLowerCase().replace(' ', '-')}`}>{eng.label}</span>
-              </div>
-              <div className="meter" role="img" aria-label={`Engagement index ${eng.index} out of 100`}>
-                <span style={{ width: `${Math.max(2, eng.index)}%` }} />
-              </div>
-              <p className="muted small">{eng.why}</p>
-            </section>
-          )}
-          <section className="panel side-card">
-            <strong>Alerts</strong>
-            {alerts.length === 0 ? (
-              <p className="muted small">Nothing needs your attention right now.</p>
-            ) : (
-              <ul className="alerts alerts-scroll">
-                {alerts.map((a, i) => (
-                  <li key={i} className={`alert ${a.severity === 'High' ? 'high' : 'medium'}`}>
-                    <span aria-hidden="true">{a.type === 'guessing' ? '\u26A0' : a.type === 'sudden_drop' ? '\u2198' : '\u2757'}</span>
-                    <span>{a.topic ? a.message.replace(a.topic, prettyTopic(a.topic)) : a.message}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
+        <div className="kpis">
+          <section className="kpi k-blue">
+            <span className="kpi-label">Predicted exam level</span>
+            <strong className="kpi-value">{plan ? `${plan.predicted.withPlan}%` : '...'}</strong>
+            <span className="kpi-note">{plan ? `if you follow the plan, ${plan.predicted.ifYouStop}% if you stop` : 'working it out'}</span>
           </section>
-        </aside>
+          <section className="kpi k-teal">
+            <span className="kpi-label">Next exam</span>
+            <strong className="kpi-value">{plan && plan.nextExam ? `${plan.daysLeft} ${plan.daysLeft === 1 ? 'day' : 'days'}` : 'Not set'}</strong>
+            <span className="kpi-note">{plan && plan.nextExam ? `${plan.nextExam.module}, ${new Date(plan.nextExam.date + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'long' })}` : 'add each module exam date in the calendar'}</span>
+          </section>
+          <section className="kpi k-indigo">
+            <span className="kpi-label">Engagement</span>
+            <strong className="kpi-value">{eng ? eng.label : '...'}</strong>
+            <span className="kpi-note">{eng ? `${eng.index} of 100` : ''}</span>
+          </section>
+          <section className="kpi k-sky">
+            <span className="kpi-label">Alerts</span>
+            <strong className="kpi-value">{alerts.length}</strong>
+            <span className="kpi-note">{alerts.length === 0 ? 'nothing needs attention' : alerts[0].topic ? alerts[0].message.replace(alerts[0].topic, prettyTopic(alerts[0].topic)) : alerts[0].message}</span>
+          </section>
+        </div>
       </div>
 
-      {behaviour && <AnswerStyle data={behaviour} />}
+      <div className="plan-row">
+        <div className="plan-col">
+          <TodayPlan plan={plan} />
+          <section className="panel glance-card" aria-labelledby="gl-topics">
+            <header>
+              <h2 id="gl-topics">Topics to work on</h2>
+              <Link className="glance-link" to="/c1/topics">See all {topics.length} topics <span aria-hidden="true">{'\u2192'}</span></Link>
+            </header>
+            <ul className="glance-list">
+              {lowest.map((r) => {
+                const band = scoreBand(r.score);
+                return (
+                  <li key={r.topic} className={band}>
+                    <Link to={`/c1/topic/${r.topic}`} state={{ from: '/c1/dashboard' }}>
+                      <span className="gl-name">{prettyTopic(r.topic)}</span>
+                      <span className="gl-bar" aria-hidden="true"><i style={{ width: `${Math.max(4, Math.min(100, r.score))}%` }} /></span>
+                      <b>{Math.round(r.score)}%</b>
+                      <small>{LEVEL_TEXT[band]}</small>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
 
-      <h2>Topics</h2>
-      <p className="muted small">Scores show your estimated level now, including forgetting since you last practised. Select a topic to see why, or press Practise.</p>
-      <p className="muted small">Score reliability shows how far you can trust a score, based on how many recent, honest answers we have. It does not show how well you know the topic.</p>
-      <div className="heat">
-        {topics.map(([topic, m]) => {
-          const score = shown(topic, m);
-          const i = info(topic);
-          const r = reads[topic];
-          const faded = i && i.estimatedNow !== null && m.score - score >= 1;
-          return (
-            <div key={topic} className="topic-cell">
-              <Link to={`/c1/topic/${topic}`} className={`topic link ${scoreBand(score)}`}>
-                <div className="topic-name">{prettyTopic(topic)}</div>
-                <div className="topic-score">{Math.round(score)}%</div>
-                <div className="bar">
-                  <span style={{ width: `${Math.max(3, score)}%` }} />
-                </div>
-                <div className="muted small">
-                  {m.practice_sessions ?? 0} {m.practice_sessions === 1 ? 'practice session' : 'practice sessions'}
-                </div>
-                {faded && <div className="muted small">Was {Math.round(m.score)}% when last practised</div>}
-                {r && (
-                  <div className={`topic-read read-${r.key}`} title={r.tip}>
-                    <span aria-hidden="true">{READ_ICON[r.key]}</span> {r.label}
-                  </div>
-                )}
-                {i && (
-                  <div className="topic-foot">
-                    <span className={`tag conf-${i.confidenceLabel.toLowerCase()}`} title={i.confidenceWhy}>
-                      Score reliability: {i.confidenceLabel}
-                    </span>
-                  </div>
-                )}
-              </Link>
-              {canPractise(topic) ? (
-                <Link className="btn secondary practise-btn" to={`/c1/practice/${topic}`} aria-label={`Practise ${prettyTopic(topic)}`}>
-                  Practise
-                </Link>
-              ) : (
-                <span className="practise-btn practise-off">No practice questions yet</span>
-              )}
-            </div>
-          );
-        })}
+          <section className="panel glance-card" aria-labelledby="gl-style">
+            <header>
+              <h2 id="gl-style">How you answer</h2>
+              <Link className="glance-link" to="/c1/topics">See my answer style <span aria-hidden="true">{'\u2192'}</span></Link>
+            </header>
+            <p className="gl-head">{behaviour ? behaviour.headline : 'Take a quiz to see how you answer.'}</p>
+            {behaviour && behaviour.pattern !== 'Not enough yet' && <p className="muted small">{behaviour.advice}</p>}
+          </section>
+        </div>
+        <ExamCalendar plan={plan} onSave={onSaveDate} savingModule={savingDate} error={planError} />
       </div>
+
+      {alerts.length > 0 && (
+        <section className="panel alert-panel">
+          <strong>Alerts</strong>
+          <ul className="alerts">
+            {alerts.map((a, i) => (
+              <li key={i} className={`alert ${a.severity === 'High' ? 'high' : 'medium'}`}>
+                <span aria-hidden="true">{a.type === 'guessing' ? '\u26A0' : a.type === 'sudden_drop' ? '\u2198' : '\u2757'}</span>
+                <span>{a.topic ? a.message.replace(a.topic, prettyTopic(a.topic)) : a.message}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
     </div>
   );
 }
