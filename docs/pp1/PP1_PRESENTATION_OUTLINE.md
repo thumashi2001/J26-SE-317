@@ -1,0 +1,24 @@
+# AdaptiveLearnSE Component 3 — 10-Minute PP1 Presentation Deck Outline
+
+**Event:** Project Performance 1 (PP1) Evaluation  
+**Presentation Time:** Exactly 10 Minutes (Strictly Enforced by Panel)  
+**Speaker:** Component 3 Engineer  
+**Component:** Component 3 (AI-Powered Automated Marking & Answer Analysis System)  
+
+---
+
+## Slide Breakdown & Minute-by-Minute Allocation
+
+| Slide | Title & Theme | Key Points to Deliver | Visual Evidence | Duration |
+| :--- | :--- | :--- | :--- | :--- |
+| **Slide 1** | **Title & Introduction** | Project Title: AdaptiveLearnSE.<br>Component 3: AI-Powered Automated Marking & Answer Analysis System.<br>Candidate Name & Registration ID. | Architecture banner & institutional logo | **0:00 – 0:45** (45s) |
+| **Slide 2** | **Problem Definition & Research Gap** | Subjective assessment in SE is labor-intensive, slow, and subjective.<br>Generative LLMs hallucinate marks and lack rubric fidelity.<br>Lexical models reward verbose fluff.<br>**Research Gap:** Traceable, rubric-aware subjective evaluation with concept diagnosis and lecturer governance. | Flowchart showing grading bottleneck | **0:45 – 1:45** (60s) |
+| **Slide 3** | **Overall System Architecture & Synergy** | AdaptiveLearnSE connects 4 components around a Cognitive Digital Twin.<br>C2 ingests past papers; C3 marks answers; C1 tracks mastery and forgetting curves; C4 recommends revision paths.<br>Neo4j CCKG intended as unifying curriculum spine. | System architecture diagram (`docs/pp1/ARCHITECTURE_DIAGRAM.md`) | **1:45 – 2:45** (60s) |
+| **Slide 4** | **Component 3 Scope & Boundaries** | Core Scope: Typed subjective answers, deterministic MCQs, rubric-aware evaluation, sentence evidence spans, concept diagnosis, explainable feedback, mind-map DAG, and lecturer override governance.<br>**Explicit Scope Boundaries:** Scanned handwriting OCR is excluded by research scope. | Functional feature matrix | **2:45 – 3:45** (60s) |
+| **Slide 5** | **Specialized Knowledge & Theoretical Pillars** | NLP Foundations: tokenization, stopword normalization, semantic similarity.<br>Educational Psychometrics: Bloom-aligned rubric levels.<br>Graph Theory: Directed Acyclic Graphs (DAGs) for concept mastery visual hierarchies. | Pipeline block diagram | **3:45 – 4:45** (60s) |
+| **Slide 6** | **F1–F4 Evaluation Engine Architecture** | F1: Preprocessing & concept regex token matching.<br>F2: Descending rubric level evaluation with sentence evidence extraction.<br>F3: Explainable formative feedback (strengths, gaps, actions).<br>F4: Concept mind-map DAG visualizer in native SVG. | `ss/06_criterion_evidence_feedback.png`<br>`ss/07_concept_mind_map.png` | **4:45 – 5:45** (60s) |
+| **Slide 7** | **Lecturer Batch Studio & Governance** | Configure question and rubric once; grade cohort in batch.<br>Pre-marking validation: blocks duplicate student IDs and empty rows.<br>Mandatory override justification enforces academic accountability.<br>Audited state transitions: `pending_review` -> `reviewed` -> `finalized`. | `ss/02_lecturer_batch_setup.png`<br>`ss/08_lecturer_override_reason.png` | **5:45 – 6:45** (60s) |
+| **Slide 8** | **Empirical Research Evaluation (N=150)** | Controlled synthetic benchmark: 167 questions, 1,002 answers (`C3-Phase3-v5-FINAL`).<br>Held-out test split: 25 unique questions, 150 answers (zero leakage).<br>Proposed Condition E achieves **17.3% lower MAE** (4.640 vs 5.609) and **56% tolerance agreement** vs 20.7% for baseline.<br>100% rejection of irrelevant answers.<br>Scientific trade-off: Baseline has lower RMSE due to smooth continuous overlap avoiding discrete rubric step penalties. | `ss/12_evaluation_results.png`<br>Comparison bar charts | **6:45 – 7:45** (60s) |
+| **Slide 9** | **Live Group Integration: C3-to-C1 Bridge** | Real component-to-component interoperability demonstrated in running code.<br>Idempotent emission to MongoDB `learning_events`.<br>Two-stage lifecycle: `provisional` (AI proposed) ignored by C1 risk model; `finalized` (lecturer approved) updates student cognitive twin. | Integration sequence diagram (`docs/pp1/COMPONENT_INTEGRATION_DIAGRAM.md`) | **7:45 – 8:45** (60s) |
+| **Slide 10** | **Commercialization Potential & Tech Excellence** | Low-cost CPU inference: 0.34ms algorithmic latency enables ultra-cheap scaling without expensive GPU clusters.<br>EdTech SaaS market for university computer science departments.<br>Integration potential with Canvas / Moodle via LTI.<br>Software Quality: 140 passing automated tests; Vite production build (112 modules). | Test results screenshot (`ss/11_test_results.png`) | **8:45 – 9:30** (45s) |
+| **Slide 11** | **Future Roadmap & Conclusion** | PP1 Status: Condition E prototype complete and verified.<br>Post-PP1 Phase 4: Vector-RAG (Condition C) and Neo4j GraphRAG (Condition D) once CCKG is implemented.<br>Transition to 10-Minute Live System Demonstration. | Roadmap timeline | **9:30 – 10:00** (30s) |
