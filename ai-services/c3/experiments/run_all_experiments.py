@@ -12,9 +12,9 @@ Executes the complete research matrix across all approved experimental condition
 - 6-Case Diagnostic Robustness Suite
 """
 
+import json
 import os
 import sys
-import json
 import time
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -22,14 +22,14 @@ BASE_DIR = os.path.abspath(os.path.join(SCRIPT_DIR, ".."))
 sys.path.append(BASE_DIR)
 sys.path.append(SCRIPT_DIR)
 
-from llm.exp1_non_rag_llm import run_experiment_1
-from llm.exp2_rubric_aligned_llm import run_experiment_2
-from rag.exp3_vector_rag import run_experiment_3
-from rag.exp4_graph_rag import run_experiment_4
-from llm.exp5_multi_llm_comparison import run_experiment_5
 import run_evaluation
 import run_model_diagnostics
 import train_semantic_model_corrected
+from llm.exp1_non_rag_llm import run_experiment_1
+from llm.exp2_rubric_aligned_llm import run_experiment_2
+from llm.exp5_multi_llm_comparison import run_experiment_5
+from rag.exp3_vector_rag import run_experiment_3
+from rag.exp4_graph_rag import run_experiment_4
 
 RESULTS_DIR = os.path.join(SCRIPT_DIR, "results")
 

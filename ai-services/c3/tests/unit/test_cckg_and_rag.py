@@ -3,9 +3,8 @@ Unit tests for CCKGGraphAdapter and CurriculumVectorStore
 Validates ontology retrieval, prerequisite traversal, vector search, and offline fallback.
 """
 
-import pytest
-from services.rag.vector_store import CurriculumVectorStore, get_vector_store
 from services.cckg.graph_adapter import CCKGGraphAdapter, get_cckg_adapter
+from services.rag.vector_store import CurriculumVectorStore, get_vector_store
 
 
 class TestCurriculumVectorStore:

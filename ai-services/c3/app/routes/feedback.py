@@ -3,7 +3,6 @@ from fastapi import APIRouter
 from app.schemas.feedback import FeedbackRequest, FeedbackResponse
 from services.feedback.generator import generate_feedback
 
-
 router = APIRouter(prefix="/feedback", tags=["feedback"])
 
 

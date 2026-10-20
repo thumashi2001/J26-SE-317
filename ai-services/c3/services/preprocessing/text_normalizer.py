@@ -1,6 +1,5 @@
-from dataclasses import dataclass
 import re
-
+from dataclasses import dataclass
 
 _TOKEN_PATTERN = re.compile(r"[^\W_]+(?:[-'’][^\W_]+)*", re.UNICODE)
 _SENTENCE_BOUNDARY_PATTERN = re.compile(r"(?<=[.!?])\s+")

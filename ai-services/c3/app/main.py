@@ -1,15 +1,15 @@
 import os
+
 from fastapi import FastAPI
 
 from app.routes.analysis import router as analysis_router
-from app.routes.marking import router as marking_router
-from app.routes.feedback import router as feedback_router
-from app.routes.mindmap import router as mindmap_router
 from app.routes.assessment import router as assessment_router
-
+from app.routes.feedback import router as feedback_router
+from app.routes.marking import router as marking_router
+from app.routes.mindmap import router as mindmap_router
+from services.cckg.graph_adapter import get_cckg_adapter
 from services.llm.factory import get_llm_provider, list_available_providers
 from services.rag.vector_store import get_vector_store
-from services.cckg.graph_adapter import get_cckg_adapter
 
 app = FastAPI(
     title="AdaptiveLearnSE - Component 3 AI Service",

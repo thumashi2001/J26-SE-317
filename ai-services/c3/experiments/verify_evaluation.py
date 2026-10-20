@@ -12,7 +12,6 @@ Conducts deep audit of:
 """
 
 import csv
-import json
 import math
 import sys
 import time
@@ -264,7 +263,7 @@ def run_independent_audit():
         writer.writeheader()
         writer.writerows(raw_results)
 
-    print(f"\n[Audit Output Saved: Raw Predictions CSV]")
+    print("\n[Audit Output Saved: Raw Predictions CSV]")
     print(f"  Path: {csv_path} ({len(raw_results)} rows saved)")
 
 

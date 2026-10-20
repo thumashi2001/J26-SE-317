@@ -1,8 +1,8 @@
 from app.schemas.analysis import AnswerAnalysisResponse
 from app.schemas.mindmap import MindMapRequest, MindMapResponse, MindMapSummary
-from services.semantic.analyzer import analyze_answer
-from services.mindmap.node_builder import build_root_node, build_concept_nodes
+from services.mindmap.node_builder import build_concept_nodes, build_root_node
 from services.mindmap.relationship_builder import build_baseline_relationships
+from services.semantic.analyzer import analyze_answer
 
 GENERATION_VERSION = "baseline-v1"
 
@@ -14,24 +14,24 @@ def build_mindmap_from_analysis(
     expected_concepts: list[str],
 ) -> MindMapResponse:
     root_node = build_root_node(
-        question_id=question_id, 
+        question_id=question_id,
         question_text=question_text,
     )
     concept_nodes = build_concept_nodes(analysis, expected_concepts)
     relationships = build_baseline_relationships(root_node, concept_nodes)
     all_nodes = [root_node] + concept_nodes
-    
+
     demonstrated = sum(1 for n in concept_nodes if n.status == "demonstrated")
     partial = sum(1 for n in concept_nodes if n.status == "partial")
     missing = sum(1 for n in concept_nodes if n.status == "not_demonstrated")
-    
+
     summary = MindMapSummary(
         total_nodes=len(all_nodes),
         demonstrated_count=demonstrated,
         partial_count=partial,
         missing_count=missing,
     )
-    
+
     warnings = []
     if missing > 0:
         warnings.append(f"Mind map contains {missing} missing expected concept(s).")

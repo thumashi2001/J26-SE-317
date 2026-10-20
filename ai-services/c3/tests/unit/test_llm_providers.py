@@ -5,15 +5,13 @@ Ollama real-execution error handling and model verification, real sentence embed
 and runtime diagnostic exposure without credentials leakage.
 """
 
-import os
-import pytest
-import numpy as np
-from unittest.mock import patch, MagicMock
-from services.llm.base import LLMRequest, LLMResponse, LLMUsage, BaseLLMProvider
+from unittest.mock import MagicMock, patch
+
+from services.llm.base import LLMRequest, LLMResponse, LLMUsage
+from services.llm.factory import get_llm_provider, list_available_providers
+from services.llm.local_provider import LocalLLMProvider
 from services.llm.mock_provider import MockLLMProvider
 from services.llm.openai_provider import OpenAIProvider
-from services.llm.local_provider import LocalLLMProvider
-from services.llm.factory import get_llm_provider, list_available_providers
 from services.rag.vector_store import CurriculumVectorStore, RealSentenceTransformerEmbedding
 
 

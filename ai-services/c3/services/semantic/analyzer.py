@@ -7,7 +7,6 @@ from app.schemas.analysis import (
 from services.preprocessing.text_normalizer import process_text, tokenize
 from services.semantic.baseline import lexical_cosine_similarity, token_overlap_score
 
-
 ANALYSIS_VERSION = "baseline-v1"
 
 

@@ -20,11 +20,10 @@ Outputs:
 
 import json
 import math
-import os
 import sys
 import time
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 # Ensure package imports resolve
 C3_ROOT = Path(__file__).resolve().parent.parent
@@ -37,7 +36,7 @@ from services.assessment.orchestrator import assess_answer
 from services.preprocessing.text_normalizer import tokenize
 
 
-def build_synthetic_rubric(question_id: str, max_marks: float, expected_concepts: List[str]) -> Rubric:
+def build_synthetic_rubric(question_id: str, max_marks: float, expected_concepts: list[str]) -> Rubric:
     """Build a standardized Rubric model for testing evaluation."""
     rubric_rows = load_rubric_criteria(question_id=question_id)
     if rubric_rows:
@@ -88,7 +87,7 @@ def build_synthetic_rubric(question_id: str, max_marks: float, expected_concepts
     )
 
 
-def compute_pearson_r(x: List[float], y: List[float]) -> float:
+def compute_pearson_r(x: list[float], y: list[float]) -> float:
     """Compute Pearson correlation coefficient."""
     n = len(x)
     if n < 2:
@@ -103,7 +102,7 @@ def compute_pearson_r(x: List[float], y: List[float]) -> float:
     return max(-1.0, min(1.0, num / (den_x * den_y)))
 
 
-def evaluate_test_split() -> Dict[str, Any]:
+def evaluate_test_split() -> dict[str, Any]:
     print("=" * 70)
     print("AdaptiveLearnSE Component 3 — Research Evaluation Pipeline")
     print("=" * 70)
@@ -118,7 +117,7 @@ def evaluate_test_split() -> Dict[str, Any]:
     baseline_marks = []
     latencies_ms = []
 
-    quality_groups: Dict[str, Dict[str, List[float]]] = {}
+    quality_groups: dict[str, dict[str, list[float]]] = {}
     valid_feedbacks = 0
     valid_mindmaps = 0
 
@@ -320,8 +319,8 @@ def evaluate_test_split() -> Dict[str, Any]:
     with open(md_path, "w", encoding="utf-8") as f:
         f.write("# AdaptiveLearnSE Component 3 — Research Evaluation Summary\n\n")
         f.write(f"**Date:** {results['evaluation_timestamp']}  \n")
-        f.write(f"**Dataset Split:** Test split (25 questions, 150 controlled student answers)  \n")
-        f.write(f"**Dataset Version:** `C3-Phase3-v5-FINAL`  \n\n")
+        f.write("**Dataset Split:** Test split (25 questions, 150 controlled student answers)  \n")
+        f.write("**Dataset Version:** `C3-Phase3-v5-FINAL`  \n\n")
 
         f.write("## 1. Quantitative Performance Comparison\n\n")
         f.write("| Model / Method | MAE (Lower is better) | RMSE | Pearson Correlation (r) | Tolerance Agreement (±2.0) |\n")

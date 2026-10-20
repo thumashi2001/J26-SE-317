@@ -1,5 +1,5 @@
-from collections import Counter
 import math
+from collections import Counter
 
 from services.preprocessing.text_normalizer import tokenize
 

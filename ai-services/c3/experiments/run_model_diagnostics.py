@@ -15,9 +15,10 @@ Diagnostic Suite Test Cases:
 - Case 6: Empty Answer
 """
 
+import json
 import os
 import sys
-import json
+
 import joblib
 import numpy as np
 import pandas as pd
@@ -27,13 +28,13 @@ BASE_DIR = os.path.abspath(os.path.join(SCRIPT_DIR, ".."))
 sys.path.append(BASE_DIR)
 sys.path.append(SCRIPT_DIR)
 
-from app.schemas.marking import Rubric, RubricCriterion, ScoringLevel
-from app.schemas.assessment import AssessmentRequest
-from services.assessment.orchestrator import assess_answer
-from services.preprocessing.text_normalizer import tokenize
-
 import train_semantic_model as tsm_v1
 import train_semantic_model_corrected as tsm_v2
+
+from app.schemas.assessment import AssessmentRequest
+from app.schemas.marking import Rubric, RubricCriterion, ScoringLevel
+from services.assessment.orchestrator import assess_answer
+from services.preprocessing.text_normalizer import tokenize
 
 MODELS_DIR = os.path.join(BASE_DIR, "models")
 RESULTS_DIR = os.path.join(SCRIPT_DIR, "results")
@@ -139,26 +140,26 @@ def run_diagnostics():
     print("=" * 80)
     print("  ADAPTIVELEARNSE COMPONENT 3 — DIAGNOSTIC ROBUSTNESS SUITE AUDIT")
     print("=" * 80)
-    
+
     # Load Condition F Original
     v1_path = os.path.join(MODELS_DIR, "c3_scoring_regressor.joblib")
     v1_data = joblib.load(v1_path)
     gbr_v1 = v1_data["gbr"]
     tfidf_v1 = v1_data["tfidf"]
-    
+
     # Load Condition F Corrected
     v2_path = os.path.join(MODELS_DIR, "c3_scoring_regressor_corrected.joblib")
     v2_data = joblib.load(v2_path)
     gbr_v2 = v2_data["gbr"]
     tfidf_v2 = v2_data["tfidf"]
-    
+
     rubric = get_diagnostic_rubric()
     results = []
-    
+
     for case in DIAGNOSTIC_CASES:
         ans_text = case["student_answer"]
         gt_mark = case["expected_mark"]
-        
+
         # 1. Lexical Token Overlap Baseline
         ans_tokens = set(tokenize(ans_text))
         ref_tokens = set(tokenize(REFERENCE_ANSWER))
@@ -167,7 +168,7 @@ def run_diagnostics():
             base_score = round(overlap * MAX_MARKS, 2)
         else:
             base_score = 0.0
-            
+
         # 2. Condition E (Deterministic Rubric Engine)
         req = AssessmentRequest(
             question_id=QUESTION_ID,
@@ -180,7 +181,7 @@ def run_diagnostics():
         )
         cond_e_res = assess_answer(req)
         cond_e_score = float(cond_e_res.total_awarded_marks)
-        
+
         # 3. Condition F Original (v1.0.0 with length bias)
         df_single = pd.DataFrame([{
             "question_text": QUESTION_TEXT,
@@ -189,7 +190,7 @@ def run_diagnostics():
         }])
         feats_v1 = tsm_v1.extract_dense_features(df_single, tfidf_v1, is_train=False)
         cond_f_v1_score = round(float(np.clip(gbr_v1.predict(feats_v1)[0], 0.0, 1.0) * MAX_MARKS), 2)
-        
+
         # 4. Condition F Corrected (v2.0.0 Gated Semantic Regressor)
         df_single_v2 = pd.DataFrame([{
             "question_text": QUESTION_TEXT,
@@ -201,7 +202,7 @@ def run_diagnostics():
         feats_v2, rel_mask = tsm_v2.extract_semantic_features(df_single_v2, tfidf_v2, is_train=False)
         raw_pred_v2 = gbr_v2.predict(feats_v2)[0]
         cond_f_v2_score = round(float(np.clip(raw_pred_v2 * rel_mask[0], 0.0, 1.0) * MAX_MARKS), 2)
-        
+
         case_result = {
             "case_id": case["case_id"],
             "description": case["description"],
@@ -219,7 +220,7 @@ def run_diagnostics():
             }
         }
         results.append(case_result)
-        
+
         print(f"\n[{case['case_id']}] {case['description']}")
         print(f"  Target Ground Truth:           {gt_mark:.1f} / 10.0")
         print(f"  1. Token Overlap Baseline:     {base_score:.2f} / 10.0")

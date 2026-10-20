@@ -4,7 +4,6 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator, model_valida
 
 from app.schemas.analysis import AnswerAnalysisRequest
 
-
 EvidenceRuleType = Literal["required_concept_count"]
 
 

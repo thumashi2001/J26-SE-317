@@ -23,16 +23,17 @@ Saves artifacts to:
 - ai-services/c3/experiments/results/trainable_model_summary_corrected.json
 """
 
+import json
 import os
 import re
-import json
+from typing import Any
+
 import joblib
 import numpy as np
 import pandas as pd
-from typing import Dict, Any, List, Tuple
+from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import Ridge
-from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -50,13 +51,13 @@ STOPWORDS = {
     "from", "which", "into", "can", "will", "should", "does", "not", "have", "has"
 }
 
-def tokenize(text: str) -> List[str]:
+def tokenize(text: str) -> list[str]:
     if not isinstance(text, str):
         return []
     words = re.findall(r"\b[a-zA-Z0-9_\-\./#+]+\b", text.lower())
     return [w for w in words if w not in STOPWORDS]
 
-def parse_concepts(concept_str: Any) -> List[str]:
+def parse_concepts(concept_str: Any) -> list[str]:
     if not isinstance(concept_str, str) or not concept_str.strip():
         return []
     try:
@@ -68,57 +69,57 @@ def parse_concepts(concept_str: Any) -> List[str]:
     parts = concept_str.replace("[", "").replace("]", "").replace('"', '').replace("'", "").split(",")
     return [p.strip().lower() for p in parts if p.strip()]
 
-def extract_semantic_features(df: pd.DataFrame, tfidf: TfidfVectorizer, is_train: bool = False) -> Tuple[np.ndarray, np.ndarray]:
+def extract_semantic_features(df: pd.DataFrame, tfidf: TfidfVectorizer, is_train: bool = False) -> tuple[np.ndarray, np.ndarray]:
     answers = df["student_answer"].fillna("").astype(str).tolist()
     questions = df["question_text"].fillna("").astype(str).tolist()
     references = df["reference_answer"].fillna("").astype(str).tolist()
-    
+
     # If reference answer is empty in some rows, fallback to question text
     for idx, ref in enumerate(references):
         if not ref.strip():
             references[idx] = questions[idx]
-            
+
     if is_train:
         tfidf.fit(questions + answers + references)
-        
+
     ans_vecs = tfidf.transform(answers)
     q_vecs = tfidf.transform(questions)
     ref_vecs = tfidf.transform(references)
-    
+
     # Pairwise TF-IDF cosine similarities
     tfidf_q_sim = np.asarray((ans_vecs.multiply(q_vecs)).sum(axis=1)).flatten()
     tfidf_ref_sim = np.asarray((ans_vecs.multiply(ref_vecs)).sum(axis=1)).flatten()
-    
+
     features = []
     relevance_masks = []
-    
+
     for i, row in df.reset_index(drop=True).iterrows():
         ans_text = str(row.get("student_answer", "") or "")
         q_text = str(row.get("question_text", "") or "")
         ref_text = str(row.get("reference_answer", "") or "")
         expected_concepts = parse_concepts(row.get("expected_concepts", ""))
-        
+
         ans_tokens = set(tokenize(ans_text))
         ref_tokens = set(tokenize(ref_text)) if ref_text.strip() else set(tokenize(q_text))
-        
+
         # Token overlap with reference answer (F1)
         common_tokens = ans_tokens.intersection(ref_tokens)
         prec = len(common_tokens) / max(1, len(ans_tokens)) if ans_tokens else 0.0
         rec = len(common_tokens) / max(1, len(ref_tokens)) if ref_tokens else 0.0
         token_f1 = (2 * prec * rec) / max(1e-6, (prec + rec))
-        
+
         # Concept coverage
         ans_lower = ans_text.lower()
         matched_concepts = sum(1 for c in expected_concepts if c and c in ans_lower)
         concept_coverage = matched_concepts / max(1, len(expected_concepts))
-        
+
         # Normalized bounded length ratio (capped at 2.0 to eliminate length gaming)
         len_ratio_bounded = min(2.0, len(ans_tokens) / max(1, len(ref_tokens)))
-        
+
         # Relevance gating flag: must have non-trivial similarity or concept presence
         has_relevance = 1.0 if (tfidf_ref_sim[i] > 0.08 or concept_coverage > 0.0) else 0.0
         relevance_masks.append(has_relevance)
-        
+
         # Semantic feature vector WITHOUT raw word count
         row_feat = [
             float(tfidf_ref_sim[i]),
@@ -131,77 +132,77 @@ def extract_semantic_features(df: pd.DataFrame, tfidf: TfidfVectorizer, is_train
             float(has_relevance)
         ]
         features.append(row_feat)
-        
+
     return np.array(features, dtype=np.float32), np.array(relevance_masks, dtype=np.float32)
 
 def train_and_evaluate():
     train_path = os.path.join(DATASET_DIR, "controlled_answers_train.csv")
     test_path = os.path.join(DATASET_DIR, "controlled_answers_test.csv")
-    
+
     print(f"[C3 Corrected Audit] Loading training data: {train_path}")
     df_train = pd.read_csv(train_path)
     print(f"[C3 Corrected Audit] Loading test data:     {test_path}")
     df_test = pd.read_csv(test_path)
-    
+
     train_marks = np.where(df_train["marks"].values > 0, df_train["marks"].values, 10.0)
     test_marks = np.where(df_test["marks"].values > 0, df_test["marks"].values, 10.0)
-    
+
     y_train = np.clip(df_train["expected_mark"].fillna(0.0).values / train_marks, 0.0, 1.0)
     y_test = np.clip(df_test["expected_mark"].fillna(0.0).values / test_marks, 0.0, 1.0)
-    
+
     tfidf = TfidfVectorizer(max_features=400, stop_words="english", ngram_range=(1, 2))
     X_train, rel_train = extract_semantic_features(df_train, tfidf, is_train=True)
     X_test, rel_test = extract_semantic_features(df_test, tfidf, is_train=False)
-    
+
     feature_names = [
         "tfidf_ref_sim", "tfidf_q_sim", "token_f1", "token_precision",
         "token_recall", "concept_coverage", "len_ratio_bounded", "has_relevance"
     ]
-    
+
     # Train regularized model
     ridge_model = Ridge(alpha=2.0, random_state=42)
     ridge_model.fit(X_train, y_train)
-    
+
     gbr_model = GradientBoostingRegressor(
         n_estimators=80, max_depth=2, learning_rate=0.08, subsample=0.8, random_state=42
     )
     gbr_model.fit(X_train, y_train)
-    
+
     print("\n[C3 Feature Importances — Corrected GBR Model]")
     for name, imp in zip(feature_names, gbr_model.feature_importances_):
         print(f"  {name:22s}: {imp:.4f}")
-        
+
     # Save corrected artifact
     artifact_path = os.path.join(MODELS_DIR, "c3_scoring_regressor_corrected.joblib")
     joblib.dump({"ridge": ridge_model, "gbr": gbr_model, "tfidf": tfidf, "features": feature_names}, artifact_path)
     print(f"\n[C3 Corrected Model] Saved artifact to: {artifact_path}")
-    
+
     # Predictions gated by relevance
     raw_pred_train = gbr_model.predict(X_train)
     raw_pred_test = gbr_model.predict(X_test)
-    
+
     pred_train_pct = np.clip(raw_pred_train * rel_train, 0.0, 1.0)
     pred_test_pct = np.clip(raw_pred_test * rel_test, 0.0, 1.0)
-    
+
     pred_train_marks = pred_train_pct * train_marks
     pred_test_marks = pred_test_pct * test_marks
     y_train_marks = df_train["expected_mark"].fillna(0.0).values
     y_test_marks = df_test["expected_mark"].fillna(0.0).values
-    
+
     train_mae = mean_absolute_error(y_train_marks, pred_train_marks)
     train_rmse = np.sqrt(mean_squared_error(y_train_marks, pred_train_marks))
     test_mae = mean_absolute_error(y_test_marks, pred_test_marks)
     test_rmse = np.sqrt(mean_squared_error(y_test_marks, pred_test_marks))
-    
+
     if np.std(pred_test_marks) > 1e-6 and np.std(y_test_marks) > 1e-6:
         pearson_r = float(np.corrcoef(pred_test_marks, y_test_marks)[0, 1])
     else:
         pearson_r = 0.0
-        
+
     abs_err = np.abs(pred_test_marks - y_test_marks)
     tol_2m = float(np.mean(abs_err <= 2.0)) * 100.0
     tol_15pct = float(np.mean((abs_err / test_marks) <= 0.15)) * 100.0
-    
+
     # Test on the Roman Empire distractor to verify length-bias elimination
     df_fake = pd.DataFrame([{
         "question_text": "Explain statement coverage and branch coverage in software testing.",
@@ -220,16 +221,16 @@ def train_and_evaluate():
     pred_fake_pct = np.clip(gbr_model.predict(X_fake) * rel_fake, 0.0, 1.0)[0]
     pred_fake_mark = pred_fake_pct * 10.0
     print(f"\n[Audit Test: Out-of-Domain Distractor] Score on Roman Empire text: {pred_fake_mark:.2f} / 10.0 (Target: 0.00)")
-    
+
     # Save predictions
     df_test_out = df_test[["question_id", "answer_id", "answer_quality", "marks", "expected_mark"]].copy()
     df_test_out["predicted_mark"] = np.round(pred_test_marks, 2)
     df_test_out["absolute_error"] = np.round(abs_err, 2)
     df_test_out["model_type"] = "GradientBoostingRegressor (Corrected v2.0.0)"
-    
+
     pred_csv_path = os.path.join(RESULTS_DIR, "raw_predictions_trainable_model_corrected.csv")
     df_test_out.to_csv(pred_csv_path, index=False)
-    
+
     summary = {
         "model_name": "C3 Corrected Supervised Semantic Scoring Regressor",
         "version": "2.0.0 (Length-Bias Corrected)",
@@ -248,11 +249,11 @@ def train_and_evaluate():
         "distractor_score_out_of_10": round(float(pred_fake_mark), 2),
         "artifact_path": artifact_path
     }
-    
+
     summary_json_path = os.path.join(RESULTS_DIR, "trainable_model_summary_corrected.json")
     with open(summary_json_path, "w", encoding="utf-8") as f:
         json.dump(summary, f, indent=2)
-        
+
     print("\n" + "="*70)
     print("      C3 CORRECTED TRAINABLE MODEL — AUDIT & EVALUATION RESULTS")
     print("="*70)

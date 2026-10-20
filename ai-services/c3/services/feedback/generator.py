@@ -19,7 +19,6 @@ from services.feedback.explanation_builder import (
 from services.marking.marking_engine import mark_answer
 from services.semantic.analyzer import analyze_answer
 
-
 FEEDBACK_VERSION = "baseline-v1"
 
 

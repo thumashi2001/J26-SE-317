@@ -4,7 +4,6 @@ from app.schemas.marking import MarkingRequest, MarkingResponse
 from services.marking.marking_engine import mark_answer
 from services.marking.rubric_validator import RubricValidationError
 
-
 router = APIRouter(prefix="/marking", tags=["marking"])
 
 

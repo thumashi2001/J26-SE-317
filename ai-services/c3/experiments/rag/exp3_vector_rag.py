@@ -3,20 +3,21 @@ AdaptiveLearnSE Component 3 — Experiment 3: Vector-RAG Assessment
 Evaluates Rubric-Aware LLM assessment augmented with retrieved curriculum passages.
 """
 
+import json
 import os
 import sys
-import json
 import time
-import pandas as pd
+
 import numpy as np
+import pandas as pd
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 BASE_DIR = os.path.abspath(os.path.join(SCRIPT_DIR, "..", ".."))
 sys.path.append(BASE_DIR)
 
-from services.llm import get_llm_provider, LLMRequest
-from services.rag.vector_store import get_vector_store
 from experiments.common import load_experiment_test_data
+from services.llm import LLMRequest, get_llm_provider
+from services.rag.vector_store import get_vector_store
 
 RESULTS_DIR = os.path.join(BASE_DIR, "experiments", "results")
 

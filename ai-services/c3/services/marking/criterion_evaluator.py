@@ -2,8 +2,8 @@ from dataclasses import dataclass
 
 from app.schemas.analysis import AnswerAnalysisResponse
 from app.schemas.marking import CriterionMarkingResult, RubricCriterion, ScoringLevel
-from services.semantic.baseline import token_overlap_score
 from services.preprocessing.text_normalizer import tokenize
+from services.semantic.baseline import token_overlap_score
 
 
 @dataclass(frozen=True)

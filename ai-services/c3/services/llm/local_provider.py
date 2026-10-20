@@ -5,12 +5,14 @@ Enforces strict model availability checks, transparent real vs mock execution fl
 and explicit error reporting without silent mock fallback.
 """
 
-import os
-import time
 import json
 import logging
+import os
+import time
 from typing import Any
+
 import httpx
+
 from .base import BaseLLMProvider, LLMRequest, LLMResponse, LLMUsage
 
 logger = logging.getLogger("c3.llm.ollama")

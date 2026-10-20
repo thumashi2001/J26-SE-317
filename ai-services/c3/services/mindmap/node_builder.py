@@ -1,7 +1,7 @@
-import hashlib
 
-from app.schemas.analysis import AnswerAnalysisResponse, ConceptMatch
+from app.schemas.analysis import AnswerAnalysisResponse
 from app.schemas.mindmap import Node
+
 
 def generate_node_id(concept: str) -> str:
     """Generate a stable, deterministic node ID based on the concept name."""
@@ -35,13 +35,13 @@ def build_concept_nodes(analysis: AnswerAnalysisResponse, expected_concepts: lis
     """
     nodes = []
     processed_concepts = set()
-    
+
     # Process matched concepts from Function 1 analysis
     for match in analysis.concept_matches:
         concept_lower = match.concept.casefold()
         if concept_lower in processed_concepts:
             continue
-            
+
         source = "student_answer" if match.status in ["demonstrated", "partial"] else "expected_concept"
         nodes.append(Node(
             node_id=generate_node_id(match.concept),
@@ -53,7 +53,7 @@ def build_concept_nodes(analysis: AnswerAnalysisResponse, expected_concepts: lis
             evidence_sentence_ids=match.evidence_sentence_ids
         ))
         processed_concepts.add(concept_lower)
-        
+
     # Process any expected concepts that Function 1 did not explicitly return
     for expected in expected_concepts:
         concept_lower = expected.casefold()
@@ -68,5 +68,5 @@ def build_concept_nodes(analysis: AnswerAnalysisResponse, expected_concepts: lis
                 evidence_sentence_ids=[]
             ))
             processed_concepts.add(concept_lower)
-            
+
     return nodes

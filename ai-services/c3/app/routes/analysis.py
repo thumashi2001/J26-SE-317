@@ -3,7 +3,6 @@ from fastapi import APIRouter
 from app.schemas.analysis import AnswerAnalysisRequest, AnswerAnalysisResponse
 from services.semantic.analyzer import analyze_answer
 
-
 router = APIRouter(prefix="/analysis", tags=["analysis"])
 
 

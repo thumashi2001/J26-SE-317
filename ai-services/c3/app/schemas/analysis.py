@@ -2,7 +2,6 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-
 AnswerType = Literal["short", "structured", "essay"]
 ConceptStatus = Literal["demonstrated", "partial", "not_demonstrated"]
 

@@ -4,8 +4,8 @@ Implements GraphRAG retrieval for curriculum concepts, prerequisite graphs, and 
 Operates against live Neo4j when available, with a deterministic in-memory ontology fallback.
 """
 
-import os
 import logging
+import os
 from typing import Any
 
 logger = logging.getLogger("c3.cckg.adapter")

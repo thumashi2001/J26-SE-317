@@ -5,9 +5,10 @@ Supports genuine neural embeddings via sentence-transformers/all-MiniLM-L6-v2 wi
 finite-vector validation, dimension verification, and explicit offline status reporting.
 """
 
-import os
 import logging
+import os
 from typing import Any
+
 import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
@@ -131,7 +132,7 @@ class RealSentenceTransformerEmbedding:
                 self.load_error = None
             else:
                 self.is_loaded = False
-                self.load_error = f"Probe validation failed: unexpected dimension or non-finite values."
+                self.load_error = "Probe validation failed: unexpected dimension or non-finite values."
         except ImportError:
             self.is_loaded = False
             self.load_error = "sentence_transformers package is not installed in the active Python environment."

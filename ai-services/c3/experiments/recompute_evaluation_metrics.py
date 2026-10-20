@@ -13,15 +13,13 @@ Outputs:
   - Markdown: ai-services/c3/experiments/results/repaired_dataset_evaluation_report.md
 """
 
-import csv
 import json
 import math
-import os
 import sys
 import time
 from collections import defaultdict
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import Any
 
 C3_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(C3_ROOT))
@@ -33,7 +31,7 @@ from services.assessment.orchestrator import assess_answer
 from services.preprocessing.text_normalizer import tokenize
 
 
-def run_recomputation() -> Dict[str, Any]:
+def run_recomputation() -> dict[str, Any]:
     print("=" * 80)
     print("ADAPTIVELEARNSE C3 — AUTHORITATIVE EVALUATION RECOMPUTATION")
     print("=" * 80)
@@ -57,24 +55,24 @@ def run_recomputation() -> Dict[str, Any]:
         "repaired_replacement_subset": replacement_answers
     }
 
-    subset_results: Dict[str, Any] = {}
+    subset_results: dict[str, Any] = {}
 
     for s_name, s_records in subsets.items():
         print(f"\nEvaluating subset: {s_name} ({len(s_records)} answers)...")
 
-        pred_marks: List[float] = []
-        gt_marks: List[float] = []
-        base_marks: List[float] = []
-        max_marks_list: List[float] = []
-        latencies_ms: List[float] = []
+        pred_marks: list[float] = []
+        gt_marks: list[float] = []
+        base_marks: list[float] = []
+        max_marks_list: list[float] = []
+        latencies_ms: list[float] = []
 
-        concept_prec_list: List[float] = []
-        concept_rec_list: List[float] = []
+        concept_prec_list: list[float] = []
+        concept_rec_list: list[float] = []
         valid_fb_count = 0
         valid_mm_count = 0
 
         quality_records = defaultdict(lambda: {"gt": [], "pred": [], "base": []})
-        per_item_errors: List[Dict[str, Any]] = []
+        per_item_errors: list[dict[str, Any]] = []
 
         t_start = time.perf_counter()
 
@@ -300,9 +298,9 @@ def run_recomputation() -> Dict[str, Any]:
     with open(md_path, "w", encoding="utf-8") as f:
         f.write("# AdaptiveLearnSE Component 3 — Authoritative Post-Repair Research Evaluation Report\n\n")
         f.write(f"**Audit & Evaluation Timestamp:** {authoritative_summary['timestamp']}  \n")
-        f.write(f"**Dataset Version:** `C3-Phase3-v5-REPAIRED`  \n")
-        f.write(f"**Active Marking Baseline:** Condition E (Deterministic Rubric-Aware Marking Engine)  \n")
-        f.write(f"**Supervisor Decision Alignment:** COM-07 (Condition E active; Conditions A–D and F remain deferred)  \n\n")
+        f.write("**Dataset Version:** `C3-Phase3-v5-REPAIRED`  \n")
+        f.write("**Active Marking Baseline:** Condition E (Deterministic Rubric-Aware Marking Engine)  \n")
+        f.write("**Supervisor Decision Alignment:** COM-07 (Condition E active; Conditions A–D and F remain deferred)  \n\n")
 
         f.write("## 1. Executive Summary & Historical Reconciliation\n\n")
         f.write("Previous project reports presented contradictory figures:\n")

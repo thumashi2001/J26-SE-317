@@ -1,7 +1,8 @@
+
 from pydantic import BaseModel
-from typing import Optional
 
 from app.schemas.analysis import AnswerAnalysisRequest
+
 
 class MindMapRequest(BaseModel):
     analysis_request: AnswerAnalysisRequest
@@ -13,11 +14,11 @@ class Node(BaseModel):
     concept: str
     label: str
     source: str
-    status: Optional[str] = None
+    status: str | None = None
     evidence_sentence_ids: list[int] = []
-    parent_node_id: Optional[str] = None
+    parent_node_id: str | None = None
     children: list[str] = []
-    relationship_type: Optional[str] = None
+    relationship_type: str | None = None
 
 
 class Relationship(BaseModel):
@@ -25,7 +26,7 @@ class Relationship(BaseModel):
     source_node_id: str
     target_node_id: str
     relationship_type: str
-    evidence: Optional[str] = None
+    evidence: str | None = None
 
 
 class MindMapSummary(BaseModel):

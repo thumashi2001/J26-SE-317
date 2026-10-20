@@ -4,11 +4,11 @@ Loads the canonical held-out test split (N=150) without question leakage.
 """
 
 import os
-import json
-import pandas as pd
-from typing import Optional
 
-def load_experiment_test_data(base_dir: str, sample_size: Optional[int] = 150) -> pd.DataFrame:
+import pandas as pd
+
+
+def load_experiment_test_data(base_dir: str, sample_size: int | None = 150) -> pd.DataFrame:
     synthetic_dir = os.path.join(base_dir, "datasets", "synthetic")
     ca_test_path = os.path.join(synthetic_dir, "controlled_answers_test.csv")
     final_ca_path = os.path.join(synthetic_dir, "02_FINAL_controlled_answers.csv")

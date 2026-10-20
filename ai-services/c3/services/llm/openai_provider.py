@@ -3,11 +3,13 @@ AdaptiveLearnSE Component 3 — OpenAI REST API Provider
 Connects to OpenAI API using httpx with environment-driven credentials and timeout safety.
 """
 
+import json
 import os
 import time
-import json
 from typing import Any
+
 import httpx
+
 from .base import BaseLLMProvider, LLMRequest, LLMResponse, LLMUsage
 
 

@@ -4,10 +4,9 @@ from app.schemas.marking import (
     MarkingRequest,
     MarkingResponse,
 )
-from services.semantic.analyzer import analyze_answer
 from services.marking.criterion_evaluator import evaluate_criterion
 from services.marking.rubric_validator import validate_rubric
-
+from services.semantic.analyzer import analyze_answer
 
 MARKING_VERSION = "baseline-v1"
 
