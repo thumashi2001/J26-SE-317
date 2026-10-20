@@ -2,6 +2,8 @@
 Unit tests for C3 synthetic dataset loader utility.
 """
 
+import pytest
+
 from datasets.loader import (
     get_dataset_summary,
     get_question_bundle,
@@ -14,6 +16,8 @@ from datasets.loader import (
     parse_concepts,
     parse_marks,
 )
+
+pytestmark = pytest.mark.dataset
 
 
 def test_synthetic_dir_exists():

@@ -2,6 +2,8 @@
 Unit and regression tests for C3 benchmark evaluation pipeline.
 """
 
+import pytest
+
 from experiments.run_evaluation import (
     build_synthetic_rubric,
     compute_pearson_r,
@@ -24,6 +26,8 @@ def test_build_synthetic_rubric():
     assert abs(total_max - 100.0) < 0.5
 
 
+@pytest.mark.dataset
+@pytest.mark.slow
 def test_evaluation_pipeline_execution():
     results = evaluate_test_split()
     assert results["dataset_split"] == "test"

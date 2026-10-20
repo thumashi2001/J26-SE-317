@@ -8,6 +8,10 @@ import app from '../../../app.js';
 import { signToken } from '../../../middleware/auth.js';
 
 test('C3 Live Microservice Boundary Integration (Express <-> FastAPI)', async (t) => {
+  const restoreEnv = (key, original) => {
+    if (original === undefined) delete process.env[key];
+    else process.env[key] = original;
+  };
   const fastapiUrl = process.env.C3_AI_URL || 'http://127.0.0.1:8003';
 
   // 1. Check if the live Python FastAPI service is active
@@ -20,19 +24,19 @@ test('C3 Live Microservice Boundary Integration (Express <-> FastAPI)', async (t
         isFastApiLive = true;
       }
     }
-  } catch (e) {
+  } catch {
     isFastApiLive = false;
   }
 
   // 2. Setup Node Express App Server
   const server = http.createServer(app);
   await new Promise((resolve) => server.listen(0, resolve));
+  t.after(() => server.close());
   const port = server.address().port;
   const baseUrl = `http://127.0.0.1:${port}/api/v1/c3`;
 
   // Auth tokens
   const studentToken = signToken({ sub: 'IT21001001', role: 'student' });
-  const lecturerToken = signToken({ sub: 'SLIITLEC101', role: 'lecturer' });
 
   const fetchApi = async (path, token, body = {}) => {
     const headers = { 'Content-Type': 'application/json' };
@@ -46,11 +50,7 @@ test('C3 Live Microservice Boundary Integration (Express <-> FastAPI)', async (t
     return { status: res.status, data };
   };
 
-  await t.test('1. Python FastAPI service health check is reachable', async () => {
-    if (!isFastApiLive) {
-      t.skip('FastAPI service is not running on port 8003; skipping live endpoint call');
-      return;
-    }
+  await t.test('1. Python FastAPI service health check is reachable', { skip: !isFastApiLive && 'FastAPI service is not running on port 8003' }, async () => {
     const res = await fetch(`${fastapiUrl}/health`);
     assert.strictEqual(res.status, 200);
     const data = await res.json();
@@ -58,12 +58,7 @@ test('C3 Live Microservice Boundary Integration (Express <-> FastAPI)', async (t
     assert.strictEqual(data.status, 'running');
   });
 
-  await t.test('2. Express successfully invokes live FastAPI for full subjective assessment', async () => {
-    if (!isFastApiLive) {
-      t.skip('FastAPI service is not running on port 8003; skipping live call');
-      return;
-    }
-
+  await t.test('2. Express successfully invokes live FastAPI for full subjective assessment', { skip: !isFastApiLive && 'FastAPI service is not running on port 8003' }, async () => {
     const payload = {
       question_id: 'SE3010-ARCH-01',
       question_text: 'Explain high cohesion and loose coupling in modular software architectures.',
@@ -126,12 +121,7 @@ test('C3 Live Microservice Boundary Integration (Express <-> FastAPI)', async (t
     assert.strictEqual(res.data.status, 'pending_review');
   });
 
-  await t.test('3. FastAPI schema validation failure is translated to 400 by Express with details', async () => {
-    if (!isFastApiLive) {
-      t.skip('FastAPI service is not running on port 8003; skipping live call');
-      return;
-    }
-
+  await t.test('3. FastAPI schema validation failure is translated to 400 by Express with details', { skip: !isFastApiLive && 'FastAPI service is not running on port 8003' }, async () => {
     // Invalid payload: rubric criteria array is empty (violates rubric validation)
     const invalidPayload = {
       question_id: 'SE3010-INVALID',
@@ -149,8 +139,9 @@ test('C3 Live Microservice Boundary Integration (Express <-> FastAPI)', async (t
     assert.ok(res.data.error.includes('Validation error') || res.data.error.includes('criteria'), 'Error must describe validation problem');
   });
 
-  await t.test('4. Express returns 502 Bad Gateway when FastAPI is down (no fake success)', async () => {
+  await t.test('4. Express returns 502 Bad Gateway when FastAPI is down (no fake success)', async (st) => {
     const originalUrl = process.env.C3_AI_URL;
+    st.after(() => restoreEnv('C3_AI_URL', originalUrl));
     // Point to non-existent port
     process.env.C3_AI_URL = 'http://127.0.0.1:54321';
 
@@ -169,12 +160,15 @@ test('C3 Live Microservice Boundary Integration (Express <-> FastAPI)', async (t
     assert.ok(res.data.error.includes('unreachable'), 'Must clearly report service unreachable');
     assert.strictEqual(res.data.status, undefined, 'Must NEVER return a fake success or pending_review result');
 
-    process.env.C3_AI_URL = originalUrl;
   });
 
-  await t.test('5. Express handles request timeout cleanly and returns 504 Gateway Timeout', async () => {
+  await t.test('5. Express handles request timeout cleanly and returns 504 Gateway Timeout', async (st) => {
     const originalUrl = process.env.C3_AI_URL;
     const originalTimeout = process.env.C3_AI_TIMEOUT_MS;
+    st.after(() => {
+      restoreEnv('C3_AI_URL', originalUrl);
+      restoreEnv('C3_AI_TIMEOUT_MS', originalTimeout);
+    });
 
     // Create a slow server that hangs for 500ms
     const slowServer = http.createServer((req, res) => {
@@ -184,6 +178,7 @@ test('C3 Live Microservice Boundary Integration (Express <-> FastAPI)', async (t
       }, 500);
     });
     await new Promise((resolve) => slowServer.listen(0, resolve));
+    st.after(() => slowServer.close());
     const slowPort = slowServer.address().port;
 
     process.env.C3_AI_URL = `http://127.0.0.1:${slowPort}`;
@@ -203,10 +198,6 @@ test('C3 Live Microservice Boundary Integration (Express <-> FastAPI)', async (t
     assert.strictEqual(res.status, 504, 'Must return 504 Gateway Timeout');
     assert.ok(res.data.error.includes('timed out'), 'Must report request timed out');
 
-    slowServer.close();
-    process.env.C3_AI_URL = originalUrl;
-    process.env.C3_AI_TIMEOUT_MS = originalTimeout;
   });
 
-  server.close();
 });

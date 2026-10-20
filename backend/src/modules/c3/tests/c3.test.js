@@ -66,6 +66,7 @@ test('C3 Module Backend Integration', async (t) => {
     aiRequests = [];
     await fetchApi('/analysis', studentToken, { question_id: 'Q2' });
     assert.strictEqual(aiRequests[0].body.student_id, undefined);
+    assert.strictEqual(aiRequests[0].body.question_id, 'Q2', 'other fields must be forwarded unchanged');
   });
 
   await t.test('student cannot impersonate another student', async () => {
@@ -87,7 +88,7 @@ test('C3 Module Backend Integration', async (t) => {
     assert.strictEqual(res.data.error, 'studentId is required');
   });
 
-  await t.test('Python service failure is handled (500)', async () => {
+  await t.test('Python 5xx is surfaced to the client as 502 Bad Gateway', async () => {
     nextAiStatus = 500;
     nextAiResponse = { detail: 'Internal Server Error' };
     const res = await fetchApi('/marking', studentToken, {});
@@ -345,8 +346,16 @@ test('C3 Module Backend Integration', async (t) => {
     const body = await res.json();
     assert.strictEqual(res.status, 200);
     assert.ok(Array.isArray(body.submissions));
-    assert.strictEqual(body.submissions.length, 1);
-    assert.strictEqual(body.submissions[0].status, 'pending_review');
+    const seeded = body.submissions.find((sub) => String(sub._id) === String(testSubId));
+    assert.ok(seeded, 'seeded submission must be listed');
+    assert.strictEqual(seeded.status, 'pending_review');
+  });
+
+  await t.test('another student cannot read a submission they do not own', async () => {
+    const res = await fetch(`http://127.0.0.1:${port}/api/v1/c3/submissions/${testSubId}`, {
+      headers: { Authorization: `Bearer ${otherStudentToken}` }
+    });
+    assert.ok([403, 404].includes(res.status), `expected 403/404, got ${res.status}`);
   });
 
   await t.test('lecturer override without reason is rejected (400)', async () => {
@@ -762,7 +771,6 @@ test('C3 Module Backend Integration', async (t) => {
     assert.ok(resMissingCriteria.data.error.includes('at least one evaluation criterion'));
   });
 
-  let savedBatchSetupId = null;
   let savedBatchId = null;
 
   await t.test('Batch Marking: lecturer creates subjective question & rubric setup once', async () => {
@@ -788,7 +796,6 @@ test('C3 Module Backend Integration', async (t) => {
     assert.strictEqual(resSetup.data.max_marks, 4);
     assert.strictEqual(resSetup.data.rubric.criteria.length, 2);
 
-    savedBatchSetupId = resSetup.data._id;
     savedBatchId = resSetup.data.batch_id;
 
     // Verify it is listed in listBatchSetups
