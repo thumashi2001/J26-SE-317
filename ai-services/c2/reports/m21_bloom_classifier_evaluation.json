@@ -1,0 +1,102 @@
+{
+  "experiment_name": "M21 Bloom's Taxonomy Cognitive Classification Experiment",
+  "model_architecture": "TF-IDF (1-2 ngrams, max_features=5000) + Multinomial Logistic Regression",
+  "split_strategy": "Leakage-Aware Module-Disjoint Split (GroupShuffleSplit 75/25)",
+  "train_modules": [
+    "application_frameworks",
+    "database_systems",
+    "distributed_systems",
+    "software_architecture",
+    "software_project_management",
+    "user_experience_engineering"
+  ],
+  "test_modules": [
+    "case_studies_software_engineering",
+    "software_engineering_process_quality_management"
+  ],
+  "total_synthetic_samples": 800,
+  "train_sample_count": 600,
+  "test_sample_count": 200,
+  "classes": [
+    "analyze",
+    "apply",
+    "create",
+    "evaluate"
+  ],
+  "overall_metrics": {
+    "accuracy": 0.35,
+    "macro_f1": 0.3247,
+    "weighted_f1": 0.3435
+  },
+  "per_class_metrics": {
+    "analyze": {
+      "precision": 0.36,
+      "recall": 0.3,
+      "f1_score": 0.3273,
+      "support": 60
+    },
+    "apply": {
+      "precision": 0.1364,
+      "recall": 0.075,
+      "f1_score": 0.0968,
+      "support": 40
+    },
+    "create": {
+      "precision": 0.619,
+      "recall": 0.4333,
+      "f1_score": 0.5098,
+      "support": 60
+    },
+    "evaluate": {
+      "precision": 0.2674,
+      "recall": 0.575,
+      "f1_score": 0.3651,
+      "support": 40
+    }
+  },
+  "confusion_matrix": {
+    "labels": [
+      "analyze",
+      "apply",
+      "create",
+      "evaluate"
+    ],
+    "matrix": [
+      [
+        18,
+        12,
+        3,
+        27
+      ],
+      [
+        12,
+        3,
+        10,
+        15
+      ],
+      [
+        11,
+        2,
+        26,
+        21
+      ],
+      [
+        9,
+        5,
+        3,
+        23
+      ]
+    ]
+  },
+  "authentic_evaluation": {
+    "status": "not_evaluable",
+    "authentic_questions_count": 443,
+    "authentic_verified_bloom_labels": 0,
+    "limitation": "Authentic examination past papers do not yet have lecturer-verified Bloom's Taxonomy ground-truth labels. Model accuracy is reported strictly on the controlled synthetic corpus."
+  },
+  "provenance": {
+    "source_corpus": "m16_expanded_content_bank.json / combined_dataset.json",
+    "evaluated_by": "AdaptiveLearnSE C2 Research Pipeline",
+    "reproducible_seed": 42
+  }
+}
