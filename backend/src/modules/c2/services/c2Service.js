@@ -154,17 +154,24 @@ export function getExamPatterns(moduleKey) {
 // M12.1 - Evidence-Aware Topic Predictions
 // --------------------------------------------------
 
-export function getTopicPredictions(moduleKey, targetPeriod = null) {
+export function getTopicPredictions(moduleKey, targetPeriod = null, experimentalDemo = false) {
   const params = new URLSearchParams({
     module_key: moduleKey,
   });
   if (targetPeriod) {
     params.set('target_period', targetPeriod);
   }
+  if (experimentalDemo === true || experimentalDemo === 'true' || experimentalDemo === '1') {
+    params.set('experimental_demo', 'true');
+  }
 
   return requestC2(
     `/topic-predictions?${params.toString()}`
   );
+}
+
+export function getExperimentalTopicPredictions(moduleKey, targetPeriod = null) {
+  return getTopicPredictions(moduleKey, targetPeriod, true);
 }
 
 // --------------------------------------------------

@@ -87,7 +87,23 @@ export const getC2StudentQuestions = (
 // M12.1 - Evidence-Aware Topic Predictions
 // --------------------------------------------------
 
-export const getC2TopicPredictions = (moduleKey, targetPeriod = null) => {
+export const getC2TopicPredictions = (moduleKey, targetPeriod = null, experimentalDemo = false) => {
+  const params = new URLSearchParams({
+    moduleKey,
+  });
+  if (targetPeriod) {
+    params.set('targetPeriod', targetPeriod);
+  }
+  if (experimentalDemo) {
+    params.set('experimental_demo', 'true');
+  }
+
+  return api(
+    `${base}/topic-predictions?${params.toString()}`
+  );
+};
+
+export const getC2ExperimentalTopicPredictions = (moduleKey, targetPeriod = null) => {
   const params = new URLSearchParams({
     moduleKey,
   });
@@ -96,7 +112,7 @@ export const getC2TopicPredictions = (moduleKey, targetPeriod = null) => {
   }
 
   return api(
-    `${base}/topic-predictions?${params.toString()}`
+    `${base}/topic-predictions/experimental-demo?${params.toString()}`
   );
 };
 

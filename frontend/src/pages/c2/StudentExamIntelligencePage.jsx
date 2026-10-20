@@ -845,6 +845,7 @@ export default function StudentExamIntelligencePage() {
       {/* ======================================================== */}
       {stage === 'evidence' && (
         <HistoricalTopicEvidenceSection
+          moduleKey={moduleKey}
           prediction={prediction}
           predictionLoading={predictionLoading}
           predictionError={predictionError}

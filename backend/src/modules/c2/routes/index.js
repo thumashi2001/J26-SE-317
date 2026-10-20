@@ -43,6 +43,11 @@ router.get(
 // --------------------------------------------------
 
 router.get(
+  '/topic-predictions/experimental-demo',
+  controller.getExperimentalTopicPredictions
+);
+
+router.get(
   '/topic-predictions',
   controller.listTopicPredictions
 );

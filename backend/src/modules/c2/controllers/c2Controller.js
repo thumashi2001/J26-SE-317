@@ -239,11 +239,46 @@ export async function listExamPatterns(req, res) {
 
 export async function listTopicPredictions(req, res) {
   try {
-    const { moduleKey, targetPeriod, target_period } = req.query;
+    const { moduleKey, module_key, targetPeriod, target_period, experimental_demo, experimentalDemo } = req.query;
+    const targetModule = moduleKey || module_key;
 
     if (
-      typeof moduleKey !== 'string' ||
-      !moduleKey.trim()
+      typeof targetModule !== 'string' ||
+      !targetModule.trim()
+    ) {
+      return res.status(400).json({
+        error: 'A valid moduleKey is required',
+      });
+    }
+
+    const period = targetPeriod || target_period || null;
+    const isDemo =
+      experimental_demo === 'true' ||
+      experimental_demo === true ||
+      experimentalDemo === 'true' ||
+      experimentalDemo === true ||
+      experimental_demo === '1';
+
+    const result = await c2Service.getTopicPredictions(
+      targetModule.trim(),
+      period,
+      isDemo
+    );
+
+    return res.json(result);
+  } catch (error) {
+    return handleError(res, error);
+  }
+}
+
+export async function getExperimentalTopicPredictions(req, res) {
+  try {
+    const { moduleKey, module_key, targetPeriod, target_period } = req.query;
+    const targetModule = moduleKey || module_key;
+
+    if (
+      typeof targetModule !== 'string' ||
+      !targetModule.trim()
     ) {
       return res.status(400).json({
         error: 'A valid moduleKey is required',
@@ -252,8 +287,8 @@ export async function listTopicPredictions(req, res) {
 
     const period = targetPeriod || target_period || null;
 
-    const result = await c2Service.getTopicPredictions(
-      moduleKey.trim(),
+    const result = await c2Service.getExperimentalTopicPredictions(
+      targetModule.trim(),
       period
     );
 

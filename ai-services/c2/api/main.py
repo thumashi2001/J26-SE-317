@@ -56,6 +56,9 @@ from services.m17_topic_prediction_service import (
 )
 from services.bloom_question_generator import BloomQuestionGenerator
 from services.generated_question_repository import GeneratedQuestionRepository
+from services.synthetic_topic_prediction_service import (
+    SyntheticTopicPredictionService,
+)
 
 
 app = FastAPI(
@@ -90,6 +93,9 @@ prediction_evaluator = ChronologicalPredictionEvaluator(readiness_assessor=readi
 topic_predictor = EvidenceAwareTopicPredictor(
     analyzer=pattern_analyzer,
     readiness_assessor=readiness_assessor,
+    evaluator=prediction_evaluator,
+)
+synthetic_topic_prediction_service = SyntheticTopicPredictionService(
     evaluator=prediction_evaluator,
 )
 
@@ -482,10 +488,20 @@ def save_decision(
 def get_topic_predictions(
     module_key: str = Query(...),
     target_period: str | None = Query(default=None),
+    experimental_demo: bool = Query(default=False),
     x_c2_internal_token: str | None = Header(default=None),
 ):
     require_internal_token(x_c2_internal_token)
     validate_module(module_key)
+
+    if experimental_demo:
+        try:
+            return synthetic_topic_prediction_service.generate_experimental_demonstration(
+                module_key,
+                target_period=target_period,
+            )
+        except ValueError as err:
+            raise HTTPException(status_code=400, detail=str(err))
 
     try:
         return topic_predictor.predict(module_key, target_period=target_period)
@@ -501,6 +517,24 @@ def get_topic_predictions(
             status_code=409,
             detail="Historical examination dataset is invalid",
         )
+
+
+@app.get("/topic-predictions/experimental-demo")
+def get_experimental_topic_predictions(
+    module_key: str = Query(...),
+    target_period: str | None = Query(default=None),
+    x_c2_internal_token: str | None = Header(default=None),
+):
+    require_internal_token(x_c2_internal_token)
+    validate_module(module_key)
+
+    try:
+        return synthetic_topic_prediction_service.generate_experimental_demonstration(
+            module_key,
+            target_period=target_period,
+        )
+    except ValueError as err:
+        raise HTTPException(status_code=400, detail=str(err))
 
 
 # --------------------------------------------------
