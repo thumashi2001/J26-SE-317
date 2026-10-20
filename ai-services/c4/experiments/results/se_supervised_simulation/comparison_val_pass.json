@@ -1,0 +1,59 @@
+[
+  {
+    "name": "constant_train_prevalence",
+    "train_metrics": {
+      "brier": 0.24867295918367352,
+      "log_loss": 0.6904907458777646,
+      "n": 1400,
+      "pred_mean": 0.5364285714285714,
+      "prevalence": 0.5364285714285715,
+      "roc_auc": 0.5
+    },
+    "val_metrics": {
+      "brier": 0.25156989795918366,
+      "log_loss": 0.6962949078194378,
+      "n": 300,
+      "pred_mean": 0.5364285714285715,
+      "prevalence": 0.49666666666666665,
+      "roc_auc": 0.5
+    }
+  },
+  {
+    "name": "logistic_regression",
+    "train_metrics": {
+      "brier": 0.10831772962613355,
+      "log_loss": 0.3397977725869414,
+      "n": 1400,
+      "pred_mean": 0.5364114605816642,
+      "prevalence": 0.5364285714285715,
+      "roc_auc": 0.927944045843344
+    },
+    "val_metrics": {
+      "brier": 0.14216364278767563,
+      "log_loss": 0.43119058724587056,
+      "n": 300,
+      "pred_mean": 0.4882130803195219,
+      "prevalence": 0.49666666666666665,
+      "roc_auc": 0.8843504155740255
+    }
+  },
+  {
+    "name": "hist_gradient_boosting_classifier",
+    "train_metrics": {
+      "brier": 0.04478624305630539,
+      "log_loss": 0.16903139228461686,
+      "n": 1400,
+      "pred_mean": 0.536460341540427,
+      "prevalence": 0.5364285714285715,
+      "roc_auc": 0.9930488162675755
+    },
+    "val_metrics": {
+      "brier": 0.15004971272052592,
+      "log_loss": 0.45544378380139194,
+      "n": 300,
+      "pred_mean": 0.48925234713188276,
+      "prevalence": 0.49666666666666665,
+      "roc_auc": 0.8787946130939154
+    }
+  }
+]

@@ -1,0 +1,14 @@
+{
+  "rule": "Select MaskablePPO seed with highest mean validation return; lowest-seed tie-break. Do not use final-test metrics.",
+  "selected_seed": 2,
+  "mean_validation_return": 11.967999500036232,
+  "per_seed_mean_validation_return": {
+    "0": 11.939999509043984,
+    "1": 11.687999557703728,
+    "2": 11.967999500036232
+  },
+  "checkpoint_relative_path": "models/seed_2/maskable_ppo_final.zip",
+  "model_sha256": "7613e1e28375ca4a844fc064b130b8d8d38d38cf085adf1e52ab73322bd09fca",
+  "protocol": "c4-env-eval-v1.1",
+  "source_run": "train_full_c4-env-eval-v1.1_20261012T051737.347320+0000"
+}

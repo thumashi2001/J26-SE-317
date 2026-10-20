@@ -1,0 +1,47 @@
+{
+  "domain": "se_simulation",
+  "exam_score": {
+    "name": "ridge_regression",
+    "primary_metric": "mae",
+    "val_metrics": {
+      "mae": 0.08241833727718875,
+      "n": 300,
+      "pred_mean": 0.5336668180160974,
+      "pred_std": 0.1591931477979567,
+      "rmse": 0.10316841432793439,
+      "y_mean": 0.5411111111111111,
+      "y_std": 0.17595275144759584
+    }
+  },
+  "generator_version": "se_supervised_gen_v0",
+  "pass": {
+    "name": "logistic_regression",
+    "pass_threshold": 0.55,
+    "primary_metric": "log_loss",
+    "val_metrics": {
+      "brier": 0.14216364278767563,
+      "log_loss": 0.43119058724587056,
+      "n": 300,
+      "pred_mean": 0.4882130803195219,
+      "prevalence": 0.49666666666666665,
+      "roc_auc": 0.8843504155740255
+    }
+  },
+  "primary_scenario": "baseline",
+  "protocol": "se-supervised-sim-v0",
+  "real_exam_validation": false,
+  "response": {
+    "name": "hist_gradient_boosting_classifier",
+    "primary_metric": "log_loss",
+    "val_metrics": {
+      "brier": 0.21327592486465474,
+      "log_loss": 0.6145887086372498,
+      "n": 13748,
+      "pred_mean": 0.5084976621937548,
+      "prevalence": 0.5040733197556008,
+      "roc_auc": 0.7198541696561643
+    }
+  },
+  "simulation_only": true,
+  "synthetic": true
+}

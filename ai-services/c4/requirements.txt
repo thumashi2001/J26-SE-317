@@ -1,1 +1,17 @@
-# Python dependencies for C4 will be selected during implementation.
+# Runtime AI-service for C4 research inference (MaskablePPO).
+# Prefer installing with the verified pin file from the machine where tests passed:
+#   python -m pip install -c constraints-runtime.txt -r requirements.txt
+#
+# Full Colab / offline RL training remains in requirements-training.txt
+# (versions there may differ from local inference; see MODEL_CARD.md).
+
+fastapi>=0.100
+uvicorn>=0.23
+pydantic>=2.0
+numpy>=1.23
+pandas>=1.5
+gymnasium>=0.29.1,<2.0
+stable-baselines3>=2.3.0,<3.0
+sb3-contrib>=2.3.0,<3.0
+torch>=2.0
+cloudpickle>=2.0

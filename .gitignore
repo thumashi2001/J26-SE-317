@@ -81,3 +81,6 @@ neo4j_data/
 !ai-services/c1/ml/models/
 !ai-services/c1/ml/models/*
 backend/responses.csv
+
+# Local C4 Colab source ZIP at repo root (do not ignore every *.zip)
+/c4-source.zip

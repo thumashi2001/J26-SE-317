@@ -1,0 +1,14 @@
+{
+  "c4_root": "/content/c4_se_sup_v1_src/ai-services/c4",
+  "decision": "No authorized SE attempt/exam exports found under ai-services/c4. Use explicitly synthetic se-supervised-sim-v0 data. Do not download unrelated datasets or relabel ASSISTments records.",
+  "found_files": [],
+  "real_se_exports_available": false,
+  "searched_globs": [
+    "datasets/raw/**/*se*attempt*",
+    "datasets/raw/**/*attempt*export*",
+    "datasets/raw/**/*mock*exam*",
+    "datasets/raw/**/*se*exam*",
+    "datasets/processed/**/*se*attempt*",
+    "datasets/authorized_se/**/*"
+  ]
+}
