@@ -83,7 +83,7 @@ export default function LecturerQueuePage() {
             ⚡ Batch Marking Studio →
           </Link>
           <Link to="/c3" className="btn-ghost" style={{ width: 'auto', padding: '6px 14px' }}>
-            ✍️ Open Student Sandbox →
+            ✍️ Student Assessment View →
           </Link>
           <button type="button" className="btn secondary" style={{ width: 'auto', padding: '6px 14px' }} onClick={fetchQueue} disabled={loading}>
             🔄 Refresh Queue
@@ -138,7 +138,7 @@ export default function LecturerQueuePage() {
                 onClick={() => setProvenanceFilter('pp1_demo')}
                 style={provenanceFilter === 'pp1_demo' ? { background: '#6b21a8', borderColor: '#6b21a8', color: '#fff' } : {}}
               >
-                🎯 PP1 Demo Benchmarks ({pp1DemoCount})
+                🎯 Curriculum Benchmarks ({pp1DemoCount})
               </button>
               <button
                 type="button"

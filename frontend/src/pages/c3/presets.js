@@ -1,7 +1,7 @@
 export const C3_PRESETS = [
   {
     id: 'arch-full',
-    title: 'Software Architecture — Full Credit (100%)',
+    title: 'Software Architecture — Comprehensive Analysis',
     description: 'Demonstrates all 3 core concepts: high-level structure, components, and relationships.',
     payload: {
       question_id: 'SE3010-Q01',
@@ -58,7 +58,7 @@ export const C3_PRESETS = [
   },
   {
     id: 'arch-partial',
-    title: 'Software Architecture — Partial Credit (50%)',
+    title: 'Software Architecture — Modular Decomposition (Baseline)',
     description: 'Demonstrates structure only; misses components and relationships.',
     payload: {
       question_id: 'SE3010-Q01',
@@ -115,7 +115,7 @@ export const C3_PRESETS = [
   },
   {
     id: 'arch-zero',
-    title: 'Irrelevant Answer — Zero Credit (0%)',
+    title: 'Software Architecture — Divergent Scope Sample',
     description: 'Completely off-topic answer with no matching evidence.',
     payload: {
       question_id: 'SE3010-Q01',
@@ -298,7 +298,7 @@ export const C3_PRESETS = [
   },
   {
     id: 'mcq-correct',
-    title: 'Architecture Pattern MCQ — Correct Key (100%)',
+    title: 'Software Architecture MCQ — REST & Microservices (Option B)',
     description: 'Deterministic answer-key evaluation: selects Option B (Microservices). Awards full marks (2/2).',
     payload: {
       question_id: 'SE3010-MCQ-01',
@@ -319,7 +319,7 @@ export const C3_PRESETS = [
   },
   {
     id: 'mcq-incorrect',
-    title: 'Architecture Pattern MCQ — Incorrect Key (0%)',
+    title: 'Software Architecture MCQ — REST & Microservices (Option A)',
     description: 'Deterministic answer-key evaluation: selects Option A (Monolith). Awards zero marks (0/2).',
     payload: {
       question_id: 'SE3010-MCQ-01',

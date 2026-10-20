@@ -412,8 +412,8 @@ export default function AssessmentPage() {
           {/* Preset Benchmarks Selector */}
           <div className="c3-presets-bar">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <strong>🎯 Controlled PP1 Demonstration Scenarios:</strong>
-              <span className="small muted">Click to auto-populate validated test scenarios</span>
+              <strong>🎯 Curriculum Assessment Scenarios:</strong>
+              <span className="small muted">Select an assessment scenario from the curriculum question bank</span>
             </div>
             <div className="c3-presets-list">
               {C3_PRESETS.map((p) => (
