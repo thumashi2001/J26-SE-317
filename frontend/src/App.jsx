@@ -22,6 +22,7 @@ import LecturerApprovals from './pages/admin/LecturerApprovals.jsx';
 import AssessmentPage from './pages/c3/AssessmentPage.jsx';
 import LecturerQueuePage from './pages/c3/LecturerQueuePage.jsx';
 import LecturerReviewPage from './pages/c3/LecturerReviewPage.jsx';
+import LecturerBatchMarkingPage from './pages/c3/LecturerBatchMarkingPage.jsx';
 
 // Three areas, one for each kind of user. A person can only open their own area.
 // Each teammate replaces their ComingSoon routes with real pages:
@@ -91,9 +92,11 @@ export default function App() {
 
         {/* Component 3: Lecturer Marking Review & Finalization */}
         <Route path="/lecturer/c3" element={<LecturerQueuePage />} />
+        <Route path="/lecturer/c3/batch" element={<LecturerBatchMarkingPage />} />
         <Route path="/lecturer/c3/:submissionId" element={<LecturerReviewPage />} />
         <Route path="/lecturer/c3/review/:submissionId" element={<LecturerReviewPage />} />
-        {/* Support direct /c3/review URLs under lecturer authorization */}
+        {/* Support direct /c3/review and /c3/batch URLs under lecturer authorization */}
+        <Route path="/c3/batch" element={<LecturerBatchMarkingPage />} />
         <Route path="/c3/review" element={<LecturerQueuePage />} />
         <Route path="/c3/review/:submissionId" element={<LecturerReviewPage />} />
 

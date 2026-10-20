@@ -22,6 +22,7 @@ export const LECTURER_MENU = [
   { heading: 'Components' },
   { to: '/lecturer/c1', label: 'Class insights' },
   { to: '/lecturer/c2', label: 'Exam intelligence' },
+  { to: '/lecturer/c3/batch', label: 'Batch marking' },
   { to: '/lecturer/c3', label: 'Marking review' },
   { to: '/lecturer/c4', label: 'Adaptive paths' },
 ];

@@ -79,8 +79,11 @@ export default function LecturerQueuePage() {
           </p>
         </div>
         <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+          <Link to="/lecturer/c3/batch" className="btn primary" style={{ width: 'auto', padding: '6px 14px', background: '#1d6f42' }}>
+            ⚡ Batch Marking Studio →
+          </Link>
           <Link to="/c3" className="btn-ghost" style={{ width: 'auto', padding: '6px 14px' }}>
-            ✍️ Open Student Assessment Sandbox →
+            ✍️ Open Student Sandbox →
           </Link>
           <button type="button" className="btn secondary" style={{ width: 'auto', padding: '6px 14px' }} onClick={fetchQueue} disabled={loading}>
             🔄 Refresh Queue

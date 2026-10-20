@@ -59,3 +59,68 @@ export const finalizeSubmission = (id) =>
   api(`/c3/submissions/${id}/finalize`, {
     method: 'POST',
   });
+
+/**
+ * Create a shared question & rubric/answer-key setup for batch marking.
+ *
+ * @param {Object} setupData
+ * @returns {Promise<Object>}
+ */
+export const createBatchSetup = (setupData) =>
+  api('/c3/batch/setup', {
+    method: 'POST',
+    body: setupData,
+  });
+
+/**
+ * List all batch setups created by lecturer.
+ *
+ * @returns {Promise<{ setups: Array }>}
+ */
+export const listBatchSetups = () =>
+  api('/c3/batch/setup');
+
+/**
+ * Get batch setup details, statistics, and student submissions.
+ *
+ * @param {string} id - setup ID or batch_id
+ * @returns {Promise<{ setup: Object, items: Array, stats: Object }>}
+ */
+export const getBatchSetup = (id) =>
+  api(`/c3/batch/setup/${id}`);
+
+/**
+ * Pre-validate student answer rows against the shared setup.
+ *
+ * @param {Object} payload - { setup_id, items: Array }
+ * @returns {Promise<Object>}
+ */
+export const validateBatchAnswers = (payload) =>
+  api('/c3/batch/validate', {
+    method: 'POST',
+    body: payload,
+  });
+
+/**
+ * Execute automated batch marking for student answers using the shared setup.
+ *
+ * @param {Object} payload - { setup_id, items: Array }
+ * @returns {Promise<Object>}
+ */
+export const processBatchMarking = (payload) =>
+  api('/c3/batch/mark', {
+    method: 'POST',
+    body: payload,
+  });
+
+/**
+ * Finalize all reviewed/eligible submissions in a batch in one confirmed operation.
+ *
+ * @param {string} batchId
+ * @returns {Promise<{ batch_id: string, finalized_count: number }>}
+ */
+export const finalizeBatchSubmissions = (batchId) =>
+  api(`/c3/batch/${batchId}/finalize-all`, {
+    method: 'POST',
+  });
+
