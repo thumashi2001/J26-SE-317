@@ -172,7 +172,7 @@ class CCKGGraphAdapter:
                         OPTIONAL MATCH (c)-[:CITED_IN]->(r:CurriculumResource)
                         RETURN c.concept_id AS id, c.name AS name, c.description AS desc,
                                collect(DISTINCT p.name) AS prerequisites,
-                               r.citation AS citation
+                               collect(DISTINCT r.citation) AS citations
                         """,
                         name=c_name
                     )
@@ -183,7 +183,7 @@ class CCKGGraphAdapter:
                             "name": record["name"],
                             "description": record["desc"],
                             "prerequisites": [p.lower() for p in record["prerequisites"] if p],
-                            "citation": record["citation"] or "Curriculum Syllabus"
+                            "citation": "; ".join(c for c in record["citations"] if c) or "Curriculum Syllabus"
                         }
             except Exception as e:
                 logger.warning(f"Neo4j query failed ({e}); falling back to in-memory store.")

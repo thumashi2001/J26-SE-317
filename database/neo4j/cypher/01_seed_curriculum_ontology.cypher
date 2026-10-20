@@ -2,6 +2,10 @@
 // AdaptiveLearnSE — Co-Evolving Curriculum Knowledge Graph (CCKG)
 // Seed Script: Modules, Topics, Concepts, and Prerequisite Relationships
 // Location: database/neo4j/cypher/01_seed_curriculum_ontology.cypher
+//
+// NOTE: cypher-shell runs each ";"-terminated statement separately, so variables are NOT shared
+// between statements. Relationship sections therefore MATCH their endpoints by id (an earlier
+// version re-used unbound variables and created empty unlabelled nodes).
 // ============================================================================
 
 // 1. Core Modules (SLIIT Year 3 Curriculum)
@@ -20,13 +24,9 @@ MERGE (t3_2:SyllabusTopic {topic_id: "TOPIC-SE3030-MET", name: "Software Metrics
 MERGE (t4_1:SyllabusTopic {topic_id: "TOPIC-SE3040-API", name: "RESTful Service Design & Microservices", module_id: "SE3040"});
 
 // 3. Link Modules to Topics
-MERGE (m1)-[:CONTAINS_TOPIC]->(t1_1)
-MERGE (m1)-[:CONTAINS_TOPIC]->(t1_2)
-MERGE (m2)-[:CONTAINS_TOPIC]->(t2_1)
-MERGE (m2)-[:CONTAINS_TOPIC]->(t2_2)
-MERGE (m3)-[:CONTAINS_TOPIC]->(t3_1)
-MERGE (m3)-[:CONTAINS_TOPIC]->(t3_2)
-MERGE (m4)-[:CONTAINS_TOPIC]->(t4_1);
+MATCH (t:SyllabusTopic)
+MATCH (m:Module {module_id: t.module_id})
+MERGE (m)-[:CONTAINS_TOPIC]->(t);
 
 // 4. Learning Concepts
 MERGE (c_coh:Concept {concept_id: "C-COHESION", name: "high cohesion", description: "Internal module coherence where all elements collaborate to perform a single well-defined task."})
@@ -39,17 +39,27 @@ MERGE (c_norm:Concept {concept_id: "C-NORMALIZATION", name: "relational normaliz
 MERGE (c_acid:Concept {concept_id: "C-ACID", name: "acid transactions", description: "Database transaction guarantees: Atomicity, Consistency, Isolation, and Durability."});
 
 // 5. Link Topics to Concepts
-MERGE (t1_1)-[:INTRODUCES_CONCEPT]->(c_coh)
-MERGE (t1_1)-[:INTRODUCES_CONCEPT]->(c_coup)
-MERGE (t1_2)-[:INTRODUCES_CONCEPT]->(c_micro)
-MERGE (t3_1)-[:INTRODUCES_CONCEPT]->(c_stmt)
-MERGE (t3_1)-[:INTRODUCES_CONCEPT]->(c_brnc)
-MERGE (t3_1)-[:INTRODUCES_CONCEPT]->(c_adeq)
-MERGE (t2_1)-[:INTRODUCES_CONCEPT]->(c_norm)
-MERGE (t2_2)-[:INTRODUCES_CONCEPT]->(c_acid);
+UNWIND [
+  ["TOPIC-SE3010-MOD", "C-COHESION"],
+  ["TOPIC-SE3010-MOD", "C-COUPLING"],
+  ["TOPIC-SE3010-PAT", "C-MICROSERVICES"],
+  ["TOPIC-SE3030-COV", "C-STMT-COV"],
+  ["TOPIC-SE3030-COV", "C-BRNC-COV"],
+  ["TOPIC-SE3030-COV", "C-TEST-ADEQ"],
+  ["TOPIC-SE3020-NORM", "C-NORMALIZATION"],
+  ["TOPIC-SE3020-TRAN", "C-ACID"]
+] AS pair
+MATCH (t:SyllabusTopic {topic_id: pair[0]})
+MATCH (c:Concept {concept_id: pair[1]})
+MERGE (t)-[:INTRODUCES_CONCEPT]->(c);
 
 // 6. Prerequisite Relationships (Concept Dependencies)
-MERGE (c_coh)-[:PREREQUISITE_OF]->(c_coup)
-MERGE (c_coup)-[:PREREQUISITE_OF]->(c_micro)
-MERGE (c_stmt)-[:PREREQUISITE_OF]->(c_brnc)
-MERGE (c_brnc)-[:PREREQUISITE_OF]->(c_adeq);
+UNWIND [
+  ["C-COHESION", "C-COUPLING"],
+  ["C-COUPLING", "C-MICROSERVICES"],
+  ["C-STMT-COV", "C-BRNC-COV"],
+  ["C-BRNC-COV", "C-TEST-ADEQ"]
+] AS pair
+MATCH (a:Concept {concept_id: pair[0]})
+MATCH (b:Concept {concept_id: pair[1]})
+MERGE (a)-[:PREREQUISITE_OF]->(b);
