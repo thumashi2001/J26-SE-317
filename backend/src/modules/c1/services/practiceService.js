@@ -2,6 +2,7 @@ import { randomUUID } from 'crypto';
 import { httpError } from './aiClient.js';
 import { recordEvent } from './eventService.js';
 import { PRACTICE_QUESTIONS, TIPS, TOPIC_ALIASES } from '../data/practiceQuestions.js';
+import { nextLevel, mixFor, pickQuestions } from './questionBuilder.js';
 
 export const QUESTIONS_PER_SESSION = 7;
 const OPTIONS_PER_QUESTION = 4;
@@ -93,6 +94,7 @@ function sessionView(session, bank) {
     done: !!session.completed,
     scoreStart: session.score_start,
     scoreNow: session.score_now,
+    level: session.level || null,
     questions: session.items.map((i) => publicItem(i, bank)),
   };
 }
@@ -132,16 +134,22 @@ export async function startSession(db, studentId, topic) {
     return sessionView(open, bank);
   }
 
-  // Pick the questions this student has seen least recently, with a random order inside ties.
+  // Pick the questions this student has seen least recently, then match them to his level.
   const lastSeen = {};
   for (const s of past) {
     for (const i of s.items) {
       lastSeen[i.question_id] = Math.max(lastSeen[i.question_id] || 0, new Date(s.started_at).getTime());
     }
   }
-  const all = Array.from({ length: count }, (_, i) => questionId(topic, i));
-  const ranked = shuffle(all).sort((a, b) => (lastSeen[a] || 0) - (lastSeen[b] || 0));
-  const chosen = shuffle(ranked.slice(0, Math.min(QUESTIONS_PER_SESSION, count)));
+  const written = PRACTICE_QUESTIONS[bankTopic(topic)] || [];
+  const pool = written.map((q, i) => ({ id: questionId(topic, i), q, lastSeen: lastSeen[questionId(topic, i)] || 0 }));
+
+  // Level: from the twin's score for the topic, moved one step by the result of the last finished quiz.
+  const finished = past.filter((s) => s.completed && !s.abandoned).sort((a, b) => new Date(b.started_at) - new Date(a.started_at));
+  const lastRatio = finished[0] ? finished[0].items.filter((i) => i.correct).length / finished[0].items.length : undefined;
+  const level = nextLevel(entry.score, lastRatio);
+  const mix = mixFor(level, Math.min(QUESTIONS_PER_SESSION, count));
+  const chosen = shuffle(pickQuestions(pool, mix));
 
   const session = {
     session_id: randomUUID(),
@@ -150,15 +158,18 @@ export async function startSession(db, studentId, topic) {
     started_at: new Date(),
     score_start: entry.score,
     score_now: entry.score,
+    level,
+    mix,
     completed: false,
-    items: chosen.map((id) => ({
-      question_id: id,
+    items: chosen.map((c) => ({
+      question_id: c.id,
+      difficulty: c.difficulty,
       order: shuffle([0, 1, 2, 3].slice(0, OPTIONS_PER_QUESTION)), // order the options are shown in
       answered: false,
     })),
   };
   await db.collection('practice_sessions').insertOne(session);
-  const bank = await loadBank(db, chosen);
+  const bank = await loadBank(db, session.items.map((i) => i.question_id));
   return sessionView(session, bank);
 }
 
