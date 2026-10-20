@@ -1,268 +1,136 @@
 """
-AdaptiveLearnSE Component 3 — Synthetic Dataset Loader Utility
-==============================================================
-Provides high-level programmatic access to the canonical C3-Phase3-v5-FINAL
-synthetic benchmark dataset located in ai-services/c3/datasets/synthetic/.
+AdaptiveLearnSE Component 3 — Synthetic dataset release loader (C3-v6).
 
-This loader operates strictly offline for research evaluations, benchmarking,
-and model comparison (Conditions A-F). It DOES NOT load data into MongoDB or
-expose records as student submissions.
+Reads a release directory produced by datasets/generate_c3_dataset.py:
+questions.csv, rubrics.csv, answers.csv and manifest.json. Hashes recorded in the manifest are
+verified on load so experiments always run against exactly the released files. Nothing here
+fabricates or repairs data: malformed files raise ReleaseError.
 """
 
-import csv
+import hashlib
 import json
-import os
+from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any
 
-# Base path resolution
-DATASETS_DIR = Path(__file__).resolve().parent
-SYNTHETIC_DIR = DATASETS_DIR / "synthetic"
+import pandas as pd
+
+DEFAULT_RELEASE_DIR = Path(__file__).resolve().parent / "c3_synthetic_v6"
+
+QUESTION_JSON_COLUMNS = ("expected_concepts", "concept_graph")
+ANSWER_JSON_COLUMNS = (
+    "criterion_marks",
+    "concept_status",
+    "incorrect_concepts",
+    "evidence_spans",
+    "gold_mindmap",
+)
+SPLITS = ("train", "validation", "test")
 
 
-def get_synthetic_dataset_dir() -> Path:
-    """Return the absolute path to the synthetic dataset directory."""
-    return SYNTHETIC_DIR
+class ReleaseError(RuntimeError):
+    """Raised when a dataset release is missing, corrupt or inconsistent."""
 
 
-def parse_concepts(val: Any) -> List[str]:
-    """
-    Parse concept list from string.
-    Supports both JSON arrays ('["concept1", "concept2"]')
-    and semicolon-delimited strings ('concept1; concept2').
-    """
-    if not val or str(val).strip().lower() in ("nan", "none", "", "null"):
-        return []
-    val = str(val).strip()
-    if val.startswith("["):
+def sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as fh:
+        for chunk in iter(lambda: fh.read(1 << 20), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def _read_csv(path: Path) -> pd.DataFrame:
+    if not path.exists():
+        raise ReleaseError(f"Missing release file: {path}")
+    # keep_default_na=False: an empty answer must stay "" and the literal text "nan" must stay text
+    return pd.read_csv(path, dtype=str, keep_default_na=False)
+
+
+def _parse_json_columns(df: pd.DataFrame, columns: tuple[str, ...], where: str) -> pd.DataFrame:
+    for column in columns:
+        if column not in df.columns:
+            raise ReleaseError(f"{where} is missing required column '{column}'")
         try:
-            parsed = json.loads(val)
-            if isinstance(parsed, list):
-                return [str(c).strip() for c in parsed if str(c).strip()]
-        except Exception:
-            pass
-    return [c.strip() for c in val.split(";") if c.strip()]
+            df[column] = df[column].map(json.loads)
+        except json.JSONDecodeError as exc:
+            raise ReleaseError(f"{where}.{column} contains invalid JSON: {exc}") from exc
+    return df
 
 
-def parse_marks(val: Any) -> List[Dict[str, Any]]:
-    """
-    Parse criterion marks.
-    Supports JSON criterion structures ('[{"criterion_id": "...", "mark": ...}]')
-    and comma-separated numbers ('5,5').
-    """
-    if not val or str(val).strip().lower() in ("nan", "none", "", "null"):
-        return []
-    val = str(val).strip()
-    if val.startswith("["):
-        try:
-            parsed = json.loads(val)
-            if isinstance(parsed, list):
-                return parsed
-        except Exception:
-            pass
-    if "," in val:
-        try:
-            return [{"mark": float(m.strip())} for m in val.split(",") if m.strip()]
-        except Exception:
-            pass
-    try:
-        return [{"mark": float(val)}]
-    except Exception:
-        return []
+@dataclass(frozen=True)
+class Release:
+    path: Path
+    manifest: dict[str, Any]
+    questions: pd.DataFrame
+    rubrics: pd.DataFrame
+    answers: pd.DataFrame
+
+    @property
+    def version(self) -> str:
+        return str(self.manifest["dataset_version"])
+
+    def question(self, question_id: str) -> dict[str, Any]:
+        rows = self.questions[self.questions["question_id"] == question_id]
+        if rows.empty:
+            raise KeyError(f"Unknown question_id {question_id}")
+        return rows.iloc[0].to_dict()
+
+    def rubric_for(self, question_id: str) -> dict[str, Any]:
+        """Rubric in the C3 API schema (app.schemas.marking.Rubric)."""
+        rows = self.rubrics[self.rubrics["question_id"] == question_id]
+        if rows.empty:
+            raise KeyError(f"No rubric rows for question_id {question_id}")
+        criteria = []
+        for _, row in rows.iterrows():
+            criteria.append(
+                {
+                    "criterion_id": row["criterion_id"],
+                    "description": row["description"],
+                    "max_marks": float(row["max_marks"]),
+                    "scoring_levels": json.loads(row["scoring_levels"]),
+                }
+            )
+        rubric_id = str(rows.iloc[0]["rubric_id"])
+        return {"rubric_id": rubric_id, "title": f"Rubric for {question_id}", "criteria": criteria}
+
+    def split_questions(self, split: str) -> pd.DataFrame:
+        if split not in SPLITS:
+            raise ValueError(f"split must be one of {SPLITS}")
+        return self.questions[self.questions["split"] == split].reset_index(drop=True)
+
+    def split_answers(self, split: str, include_needs_review: bool = True) -> pd.DataFrame:
+        if split not in SPLITS:
+            raise ValueError(f"split must be one of {SPLITS}")
+        df = self.answers[self.answers["split"] == split]
+        if not include_needs_review:
+            df = df[df["needs_review"] != "True"]
+        return df.reset_index(drop=True)
 
 
-def parse_evidence_spans(val: Any) -> Union[Dict[str, Any], List[str]]:
-    """
-    Parse evidence spans.
-    Supports JSON mapping ('{"C01": ["S1"]}') and semicolon-delimited sentences.
-    """
-    if not val or str(val).strip().lower() in ("nan", "none", "", "null"):
-        return {}
-    val = str(val).strip()
-    if val.startswith("{"):
-        try:
-            return json.loads(val)
-        except Exception:
-            pass
-    return [s.strip() for s in val.split(";") if s.strip()]
-
-
-def load_manifest() -> Dict[str, Any]:
-    """Load dataset manifest file (00_MANIFEST.json)."""
-    manifest_path = SYNTHETIC_DIR / "00_MANIFEST.json"
+def load_release(path: str | Path | None = None, verify_hashes: bool = True) -> Release:
+    root = Path(path) if path else DEFAULT_RELEASE_DIR
+    manifest_path = root / "manifest.json"
     if not manifest_path.exists():
-        raise FileNotFoundError(f"Manifest not found at {manifest_path}")
-    with open(manifest_path, "r", encoding="utf-8") as f:
-        return json.load(f)
+        raise ReleaseError(
+            f"No dataset release at {root}. Generate it with: python datasets/generate_c3_dataset.py"
+        )
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
 
+    if verify_hashes:
+        for name, meta in manifest.get("files", {}).items():
+            file_path = root / name
+            if not file_path.exists():
+                raise ReleaseError(f"Manifest lists {name} but the file is missing")
+            if sha256_file(file_path) != meta["sha256"]:
+                raise ReleaseError(f"{name} does not match the sha256 recorded in manifest.json")
 
-def load_question_bank(
-    split: Optional[str] = None,
-    parse_structured_fields: bool = True
-) -> List[Dict[str, Any]]:
-    """
-    Load question bank records (01_FINAL_question_bank.csv).
-    
-    Args:
-        split: Optional filter by 'train', 'validation', or 'test'.
-        parse_structured_fields: If True, parses JSON/delimited columns.
-        
-    Returns:
-        List of question dictionaries.
-    """
-    qb_path = SYNTHETIC_DIR / "01_FINAL_question_bank.csv"
-    if not qb_path.exists():
-        raise FileNotFoundError(f"Question bank not found at {qb_path}")
+    questions = _parse_json_columns(_read_csv(root / "questions.csv"), QUESTION_JSON_COLUMNS, "questions.csv")
+    rubrics = _read_csv(root / "rubrics.csv")
+    answers = _parse_json_columns(_read_csv(root / "answers.csv"), ANSWER_JSON_COLUMNS, "answers.csv")
 
-    records = []
-    with open(qb_path, "r", encoding="utf-8") as f:
-        reader = csv.DictReader(f)
-        for row in reader:
-            if split and row.get("split", "").lower() != split.lower():
-                continue
-            item = dict(row)
-            if parse_structured_fields:
-                item["expected_concepts_parsed"] = parse_concepts(item.get("expected_concepts"))
-                item["expected_relationships_parsed"] = parse_concepts(item.get("expected_relationships"))
-                item["evidence_requirements_parsed"] = parse_concepts(item.get("evidence_requirements"))
-                try:
-                    item["marks"] = float(item["marks"]) if item.get("marks") else 0.0
-                except ValueError:
-                    pass
-            records.append(item)
-    return records
+    for col in ("expected_mark", "max_marks", "normalized_mark", "word_count"):
+        answers[col] = pd.to_numeric(answers[col], errors="raise")
+    questions["max_marks"] = pd.to_numeric(questions["max_marks"], errors="raise")
 
-
-def load_controlled_answers(
-    split: Optional[str] = None,
-    quality: Optional[str] = None,
-    question_id: Optional[str] = None,
-    parse_structured_fields: bool = True
-) -> List[Dict[str, Any]]:
-    """
-    Load controlled synthetic answers (02_FINAL_controlled_answers.csv).
-    
-    Args:
-        split: Optional filter by 'train', 'validation', or 'test'.
-        quality: Optional filter by 'FULL', 'MOSTLY_CORRECT', 'PARTIAL',
-                 'MISSING_CONCEPT', 'MISCONCEPTION', or 'IRRELEVANT'.
-        question_id: Optional filter for a specific question ID.
-        parse_structured_fields: If True, parses structured concept and mark fields.
-        
-    Returns:
-        List of answer dictionaries.
-    """
-    ca_path = SYNTHETIC_DIR / "02_FINAL_controlled_answers.csv"
-    if not ca_path.exists():
-        raise FileNotFoundError(f"Controlled answers not found at {ca_path}")
-
-    records = []
-    with open(ca_path, "r", encoding="utf-8") as f:
-        reader = csv.DictReader(f)
-        for row in reader:
-            if split and row.get("split", "").lower() != split.lower():
-                continue
-            if quality and row.get("answer_quality", "").upper() != quality.upper():
-                continue
-            if question_id and row.get("question_id", "") != question_id:
-                continue
-
-            item = dict(row)
-            if parse_structured_fields:
-                item["demonstrated_concepts_parsed"] = parse_concepts(item.get("demonstrated_concepts"))
-                item["missing_concepts_parsed"] = parse_concepts(item.get("missing_concepts"))
-                item["incorrect_concepts_parsed"] = parse_concepts(item.get("incorrect_concepts"))
-                item["criterion_marks_parsed"] = parse_marks(item.get("criterion_marks"))
-                item["evidence_spans_parsed"] = parse_evidence_spans(item.get("evidence_spans"))
-                try:
-                    item["expected_mark"] = float(item["expected_mark"]) if item.get("expected_mark") else 0.0
-                except ValueError:
-                    pass
-                try:
-                    item["marks"] = float(item["marks"]) if item.get("marks") else 0.0
-                except ValueError:
-                    pass
-            records.append(item)
-    return records
-
-
-def load_rubric_criteria(question_id: Optional[str] = None) -> List[Dict[str, Any]]:
-    """Load rubric criteria records (03_FINAL_rubric_criteria.csv)."""
-    rc_path = SYNTHETIC_DIR / "03_FINAL_rubric_criteria.csv"
-    if not rc_path.exists():
-        raise FileNotFoundError(f"Rubric criteria not found at {rc_path}")
-
-    records = []
-    with open(rc_path, "r", encoding="utf-8") as f:
-        reader = csv.DictReader(f)
-        for row in reader:
-            if question_id and row.get("question_id", "") != question_id:
-                continue
-            item = dict(row)
-            try:
-                item["criterion_marks"] = float(item["criterion_marks"]) if item.get("criterion_marks") else 0.0
-            except ValueError:
-                pass
-            records.append(item)
-    return records
-
-
-def load_replacement_audit() -> List[Dict[str, Any]]:
-    """Load question replacement audit records (04_ORIGINAL_63_REPLACEMENT_AUDIT.csv)."""
-    ra_path = SYNTHETIC_DIR / "04_ORIGINAL_63_REPLACEMENT_AUDIT.csv"
-    if not ra_path.exists():
-        raise FileNotFoundError(f"Replacement audit not found at {ra_path}")
-
-    records = []
-    with open(ra_path, "r", encoding="utf-8") as f:
-        reader = csv.DictReader(f)
-        for row in reader:
-            records.append(dict(row))
-    return records
-
-
-def get_dataset_summary() -> Dict[str, Any]:
-    """Return summary metrics of the synthetic dataset package."""
-    manifest = load_manifest()
-    qb = load_question_bank(parse_structured_fields=False)
-    ca = load_controlled_answers(parse_structured_fields=False)
-
-    split_counts_qb = {}
-    for r in qb:
-        s = r.get("split", "unknown")
-        split_counts_qb[s] = split_counts_qb.get(s, 0) + 1
-
-    split_counts_ca = {}
-    quality_counts = {}
-    for r in ca:
-        s = r.get("split", "unknown")
-        split_counts_ca[s] = split_counts_ca.get(s, 0) + 1
-        q = r.get("answer_quality", "unknown")
-        quality_counts[q] = quality_counts.get(q, 0) + 1
-
-    return {
-        "dataset_version": manifest.get("dataset_version", "unknown"),
-        "total_questions": len(qb),
-        "total_answers": len(ca),
-        "question_splits": split_counts_qb,
-        "answer_splits": split_counts_ca,
-        "quality_distribution": quality_counts,
-        "expert_validation_claimed": manifest.get("expert_validation", False),
-    }
-
-
-def get_question_bundle(question_id: str) -> Optional[Dict[str, Any]]:
-    """
-    Retrieve a question, its rubric criteria, and its 6 controlled answers bundled together.
-    """
-    questions = [q for q in load_question_bank() if q.get("question_id") == question_id]
-    if not questions:
-        return None
-    question = questions[0]
-    rubrics = load_rubric_criteria(question_id=question_id)
-    answers = load_controlled_answers(question_id=question_id)
-    return {
-        "question": question,
-        "rubric_criteria": rubrics,
-        "controlled_answers": answers,
-    }
+    return Release(path=root, manifest=manifest, questions=questions, rubrics=rubrics, answers=answers)

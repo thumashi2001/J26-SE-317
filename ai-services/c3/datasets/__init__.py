@@ -1,25 +1,4 @@
-"""
-AdaptiveLearnSE Component 3 Datasets Package
-"""
+"""AdaptiveLearnSE Component 3 — dataset package (release loader and generator)."""
+from .loader import Release, ReleaseError, load_release
 
-from .loader import (
-    get_dataset_summary,
-    get_question_bundle,
-    get_synthetic_dataset_dir,
-    load_controlled_answers,
-    load_manifest,
-    load_question_bank,
-    load_replacement_audit,
-    load_rubric_criteria,
-)
-
-__all__ = [
-    "get_dataset_summary",
-    "get_question_bundle",
-    "get_synthetic_dataset_dir",
-    "load_controlled_answers",
-    "load_manifest",
-    "load_question_bank",
-    "load_replacement_audit",
-    "load_rubric_criteria",
-]
+__all__ = ["Release", "ReleaseError", "load_release"]
