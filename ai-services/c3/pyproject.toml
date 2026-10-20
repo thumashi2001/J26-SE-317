@@ -1,0 +1,28 @@
+[tool.ruff]
+target-version = "py313"
+line-length = 120
+extend-exclude = [".venv", ".venv_c3", "scratch", "datasets/backup_*"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-m 'not live_llm and not neo4j'"
+markers = [
+    "live_llm: calls a real LLM provider (needs API keys, costs money)",
+    "neo4j: needs a live Neo4j instance",
+    "dataset: reads the synthetic dataset files",
+    "slow: long-running test",
+]
+
+[tool.coverage.run]
+source = ["app", "services"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+skip_empty = true
+
+[tool.coverage.html]
+directory = "htmlcov"
