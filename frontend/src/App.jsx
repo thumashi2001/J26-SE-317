@@ -45,6 +45,8 @@ import LecturerReviewPage from './pages/c3/LecturerReviewPage.jsx';
 import LecturerSyllabusReviewPage from './pages/c2/LecturerSyllabusReviewPage.jsx';
 import LecturerSyntheticPreviewPage from './pages/c2/LecturerSyntheticPreviewPage.jsx';
 import LecturerQuestionClassificationReviewPage from './pages/c2/LecturerQuestionClassificationReviewPage.jsx';
+import LecturerQuestionGenerationPage from './pages/c2/LecturerQuestionGenerationPage.jsx';
+
 
 // Component 2 - Student
 import StudentExamIntelligencePage from './pages/c2/StudentExamIntelligencePage.jsx';
@@ -211,6 +213,14 @@ export default function App() {
           element={<LecturerQuestionClassificationReviewPage />}
         />
 
+        {/* Component 2: M21 Bloom's Question Generation */}
+
+        <Route
+          path="/lecturer/c2/question-generation"
+          element={<LecturerQuestionGenerationPage />}
+        />
+
+
         {/* Component 2: Syllabus Review */}
 
         <Route
@@ -288,6 +298,12 @@ export default function App() {
           path="/admin/c2/classification-review"
           element={<LecturerQuestionClassificationReviewPage />}
         />
+
+        <Route
+          path="/admin/c2/question-generation"
+          element={<LecturerQuestionGenerationPage />}
+        />
+
 
       </Route>
 

@@ -839,6 +839,11 @@ class QuestionClassificationReviewService:
             "total_authentic_questions": total,
             "usable_text_questions": usable_text_count,
             "empty_text_questions": abstained,
+            "suggestion_coverage": round((suggested + low_conf) / total, 4) if total > 0 else 0.0,
+            "verified_coverage": round(approved / total, 4) if total > 0 else 0.0,
+            "suggested_for_review": suggested,
+            "low_confidence_review": low_conf,
+            "lecturer_approved": approved,
             "candidate_suggestions": {
                 "suggested_for_review_count": suggested,
                 "low_confidence_count": low_conf,

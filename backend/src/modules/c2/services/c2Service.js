@@ -342,4 +342,72 @@ export function classifyTopicExperimental({
   });
 }
 
+// M21 - Bloom's Taxonomy Question Generation
+export function getGenerationTopics(moduleKey) {
+  const params = new URLSearchParams();
+  if (moduleKey) {
+    params.set('module_key', moduleKey);
+  }
+  const query = params.toString() ? `?${params.toString()}` : '';
+  return requestC2(`/question-generation/topics${query}`);
+}
+
+export function generateBloomQuestion({
+  moduleKey,
+  topicId,
+  bloomLevel = 'apply',
+  difficulty = 'medium',
+  questionType = 'structured',
+  marks = 10,
+  lecturerInstructions = '',
+}) {
+  return requestC2('/question-generation/generate', {
+    method: 'POST',
+    body: {
+      module_key: moduleKey,
+      topic_id: topicId,
+      bloom_level: bloomLevel,
+      difficulty,
+      question_type: questionType,
+      marks: Number(marks) || 10,
+      lecturer_instructions: lecturerInstructions,
+    },
+  });
+}
+
+export function submitBloomQuestionDecision({
+  decision,
+  question,
+  reviewerId,
+  reviewNotes = '',
+  updatedText,
+  updatedMarks,
+}) {
+  return requestC2('/question-generation/decision', {
+    method: 'POST',
+    body: {
+      decision,
+      question,
+      reviewer_id: reviewerId,
+      review_notes: reviewNotes,
+      updated_text: updatedText,
+      updated_marks: updatedMarks ? Number(updatedMarks) : undefined,
+    },
+  });
+}
+
+export function listApprovedGeneratedQuestions(moduleKey) {
+  const params = new URLSearchParams();
+  if (moduleKey) {
+    params.set('module_key', moduleKey);
+  }
+  const query = params.toString() ? `?${params.toString()}` : '';
+  return requestC2(`/question-generation/approved${query}`);
+}
+
+export function getBloomClassifierEvaluation() {
+  return requestC2('/question-generation/bloom-evaluation');
+}
+
+
 

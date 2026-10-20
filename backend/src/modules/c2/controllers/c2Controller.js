@@ -809,4 +809,117 @@ export async function getMockAttempt(req, res) {
   }
 }
 
+// --------------------------------------------------
+// M21 - Bloom's Taxonomy Question Generation
+// --------------------------------------------------
+
+export async function getGenerationTopics(req, res) {
+  try {
+    const { moduleKey } = req.query;
+    if (!moduleKey || typeof moduleKey !== 'string') {
+      return res.status(400).json({ error: 'Valid moduleKey query parameter is required' });
+    }
+    const result = await c2Service.getGenerationTopics(moduleKey);
+    return res.json(result);
+  } catch (error) {
+    return handleError(res, error);
+  }
+}
+
+export async function generateBloomQuestion(req, res) {
+  try {
+    const {
+      moduleKey,
+      topicId,
+      bloomLevel = 'apply',
+      difficulty = 'medium',
+      questionType = 'structured',
+      marks = 10,
+      lecturerInstructions = '',
+    } = req.body || {};
+
+    if (!moduleKey || typeof moduleKey !== 'string') {
+      return res.status(400).json({ error: 'Valid moduleKey is required' });
+    }
+    if (!topicId || typeof topicId !== 'string') {
+      return res.status(400).json({ error: 'Valid topicId is required' });
+    }
+
+    const marksNum = Number(marks);
+    if (!Number.isInteger(marksNum) || marksNum <= 0) {
+      return res.status(400).json({ error: 'Marks must be a positive integer' });
+    }
+
+    const result = await c2Service.generateBloomQuestion({
+      moduleKey,
+      topicId,
+      bloomLevel,
+      difficulty,
+      questionType,
+      marks: marksNum,
+      lecturerInstructions: typeof lecturerInstructions === 'string' ? lecturerInstructions.trim() : '',
+    });
+
+    return res.json(result);
+  } catch (error) {
+    return handleError(res, error);
+  }
+}
+
+export async function submitBloomQuestionDecision(req, res) {
+  try {
+    const {
+      decision,
+      question,
+      reviewNotes = '',
+      updatedText,
+      updatedMarks,
+    } = req.body || {};
+
+    if (!['approved', 'rejected'].includes(decision)) {
+      return res.status(400).json({ error: "Decision must be 'approved' or 'rejected'" });
+    }
+    if (!question || typeof question !== 'object' || !question.question_id) {
+      return res.status(400).json({ error: 'Valid question object is required' });
+    }
+
+    if (decision === 'rejected' && (!reviewNotes || !reviewNotes.trim())) {
+      return res.status(400).json({ error: 'Rejection requires review notes explaining the reason.' });
+    }
+
+    const result = await c2Service.submitBloomQuestionDecision({
+      decision,
+      question,
+      reviewerId: req.user.sub,
+      reviewNotes: typeof reviewNotes === 'string' ? reviewNotes.trim() : '',
+      updatedText: typeof updatedText === 'string' ? updatedText.trim() : undefined,
+      updatedMarks: updatedMarks ? Number(updatedMarks) : undefined,
+    });
+
+    return res.json(result);
+  } catch (error) {
+    return handleError(res, error);
+  }
+}
+
+export async function listApprovedGeneratedQuestions(req, res) {
+  try {
+    const { moduleKey } = req.query;
+    const result = await c2Service.listApprovedGeneratedQuestions(moduleKey);
+    return res.json(result);
+  } catch (error) {
+    return handleError(res, error);
+  }
+}
+
+export async function getBloomClassifierEvaluation(req, res) {
+  try {
+    const result = await c2Service.getBloomClassifierEvaluation();
+    return res.json(result);
+  } catch (error) {
+    return handleError(res, error);
+  }
+}
+
+
 

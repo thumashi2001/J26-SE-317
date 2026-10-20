@@ -1,0 +1,499 @@
+/* C2 Lecturer Bloom Question Generation — AdaptiveLearnSE Design */
+
+.c2-generation-page {
+  width: 100%;
+  min-width: 0;
+}
+
+.c2-gen-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.c2-gen-header h1 {
+  margin: 0 0 6px;
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+
+.c2-gen-header p {
+  margin: 0;
+  color: var(--muted, #64748b);
+  font-size: 0.95rem;
+}
+
+.c2-gen-tabs {
+  display: flex;
+  gap: 8px;
+  border-bottom: 1px solid var(--border, #e2e8f0);
+  margin-bottom: 24px;
+}
+
+.c2-gen-tab {
+  padding: 10px 18px;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--muted, #64748b);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.c2-gen-tab:hover {
+  color: var(--primary, #2563eb);
+}
+
+.c2-gen-tab.active {
+  color: var(--primary, #2563eb);
+  border-bottom-color: var(--primary, #2563eb);
+}
+
+/* Two-column layout for Generator */
+.c2-gen-layout {
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+@media (max-width: 980px) {
+  .c2-gen-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.c2-gen-form-panel {
+  background: var(--surface, #ffffff);
+  border: 1px solid var(--border, #e2e8f0);
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.c2-form-group {
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.c2-form-group label {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--foreground, #1e293b);
+}
+
+.c2-form-group select,
+.c2-form-group input,
+.c2-form-group textarea {
+  padding: 9px 12px;
+  border: 1px solid var(--border, #cbd5e1);
+  border-radius: 6px;
+  font-size: 0.9rem;
+  background: var(--input-bg, #ffffff);
+  color: inherit;
+  font-family: inherit;
+}
+
+.c2-form-group select:focus,
+.c2-form-group input:focus,
+.c2-form-group textarea:focus {
+  outline: none;
+  border-color: var(--primary, #2563eb);
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+}
+
+.c2-bloom-buttons {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.c2-bloom-btn {
+  padding: 8px 10px;
+  border: 1px solid var(--border, #cbd5e1);
+  background: var(--bg-alt, #f8fafc);
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.15s ease;
+}
+
+.c2-bloom-btn:hover {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+}
+
+.c2-bloom-btn.active {
+  background: #eff6ff;
+  border-color: #3b82f6;
+  color: #1d4ed8;
+  box-shadow: 0 0 0 1px #3b82f6;
+}
+
+.c2-bloom-hint {
+  font-size: 0.76rem;
+  color: var(--muted, #64748b);
+  margin-top: 2px;
+}
+
+.c2-btn-generate {
+  width: 100%;
+  padding: 12px;
+  background: var(--primary, #2563eb);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.c2-btn-generate:hover:not(:disabled) {
+  background: #1d4ed8;
+}
+
+.c2-btn-generate:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* Candidate Display Panel */
+.c2-candidate-panel {
+  background: var(--surface, #ffffff);
+  border: 1px solid var(--border, #e2e8f0);
+  border-radius: 10px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.c2-candidate-empty {
+  text-align: center;
+  padding: 48px 24px;
+  color: var(--muted, #64748b);
+}
+
+.c2-candidate-empty h3 {
+  margin: 0 0 8px;
+  color: var(--foreground, #334155);
+}
+
+.c2-candidate-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 12px;
+  border-bottom: 1px solid var(--border, #f1f5f9);
+  padding-bottom: 16px;
+  margin-bottom: 18px;
+}
+
+.c2-candidate-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.c2-badge {
+  font-size: 0.75rem;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.c2-badge-bloom {
+  background: #ede9fe;
+  color: #6d28d9;
+}
+
+.c2-badge-marks {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.c2-badge-diff {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.c2-badge-type {
+  background: #f1f5f9;
+  color: #334155;
+}
+
+.c2-badge-synthetic {
+  background: #fee2e2;
+  color: #991b1b;
+  font-weight: 700;
+}
+
+.c2-candidate-body {
+  margin-bottom: 24px;
+}
+
+.c2-candidate-text {
+  font-size: 0.98rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  background: #f8fafc;
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  font-family: inherit;
+}
+
+.c2-subquestion-box {
+  margin-top: 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.c2-subq-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-bottom: 1px solid #f1f5f9;
+  background: #ffffff;
+  font-size: 0.92rem;
+}
+
+.c2-subq-row:last-child {
+  border-bottom: none;
+}
+
+.c2-subq-part {
+  font-weight: 700;
+  color: var(--primary, #2563eb);
+  margin-right: 8px;
+}
+
+.c2-subq-marks {
+  font-weight: 600;
+  color: var(--muted, #64748b);
+  white-space: nowrap;
+  margin-left: 12px;
+}
+
+/* Validation Scorecard */
+.c2-validation-section {
+  background: #fafaf9;
+  border: 1px solid #e7e5e4;
+  border-radius: 8px;
+  padding: 18px;
+  margin-bottom: 24px;
+}
+
+.c2-validation-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin: 0 0 12px;
+  color: #292524;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.c2-validation-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.c2-val-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 12px;
+  font-size: 0.85rem;
+}
+
+.c2-val-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
+.c2-val-pill {
+  font-size: 0.72rem;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-weight: 700;
+}
+
+.c2-val-pill.pass {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.c2-val-pill.needs_review,
+.c2-val-pill.moderate {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.c2-val-pill.fail,
+.c2-val-pill.flagged_duplicate {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.c2-val-details {
+  color: #64748b;
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
+/* Lecturer Action Toolbar */
+.c2-actions-toolbar {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+  padding-top: 16px;
+  border-top: 1px solid var(--border, #e2e8f0);
+}
+
+.c2-btn-action {
+  padding: 9px 16px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  border: 1px solid transparent;
+}
+
+.c2-btn-edit {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #334155;
+}
+
+.c2-btn-edit:hover {
+  background: #e2e8f0;
+}
+
+.c2-btn-regen {
+  background: #ffffff;
+  border-color: #3b82f6;
+  color: #2563eb;
+}
+
+.c2-btn-regen:hover {
+  background: #eff6ff;
+}
+
+.c2-btn-reject {
+  background: #fee2e2;
+  border-color: #fca5a5;
+  color: #991b1b;
+}
+
+.c2-btn-reject:hover {
+  background: #fecaca;
+}
+
+.c2-btn-approve {
+  background: #16a34a;
+  color: #ffffff;
+}
+
+.c2-btn-approve:hover {
+  background: #15803d;
+}
+
+/* Repository Table */
+.c2-repo-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  margin-top: 16px;
+}
+
+.c2-repo-table th,
+.c2-repo-table td {
+  padding: 12px 14px;
+  border: 1px solid var(--border, #e2e8f0);
+  text-align: left;
+}
+
+.c2-repo-table th {
+  background: #f8fafc;
+  font-weight: 600;
+  color: #334155;
+}
+
+.c2-repo-card {
+  background: #ffffff;
+  border: 1px solid var(--border, #e2e8f0);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 14px;
+}
+
+/* Experiment Cards */
+.c2-experiment-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.c2-stat-box {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.c2-stat-num {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #2563eb;
+  margin-top: 4px;
+}
+
+.c2-stat-sub {
+  font-size: 0.8rem;
+  color: #64748b;
+  margin-top: 4px;
+}
+
+.c2-conf-matrix {
+  border-collapse: collapse;
+  margin-top: 12px;
+}
+
+.c2-conf-matrix th,
+.c2-conf-matrix td {
+  border: 1px solid #cbd5e1;
+  padding: 8px 12px;
+  text-align: center;
+  font-size: 0.85rem;
+}
+
+.c2-conf-matrix th {
+  background: #f1f5f9;
+  font-weight: 600;
+}

@@ -22,6 +22,7 @@ export const LECTURER_MENU = [
   { to: '/lecturer/c1', label: 'Class insights' },
   { to: '/lecturer/c2', label: 'Exam intelligence', end: true },
   { to: '/lecturer/c2/classification-review', label: 'Question classifications' },
+  { to: '/lecturer/c2/question-generation', label: 'Bloom question generation' },
   { to: '/lecturer/c3', label: 'Marking review' },
   { to: '/lecturer/c4', label: 'Adaptive paths' },
 ];
@@ -33,8 +34,10 @@ export const ADMIN_MENU = [
   { to: '/admin/lecturers', label: 'Lecturer approvals' },
   { heading: 'Exams' },
   { to: '/lecturer/c2/classification-review', label: 'Question classifications' },
+  { to: '/admin/c2/question-generation', label: 'Bloom question generation' },
   // TEAM: add your admin pages here.
 ];
+
 
 // Cards on the lecturer overview page (one per component).
 export const LECTURER_SECTIONS = [

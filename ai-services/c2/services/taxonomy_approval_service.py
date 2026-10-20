@@ -147,3 +147,40 @@ class TaxonomyApprovalService:
         )
 
         return self.get_taxonomy(canonical_key)
+
+    def get_taxonomy_for_review(self, module_key: str) -> Dict[str, Any]:
+        """Convenience alias for API layer."""
+        return self.get_taxonomy(module_key)
+
+    def approve_taxonomy(
+        self,
+        module_key: str,
+        reviewer_id: str,
+        review_notes: str = "",
+        version: str = "1.0",
+    ) -> Dict[str, Any]:
+        """Convenience method for approving a module taxonomy."""
+        return self.review_taxonomy(
+            module_key=module_key,
+            status="approved",
+            reviewer_id=reviewer_id,
+            review_notes=review_notes,
+            version=version,
+        )
+
+    def reject_taxonomy(
+        self,
+        module_key: str,
+        reviewer_id: str,
+        review_notes: str = "",
+        version: str = "1.0",
+    ) -> Dict[str, Any]:
+        """Convenience method for rejecting a module taxonomy."""
+        return self.review_taxonomy(
+            module_key=module_key,
+            status="rejected",
+            reviewer_id=reviewer_id,
+            review_notes=review_notes,
+            version=version,
+        )
+

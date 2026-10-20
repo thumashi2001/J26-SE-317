@@ -321,4 +321,60 @@ export const getC2MockAttempts = ({ moduleKey } = {}) => {
 
 export const getC2MockAttempt = (attemptId) =>
   api(`${base}/mock-exams/attempts/${encodeURIComponent(attemptId)}`);
+
+// --------------------------------------------------
+// M21 - Bloom's Taxonomy-Controlled Question Generation
+// --------------------------------------------------
+
+export const getC2GenerationTopics = (moduleKey) =>
+  api(`${base}/question-generation/topics?moduleKey=${encodeURIComponent(moduleKey)}`);
+
+export const generateC2BloomQuestion = ({
+  moduleKey,
+  topicId,
+  bloomLevel = 'apply',
+  difficulty = 'medium',
+  questionType = 'structured',
+  marks = 10,
+  lecturerInstructions = '',
+}) =>
+  api(`${base}/question-generation/generate`, {
+    method: 'POST',
+    body: {
+      moduleKey,
+      topicId,
+      bloomLevel,
+      difficulty,
+      questionType,
+      marks,
+      lecturerInstructions,
+    },
+  });
+
+export const submitC2BloomQuestionDecision = ({
+  decision,
+  question,
+  reviewNotes = '',
+  updatedText,
+  updatedMarks,
+}) =>
+  api(`${base}/question-generation/decision`, {
+    method: 'POST',
+    body: {
+      decision,
+      question,
+      reviewNotes,
+      updatedText,
+      updatedMarks,
+    },
+  });
+
+export const getC2ApprovedGeneratedQuestions = (moduleKey = null) => {
+  const params = moduleKey ? `?moduleKey=${encodeURIComponent(moduleKey)}` : '';
+  return api(`${base}/question-generation/approved${params}`);
+};
+
+export const getC2BloomClassifierEvaluation = () =>
+  api(`${base}/question-generation/bloom-evaluation`);
+
 

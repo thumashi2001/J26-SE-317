@@ -54,6 +54,9 @@ from services.m17_topic_prediction_service import (
     M17TopicPredictionService,
     ModelNotFoundError,
 )
+from services.bloom_question_generator import BloomQuestionGenerator
+from services.generated_question_repository import GeneratedQuestionRepository
+
 
 app = FastAPI(
     title="C2 Exam Intelligence API",
@@ -886,4 +889,141 @@ def classify_topic_experimental(
             status_code=400,
             detail=str(e),
         )
+
+
+# --------------------------------------------------
+# M21 - Bloom's Taxonomy-Controlled Question Generation
+# --------------------------------------------------
+
+class BloomQuestionGenerationApiRequest(BaseModel):
+    module_key: str = Field(min_length=1, max_length=100)
+    topic_id: str = Field(min_length=1, max_length=150)
+    bloom_level: str = Field(default="apply")
+    difficulty: str = Field(default="medium")
+    question_type: str = Field(default="structured")
+    marks: int = Field(default=10, ge=1, le=100)
+    lecturer_instructions: str = Field(default="", max_length=2000)
+
+
+class BloomQuestionDecisionApiRequest(BaseModel):
+    decision: str = Field(pattern="^(approved|rejected)$")
+    question: dict
+    reviewer_id: str = Field(min_length=1)
+    review_notes: str = Field(default="", max_length=2000)
+    updated_text: str | None = None
+    updated_marks: int | None = None
+
+
+@app.get("/question-generation/topics")
+def get_generation_curriculum_topics(
+    module_key: str,
+    x_c2_internal_token: str | None = Header(default=None),
+):
+    require_internal_token(x_c2_internal_token)
+    validate_module(module_key)
+
+    generator = BloomQuestionGenerator()
+    try:
+        topics = generator.get_module_topics(module_key)
+        return {"module_key": module_key, "topics": topics}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/question-generation/generate")
+def generate_bloom_question(
+    request: BloomQuestionGenerationApiRequest,
+    x_c2_internal_token: str | None = Header(default=None),
+):
+    require_internal_token(x_c2_internal_token)
+    validate_module(request.module_key)
+
+    generator = BloomQuestionGenerator()
+    try:
+        candidate = generator.generate_question(
+            module_key=request.module_key,
+            topic_id=request.topic_id,
+            bloom_level=request.bloom_level,
+            difficulty=request.difficulty,
+            question_type=request.question_type,
+            marks=request.marks,
+            lecturer_instructions=request.lecturer_instructions,
+        )
+        return candidate
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Generation failed: {str(e)}")
+
+
+@app.post("/question-generation/decision")
+def review_bloom_question_decision(
+    request: BloomQuestionDecisionApiRequest,
+    x_c2_internal_token: str | None = Header(default=None),
+):
+    require_internal_token(x_c2_internal_token)
+
+    repo = GeneratedQuestionRepository()
+    question_data = dict(request.question)
+
+    if request.updated_text:
+        question_data["question_text"] = request.updated_text.strip()
+    if request.updated_marks and request.updated_marks > 0:
+        question_data["marks"] = request.updated_marks
+
+    try:
+        if request.decision == "approved":
+            saved = repo.save_approved_question(
+                question_data=question_data,
+                reviewer_id=request.reviewer_id,
+                review_notes=request.review_notes,
+            )
+            return {"success": True, "action": "approved", "question": saved}
+        else:
+            rejected = repo.save_rejected_question(
+                question_data=question_data,
+                reviewer_id=request.reviewer_id,
+                reason=request.review_notes or "Rejected by lecturer.",
+            )
+            return {"success": True, "action": "rejected", "audit": rejected}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/question-generation/approved")
+def list_approved_generated_questions(
+    module_key: str | None = None,
+    x_c2_internal_token: str | None = Header(default=None),
+):
+    require_internal_token(x_c2_internal_token)
+    if module_key:
+        validate_module(module_key)
+
+    repo = GeneratedQuestionRepository()
+    try:
+        items = repo.list_approved_questions(module_key=module_key)
+        return {
+            "module_key": module_key,
+            "total": len(items),
+            "questions": items,
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/question-generation/bloom-evaluation")
+def get_bloom_classifier_evaluation(
+    x_c2_internal_token: str | None = Header(default=None),
+):
+    require_internal_token(x_c2_internal_token)
+
+    report_path = C2_ROOT / "reports" / "m21_bloom_classifier_evaluation.json"
+    if not report_path.exists():
+        from services.bloom_classifier_experiment import run_bloom_classification_experiment
+        return run_bloom_classification_experiment()
+
+    import json
+    with open(report_path, "r", encoding="utf-8") as f:
+        return json.load(f)
+
 

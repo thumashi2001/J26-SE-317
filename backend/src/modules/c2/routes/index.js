@@ -197,4 +197,40 @@ router.post(
   controller.classifyTopicExperimental
 );
 
+// --------------------------------------------------
+// M21 - Bloom's Taxonomy-Controlled Question Generation
+// Restricted to lecturers and administrators.
+// --------------------------------------------------
+
+router.get(
+  '/question-generation/topics',
+  requireRole('lecturer', 'admin'),
+  controller.getGenerationTopics
+);
+
+router.post(
+  '/question-generation/generate',
+  requireRole('lecturer', 'admin'),
+  controller.generateBloomQuestion
+);
+
+router.post(
+  '/question-generation/decision',
+  requireRole('lecturer', 'admin'),
+  controller.submitBloomQuestionDecision
+);
+
+router.get(
+  '/question-generation/approved',
+  requireRole('lecturer', 'admin'),
+  controller.listApprovedGeneratedQuestions
+);
+
+router.get(
+  '/question-generation/bloom-evaluation',
+  requireRole('lecturer', 'admin'),
+  controller.getBloomClassifierEvaluation
+);
+
 export default router;
+

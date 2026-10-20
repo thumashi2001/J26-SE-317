@@ -344,11 +344,20 @@ export default function LecturerQuestionClassificationReviewPage() {
         <div className="c2-analytics-card" style={{ borderLeft: '4px solid #3b82f6' }}>
           <div className="c2-analytics-label">AI Suggestion Coverage</div>
           <div className="c2-analytics-val">
-            {analytics ? `${Math.round(analytics.suggestion_coverage * 100)}%` : '—'}
+            {(() => {
+              if (!analytics) return '—';
+              const raw = analytics.suggestion_coverage ??
+                (analytics.candidate_suggestions?.total_candidate_coverage_pct != null
+                  ? analytics.candidate_suggestions.total_candidate_coverage_pct / 100
+                  : null);
+              if (raw === null || Number.isNaN(raw)) return 'Unavailable';
+              return `${Math.round(raw * 100)}%`;
+            })()}
           </div>
           <div className="c2-analytics-desc">
             {analytics
-              ? `${analytics.suggested_for_review + analytics.low_confidence_review} with candidate suggestions`
+              ? `${(analytics.suggested_for_review ?? analytics.candidate_suggestions?.suggested_for_review_count ?? 0) +
+                   (analytics.low_confidence_review ?? analytics.candidate_suggestions?.low_confidence_count ?? 0)} with candidate suggestions`
               : 'Candidate ranking suggestions'}
           </div>
         </div>
@@ -356,10 +365,18 @@ export default function LecturerQuestionClassificationReviewPage() {
         <div className="c2-analytics-card" style={{ borderLeft: '4px solid #10b981' }}>
           <div className="c2-analytics-label">Lecturer Verified Coverage</div>
           <div className="c2-analytics-val">
-            {analytics ? `${Math.round(analytics.verified_coverage * 100)}%` : '—'}
+            {(() => {
+              if (!analytics) return '—';
+              const raw = analytics.verified_coverage ??
+                (analytics.lecturer_review_progress?.verified_coverage_pct != null
+                  ? analytics.lecturer_review_progress.verified_coverage_pct / 100
+                  : null);
+              if (raw === null || Number.isNaN(raw)) return 'Unavailable';
+              return `${Math.round(raw * 100)}%`;
+            })()}
           </div>
           <div className="c2-analytics-desc">
-            {analytics?.lecturer_approved ?? 0} approved ground-truth labels
+            {analytics?.lecturer_approved ?? analytics?.lecturer_review_progress?.approved_count ?? 0} approved ground-truth labels
           </div>
         </div>
 
@@ -391,12 +408,14 @@ export default function LecturerQuestionClassificationReviewPage() {
             </span>
             <span>{formatModule(moduleKey)}</span>
             <span className="muted" style={{ fontWeight: 400, fontSize: '0.8rem' }}>
-              (v{taxonomyDetails?.taxonomy_version || '1.0.0'})
+              (v{taxonomyDetails?.version || taxonomyDetails?.taxonomy_version || '1.0'})
             </span>
           </div>
 
           <div className="c2-taxonomy-topics-preview">
-            Curriculum Topics: {taxonomyDetails?.topics?.map((t) => t.topic_name).join(' • ') || 'Loading topics...'}
+            Curriculum Topics:{' '}
+            {(taxonomyDetails?.topics || taxonomyStatus?.topics)?.map((t) => (typeof t === 'string' ? t : t.topic_name || t.topic_id)).join(' • ') ||
+              (loading ? 'Loading topics...' : 'No curriculum topics configured')}
           </div>
 
           {taxonomyStatus?.is_verified ? (
