@@ -6,8 +6,8 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "node --watch src/server.js",
-    "test": "node --test src/modules/c3/tests/*.test.js",
-    "test:coverage": "node --test --experimental-test-coverage src/modules/c3/tests/*.test.js",
+    "test": "node --test src/modules/c3/tests/*.test.js src/middleware/tests/*.test.js",
+    "test:coverage": "node --test --experimental-test-coverage src/modules/c3/tests/*.test.js src/middleware/tests/*.test.js",
     "lint": "eslint src"
   },
   "dependencies": {
