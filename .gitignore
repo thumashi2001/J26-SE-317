@@ -66,6 +66,10 @@ ai-services/c2/outputs/syllabus_reviews/
 /ai-services/c2/datasets/synthetic/m16/
 
 ai-services/c2/outputs/question_classification_reviews/
+
+# C2 lecturer-generated and approval runtime data
+/ai-services/c2/datasets/generated_questions/lecturer_approved_questions.json
+/ai-services/c2/outputs/taxonomy_approvals/approvals.json
 # IDE files
 .vscode/*
 !.vscode/extensions.json
