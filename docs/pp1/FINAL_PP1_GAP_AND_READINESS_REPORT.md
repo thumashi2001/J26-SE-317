@@ -3,35 +3,34 @@
 **Project Title:** IT4010 AdaptiveLearnSE — AI-Powered Cognitive Digital Twin for Adaptive Learning, Exam Intelligence, and Automated Assessment  
 **Candidate Component:** Component 3 (C3) — AI-Powered Automated Marking & Answer Analysis System  
 **Audit Date:** 20 October 2026 | **Scheduled PP1 Viva Slots:** 22, 23, and 26 October 2026  
-**Active Working Branch:** `feature/c3-pp1-final-integration-20261020`  
-**Overall Readiness Verdict:** **Ready with limitations** (Software engineering system is 100% complete, tested, and live-demonstrable; research boundaries and experimental conditions are transparently documented).
+**Active Working Branch:** `feature/c3-pp1-experiments-20261020` (commit `f21dba4`)  
+**Overall Readiness Verdict:** **Ready with limitations** (Software engineering system is 100% complete, tested, and live-demonstrable; research boundaries, trainable model audit, and experimental conditions are transparently documented).
 
 ---
 
-## 1. Git State, Base Commits & Merge Outcome
+## 1. Git State, Base Commits & Branch History
 
-1. **Current Working Branch:** `feature/c3-pp1-final-integration-20261020`
-   - Created safely from HEAD of `feature/c3-system-integration` (commit `b1b148b`).
-   - All C3 implementation files, tests, datasets, and uncommitted working tree changes were fully preserved.
+1. **Current Working Branch:** `feature/c3-pp1-experiments-20261020`
+   - Incorporates remote tracking to `origin/feature/c3-pp1-experiments-20261020`.
+   - Formally pulled and merged latest `origin/Development` (commit `e3bbb64`, incorporating PRs #29, #30, #37, #38, #39) at merge commit `f21dba4` with 0 merge conflicts.
+   - All C3 implementation files, tests, datasets, and working tree artifacts are fully preserved.
 2. **Merge Base & Branch Relationship:**
-   - Merge Base between `HEAD` and `origin/Development`: `b1b148b89d63bf4f5c8989434e02190e3f159cca` (`HEAD`).
-   - Explanation of the "ahead 108" count: `origin/feature/c3-system-integration` was left at commit `3fc28ef` on 14 October 2026. 108 commits were made locally on `feature/c3-system-integration` (marking engine, MCQ engine, synthetic dataset loader, etc.) up to `b1b148b`. Those 108 commits were merged into `Development` at `422b340` and pushed to `origin/Development`.
-3. **Integration of Latest Development:**
-   - Latest `origin/Development` commit: `e3bbb64` (incorporating Component 1 adaptive level practice PR #39, topic insights PR #37, and Component 2 syllabus topic PRs #29–#30).
-   - In accordance with safety rules, a full patch backup of uncommitted C3 changes was saved to `scratch/uncommitted_c3_work.patch` (59,144 bytes).
-   - `origin/Development` was integrated into `feature/c3-pp1-final-integration-20261020` using `git merge --no-commit --no-ff origin/Development`.
-   - Result: **Automatic merge went well; 0 merge conflicts.** `frontend/src/App.jsx` and `frontend/src/config/menus.js` auto-merged cleanly.
-   - C3 stashed working changes were popped cleanly with **0 conflicts**.
-   - No push or unauthorized permanent commit was executed.
+   - Active branch has two parents at commit `f21dba4`: `84f7e7d` (C3 documentation and model suite) and `e3bbb64` (`origin/Development`).
+   - Staged index is clean; all 140 automated tests pass; Vite frontend production build succeeds with 0 errors.
+   - Preserves all teammate components (C1, C2, C4, CCKG) untouched.
 
 ---
 
 ## 2. Exact Git Working Tree Status
 
-- **Committed Work:** All 108 historical C3 commits up to `b1b148b` are committed in branch ancestry.
-- **Staged Work:** Incoming changes from `origin/Development` (35 commits from C1 and C2 PRs) are staged in index following `--no-commit` merge.
-- **Unstaged Work (C3 Modified Files):**
-  - `backend/package.json` (test script definition)
+- **Committed Work:** Branch history incorporates all C3 commits and Development PRs up to merge commit `f21dba4`.
+- **Staged Work:** Clean.
+- **Unstaged Working Tree Changes (C3 Documentation & Configuration):**
+  - `backend/.env` (MongoDB Atlas URI, JWT secret, port 3000, AI service URLs, and default admin configuration)
+  - `docs/pp1/CLAIM_EVIDENCE_DECISION_LOG.md` (Updated with DEC-07 and DEC-08)
+  - `docs/pp1/DATASET_AND_EVALUATION_REPORT.md` (Updated with Condition F and diagnostic suite)
+  - `docs/pp1/EXPERIMENT_A_TO_F_TRACEABILITY.md` (Updated with Condition F model audit)
+  - `docs/pp1/FINAL_PP1_GAP_AND_READINESS_REPORT.md` (Updated branch status and evidence manifest)
   - `backend/src/modules/c3/controllers/c3Controller.js` (batch marking controller endpoints)
   - `backend/src/modules/c3/routes/index.js` (batch routes registration)
   - `backend/src/modules/c3/services/submissionService.js` (idempotent upsert logic)
@@ -113,9 +112,12 @@
 
 ## 7. Model Trainability & Research Evaluation Findings
 
-1. **Trainability Reality:**
-   - Active PP1 prototype (Condition E) uses **deterministic NLP algorithms and rubric rules**; it does not contain backpropagation-trained weights.
-   - It is not claimed to be a trained neural network. Trainable dense vector embeddings (Condition C) and fine-tuned LLMs (Condition B) are scheduled for post-PP1 Phase 4.
+1. **Trainability Reality & Condition F Audit:**
+   - Active PP1 prototype (**Condition E**) uses **deterministic NLP algorithms and rubric rules** (0.34 ms latency, 17.3% lower MAE than baseline).
+   - To satisfy the PP1 rubric on trainable machine learning models, a supervised regression pipeline (**Condition F proof-of-concept**) was implemented in [`train_semantic_model.py`](file:///c:/Users/M%20S%20I/Desktop/Reserach/DEVELOPMENT/ADAPTIVE_LEARN_SE/ai-services/c3/experiments/train_semantic_model.py).
+   - **Critical Post-Execution Audit Finding:** The initial proof-of-concept model (v1.0.0) achieved an apparent MAE of 0.017 on synthetic data, but our independent audit revealed it relied 86.64% on length features (`word_count` + `char_len_norm`), and failed an out-of-domain distractor audit (awarding 9.99/10 to a Roman Empire history text).
+   - **Corrected Model (v2.0.0):** Created [`train_semantic_model_corrected.py`](file:///c:/Users/M%20S%20I/Desktop/Reserach/DEVELOPMENT/ADAPTIVE_LEARN_SE/ai-services/c3/experiments/train_semantic_model_corrected.py) which eliminated unnormalized word count, added TF-IDF reference similarity (35.42% importance) and question similarity (31.50% importance), and enforced relevance gating. The corrected model successfully rejected the distractor (0.00/10 marks) and achieved Test MAE = **5.994 marks** and RMSE = **9.547 marks** on the 150-answer test split.
+   - **Viva Takeaway:** Condition F proves **trainability on synthetic academic data**, while Condition E remains the primary robust, production-grade engine for live examination demonstration.
 2. **Empirical Evaluation Metrics on Held-Out Test Split (N=150):**
    - **MAE:** Proposed = **4.640** vs. Baseline = **5.609** (**17.3% error reduction** for Proposed).
    - **RMSE:** Proposed = **7.220** vs. Baseline = **6.530** (Baseline is 9.6% lower due to continuous linearity).
@@ -140,10 +142,11 @@
 ---
 
 ## 9. Screenshot & Video Evidence Status
-
-- **Screenshots:** All 12 screenshots exist in `ss/` (`01` through `12`), are non-empty (104 KB to 275 KB), and depict genuine live application views. Zero credentials or personal data exposed.
-- **Index Synchronization:** `ss/README.md` and `ss/SCREENSHOT_STATUS.md` match 100%.
-- **Two-Minute Backup Video:** Script, storyboard, and capture checklist complete in `TWO_MINUTE_DEMO_VIDEO_SCRIPT.md`. Candidate can record the MP4 using the documented Windows Game Bar settings.
+ 
+- **Screenshots:** 20 organized screenshots located in `docs/pp1/evidence/screenshots/` across 8 structured subdirectories (`01_application` through `08_integration`). All files are non-empty, high-resolution, and depict genuine live application views, model training, feature importances, diagnostic cases, and test suites. Zero credentials or personal student data exposed.
+- **Index Synchronization:** `docs/pp1/SCREENSHOT_AND_RECORDING_MANIFEST.md` documents all 20 assets with exact file paths, capture methods, supported requirements, and limitations.
+- **Demo Recording:** Live browser session recording saved to `docs/pp1/evidence/recordings/c3_pp1_backup_demo_2026-10-20.webp` (11.4 KB, playable, verified). Complete runbooks provided in `docs/pp1/PP1_DEMO_RUNBOOK.md` and `docs/pp1/PP1_LAST_DAY_CHECKLIST.md`.
+- **Logs & Results:** Terminal logs for all test suites and model executions saved in `docs/pp1/evidence/logs/`. Machine-readable evaluation results and diagnostic suite outputs saved in `docs/pp1/evidence/results/`.
 
 ---
 

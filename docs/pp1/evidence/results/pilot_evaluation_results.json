@@ -1,0 +1,85 @@
+{
+  "evaluation_timestamp": "2026-10-20 11:37:19 UTC",
+  "dataset_split": "test",
+  "sample_size": 150,
+  "total_evaluation_time_sec": 0.22,
+  "metrics": {
+    "rubric_aware_pipeline": {
+      "mean_absolute_error_mae": 4.64,
+      "root_mean_squared_error_rmse": 7.22,
+      "pearson_correlation_r": 0.7243,
+      "tolerance_agreement_rate_pct": 56.0
+    },
+    "token_overlap_baseline": {
+      "mean_absolute_error_mae": 5.609,
+      "root_mean_squared_error_rmse": 6.53,
+      "pearson_correlation_r": 0.7704
+    },
+    "concept_diagnosis": {
+      "mean_precision_pct": 90.9,
+      "mean_recall_pct": 98.0,
+      "f1_score_pct": 94.3
+    },
+    "structural_validity": {
+      "feedback_validity_rate_pct": 100.0,
+      "mindmap_validity_rate_pct": 100.0
+    },
+    "latency_ms": {
+      "mean_latency_ms": 0.32,
+      "median_latency_ms": 0.27,
+      "p95_latency_ms": 0.5
+    }
+  },
+  "quality_breakdown": {
+    "FULL": {
+      "count": 25,
+      "mean_ground_truth": 13.96,
+      "mean_predicted": 9.96,
+      "mean_baseline": 8.27,
+      "mae": 4.0
+    },
+    "MOSTLY_CORRECT": {
+      "count": 25,
+      "mean_ground_truth": 12.06,
+      "mean_predicted": 4.46,
+      "mean_baseline": 6.58,
+      "mae": 7.6
+    },
+    "PARTIAL": {
+      "count": 25,
+      "mean_ground_truth": 10.22,
+      "mean_predicted": 5.18,
+      "mean_baseline": 3.88,
+      "mae": 5.04
+    },
+    "MISSING_CONCEPT": {
+      "count": 25,
+      "mean_ground_truth": 12.06,
+      "mean_predicted": 8.86,
+      "mean_baseline": 6.37,
+      "mae": 3.2
+    },
+    "MISCONCEPTION": {
+      "count": 25,
+      "mean_ground_truth": 12.06,
+      "mean_predicted": 8.06,
+      "mean_baseline": 6.57,
+      "mae": 4.0
+    },
+    "IRRELEVANT": {
+      "count": 25,
+      "mean_ground_truth": 4.0,
+      "mean_predicted": 0.0,
+      "mean_baseline": 1.91,
+      "mae": 4.0
+    }
+  },
+  "experimental_conditions_status": {
+    "A_LLM_only": "NOT_STARTED (Deferred Viva Boundary)",
+    "B_LLM_Rubric": "NOT_STARTED (Deferred Viva Boundary)",
+    "C_Vector_RAG": "NOT_STARTED (Deferred Viva Boundary)",
+    "D_GraphRAG": "NOT_STARTED (Deferred Viva Boundary)",
+    "E_Concept_Evidence_Rubric": "IMPLEMENTED & EVALUATED (Canonical Baseline v1)",
+    "F_Full_Combined": "NOT_STARTED (Deferred Viva Boundary)"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "model_name": "C3 Corrected Supervised Semantic Scoring Regressor",
+  "version": "2.0.0 (Length-Bias Corrected)",
+  "model_type": "GradientBoostingRegressor(n_estimators=80, max_depth=2, lr=0.08, subsample=0.8)",
+  "train_samples": 702,
+  "train_questions": 117,
+  "test_samples": 150,
+  "test_questions": 25,
+  "train_mae": 7.256,
+  "train_rmse": 10.71,
+  "test_mae": 5.994,
+  "test_rmse": 9.547,
+  "test_pearson_r": 0.282,
+  "tolerance_le_2_marks_pct": 53.3,
+  "tolerance_le_15_pct_pct": 53.3,
+  "distractor_score_out_of_10": 0.0,
+  "artifact_path": "C:\\Users\\M S I\\Desktop\\Reserach\\DEVELOPMENT\\ADAPTIVE_LEARN_SE\\ai-services\\c3\\models\\c3_scoring_regressor_corrected.joblib"
+}

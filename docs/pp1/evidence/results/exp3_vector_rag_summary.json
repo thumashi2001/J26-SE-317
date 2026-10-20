@@ -1,0 +1,15 @@
+{
+  "experiment_id": "EXP-03-VECTOR-RAG",
+  "description": "Vector-RAG assessment grounded in retrieved curriculum passages",
+  "model": "mock-gpt4o",
+  "sample_size": 150,
+  "mae": 4.5127,
+  "rmse": 6.2105,
+  "tolerance_within_2_marks_pct": 47.33,
+  "irrelevant_distractor_rejection": "15/15",
+  "mean_chunks_retrieved": 1.52,
+  "total_runtime_seconds": 0.15,
+  "mean_latency_ms": 12.24,
+  "total_tokens": 89211,
+  "output_csv": "C:\\Users\\M S I\\Desktop\\Reserach\\DEVELOPMENT\\ADAPTIVE_LEARN_SE\\ai-services\\c3\\experiments\\results\\raw_predictions_exp3_vector_rag.csv"
+}

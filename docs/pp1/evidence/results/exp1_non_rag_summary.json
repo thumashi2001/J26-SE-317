@@ -1,0 +1,14 @@
+{
+  "experiment_id": "EXP-01-NON-RAG-LLM",
+  "description": "Direct Non-RAG LLM scoring without external curriculum context",
+  "model": "mock-gpt4o",
+  "sample_size": 150,
+  "mae": 4.8587,
+  "rmse": 6.3535,
+  "tolerance_within_2_marks_pct": 38.67,
+  "irrelevant_distractor_rejection": "15/15",
+  "total_runtime_seconds": 0.03,
+  "mean_latency_ms": 12.15,
+  "total_tokens": 63492,
+  "output_csv": "C:\\Users\\M S I\\Desktop\\Reserach\\DEVELOPMENT\\ADAPTIVE_LEARN_SE\\ai-services\\c3\\experiments\\results\\raw_predictions_exp1_non_rag_llm.csv"
+}

@@ -1,0 +1,183 @@
+{
+  "project": "AdaptiveLearnSE",
+  "component": "Component 3 (AI-Powered Automated Marking & Answer Analysis System)",
+  "timestamp": "2026-10-20 17:07:20",
+  "total_suite_runtime_seconds": 1.04,
+  "dataset_split": "test_set.csv (25 Questions, 150 Answers, Zero-Leakage)",
+  "benchmarks": {
+    "lexical_token_baseline": {
+      "mae": 5.609,
+      "rmse": 6.53,
+      "tolerance_within_2_marks": 20.7,
+      "irrelevant_rejection": "0/25 (Over-predicted passing mark)"
+    },
+    "condition_e_rubric_engine": {
+      "mae": 4.64,
+      "rmse": 7.22,
+      "tolerance_within_2_marks": 56.0,
+      "irrelevant_rejection": "25/25 (100% rejection rate)"
+    },
+    "condition_f_trainable_model_v2": {
+      "mae": 5.994,
+      "rmse": 9.547,
+      "tolerance_within_2_marks": 53.3,
+      "irrelevant_rejection": "25/25 (100% rejection rate)"
+    },
+    "experiment_1_non_rag_llm": {
+      "mae": 4.8587,
+      "rmse": 6.3535,
+      "tolerance_within_2_marks": 38.67,
+      "irrelevant_rejection": "15/15"
+    },
+    "experiment_2_rubric_aligned_llm": {
+      "mae": 4.5887,
+      "rmse": 6.2352,
+      "tolerance_within_2_marks": 43.33,
+      "irrelevant_rejection": "15/15"
+    },
+    "experiment_3_vector_rag": {
+      "mae": 4.5127,
+      "rmse": 6.2105,
+      "tolerance_within_2_marks": 47.33,
+      "irrelevant_rejection": "15/15",
+      "mean_chunks_retrieved": 1.52
+    },
+    "experiment_4_graph_rag": {
+      "mae": 4.5813,
+      "rmse": 6.2302,
+      "tolerance_within_2_marks": 43.33,
+      "irrelevant_rejection": "15/15",
+      "mean_graph_nodes": 0.08
+    },
+    "experiment_5_multi_llm": [
+      {
+        "model_identifier": "mock-gpt4o",
+        "model_label": "Model A (GPT-4o Class)",
+        "sample_size": 150,
+        "mae": 4.586,
+        "rmse": 6.2343,
+        "tolerance_within_2_marks_pct": 44.0,
+        "mean_latency_ms": 12.16,
+        "total_runtime_seconds": 0.03
+      },
+      {
+        "model_identifier": "mock-claude-3-5-sonnet",
+        "model_label": "Model B (Claude 3.5 Sonnet Class)",
+        "sample_size": 150,
+        "mae": 4.956,
+        "rmse": 6.3788,
+        "tolerance_within_2_marks_pct": 37.33,
+        "mean_latency_ms": 12.15,
+        "total_runtime_seconds": 0.03
+      },
+      {
+        "model_identifier": "mock-llama-3-8b",
+        "model_label": "Model C (Llama 3 8B Open Weights Class)",
+        "sample_size": 150,
+        "mae": 5.1373,
+        "rmse": 6.4699,
+        "tolerance_within_2_marks_pct": 33.33,
+        "mean_latency_ms": 12.16,
+        "total_runtime_seconds": 0.03
+      }
+    ]
+  },
+  "diagnostic_robustness_suite": [
+    {
+      "case_id": "CASE-1-CORRECT",
+      "description": "Relevant Correct Answer",
+      "expected_ground_truth": 10.0,
+      "scores": {
+        "token_overlap_baseline": 4.86,
+        "condition_e_rubric_engine": 10.0,
+        "condition_f_v1_length_biased": 9.99,
+        "condition_f_v2_corrected": 10.0
+      },
+      "evaluation_verdict": {
+        "condition_e_passed": true,
+        "condition_f_v1_passed": true,
+        "condition_f_v2_passed": true
+      }
+    },
+    {
+      "case_id": "CASE-2-PARTIAL",
+      "description": "Partially Correct Answer (Only Statement Coverage)",
+      "expected_ground_truth": 3.0,
+      "scores": {
+        "token_overlap_baseline": 2.86,
+        "condition_e_rubric_engine": 3.0,
+        "condition_f_v1_length_biased": 9.99,
+        "condition_f_v2_corrected": 10.0
+      },
+      "evaluation_verdict": {
+        "condition_e_passed": true,
+        "condition_f_v1_passed": false,
+        "condition_f_v2_passed": false
+      }
+    },
+    {
+      "case_id": "CASE-3-IRRELEVANT-SHORT",
+      "description": "Completely Irrelevant Answer of Comparable Length",
+      "expected_ground_truth": 0.0,
+      "scores": {
+        "token_overlap_baseline": 1.14,
+        "condition_e_rubric_engine": 0.0,
+        "condition_f_v1_length_biased": 9.99,
+        "condition_f_v2_corrected": 0.0
+      },
+      "evaluation_verdict": {
+        "condition_e_passed": true,
+        "condition_f_v1_passed": false,
+        "condition_f_v2_passed": true
+      }
+    },
+    {
+      "case_id": "CASE-4-IRRELEVANT-LONG",
+      "description": "Long Irrelevant Distractor Answer (Roman Empire History)",
+      "expected_ground_truth": 0.0,
+      "scores": {
+        "token_overlap_baseline": 1.14,
+        "condition_e_rubric_engine": 0.0,
+        "condition_f_v1_length_biased": 9.99,
+        "condition_f_v2_corrected": 0.0
+      },
+      "evaluation_verdict": {
+        "condition_e_passed": true,
+        "condition_f_v1_passed": false,
+        "condition_f_v2_passed": true
+      }
+    },
+    {
+      "case_id": "CASE-5-INCORRECT-REASONING",
+      "description": "Answer Containing Keywords but Inverted / Incorrect Reasoning",
+      "expected_ground_truth": 0.0,
+      "scores": {
+        "token_overlap_baseline": 3.14,
+        "condition_e_rubric_engine": 7.0,
+        "condition_f_v1_length_biased": 9.99,
+        "condition_f_v2_corrected": 10.0
+      },
+      "evaluation_verdict": {
+        "condition_e_passed": false,
+        "condition_f_v1_passed": false,
+        "condition_f_v2_passed": false
+      }
+    },
+    {
+      "case_id": "CASE-6-EMPTY",
+      "description": "Empty / Whitespace-Only Answer",
+      "expected_ground_truth": 0.0,
+      "scores": {
+        "token_overlap_baseline": 0.0,
+        "condition_e_rubric_engine": 0.0,
+        "condition_f_v1_length_biased": 9.99,
+        "condition_f_v2_corrected": 0.0
+      },
+      "evaluation_verdict": {
+        "condition_e_passed": true,
+        "condition_f_v1_passed": false,
+        "condition_f_v2_passed": true
+      }
+    }
+  ]
+}

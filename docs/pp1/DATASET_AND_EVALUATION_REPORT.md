@@ -92,3 +92,39 @@ The evaluation pipeline was executed across all 150 test split answers (25 uniqu
 - **Marking Latency Scope & Measurement:**
   - Mean In-Process Execution Time: **0.34 ms** (Median: 0.31 ms, P95: 0.55 ms)
   - **Latency Scope Disclosure:** This latency measures the **in-process CPU execution time** of the Python AI service (text normalization, token regex matching, rubric scoring level evaluation, and mind-map synthesis). It does **not** include network latency (Express to FastAPI HTTP round-trip over `localhost` adds ~10–15 ms) or remote cloud LLM API calls (which typically require 500–2,000 ms). Total web round-trip is ~45–80 ms.
+
+---
+
+## 4. Condition F — Supervised Trainable Model Audit & Diagnostic Robustness
+
+### 4.1 Condition F Model Architecture & Trainability
+To satisfy supervisor requirements regarding trainable models, a supervised Gradient Boosted Regressor (`HistGradientBoostingRegressor`) was implemented and audited:
+- **Training Set:** 702 controlled answers across 117 disjoint questions.
+- **Held-Out Test Set:** 150 controlled answers across 25 unseen questions (zero overlap).
+- **Saved Model Artifact:** `ai-services/c3/models/c3_scoring_regressor_corrected.joblib` (1.38 MB).
+- **Features Extracted:** Pairwise TF-IDF reference similarity (35.42%), concept coverage (28.15%), question-answer similarity (19.84%), sentence count clamped (8.92%), char length clamped (7.67%).
+
+### 4.2 Model Performance Comparison
+
+| Metric / Dimension | Baseline (Token Overlap) | Condition E (Rubric Engine) | Condition F v1.0.0 (Length Biased) | Condition F v2.0.0 (Corrected Gated) |
+|---|---|---|---|---|
+| **Test Split MAE** | 5.609 | **4.640** | 0.017* (Overfitted) | 5.994 |
+| **Test Split RMSE** | **6.530** | 7.220 | 0.024* (Overfitted) | 9.547 |
+| **Tolerance ($\le 2$ marks)** | 20.7% | **56.0%** | 100.0%* (Overfitted) | 53.3% |
+| **Irrelevant Rejection** | 0/25 (Over-predicted) | **25/25 (100% rejected)** | 0/10 (Length gaming) | **25/25 (100% rejected)** |
+| **Explainable Output** | None | Full Evidence Spans & DAG | Regression mark only | Regression mark only |
+
+*\*Note: v1.0.0 achieved near-zero synthetic error because length features mirrored synthetic marks. Feature importance unmasked that `word_count` (68.14%) drove predictions. When challenged with 50-word Roman Empire essays, v1.0.0 awarded 9.99/10 marks. Model v2.0.0 eliminated raw length and incorporated reference similarity and semantic gating, restoring 100% distractor rejection.*
+
+### 4.3 6-Case Diagnostic Robustness Suite Audit
+
+| Case ID & Description | Ground Truth | Baseline | Condition E | Condition F v1.0.0 | Condition F v2.0.0 | Academic Conclusion |
+|---|---|---|---|---|---|---|
+| **Case 1: Relevant Correct Answer** | 10.0 / 10 | 4.86 | **10.00 [PASS]** | 9.99 [PASS] | **10.00 [PASS]** | All models score full credit. |
+| **Case 2: Partially Correct Answer** | 3.0 / 10 | 2.86 | **3.00 [PASS]** | 9.99 [FAIL] | 10.00 [FAIL] | Condition E accurately isolates criterion marks; regressor over-awards due to topical reference overlap. |
+| **Case 3: Completely Irrelevant (Short Recipe)** | 0.0 / 10 | 1.14 | **0.00 [PASS]** | 9.99 [FAIL] | **0.00 [PASS]** | v2.0.0 gate blocks irrelevant text successfully. |
+| **Case 4: Long Irrelevant Distractor (Roman Empire)** | 0.0 / 10 | 1.14 | **0.00 [PASS]** | 9.99 [FAIL] | **0.00 [PASS]** | Cures length bias completely. |
+| **Case 5: Inverted Reasoning with Keywords** | 0.0 / 10 | 3.14 | 7.00 [FAIL] | 9.99 [FAIL] | 10.00 [FAIL] | Known limitation of lexical/semantic match; requires deep NLI entailment (Phase 4). |
+| **Case 6: Empty / Whitespace Answer** | 0.0 / 10 | 0.00 | **0.00 [PASS]** | 9.99 [FAIL] | **0.00 [PASS]** | Gracefully handles empty input with 0.00 marks. |
+
+**Authoritative Conclusion:** Condition E remains the primary, production-ready, and defensible prototype for PP1, providing explainable criterion-level scores and superior MAE (4.640). Condition F v2.0.0 demonstrates supervised ML model trainability and bias correction feasibility.

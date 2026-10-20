@@ -1,0 +1,14 @@
+{
+  "experiment_id": "EXP-02-RUBRIC-ALIGNED-LLM",
+  "description": "Rubric-aligned LLM evaluation with explicit criterion-level constraints",
+  "model": "mock-gpt4o",
+  "sample_size": 150,
+  "mae": 4.5887,
+  "rmse": 6.2352,
+  "tolerance_within_2_marks_pct": 43.33,
+  "irrelevant_distractor_rejection": "15/15",
+  "total_runtime_seconds": 0.03,
+  "mean_latency_ms": 12.16,
+  "total_tokens": 72762,
+  "output_csv": "C:\\Users\\M S I\\Desktop\\Reserach\\DEVELOPMENT\\ADAPTIVE_LEARN_SE\\ai-services\\c3\\experiments\\results\\raw_predictions_exp2_rubric_aligned_llm.csv"
+}

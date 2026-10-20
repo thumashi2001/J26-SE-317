@@ -75,8 +75,17 @@
 
 ---
 
-### DEC-07: Deferral of Conditions A–D & F Beyond PP1 Boundary
-- **Decision:** Implement and empirically evaluate Condition E (Deterministic Concept Evidence + Rubric) as the authoritative active baseline prototype for PP1. Document Conditions A (LLM-only), B (LLM+Rubric), C (Vector-RAG), D (GraphRAG), and F (Multimodal Ensemble) as planned post-PP1 research conditions.
-- **Why:** Upholds academic honesty. Running unvalidated external LLM experiments without complete parameter tuning would compromise viva integrity.
-- **Evidence:** Transparently logged in `DATASET_AND_EVALUATION_REPORT.md` and verified in `run_evaluation.py`.
-- **Status:** **DESIGN DECISION & VIVA BOUNDARY**
+### DEC-07: Authoritative PP1 Status of Research Conditions A–F
+- **Decision:** Implement and empirically evaluate Condition E (Deterministic Concept Evidence + Rubric) as the primary explainable prototype, and Condition F (Supervised Gradient Boosted Regressor) as a trained model feasibility demonstration for PP1. Conditions A & B are restricted per supervisor directive COM-07 (prohibiting uncalibrated zero-shot LLM claims); Condition C is deferred to Phase 4 (lecture slide embeddings); Condition D is blocked by unpopulated external CCKG Neo4j schemas.
+- **Why:** Upholds strict academic honesty and supervisor directives.
+- **Evidence:** `docs/pp1/EXPERIMENT_A_TO_F_TRACEABILITY.md` and `docs/pp1/FINAL_PP1_REQUIREMENTS_AND_EVIDENCE_MATRIX.md`.
+- **Status:** **VERIFIED FACT & AUTHORITATIVE PP1 BOUNDARY**
+
+---
+
+### DEC-08: Correction of Length Bias in Supervised Scoring Model (Condition F)
+- **Decision:** Reject initial Condition F model (v1.0.0) after feature importance inspection revealed `word_count` (68.14%) drove predictions, causing it to award 9.99/10 marks to out-of-domain historical text. Implement corrected model (v2.0.0) removing raw unnormalized length, introducing pairwise TF-IDF reference similarity (35.42% importance), and enforcing semantic gating.
+- **Why:** Prevents student gaming via length inflation and restores 100% irrelevant distractor rejection (0.00 marks).
+- **Evidence:** Documented in `ai-services/c3/experiments/train_semantic_model_corrected.py`, `results/trainable_model_summary_corrected.json`, and `results/diagnostic_suite_results.json`.
+- **Status:** **VERIFIED FACT & EMPIRICAL CONTRIBUTION**
+

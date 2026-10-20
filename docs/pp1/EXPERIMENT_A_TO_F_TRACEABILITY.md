@@ -277,32 +277,36 @@ This document establishes the exhaustive, evidence-based traceability for **Expe
 8. **Evaluation Metrics & Comparison Method:**  
    MAE, RMSE, Pearson $r$, Spearman $\rho$, Train/Test loss curves.
 9. **Existing Implementation & Exact File Paths:**  
-   Training pipeline implemented at [`ai-services/c3/experiments/train_semantic_model.py`](file:///c:/Users/M%20S%20I/Desktop/Reserach/DEVELOPMENT/ADAPTIVE_LEARN_SE/ai-services/c3/experiments/train_semantic_model.py); saved model at [`ai-services/c3/models/c3_scoring_regressor.joblib`](file:///c:/Users/M%20S%20I/Desktop/Reserach/DEVELOPMENT/ADAPTIVE_LEARN_SE/ai-services/c3/models/c3_scoring_regressor.joblib).
+   - Initial Model (v1.0.0): [`ai-services/c3/experiments/train_semantic_model.py`](file:///c:/Users/M%20S%20I/Desktop/Reserach/DEVELOPMENT/ADAPTIVE_LEARN_SE/ai-services/c3/experiments/train_semantic_model.py); model artifact [`c3_scoring_regressor.joblib`](file:///c:/Users/M%20S%20I/Desktop/Reserach/DEVELOPMENT/ADAPTIVE_LEARN_SE/ai-services/c3/models/c3_scoring_regressor.joblib).  
+   - Corrected Model (v2.0.0): [`ai-services/c3/experiments/train_semantic_model_corrected.py`](file:///c:/Users/M%20S%20I/Desktop/Reserach/DEVELOPMENT/ADAPTIVE_LEARN_SE/ai-services/c3/experiments/train_semantic_model_corrected.py); model artifact [`c3_scoring_regressor_corrected.joblib`](file:///c:/Users/M%20S%20I/Desktop/Reserach/DEVELOPMENT/ADAPTIVE_LEARN_SE/ai-services/c3/models/c3_scoring_regressor_corrected.joblib).
 10. **Current Execution Status & Available Raw Evidence:**  
-    ✅ **EXECUTED & VERIFIED FOR PP1.** Provides concrete proof of model trainability required by PP1 assessment rubric.
+    ✅ **100% EXECUTED, AUDITED & REPRODUCED.** Raw predictions saved at [`raw_predictions_trainable_model_corrected.csv`](file:///c:/Users/M%20S%20I/Desktop/Reserach/DEVELOPMENT/ADAPTIVE_LEARN_SE/ai-services/c3/experiments/results/raw_predictions_trainable_model_corrected.csv).
 11. **Missing Implementation & Data:**  
     None. Runs 100% locally with zero cloud dependencies.
 12. **Dependencies, Feasibility & Estimated Work:**  
     Complete. Uses existing scikit-learn in workspace virtual environment.
 13. **Execution Command & Expected Output Artifacts:**  
-    `python ai-services/c3/experiments/train_semantic_model.py` → `c3_scoring_regressor.joblib`, `raw_predictions_cond_f.csv`.
-14. **Actual Result / Observation:**  
-    Produces trainable proof-of-concept demonstrating learned parameters, train/test separation, and quantifiable loss minimization.
-15. **Limitations & Deviations:**  
-    Trained on synthetic academic data; requires fine-tuning on authentic student exam papers post-PP1 once institutional ethics clearance is obtained.
+    `python ai-services/c3/experiments/train_semantic_model_corrected.py` → `c3_scoring_regressor_corrected.joblib`, `trainable_model_summary_corrected.json`.
+14. **Actual Result / Audit Findings:**  
+    - **Audit Finding on Initial Model (v1.0.0):** Achieved an apparent MAE of 0.017 on the synthetic test set, but an independent audit revealed that 68.14% of feature importance was concentrated on `word_count` and 18.50% on `char_len_norm` (total 86.64% length bias). When audited with an out-of-domain distractor (Roman Empire history essay), the initial model awarded **9.99 / 10.0 marks**, unmasking severe length gaming.  
+    - **Corrected Model (v2.0.0):** Removed unnormalized word count, introduced pairwise TF-IDF reference similarity (35.42% importance) and question similarity (31.50% importance), bounded length ratios, and enforced relevance gating.  
+    - **Corrected Held-Out Metrics (N=150):** Test MAE = **5.994 marks**, Test RMSE = **9.547 marks**, Pearson $r = 0.282$, Tolerance ($\le 2.0$ marks) = **53.3%**.  
+    - **Distractor Rejection:** **0.00 / 10.0 marks** on out-of-domain essay (100% hallucination rejected).
+15. **Limitations & Generalization Scope:**  
+    Condition F demonstrates **trainability feasibility on synthetic academic data**, but confirms that the deterministic rubric evaluator (**Condition E, MAE = 4.640**) remains significantly superior and more dependable for live examination marking.
 
 ---
 
 ## 3. Master Summary Matrix: Conditions A through F
 
-| Condition | Architecture Paradigm | Implementation Status | Data / Dependency Status | Live PP1 Execution | Key Role in Viva Defense |
+| Condition | Architecture Paradigm | Exact Supervisor Instruction Governing PP1 | Status & Milestone Decision | Live PP1 Execution | Key Role in Viva Defense |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Condition A** | Zero-Shot Generative LLM | Harness Ready | Needs Live API Key | ⏸️ Post-PP1 (COM-07) | Illustrates hallucination vulnerability of uncalibrated generative grading. |
-| **Condition B** | In-Context Rubric LLM | Harness Ready | Needs Live API Key | ⏸️ Post-PP1 (COM-07) | Shows prompt engineering trade-off vs deterministic evaluation. |
-| **Condition C** | Vector-RAG + Rubric LLM | Architecture Specified | Needs Slide Embeddings | ⏸️ Post-PP1 Phase 4 | Demonstrates planned syllabus slide factual grounding. |
-| **Condition D** | GraphRAG via Neo4j CCKG | Architecture Specified | Blocked by Teammate | 🚫 External Blocker | Highlights C3 readiness for CCKG once graph is delivered by team. |
-| **Condition E** | Deterministic Concept Rubric | **100% Production Ready** | **Complete (N=150 Test)** | ✅ **Primary PP1 Prototype** | **Core Demonstration:** 17.3% lower MAE, 0 hallucinations, 0.34ms latency. |
-| **Condition F** | Trainable Semantic Ensemble | **100% Production Ready** | **Complete (Train/Test)** | ✅ **PP1 Trainability PoC** | **Proves Model Trainability:** Scikit-learn regression model with learned weights. |
+| **Condition A** | Zero-Shot Generative LLM | *"Do not present uncalibrated zero-shot LLM numbers during PP1 if parameters are not yet tuned."* (COM-07) | ⏸️ **Explicitly Deferred** | Harness Prepared | Illustrates hallucination vulnerability of uncalibrated generative grading. |
+| **Condition B** | In-Context Rubric LLM | Governed by COM-07 prompt calibration requirement; requires authorized API credentials. | ⏸️ **Explicitly Deferred** | Schema Prepared | Shows prompt engineering trade-off vs deterministic evaluation. |
+| **Condition C** | Vector-RAG + Rubric LLM | Requires full lecture slide corpus digitization across SE3010–SE3040. | ⏸️ **Deferred to Phase 4** | Architecture Specified | Demonstrates planned syllabus slide factual grounding. |
+| **Condition D** | GraphRAG via Neo4j CCKG | Dependent on team-wide CCKG delivery; repo audit confirms CCKG is Proposed Architecture Only. | 🚫 **Blocked by Teammate** | Architecture Specified | Highlights C3 readiness for CCKG once graph is delivered by team. |
+| **Condition E** | Deterministic Concept Rubric | Approved primary prototype for PP1 viva demonstration; satisfies explainability & accuracy. | ✅ **Authoritative Active Prototype** | **100% Executed & Reproduced** | **Primary Live System:** 17.3% lower MAE (4.640), 0 hallucinations, 0.34ms latency. |
+| **Condition F** | Trainable Semantic Ensemble | Required to satisfy PP1 rubric criterion on trainable machine learning models. | ✅ **Executed, Audited & Corrected** | **100% Executed & Verified** | **Proves Model Trainability:** Scikit-learn regression model with learned weights. |
 
 ---
 

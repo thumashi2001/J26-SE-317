@@ -1,0 +1,37 @@
+{
+  "experiment_id": "EXP-05-MULTI-LLM-COMPARISON",
+  "description": "Cross-architecture comparison of LLM candidates under identical rubric prompt constraints",
+  "models_evaluated": [
+    {
+      "model_identifier": "mock-gpt4o",
+      "model_label": "Model A (GPT-4o Class)",
+      "sample_size": 150,
+      "mae": 4.586,
+      "rmse": 6.2343,
+      "tolerance_within_2_marks_pct": 44.0,
+      "mean_latency_ms": 12.16,
+      "total_runtime_seconds": 0.03
+    },
+    {
+      "model_identifier": "mock-claude-3-5-sonnet",
+      "model_label": "Model B (Claude 3.5 Sonnet Class)",
+      "sample_size": 150,
+      "mae": 4.956,
+      "rmse": 6.3788,
+      "tolerance_within_2_marks_pct": 37.33,
+      "mean_latency_ms": 12.15,
+      "total_runtime_seconds": 0.03
+    },
+    {
+      "model_identifier": "mock-llama-3-8b",
+      "model_label": "Model C (Llama 3 8B Open Weights Class)",
+      "sample_size": 150,
+      "mae": 5.1373,
+      "rmse": 6.4699,
+      "tolerance_within_2_marks_pct": 33.33,
+      "mean_latency_ms": 12.16,
+      "total_runtime_seconds": 0.03
+    }
+  ],
+  "output_csv": "C:\\Users\\M S I\\Desktop\\Reserach\\DEVELOPMENT\\ADAPTIVE_LEARN_SE\\ai-services\\c3\\experiments\\results\\raw_predictions_exp5_multi_llm.csv"
+}

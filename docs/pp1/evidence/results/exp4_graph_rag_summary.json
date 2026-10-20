@@ -1,0 +1,15 @@
+{
+  "experiment_id": "EXP-04-GRAPHRAG-CCKG",
+  "description": "GraphRAG assessment grounded in CCKG curriculum ontology and prerequisite graph",
+  "model": "mock-gpt4o",
+  "sample_size": 150,
+  "mae": 4.5813,
+  "rmse": 6.2302,
+  "tolerance_within_2_marks_pct": 43.33,
+  "irrelevant_distractor_rejection": "15/15",
+  "mean_graph_nodes": 0.08,
+  "total_runtime_seconds": 0.03,
+  "mean_latency_ms": 12.15,
+  "total_tokens": 73808,
+  "output_csv": "C:\\Users\\M S I\\Desktop\\Reserach\\DEVELOPMENT\\ADAPTIVE_LEARN_SE\\ai-services\\c3\\experiments\\results\\raw_predictions_exp4_graph_rag.csv"
+}

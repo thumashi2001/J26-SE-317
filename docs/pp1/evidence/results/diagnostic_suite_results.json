@@ -1,0 +1,98 @@
+[
+  {
+    "case_id": "CASE-1-CORRECT",
+    "description": "Relevant Correct Answer",
+    "expected_ground_truth": 10.0,
+    "scores": {
+      "token_overlap_baseline": 4.86,
+      "condition_e_rubric_engine": 10.0,
+      "condition_f_v1_length_biased": 9.99,
+      "condition_f_v2_corrected": 10.0
+    },
+    "evaluation_verdict": {
+      "condition_e_passed": true,
+      "condition_f_v1_passed": true,
+      "condition_f_v2_passed": true
+    }
+  },
+  {
+    "case_id": "CASE-2-PARTIAL",
+    "description": "Partially Correct Answer (Only Statement Coverage)",
+    "expected_ground_truth": 3.0,
+    "scores": {
+      "token_overlap_baseline": 2.86,
+      "condition_e_rubric_engine": 3.0,
+      "condition_f_v1_length_biased": 9.99,
+      "condition_f_v2_corrected": 10.0
+    },
+    "evaluation_verdict": {
+      "condition_e_passed": true,
+      "condition_f_v1_passed": false,
+      "condition_f_v2_passed": false
+    }
+  },
+  {
+    "case_id": "CASE-3-IRRELEVANT-SHORT",
+    "description": "Completely Irrelevant Answer of Comparable Length",
+    "expected_ground_truth": 0.0,
+    "scores": {
+      "token_overlap_baseline": 1.14,
+      "condition_e_rubric_engine": 0.0,
+      "condition_f_v1_length_biased": 9.99,
+      "condition_f_v2_corrected": 0.0
+    },
+    "evaluation_verdict": {
+      "condition_e_passed": true,
+      "condition_f_v1_passed": false,
+      "condition_f_v2_passed": true
+    }
+  },
+  {
+    "case_id": "CASE-4-IRRELEVANT-LONG",
+    "description": "Long Irrelevant Distractor Answer (Roman Empire History)",
+    "expected_ground_truth": 0.0,
+    "scores": {
+      "token_overlap_baseline": 1.14,
+      "condition_e_rubric_engine": 0.0,
+      "condition_f_v1_length_biased": 9.99,
+      "condition_f_v2_corrected": 0.0
+    },
+    "evaluation_verdict": {
+      "condition_e_passed": true,
+      "condition_f_v1_passed": false,
+      "condition_f_v2_passed": true
+    }
+  },
+  {
+    "case_id": "CASE-5-INCORRECT-REASONING",
+    "description": "Answer Containing Keywords but Inverted / Incorrect Reasoning",
+    "expected_ground_truth": 0.0,
+    "scores": {
+      "token_overlap_baseline": 3.14,
+      "condition_e_rubric_engine": 7.0,
+      "condition_f_v1_length_biased": 9.99,
+      "condition_f_v2_corrected": 10.0
+    },
+    "evaluation_verdict": {
+      "condition_e_passed": false,
+      "condition_f_v1_passed": false,
+      "condition_f_v2_passed": false
+    }
+  },
+  {
+    "case_id": "CASE-6-EMPTY",
+    "description": "Empty / Whitespace-Only Answer",
+    "expected_ground_truth": 0.0,
+    "scores": {
+      "token_overlap_baseline": 0.0,
+      "condition_e_rubric_engine": 0.0,
+      "condition_f_v1_length_biased": 9.99,
+      "condition_f_v2_corrected": 0.0
+    },
+    "evaluation_verdict": {
+      "condition_e_passed": true,
+      "condition_f_v1_passed": false,
+      "condition_f_v2_passed": true
+    }
+  }
+]
