@@ -67,13 +67,15 @@ export async function recordEvent(db, input, aiUrl) {
   all.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
   const start = new Date(all[0].timestamp);
   const toDay = (t) => Math.floor((new Date(t) - start) / DAY_MS) + 1;
-  const events = all.map((e) => ({
-    day: toDay(e.timestamp),
-    topic: e.topic,
-    correct: !!e.correct,
-    hint_used: !!e.hint_used,
-    time_sec: e.time_sec ?? 30,
-  }));
+  const events = all
+    .filter((e) => e.lifecycle_stage !== 'provisional')
+    .map((e) => ({
+      day: toDay(e.timestamp),
+      topic: e.topic,
+      correct: !!e.correct,
+      hint_used: !!e.hint_used,
+      time_sec: e.time_sec ?? 30,
+    }));
   const risk = await callAi(aiUrl, '/risk/predict', {
     student_id: studentId,
     as_of_day: toDay(when),

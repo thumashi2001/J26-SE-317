@@ -33,7 +33,7 @@ const dayKey = (t) => new Date(t).toISOString().slice(0, 10);
 export function answerReliability(ev) {
   let r = 1;
   if ((ev.tab_leaves || 0) > 0) r *= 0.5;
-  if (ev.type === 'quiz_answer' && ev.time_sec != null && ev.time_sec < FAST_SEC) r *= 0.6;
+  if ((ev.type === 'quiz_answer' || ev.type === 'diagnostic_answer') && ev.answered !== false && ev.time_sec != null && ev.time_sec < FAST_SEC) r *= 0.6;
   return r;
 }
 
@@ -95,14 +95,15 @@ export function engagementFrom(events, sessions, now = new Date()) {
 }
 
 export function confidenceFrom(topicEvents, daysSincePractice) {
-  const evidence = topicEvents.reduce((sum, e) => sum + answerReliability(e), 0);
-  const flagged = topicEvents.filter(isFlagged).length;
+  const confirmed = topicEvents.filter((e) => e.lifecycle_stage !== 'provisional');
+  const evidence = confirmed.reduce((sum, e) => sum + answerReliability(e), 0);
+  const flagged = confirmed.filter(isFlagged).length;
   const base = 1 - Math.exp(-evidence / 8);
   const recency = 0.6 + 0.4 * Math.exp(-Math.max(0, daysSincePractice) / 30);
   const value = round(100 * base * recency);
   const label = value >= 70 ? 'High' : value >= 40 ? 'Medium' : 'Low';
 
-  const n = topicEvents.length;
+  const n = confirmed.length;
   let why = `Based on ${plural(n, 'answer', 'answers')}`;
   if (flagged > 0) why += `, ${flagged} of them counted less (left the tab or answered very fast)`;
   why += '.';
@@ -146,10 +147,9 @@ export async function getInsights(db, studentId, aiUrl, now = new Date()) {
   topics.forEach(([topic, m], i) => {
     const daysSince = Math.max(0, (now.getTime() - when(m.last_practiced)) / DAY_MS);
     const estimated = estimates[i].status === 'fulfilled' ? estimates[i].value : null; // null if the AI service is down
-    const conf = confidenceFrom(
-      events.filter((e) => e.topic === topic),
-      daysSince
-    );
+    const topicEvents = events.filter((e) => e.topic === topic);
+    const conf = confidenceFrom(topicEvents, daysSince);
+    const quizEvents = topicEvents.filter((e) => e.type === 'quiz_answer');
     out[topic] = {
       storedScore: m.score,
       estimatedNow: estimated,
@@ -161,6 +161,10 @@ export async function getInsights(db, studentId, aiUrl, now = new Date()) {
       confidenceWhy: conf.why,
       answers: conf.answers,
       flaggedAnswers: conf.flagged,
+      quizAnswers: quizEvents.length,
+      hintsUsed: quizEvents.filter((e) => e.hint_used).length,
+      timeSpentSec: topicEvents.reduce((sum, e) => sum + (Number(e.time_sec) || 0), 0), // time spent answering questions in this topic
+      practiceSessions: sessions.filter((x) => x.topic === topic).length,
     };
   });
 
@@ -168,6 +172,11 @@ export async function getInsights(db, studentId, aiUrl, now = new Date()) {
     studentId,
     generatedAt: now.toISOString(),
     engagement: engagementFrom(events, sessions, now),
+    totals: {
+      timeSpentSec: Object.values(out).reduce((a, t) => a + t.timeSpentSec, 0),
+      hintsUsed: Object.values(out).reduce((a, t) => a + t.hintsUsed, 0),
+      quizAnswers: Object.values(out).reduce((a, t) => a + t.quizAnswers, 0),
+    },
     topics: out,
   };
 }
