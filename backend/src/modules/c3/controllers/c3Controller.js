@@ -70,8 +70,10 @@ export const assessAnswer = handle(async (req) => {
 
   let aiResult;
   if (isMcqPayload(payload)) {
+    payload.answer_type = 'mcq';
     aiResult = mcqSvc.evaluateMcqAnswer(payload);
   } else {
+    payload.answer_type = payload.answer_type || 'short';
     aiResult = await aiClient.assessAnswer(AI_URL(), payload);
   }
 

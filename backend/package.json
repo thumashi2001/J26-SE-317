@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "node --watch src/server.js",
-    "test": "node --test src/modules/c3/tests/c3.test.js"
+    "test": "node --test src/modules/c3/tests/*.test.js"
   },
   "dependencies": {
     "cors": "^2.8.6",

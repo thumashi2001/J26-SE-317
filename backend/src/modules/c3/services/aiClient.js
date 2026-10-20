@@ -4,15 +4,20 @@ export function httpError(status, message) {
   return err;
 }
 
-export async function callAi(aiUrl, path, body) {
+export async function callAi(aiUrl, path, body, options = {}) {
+  const timeoutMs = Number(options.timeoutMs || process.env.C3_AI_TIMEOUT_MS || 15000);
   let res;
   try {
     res = await fetch(`${aiUrl}${path}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
+      signal: AbortSignal.timeout(timeoutMs),
     });
   } catch (e) {
+    if (e.name === 'TimeoutError' || e.name === 'AbortError') {
+      throw httpError(504, `C3 AI service request timed out after ${timeoutMs}ms at ${aiUrl}${path}`);
+    }
     throw httpError(502, `C3 AI service unreachable at ${aiUrl}. Is it running?`);
   }
   
