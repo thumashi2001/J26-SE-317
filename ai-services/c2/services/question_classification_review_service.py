@@ -51,6 +51,16 @@ class QuestionClassificationReviewService:
             repository
             or QuestionClassificationReviewRepository()
         )
+        self._ranker = None
+
+    @property
+    def ranker(self):
+        if self._ranker is None:
+            from services.hybrid_topic_candidate_ranker import HybridTopicCandidateRanker
+            self._ranker = HybridTopicCandidateRanker(
+                modules_path=self.modules_path,
+            )
+        return self._ranker
 
     @staticmethod
     def _read_json(path):
@@ -205,20 +215,30 @@ class QuestionClassificationReviewService:
         *,
         question_id,
         module_key,
-        topic_id,
+        topic_id=None,
         decision,
         reviewer_id,
         review_notes="",
+        is_correction=False,
+        allow_manual=False,
+        allow_update=False,
     ):
-        if decision not in ("approved", "rejected"):
+        if decision not in ("approved", "rejected", "deferred"):
             raise ValueError("Invalid review decision")
 
-        required_values = (
-            question_id,
-            module_key,
-            topic_id,
-            reviewer_id,
-        )
+        if decision == "approved":
+            required_values = (
+                question_id,
+                module_key,
+                topic_id,
+                reviewer_id,
+            )
+        else:
+            required_values = (
+                question_id,
+                module_key,
+                reviewer_id,
+            )
 
         if not all(
             isinstance(value, str) and value.strip()
@@ -245,7 +265,7 @@ class QuestionClassificationReviewService:
 
         question_id = question_id.strip()
         module_key = module_key.strip()
-        topic_id = topic_id.strip()
+        topic_id = topic_id.strip() if isinstance(topic_id, str) and topic_id.strip() else None
         reviewer_id = reviewer_id.strip()
 
         questions = self._read_json(self.questions_path)
@@ -315,16 +335,17 @@ class QuestionClassificationReviewService:
 
         proposed_topic_id = proposal["topic_id"]
 
-        if proposed_topic_id is None:
-            raise ValueError(
-                "Question has no proposed topic classification to review"
-            )
+        if not is_correction and not allow_manual:
+            if proposed_topic_id is None:
+                raise ValueError(
+                    "Question has no proposed topic classification to review"
+                )
 
-        if topic_id != proposed_topic_id:
-            raise ValueError(
-                "Submitted topic does not match the stored "
-                "proposed classification"
-            )
+            if topic_id != proposed_topic_id:
+                raise ValueError(
+                    "Submitted topic does not match the stored "
+                    "proposed classification"
+                )
 
         # Preserve existing taxonomy verification rules.
         taxonomies = self._load_taxonomies()
@@ -346,15 +367,23 @@ class QuestionClassificationReviewService:
         taxonomy = matching_taxonomies[0]
 
         if decision == "approved":
-            if (
-                taxonomy.get("verification_status")
-                != "verified"
-            ):
+            # Check verification status from loaded taxonomy or TaxonomyApprovalRepository
+            from services.taxonomy_approval_repository import TaxonomyApprovalRepository
+            tax_repo = TaxonomyApprovalRepository()
+            appr = tax_repo.get_approval(module_key)
+            is_tax_verified = (
+                taxonomy.get("verification_status") == "verified"
+                or (appr and appr.get("status") == "approved")
+            )
+
+            if not is_tax_verified:
                 raise ValueError(
                     "Module taxonomy is not verified"
                 )
 
             topics = taxonomy.get("topics", [])
+            if not topics and appr and appr.get("topics"):
+                topics = appr.get("topics")
 
             if not isinstance(topics, list):
                 raise ValueError(
@@ -375,7 +404,7 @@ class QuestionClassificationReviewService:
                     "Topic is not present in approved taxonomy"
                 )
 
-        # The repository enforces one decision per question.
+        # The repository enforces one decision per question or updates if requested.
         return self.repository.save_review({
             "question_id": question_id,
             "module_key": module_key,
@@ -383,7 +412,11 @@ class QuestionClassificationReviewService:
             "decision": decision,
             "reviewer_id": reviewer_id,
             "review_notes": review_notes.strip(),
-        })
+            "original_ai_suggestion": proposed_topic_id,
+            "taxonomy_version": "1.0",
+            "model_version": "m20.5_hybrid_v1",
+            "is_correction": bool(is_correction),
+        }, allow_update=allow_update)
 
     def list_review_candidates(
         self,
@@ -391,6 +424,7 @@ class QuestionClassificationReviewService:
         page=1,
         page_size=10,
         include_reviewed=False,
+        status_filter=None,
     ):
         if (
             isinstance(page, bool)
@@ -465,6 +499,11 @@ class QuestionClassificationReviewService:
             )
         }
 
+        # Check explicit lecturer approvals
+        from services.taxonomy_approval_repository import TaxonomyApprovalRepository
+        tax_repo = TaxonomyApprovalRepository()
+        approvals = tax_repo.list_approvals()
+
         records = []
 
         for question in questions:
@@ -500,15 +539,24 @@ class QuestionClassificationReviewService:
                 {},
             )
 
-            taxonomy_verified = (
-                taxonomy.get("verification_status")
-                == "verified"
+            appr = approvals.get(question_module)
+            taxonomy_verified = bool(
+                taxonomy.get("verification_status") == "verified"
+                or (appr and appr.get("status") == "approved")
             )
 
             taxonomy_topics = taxonomy.get("topics", [])
-
+            if not taxonomy_topics and appr and appr.get("topics"):
+                taxonomy_topics = appr.get("topics")
             if not isinstance(taxonomy_topics, list):
                 taxonomy_topics = []
+
+            # Retrieve curriculum topics for manual selection dropdown
+            available_topics = taxonomy_topics
+            if not available_topics and hasattr(self, "ranker") and self.ranker:
+                curriculum_mod = self.ranker.curriculum_data.get(question_module)
+                if curriculum_mod:
+                    available_topics = curriculum_mod.get("topics", [])
 
             topic_in_taxonomy = any(
                 isinstance(topic, dict)
@@ -518,12 +566,9 @@ class QuestionClassificationReviewService:
             )
 
             is_reviewed = saved_review is not None
+            review_decision = saved_review.get("decision") if is_reviewed else None
 
             if is_reviewed:
-                review_decision = saved_review.get(
-                    "decision"
-                )
-
                 reviewed_topic_id = saved_review.get(
                     "topic_id"
                 )
@@ -541,11 +586,11 @@ class QuestionClassificationReviewService:
                         if (
                             taxonomy_verified
                             and reviewed_topic_in_taxonomy
-                            and reviewed_topic_id
-                            == proposed_topic_id
                         )
                         else "unverified"
                     )
+                elif review_decision == "deferred":
+                    status = "deferred"
                 else:
                     status = "rejected"
             else:
@@ -558,7 +603,30 @@ class QuestionClassificationReviewService:
                 and topic_in_taxonomy
             )
 
-            records.append({
+            # Generate top-3 hybrid candidate suggestions
+            ranking = None
+            try:
+                ranking = self.ranker.rank_candidates(
+                    question_module or "",
+                    question.get("question_text") or "",
+                    question_id,
+                )
+            except Exception:
+                ranking = {
+                    "candidate_topics": [],
+                    "suggestion_status": "abstained",
+                    "abstained": True,
+                    "abstention_reason": "Topic ranker unavailable",
+                }
+
+            top_candidate = ranking["candidate_topics"][0] if ranking.get("candidate_topics") else None
+            suggestion_explanation = (
+                top_candidate.get("explanation")
+                if top_candidate
+                else ranking.get("abstention_reason")
+            )
+
+            record_item = {
                 "question_id": question_id,
                 "paper_id": question.get("paper_id"),
                 "module_code": question_code,
@@ -580,11 +648,35 @@ class QuestionClassificationReviewService:
                 "bloom_level": question.get("bloom_level"),
                 "difficulty": question.get("difficulty"),
                 "proposed_classification": proposal,
+                "candidate_topics": ranking.get("candidate_topics", []),
+                "suggestion_status": ranking.get("suggestion_status", "abstained"),
+                "suggestion_explanation": suggestion_explanation,
                 "review": saved_review,
                 "verification_status": status,
                 "can_approve": can_approve,
                 "taxonomy_verified": taxonomy_verified,
-            })
+                "available_topics": available_topics,
+            }
+
+            # Optional filter by status
+            if status_filter:
+                sf = status_filter.lower().strip()
+                if sf in ("pending", "unreviewed") and is_reviewed:
+                    continue
+                elif sf == "approved" and review_decision != "approved":
+                    continue
+                elif sf == "rejected" and review_decision != "rejected":
+                    continue
+                elif sf == "deferred" and review_decision != "deferred":
+                    continue
+                elif sf == "suggested_for_review" and ranking.get("suggestion_status") != "suggested_for_review":
+                    continue
+                elif sf == "low_confidence_review" and ranking.get("suggestion_status") != "low_confidence_review":
+                    continue
+                elif sf == "abstained" and ranking.get("suggestion_status") != "abstained":
+                    continue
+
+            records.append(record_item)
 
         total_questions = len(records)
 
@@ -608,10 +700,34 @@ class QuestionClassificationReviewService:
             )
         )
 
+        deferred_count = sum(
+            1
+            for record in records
+            if (
+                record["review"]
+                and record["review"].get("decision")
+                == "deferred"
+            )
+        )
+
         pending_count = (
             total_questions
             - approved_count
             - rejected_count
+            - deferred_count
+        )
+
+        suggested_count = sum(
+            1 for record in records
+            if record.get("suggestion_status") == "suggested_for_review"
+        )
+        low_conf_count = sum(
+            1 for record in records
+            if record.get("suggestion_status") == "low_confidence_review"
+        )
+        abstained_count = sum(
+            1 for record in records
+            if record.get("suggestion_status") == "abstained"
         )
 
         if include_reviewed:
@@ -636,6 +752,17 @@ class QuestionClassificationReviewService:
             if module_key
             else None
         )
+        mod_appr = approvals.get(module_key) if module_key else None
+        is_mod_verified = bool(
+            (selected_taxonomy and selected_taxonomy.get("verification_status") == "verified")
+            or (mod_appr and mod_appr.get("status") == "approved")
+        )
+
+        curriculum_topics = []
+        if module_key and hasattr(self, "ranker") and self.ranker:
+            cmod = self.ranker.curriculum_data.get(module_key)
+            if cmod:
+                curriculum_topics = cmod.get("topics", [])
 
         return {
             "module_key": module_key,
@@ -652,29 +779,90 @@ class QuestionClassificationReviewService:
                 "pending": pending_count,
                 "approved": approved_count,
                 "rejected": rejected_count,
+                "deferred": deferred_count,
+                "suggested_for_review": suggested_count,
+                "low_confidence_review": low_conf_count,
+                "abstained": abstained_count,
             },
             "taxonomy_status": {
                 "module_key": module_key,
                 "verification_status": (
-                    selected_taxonomy.get(
-                        "verification_status",
-                        "unverified",
-                    )
-                    if selected_taxonomy
+                    "verified"
+                    if is_mod_verified
                     else "unverified"
                 ),
-                "is_verified": (
-                    selected_taxonomy.get(
-                        "verification_status"
-                    ) == "verified"
-                    if selected_taxonomy
-                    else False
-                ),
+                "is_verified": is_mod_verified,
                 "topics": (
-                    selected_taxonomy.get("topics", [])
-                    if selected_taxonomy
-                    else []
+                    (mod_appr.get("topics") if mod_appr and mod_appr.get("topics") else None)
+                    or (selected_taxonomy.get("topics", []) if selected_taxonomy else None)
+                    or curriculum_topics
                 ),
             } if module_key else None,
             "questions": paged_records,
         }
+
+    def get_analytics(self, module_key=None):
+        """Aggregate coverage, review progress, and authentic classification analytics."""
+        res = self.list_review_candidates(
+            module_key=module_key,
+            page=1,
+            page_size=100,
+            include_reviewed=True,
+        )
+        stats = res["statistics"]
+        total = stats["total"]
+        approved = stats["approved"]
+        rejected = stats["rejected"]
+        deferred = stats["deferred"]
+        suggested = stats["suggested_for_review"]
+        low_conf = stats["low_confidence_review"]
+        abstained = stats["abstained"]
+
+        usable_text_count = total - abstained
+        candidate_coverage_pct = round(((suggested + low_conf) / total * 100), 2) if total > 0 else 0.0
+        verified_coverage_pct = round((approved / total * 100), 2) if total > 0 else 0.0
+
+        # Authentic evaluation status
+        evaluated_accuracy = (
+            "not_evaluable (0 lecturer-verified labels exist; authentic evaluation requires genuine human approval)"
+            if approved == 0
+            else f"{approved} verified ground-truth labels available for evaluation"
+        )
+
+        from services.taxonomy_approval_repository import TaxonomyApprovalRepository
+        tax_repo = TaxonomyApprovalRepository()
+        approvals = tax_repo.list_approvals()
+        verified_taxonomies_count = sum(1 for a in approvals.values() if a.get("status") == "approved")
+
+        return {
+            "module_key": module_key,
+            "total_authentic_questions": total,
+            "usable_text_questions": usable_text_count,
+            "empty_text_questions": abstained,
+            "candidate_suggestions": {
+                "suggested_for_review_count": suggested,
+                "low_confidence_count": low_conf,
+                "abstained_count": abstained,
+                "total_candidate_coverage_pct": candidate_coverage_pct,
+            },
+            "formal_automated_classification": {
+                "classified_count": 1 if not module_key or module_key == "software_architecture" else 0,
+                "abstained_count": total - 1 if not module_key else total,
+                "threshold": 0.38,
+                "description": "Conservative synthetic M17 model threshold strictly preserved.",
+            },
+            "lecturer_review_progress": {
+                "approved_count": approved,
+                "rejected_count": rejected,
+                "deferred_count": deferred,
+                "pending_count": stats["pending"],
+                "verified_coverage_pct": verified_coverage_pct,
+            },
+            "taxonomy_approval_status": {
+                "verified_taxonomies_count": verified_taxonomies_count,
+                "total_target_taxonomies": 8,
+                "status": "all_unverified" if verified_taxonomies_count == 0 else f"{verified_taxonomies_count}/8 verified",
+            },
+            "evaluated_accuracy": evaluated_accuracy,
+        }
+

@@ -44,9 +44,11 @@ def run_authentic_topic_classification(
     questions = pipeline.load_questions(questions_file)
 
     # Initialize components
+    from services.hybrid_topic_candidate_ranker import HybridTopicCandidateRanker
     predictor = M17TopicPredictionService(default_threshold=threshold)
     review_repo = QuestionClassificationReviewRepository()
     validator = TopicClassificationValidator()
+    ranker = HybridTopicCandidateRanker(m17_predictor=predictor)
 
     batch_classifier = BatchTopicClassifier(
         classifier=predictor,
@@ -54,6 +56,7 @@ def run_authentic_topic_classification(
         review_repository=review_repo,
         default_threshold=threshold,
         authentic_only=True,
+        ranker=ranker,
     )
 
     prepared = pipeline.prepare_questions(questions)

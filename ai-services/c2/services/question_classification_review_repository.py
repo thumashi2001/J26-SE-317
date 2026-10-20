@@ -73,44 +73,54 @@ class QuestionClassificationReviewRepository:
 
         return reviews
 
-    def save_review(self, record):
+    def save_review(self, record, allow_update=False):
         if not isinstance(record, dict):
             raise ValueError("Review record must be an object")
 
-        required = (
+        decision = record.get("decision")
+        if decision not in ("approved", "rejected", "deferred"):
+            raise ValueError("Invalid review decision")
+
+        base_required = (
             "question_id",
             "module_key",
-            "topic_id",
             "decision",
             "reviewer_id",
         )
 
-        for field in required:
+        for field in base_required:
             value = record.get(field)
-
             if not isinstance(value, str) or not value.strip():
                 raise ValueError(
                     f"Missing or invalid review field: {field}"
                 )
 
-        if record["decision"] not in ("approved", "rejected"):
-            raise ValueError("Invalid review decision")
+        raw_topic_id = record.get("topic_id")
+        if decision == "approved":
+            if not isinstance(raw_topic_id, str) or not raw_topic_id.strip():
+                raise ValueError("Missing or invalid review field: topic_id")
+            topic_id = raw_topic_id.strip()
+        else:
+            topic_id = raw_topic_id.strip() if isinstance(raw_topic_id, str) and raw_topic_id.strip() else None
 
         notes = record.get("review_notes", "")
 
         if not isinstance(notes, str) or len(notes) > 2000:
             raise ValueError("Invalid review notes")
 
-        if record["decision"] == "rejected" and not notes.strip():
+        if decision == "rejected" and not notes.strip():
             raise ValueError("Rejection requires review notes")
 
         with self._lock:
             document = self.load()
 
-            if any(
-                item.get("question_id") == record["question_id"]
-                for item in document["reviews"]
-            ):
+            existing_idx = None
+            for idx, item in enumerate(document["reviews"]):
+                if item.get("question_id") == record["question_id"]:
+                    existing_idx = idx
+                    break
+
+            if existing_idx is not None and not allow_update:
                 raise ValueError(
                     "Question already has a review decision"
                 )
@@ -118,8 +128,8 @@ class QuestionClassificationReviewRepository:
             saved = {
                 "question_id": record["question_id"].strip(),
                 "module_key": record["module_key"].strip(),
-                "topic_id": record["topic_id"].strip(),
-                "decision": record["decision"],
+                "topic_id": topic_id,
+                "decision": decision,
                 "review_notes": notes.strip(),
                 "reviewer_id": record["reviewer_id"].strip(),
                 "reviewed_at": datetime.now(
@@ -127,7 +137,19 @@ class QuestionClassificationReviewRepository:
                 ).isoformat(),
             }
 
-            document["reviews"].append(saved)
+            if "original_ai_suggestion" in record:
+                saved["original_ai_suggestion"] = record["original_ai_suggestion"]
+            if "taxonomy_version" in record:
+                saved["taxonomy_version"] = record["taxonomy_version"]
+            if "model_version" in record:
+                saved["model_version"] = record["model_version"]
+            if "is_correction" in record:
+                saved["is_correction"] = bool(record["is_correction"])
+
+            if existing_idx is not None:
+                document["reviews"][existing_idx] = saved
+            else:
+                document["reviews"].append(saved)
 
             self.path.parent.mkdir(
                 parents=True,

@@ -105,12 +105,32 @@ class TopicTaxonomy:
         if module_key in alias_map:
             target_keys.add(alias_map[module_key])
 
+        base_tax = None
         for taxonomy in self.taxonomies:
             if taxonomy["module_key"] in target_keys:
-                return taxonomy
+                base_tax = taxonomy
+                break
 
-        return None
+        if base_tax is None:
+            return None
 
+        # Check if an explicit lecturer approval exists in the approval repository
+        try:
+            from services.taxonomy_approval_repository import TaxonomyApprovalRepository
+            repo = TaxonomyApprovalRepository()
+            appr = repo.get_approval(base_tax["module_key"])
+            if appr and appr.get("status") == "approved":
+                import copy
+                approved_tax = copy.deepcopy(base_tax)
+                approved_tax["verification_status"] = "verified"
+                approved_topics = appr.get("topics")
+                if approved_topics and isinstance(approved_topics, list):
+                    approved_tax["topics"] = approved_topics
+                return approved_tax
+        except Exception:
+            pass
+
+        return base_tax
 
     def get_topics(self, module_key):
         taxonomy = self.get_module_taxonomy(module_key)
@@ -139,3 +159,4 @@ class TopicTaxonomy:
             taxonomy["verification_status"] == "verified"
             and len(taxonomy["topics"]) > 0
         )
+

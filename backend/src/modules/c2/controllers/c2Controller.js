@@ -535,6 +535,8 @@ export async function reviewQuestionClassification(req, res) {
       topicId,
       decision,
       reviewNotes = '',
+      isCorrection = false,
+      allowManual = false,
     } = req.body || {};
 
     if (
@@ -542,15 +544,14 @@ export async function reviewQuestionClassification(req, res) {
       !questionId.trim() ||
       typeof moduleKey !== 'string' ||
       !moduleKey.trim() ||
-      typeof topicId !== 'string' ||
-      !topicId.trim()
+      (decision !== 'deferred' && (typeof topicId !== 'string' || !topicId.trim()))
     ) {
       return res.status(400).json({
         error: 'Valid questionId, moduleKey and topicId are required',
       });
     }
 
-    if (!['approved', 'rejected'].includes(decision)) {
+    if (!['approved', 'rejected', 'deferred'].includes(decision)) {
       return res.status(400).json({
         error: 'Decision must be approved or rejected',
       });
@@ -578,10 +579,12 @@ export async function reviewQuestionClassification(req, res) {
       await c2Service.submitQuestionClassificationReview({
         questionId: questionId.trim(),
         moduleKey: moduleKey.trim(),
-        topicId: topicId.trim(),
+        topicId: topicId ? topicId.trim() : '',
         decision,
         reviewNotes: reviewNotes.trim(),
         reviewerId: req.user.sub,
+        isCorrection: Boolean(isCorrection),
+        allowManual: Boolean(allowManual),
       });
 
     return res.json(result);
@@ -593,7 +596,7 @@ export async function reviewQuestionClassification(req, res) {
 // M15.3 - Lecturer Question Classification Review List
 export async function listQuestionClassificationReviews(req, res) {
   try {
-    const { moduleKey } = req.query;
+    const { moduleKey, statusFilter } = req.query;
     const page = Number(req.query.page ?? 1);
     const pageSize = Number(req.query.pageSize ?? 10);
     const includeReviewed = req.query.includeReviewed === 'true';
@@ -625,8 +628,68 @@ export async function listQuestionClassificationReviews(req, res) {
         page,
         pageSize,
         includeReviewed,
+        statusFilter: typeof statusFilter === 'string' && statusFilter.trim() ? statusFilter.trim() : undefined,
       });
 
+    return res.json(result);
+  } catch (error) {
+    return handleError(res, error);
+  }
+}
+
+export async function getQuestionClassificationReviewAnalytics(req, res) {
+  try {
+    const { moduleKey } = req.query;
+    const result = await c2Service.getQuestionClassificationReviewAnalytics(moduleKey);
+    return res.json(result);
+  } catch (error) {
+    return handleError(res, error);
+  }
+}
+
+export async function getTaxonomyReview(req, res) {
+  try {
+    const { moduleKey } = req.params;
+    if (!moduleKey || typeof moduleKey !== 'string') {
+      return res.status(400).json({ error: 'Valid moduleKey is required' });
+    }
+    const result = await c2Service.getTaxonomyReview(moduleKey);
+    return res.json(result);
+  } catch (error) {
+    return handleError(res, error);
+  }
+}
+
+export async function reviewTaxonomyDecision(req, res) {
+  try {
+    const { moduleKey } = req.params;
+    const { decision, reviewNotes = '' } = req.body || {};
+
+    if (!moduleKey || typeof moduleKey !== 'string') {
+      return res.status(400).json({ error: 'Valid moduleKey is required' });
+    }
+
+    if (!['approved', 'rejected'].includes(decision)) {
+      return res.status(400).json({ error: 'Decision must be approved or rejected' });
+    }
+
+    const result = await c2Service.submitTaxonomyDecision({
+      moduleKey,
+      decision,
+      reviewerId: req.user.sub,
+      reviewNotes: typeof reviewNotes === 'string' ? reviewNotes.trim() : '',
+    });
+
+    return res.json(result);
+  } catch (error) {
+    return handleError(res, error);
+  }
+}
+
+export async function getQuestionClassificationEvaluations(req, res) {
+  try {
+    const { moduleKey } = req.query;
+    const result = await c2Service.getQuestionClassificationEvaluations(moduleKey);
     return res.json(result);
   } catch (error) {
     return handleError(res, error);

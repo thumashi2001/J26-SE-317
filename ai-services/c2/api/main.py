@@ -41,6 +41,15 @@ from services.synthetic_practice_service import (
 from services.question_classification_review_service import (
     QuestionClassificationReviewService,
 )
+from services.question_classification_review_repository import (
+    QuestionClassificationReviewRepository,
+)
+from services.taxonomy_approval_service import (
+    TaxonomyApprovalService,
+)
+from services.authentic_topic_classifier_evaluator import (
+    AuthenticTopicClassifierEvaluator,
+)
 from services.m17_topic_prediction_service import (
     M17TopicPredictionService,
     ModelNotFoundError,
@@ -99,10 +108,19 @@ class ReviewDecisionRequest(BaseModel):
 class QuestionClassificationReviewRequest(BaseModel):
     question_id: str = Field(min_length=1, max_length=200)
     module_key: str = Field(min_length=1, max_length=100)
-    topic_id: str = Field(min_length=1, max_length=200)
+    topic_id: str = Field(default="", max_length=200)
     decision: str
     review_notes: str = Field(default="", max_length=2000)
     reviewer_id: str = Field(min_length=1, max_length=200)
+    is_correction: bool = Field(default=False)
+    allow_manual: bool = Field(default=False)
+
+
+class TaxonomyApprovalRequest(BaseModel):
+    module_key: str = Field(min_length=1, max_length=100)
+    decision: str
+    reviewer_id: str = Field(min_length=1, max_length=200)
+    review_notes: str = Field(default="", max_length=2000)
 
 
 def require_internal_token(x_c2_internal_token: str | None):
@@ -651,10 +669,10 @@ def review_question_classification(
 
     validate_module(request.module_key)
 
-    if request.decision not in ("approved", "rejected"):
+    if request.decision not in ("approved", "rejected", "deferred"):
         raise HTTPException(
             status_code=400,
-            detail="Decision must be approved or rejected",
+            detail="Decision must be approved, rejected, or deferred",
         )
 
     if not re.fullmatch(
@@ -681,10 +699,12 @@ def review_question_classification(
         saved = service.review(
             question_id=request.question_id,
             module_key=request.module_key,
-            topic_id=request.topic_id,
+            topic_id=request.topic_id if request.topic_id else None,
             decision=request.decision,
             reviewer_id=request.reviewer_id,
             review_notes=request.review_notes,
+            is_correction=request.is_correction,
+            allow_manual=request.allow_manual,
         )
 
     except FileNotFoundError:
@@ -711,6 +731,7 @@ def list_question_classification_reviews(
     page: int = Query(default=1, ge=1),
     page_size: int = Query(default=10, ge=1, le=100),
     include_reviewed: bool = False,
+    status_filter: str | None = None,
     x_c2_internal_token: str | None = Header(default=None),
 ):
     require_internal_token(x_c2_internal_token)
@@ -726,6 +747,7 @@ def list_question_classification_reviews(
             page=page,
             page_size=page_size,
             include_reviewed=include_reviewed,
+            status_filter=status_filter,
         )
 
     except FileNotFoundError:
@@ -739,6 +761,95 @@ def list_question_classification_reviews(
             status_code=409,
             detail=str(error),
         )
+
+
+@app.get("/question-classification-reviews/analytics")
+def get_classification_review_analytics(
+    module_key: str | None = None,
+    x_c2_internal_token: str | None = Header(default=None),
+):
+    require_internal_token(x_c2_internal_token)
+    if module_key is not None:
+        validate_module(module_key)
+
+    service = QuestionClassificationReviewService()
+    try:
+        return service.get_analytics(module_key=module_key)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/taxonomy-reviews/{module_key}")
+def get_taxonomy_for_review(
+    module_key: str,
+    x_c2_internal_token: str | None = Header(default=None),
+):
+    require_internal_token(x_c2_internal_token)
+    validate_module(module_key)
+
+    service = TaxonomyApprovalService()
+    try:
+        return service.get_taxonomy_for_review(module_key)
+    except ValueError as error:
+        raise HTTPException(status_code=404, detail=str(error))
+
+
+@app.post("/taxonomy-reviews/decision")
+def review_taxonomy_decision(
+    request: TaxonomyApprovalRequest,
+    x_c2_internal_token: str | None = Header(default=None),
+):
+    require_internal_token(x_c2_internal_token)
+    validate_module(request.module_key)
+
+    service = TaxonomyApprovalService()
+    try:
+        if request.decision == "approved":
+            res = service.approve_taxonomy(
+                module_key=request.module_key,
+                reviewer_id=request.reviewer_id,
+                review_notes=request.review_notes,
+            )
+        elif request.decision == "rejected":
+            res = service.reject_taxonomy(
+                module_key=request.module_key,
+                reviewer_id=request.reviewer_id,
+                review_notes=request.review_notes,
+            )
+        else:
+            raise HTTPException(
+                status_code=400,
+                detail="Decision must be approved or rejected",
+            )
+        return {"success": True, "approval": res}
+    except ValueError as error:
+        raise HTTPException(status_code=409, detail=str(error))
+
+
+@app.get("/question-classification-evaluations")
+def evaluate_authentic_question_classifications(
+    module_key: str | None = None,
+    x_c2_internal_token: str | None = Header(default=None),
+):
+    require_internal_token(x_c2_internal_token)
+    if module_key is not None:
+        validate_module(module_key)
+
+    evaluator = AuthenticTopicClassifierEvaluator(
+        reviews_repo=QuestionClassificationReviewRepository()
+    )
+    import json
+    classifications = []
+    class_path = C2_ROOT / "datasets" / "processed" / "topic_classifications.json"
+    if class_path.exists():
+        try:
+            with open(class_path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                classifications = [r.get("classification") for r in data.get("results", []) if r.get("valid")]
+        except Exception:
+            pass
+
+    return evaluator.evaluate(classifications=classifications)
 
 
 # --------------------------------------------------

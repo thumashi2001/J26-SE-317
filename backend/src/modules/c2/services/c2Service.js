@@ -240,6 +240,8 @@ export function submitQuestionClassificationReview({
   decision,
   reviewNotes,
   reviewerId,
+  isCorrection = false,
+  allowManual = false,
 }) {
   return requestC2(
     '/question-classification-reviews/decision',
@@ -252,6 +254,8 @@ export function submitQuestionClassificationReview({
         decision,
         review_notes: reviewNotes,
         reviewer_id: reviewerId,
+        is_correction: isCorrection,
+        allow_manual: allowManual,
       },
     }
   );
@@ -263,6 +267,7 @@ export function getQuestionClassificationReviews({
   page = 1,
   pageSize = 10,
   includeReviewed = false,
+  statusFilter,
 } = {}) {
   const params = new URLSearchParams({
     page: String(page),
@@ -273,10 +278,52 @@ export function getQuestionClassificationReviews({
   if (moduleKey) {
     params.set('module_key', moduleKey);
   }
+  if (statusFilter) {
+    params.set('status_filter', statusFilter);
+  }
 
   return requestC2(
     `/question-classification-reviews?${params.toString()}`
   );
+}
+
+export function getQuestionClassificationReviewAnalytics(moduleKey) {
+  const params = new URLSearchParams();
+  if (moduleKey) {
+    params.set('module_key', moduleKey);
+  }
+  const query = params.toString() ? `?${params.toString()}` : '';
+  return requestC2(`/question-classification-reviews/analytics${query}`);
+}
+
+export function getTaxonomyReview(moduleKey) {
+  return requestC2(`/taxonomy-reviews/${encodeURIComponent(moduleKey)}`);
+}
+
+export function submitTaxonomyDecision({
+  moduleKey,
+  decision,
+  reviewerId,
+  reviewNotes = '',
+}) {
+  return requestC2('/taxonomy-reviews/decision', {
+    method: 'POST',
+    body: {
+      module_key: moduleKey,
+      decision,
+      reviewer_id: reviewerId,
+      review_notes: reviewNotes,
+    },
+  });
+}
+
+export function getQuestionClassificationEvaluations(moduleKey) {
+  const params = new URLSearchParams();
+  if (moduleKey) {
+    params.set('module_key', moduleKey);
+  }
+  const query = params.toString() ? `?${params.toString()}` : '';
+  return requestC2(`/question-classification-evaluations${query}`);
 }
 
 // M18.2 - Experimental Topic Classification
@@ -294,4 +341,5 @@ export function classifyTopicExperimental({
     },
   });
 }
+
 

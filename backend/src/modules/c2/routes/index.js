@@ -154,10 +154,36 @@ router.get(
   controller.listQuestionClassificationReviews
 );
 
+router.get(
+  '/question-classification-reviews/analytics',
+  requireRole('lecturer', 'admin'),
+  controller.getQuestionClassificationReviewAnalytics
+);
+
 router.post(
   '/question-classification-reviews/:questionId/decision',
   requireRole('lecturer', 'admin'),
   controller.reviewQuestionClassification
+);
+
+// M20.5 - Module Taxonomy Review and Approval
+router.get(
+  '/taxonomy-reviews/:moduleKey',
+  requireRole('lecturer', 'admin'),
+  controller.getTaxonomyReview
+);
+
+router.post(
+  '/taxonomy-reviews/:moduleKey/decision',
+  requireRole('lecturer', 'admin'),
+  controller.reviewTaxonomyDecision
+);
+
+// M20.5 - Authentic Question Classification Evaluation
+router.get(
+  '/question-classification-evaluations',
+  requireRole('lecturer', 'admin'),
+  controller.getQuestionClassificationEvaluations
 );
 
 // --------------------------------------------------

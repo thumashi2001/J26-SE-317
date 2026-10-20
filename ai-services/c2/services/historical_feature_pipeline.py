@@ -5,6 +5,9 @@ authentic examination evidence. Guaranteed to prevent future target examination 
 """
 
 from collections import defaultdict
+from services.question_classification_review_repository import (
+    QuestionClassificationReviewRepository,
+)
 from services.student_question_bank import StudentQuestionBank
 from services.topic_taxonomy import TopicTaxonomy
 
@@ -14,9 +17,16 @@ class HistoricalFeaturePipeline:
 
     DEFAULT_RECENCY_DECAY = 0.75  # Exponential decay parameter lambda
 
-    def __init__(self, bank=None, taxonomy=None):
+    def __init__(self, bank=None, taxonomy=None, reviews_repo=None):
         self.bank = bank if bank is not None else StudentQuestionBank()
         self.taxonomy = taxonomy if taxonomy is not None else TopicTaxonomy()
+        if reviews_repo is not None:
+            self.reviews_repo = reviews_repo
+        else:
+            try:
+                self.reviews_repo = QuestionClassificationReviewRepository()
+            except Exception:
+                self.reviews_repo = None
 
     def build_features_for_module(self, module_key, decay_factor=None):
         """Construct leak-free chronological features for a module."""
@@ -63,6 +73,29 @@ class HistoricalFeaturePipeline:
                 and classification.get("topic_id")
             ):
                 verified_classifications[qid] = classification
+
+        # Overlay genuine lecturer-reviewed classifications
+        if self.reviews_repo is not None:
+            try:
+                for rev in self.reviews_repo.get_all_reviews():
+                    if not isinstance(rev, dict):
+                        continue
+                    qid = rev.get("question_id")
+                    if not qid:
+                        continue
+                    decision = rev.get("decision")
+                    if decision == "approved" and rev.get("topic_id"):
+                        verified_classifications[qid] = {
+                            "question_id": qid,
+                            "module_key": rev.get("module_key"),
+                            "topic_id": rev.get("topic_id"),
+                            "verification_status": "verified",
+                            "reviewer_id": rev.get("reviewer_id"),
+                        }
+                    elif decision == "rejected":
+                        verified_classifications.pop(qid, None)
+            except Exception:
+                pass
 
         # Filter authentic questions for this module
         selected_questions = []

@@ -5,6 +5,9 @@ import json
 from collections import Counter, defaultdict
 from pathlib import Path
 
+from services.question_classification_review_repository import (
+    QuestionClassificationReviewRepository,
+)
 from services.student_question_bank import StudentQuestionBank
 
 
@@ -22,12 +25,20 @@ class ExamPatternAnalyzer:
         questions_path=None,
         classifications_path=None,
         modules_path=None,
+        reviews_repo=None,
     ):
         self.bank = StudentQuestionBank(
             questions_path=questions_path,
             classifications_path=classifications_path,
             modules_path=modules_path,
         )
+        if reviews_repo is not None:
+            self.reviews_repo = reviews_repo
+        else:
+            try:
+                self.reviews_repo = QuestionClassificationReviewRepository()
+            except Exception:
+                self.reviews_repo = None
 
     @staticmethod
     def _read_json(path):
@@ -85,6 +96,36 @@ class ExamPatternAnalyzer:
                 valid_classifications[
                     result["question_id"]
                 ] = classification
+
+        # Overlay genuine lecturer-reviewed classifications
+        if self.reviews_repo is not None:
+            try:
+                for rev in self.reviews_repo.get_all_reviews():
+                    if not isinstance(rev, dict):
+                        continue
+                    qid = rev.get("question_id")
+                    if not qid:
+                        continue
+                    decision = rev.get("decision")
+                    if decision == "approved" and rev.get("topic_id"):
+                        if qid in valid_classifications:
+                            valid_classifications[qid]["topic_id"] = rev.get("topic_id")
+                            valid_classifications[qid]["verification_status"] = "verified"
+                            valid_classifications[qid]["reviewer_id"] = rev.get("reviewer_id")
+                        else:
+                            valid_classifications[qid] = {
+                                "question_id": qid,
+                                "module_key": rev.get("module_key"),
+                                "topic_id": rev.get("topic_id"),
+                                "verification_status": "verified",
+                                "reviewer_id": rev.get("reviewer_id"),
+                            }
+                    elif decision == "rejected":
+                        if qid in valid_classifications:
+                            valid_classifications[qid]["topic_id"] = None
+                            valid_classifications[qid]["verification_status"] = "rejected"
+            except Exception:
+                pass
 
         selected = []
         excluded_synthetic = 0

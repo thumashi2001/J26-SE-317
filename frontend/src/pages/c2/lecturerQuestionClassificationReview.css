@@ -517,3 +517,164 @@
   padding-top: 16px;
   border-top: 1px solid var(--line);
 }
+
+/* M20.5 Enhancements — Candidate Rankings & Coverage Analytics */
+
+.status-suggested {
+  background: rgba(59, 130, 246, 0.15);
+  color: #2563eb;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.status-low-confidence {
+  background: rgba(245, 158, 11, 0.15);
+  color: #d97706;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.status-abstained {
+  background: rgba(107, 114, 128, 0.12);
+  color: #4b5563;
+  border: 1px solid rgba(107, 114, 128, 0.25);
+}
+
+.status-deferred {
+  background: rgba(139, 92, 246, 0.15);
+  color: #7c3aed;
+  border: 1px solid rgba(139, 92, 246, 0.3);
+}
+
+.c2-candidate-container {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.c2-candidate-item {
+  background: var(--surface-soft);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 0.8rem;
+}
+
+.c2-candidate-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+  margin-bottom: 3px;
+}
+
+.c2-candidate-score {
+  font-family: monospace;
+  font-size: 0.76rem;
+  background: rgba(0, 0, 0, 0.06);
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+.c2-candidate-signals {
+  font-size: 0.72rem;
+  color: var(--muted);
+  line-height: 1.35;
+}
+
+.btn-defer {
+  background: transparent;
+  color: #7c3aed;
+  border: 1px solid #7c3aed;
+}
+
+.btn-defer:hover:not(:disabled) {
+  background: rgba(139, 92, 246, 0.1);
+}
+
+.c2-taxonomy-banner {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 14px 18px;
+  margin-bottom: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.c2-taxonomy-banner.verified {
+  border-left: 4px solid var(--good, #10b981);
+}
+
+.c2-taxonomy-banner.unverified {
+  border-left: 4px solid var(--warn, #f59e0b);
+}
+
+.c2-taxonomy-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.c2-taxonomy-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.c2-taxonomy-topics-preview {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.c2-analytics-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 12px;
+  margin: 16px 0 20px;
+}
+
+.c2-analytics-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.c2-analytics-val {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.c2-analytics-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.c2-analytics-desc {
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+
+.c2-topic-select {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 0.88rem;
+  margin-top: 8px;
+}
+

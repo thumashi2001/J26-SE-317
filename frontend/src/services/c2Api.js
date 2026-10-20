@@ -204,6 +204,7 @@ export const getC2QuestionClassificationReviews = ({
   page = 1,
   pageSize = 10,
   includeReviewed = false,
+  statusFilter,
 } = {}) => {
   const params = new URLSearchParams({
     page: String(page),
@@ -214,6 +215,9 @@ export const getC2QuestionClassificationReviews = ({
   if (moduleKey) {
     params.set('moduleKey', moduleKey);
   }
+  if (statusFilter) {
+    params.set('statusFilter', statusFilter);
+  }
 
   return api(
     `${base}/question-classification-reviews?${params.toString()}`
@@ -222,7 +226,7 @@ export const getC2QuestionClassificationReviews = ({
 
 export const submitC2QuestionClassificationReview = (
   questionId,
-  { moduleKey, topicId, decision, reviewNotes = '' }
+  { moduleKey, topicId, decision, reviewNotes = '', isCorrection = false, allowManual = false }
 ) =>
   api(
     `${base}/question-classification-reviews/${encodeURIComponent(questionId)}/decision`,
@@ -233,9 +237,36 @@ export const submitC2QuestionClassificationReview = (
         topicId,
         decision,
         reviewNotes,
+        isCorrection,
+        allowManual,
       },
     }
   );
+
+export const getC2QuestionClassificationReviewAnalytics = (moduleKey = null) => {
+  const params = moduleKey ? `?moduleKey=${encodeURIComponent(moduleKey)}` : '';
+  return api(`${base}/question-classification-reviews/analytics${params}`);
+};
+
+export const getC2TaxonomyReview = (moduleKey) =>
+  api(`${base}/taxonomy-reviews/${encodeURIComponent(moduleKey)}`);
+
+export const submitC2TaxonomyDecision = (
+  moduleKey,
+  { decision, reviewNotes = '' }
+) =>
+  api(`${base}/taxonomy-reviews/${encodeURIComponent(moduleKey)}/decision`, {
+    method: 'POST',
+    body: {
+      decision,
+      reviewNotes,
+    },
+  });
+
+export const getC2QuestionClassificationEvaluations = (moduleKey = null) => {
+  const params = moduleKey ? `?moduleKey=${encodeURIComponent(moduleKey)}` : '';
+  return api(`${base}/question-classification-evaluations${params}`);
+};
 
 // --------------------------------------------------
 // M18.2 - Experimental Topic Classification
