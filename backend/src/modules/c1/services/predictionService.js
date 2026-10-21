@@ -7,6 +7,7 @@ const bandFor = (pct) => (pct >= 70 ? 'likely' : pct >= 50 ? 'unsure' : 'unlikel
 
 // Turns the student's logged answers into the format the trained model expects.
 export function toModelEvents(logged) {
+  // SOLID (Single Responsibility): this function only converts logged answers into the model's input format.
   const sorted = [...logged].sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
   if (!sorted.length) return { events: [], start: null };
   const start = new Date(sorted[0].timestamp).getTime();
@@ -35,6 +36,9 @@ export function toModelEvents(logged) {
 
 // For every topic the student has answered: the chance they get the next question on it right, from the trained model.
 export async function getPredictions(db, studentId, aiUrl, now = new Date(), ai = callAi) {
+  // SOLID (Dependency Inversion): the database, AI service address, clock and AI caller are passed in as
+// parameters (ai = callAi is only the default). Tests can pass a fake `ai`, so no real Python service is needed.
+// See backend/scripts/checkPrediction.js.
   const state = await db.collection('mastery_state').findOne({ student_id: studentId });
   if (!state || !state.diagnostic_completed) throw httpError(409, 'Complete the diagnostic test first');
 
