@@ -1,0 +1,660 @@
+{
+  "checks": [
+    {
+      "details": {
+        "missing": []
+      },
+      "hard": true,
+      "name": "files_present",
+      "status": "pass",
+      "summary": "15/15 files"
+    },
+    {
+      "details": {
+        "problems": []
+      },
+      "hard": true,
+      "name": "schema_required_fields",
+      "status": "pass",
+      "summary": "0 problem(s)"
+    },
+    {
+      "details": {
+        "compared_to_archive": true,
+        "parts": {
+          "eligible": 576,
+          "quarantine": 355,
+          "repaired_ineligible_controls": 71
+        },
+        "problems": []
+      },
+      "hard": true,
+      "name": "counts_reconcile",
+      "status": "pass",
+      "summary": "original 1002 = eligible 576 + quarantine 355 + ineligible controls 71"
+    },
+    {
+      "details": {
+        "answer_id": 0,
+        "criterion_id": 0,
+        "question_id": 0
+      },
+      "hard": true,
+      "name": "id_uniqueness",
+      "status": "pass",
+      "summary": "duplicate ids: {'answer_id': 0, 'question_id': 0, 'criterion_id': 0}"
+    },
+    {
+      "details": {
+        "problems": []
+      },
+      "hard": true,
+      "name": "split_files_consistent",
+      "status": "pass",
+      "summary": "0 problem(s)"
+    },
+    {
+      "details": {
+        "max_marks_mismatch": [],
+        "out_of_range": []
+      },
+      "hard": true,
+      "name": "score_ranges",
+      "status": "pass",
+      "summary": "0 out of 0<=expected_mark<=max_marks, 0 max_marks != question marks"
+    },
+    {
+      "details": {
+        "bad": []
+      },
+      "hard": true,
+      "name": "label_values",
+      "status": "pass",
+      "summary": "labels outside the 6 core tiers: []"
+    },
+    {
+      "details": {
+        "non_zero": []
+      },
+      "hard": true,
+      "name": "irrelevant_marks_zero",
+      "status": "pass",
+      "summary": "167 IRRELEVANT answers, 0 non-zero"
+    },
+    {
+      "details": {
+        "no_rubric": [],
+        "rubric_id_mismatch": [],
+        "unknown_question": []
+      },
+      "hard": true,
+      "name": "rubric_association",
+      "status": "pass",
+      "summary": "0 eligible questions without rubric rows, 0 rubric rows for unknown questions, 0 rubric_id mismatches"
+    },
+    {
+      "details": {
+        "mismatch": []
+      },
+      "hard": true,
+      "name": "rubric_criterion_sums_eligible",
+      "status": "pass",
+      "summary": "0 eligible questions where rubric marks != question marks"
+    },
+    {
+      "details": {
+        "mismatch": {
+          "SYN-REPL-PP-SE3020-035": [
+            25.0,
+            10.0
+          ],
+          "SYN-REPL-PP-SE3020-040": [
+            12.0,
+            10.0
+          ],
+          "SYN-REPL-PP-SE3040-007": [
+            70.0,
+            10.0
+          ],
+          "SYN-REPL-PP-SE3050-109": [
+            40.0,
+            10.0
+          ],
+          "SYN-REPL-PP-SE3070-012": [
+            18.0,
+            10.0
+          ],
+          "SYN-REPL-PP-SE3070-022": [
+            4.0,
+            10.0
+          ],
+          "SYN-REPL-PP-SE3070-025": [
+            20.0,
+            10.0
+          ]
+        }
+      },
+      "hard": false,
+      "name": "rubric_criterion_sums_ineligible",
+      "status": "warn",
+      "summary": "7 ineligible questions where re-keyed rubric marks != question marks (the rows keep the replaced original's allocation)"
+    },
+    {
+      "details": {
+        "eligible_answers": {},
+        "question_bank": {},
+        "rubric": {}
+      },
+      "hard": true,
+      "name": "no_literal_nan_none",
+      "status": "pass",
+      "summary": "0 literal nan/None/null cells or embedded tokens in the eligible answers, question bank and rubric"
+    },
+    {
+      "details": {
+        "missing_concepts:whole_cell_null_token": 63
+      },
+      "hard": false,
+      "name": "nan_in_ineligible_controls",
+      "status": "warn",
+      "summary": "63 literal nan cells remain in repaired_ineligible_controls (unrecoverable concept names, kept as in the original and listed in repair_manifest.csv as unrecoverable_nan_field; outside the primary set)"
+    },
+    {
+      "details": {
+        "groups": [
+          [
+            "SA-PP-SE3010-089-MOSTLY_CORRECT",
+            "SA-PP-SE3010-089-PARTIAL"
+          ],
+          [
+            "SA-PP-SE3080-102-FULL",
+            "SA-PP-SE3080-102-PARTIAL"
+          ]
+        ],
+        "unflagged": []
+      },
+      "hard": true,
+      "name": "duplicates_within_question",
+      "status": "pass",
+      "summary": "4 answers share their text with another variant of the same question; 0 not flagged for review"
+    },
+    {
+      "details": {
+        "accidental_answer_ids": [
+          "SA-PP-SE3040-005-FULL",
+          "SA-PP-SE3040-005-MOSTLY_CORRECT",
+          "SA-PP-SE3040-006-PARTIAL",
+          "SA-PP-SE3060-015-PARTIAL",
+          "SA-PP-SE3020-030-PARTIAL",
+          "SA-PP-SE3020-037-PARTIAL",
+          "SA-PP-SE3020-039-PARTIAL",
+          "SA-PP-SE3060-045-PARTIAL",
+          "SA-PP-SE3010-086-PARTIAL"
+        ],
+        "accidental_answers": 9,
+        "accidental_by_tier": {
+          "FULL": 1,
+          "MOSTLY_CORRECT": 1,
+          "PARTIAL": 7
+        },
+        "accidental_strings": 4,
+        "intentional_answers": 96,
+        "intentional_strings": 1
+      },
+      "hard": false,
+      "name": "duplicates_across_questions",
+      "status": "warn",
+      "summary": "96 answers are intentional template negative controls (flagged); 9 answers in 4 strings are shared across questions without a flag (accidental)"
+    },
+    {
+      "details": {},
+      "hard": true,
+      "name": "duplicates_exact_rows",
+      "status": "pass",
+      "summary": "0 exact duplicate rows (ignoring answer_id)"
+    },
+    {
+      "details": {
+        "reference_answer_shared": 0
+      },
+      "hard": true,
+      "name": "duplicates_question_content",
+      "status": "pass",
+      "summary": "0 exact / 0 normalised duplicate question texts; 0 eligible questions share a reference_answer with another question (report-only)"
+    },
+    {
+      "details": {
+        "test&train": [],
+        "test&validation": [],
+        "train&validation": []
+      },
+      "hard": true,
+      "name": "split_question_disjoint",
+      "status": "pass",
+      "summary": "question ids shared between splits: {'train&validation': 0, 'test&train': 0, 'test&validation': 0}"
+    },
+    {
+      "details": {
+        "mismatch": []
+      },
+      "hard": true,
+      "name": "answer_split_matches_question",
+      "status": "pass",
+      "summary": "0 answers whose split differs from their question's"
+    },
+    {
+      "details": {
+        "max": 0.9034,
+        "pairs_above": 1,
+        "threshold": 0.8,
+        "top5": [
+          [
+            0.9034,
+            "PP-SE3080-099",
+            "PP-SE3080-107"
+          ],
+          [
+            0.6442,
+            "PP-SE3060-015",
+            "PP-SE3060-045"
+          ],
+          [
+            0.6017,
+            "PP-SE3020-030",
+            "PP-SE3020-039"
+          ],
+          [
+            0.6009,
+            "PP-SE3040-005",
+            "PP-SE3040-006"
+          ],
+          [
+            0.5881,
+            "PP-SE3030-061",
+            "PP-SE3030-079"
+          ]
+        ]
+      },
+      "hard": false,
+      "name": "near_duplicate_questions_across_splits",
+      "status": "warn",
+      "summary": "max TF-IDF cosine between questions of different splits = 0.903 (threshold 0.8); 1 pairs above (report-only)"
+    },
+    {
+      "details": {
+        "intentional_strings": 1,
+        "unflagged_by_tier": {
+          "FULL": 1,
+          "MOSTLY_CORRECT": 1,
+          "PARTIAL": 7
+        },
+        "unflagged_strings": 4
+      },
+      "hard": false,
+      "name": "cross_split_identical_answer_strings",
+      "status": "warn",
+      "summary": "5 answer strings occur in more than one split: 1 intentional template strings (96 answers), 4 unflagged strings (9 answers) (report-only)"
+    },
+    {
+      "details": {},
+      "hard": false,
+      "name": "label_distribution",
+      "status": "info",
+      "summary": "per split and tier in sections.label_distribution_eligible"
+    },
+    {
+      "details": {
+        "bad": {},
+        "eligible_with_controls": [],
+        "no_answers": []
+      },
+      "hard": true,
+      "name": "per_question_coverage",
+      "status": "pass",
+      "summary": "96/96 eligible questions have exactly one answer per tier (6 variants)"
+    },
+    {
+      "details": {
+        "mismatch": []
+      },
+      "hard": true,
+      "name": "criterion_marks_sum_equals_expected_mark",
+      "status": "pass",
+      "summary": "0 answers where sum(criterion_marks) != expected_mark"
+    },
+    {
+      "details": {
+        "RESOLVED": 96,
+        "UNRESOLVED": 391
+      },
+      "hard": false,
+      "name": "criterion_id_map",
+      "status": "warn",
+      "summary": "96 answer criterion ids resolved to a rubric row, 391 unresolved; resolved with equal marks: 1, with different marks: 95"
+    },
+    {
+      "details": {
+        "n_inner": 380,
+        "threshold": 0.45,
+        "top7": [
+          [
+            0.8,
+            163
+          ],
+          [
+            0.6,
+            52
+          ],
+          [
+            0.85,
+            24
+          ],
+          [
+            0.84,
+            18
+          ],
+          [
+            0.667,
+            12
+          ],
+          [
+            0.55,
+            10
+          ],
+          [
+            0.9,
+            9
+          ]
+        ],
+        "value": 0.757895
+      },
+      "hard": true,
+      "name": "ratio_concentration",
+      "status": "fail",
+      "summary": "share of the 380 inner-label answers on the top-7 ratios = 0.7579 (threshold 0.45, definition: tier_spec.json max_share_on_top7_ratios) - THRESHOLD EXCEEDED; threshold and labels NOT changed"
+    },
+    {
+      "details": {
+        "n": 576,
+        "r": 0.8106568292574906,
+        "threshold": 0.4
+      },
+      "hard": false,
+      "name": "answer_length_vs_mark_pearson",
+      "status": "warn",
+      "summary": "Pearson(words, expected_mark/max_marks) = 0.8107 (spec threshold 0.4; report-only)"
+    },
+    {
+      "details": {
+        "eligible_diffs": [],
+        "quarantine_diffs": [],
+        "question_split_diffs": []
+      },
+      "hard": true,
+      "name": "preserved_vs_original",
+      "status": "pass",
+      "summary": "0 eligible-answer fields differ from the original in labels/marks/text/split, 0 question splits changed, 0 quarantine fields differ from the original, 0 quarantine rows without reason"
+    },
+    {
+      "details": {},
+      "hard": false,
+      "name": "original_vs_repaired_counts",
+      "status": "info",
+      "summary": "see sections.original_vs_repaired"
+    },
+    {
+      "details": {
+        "problems": []
+      },
+      "hard": true,
+      "name": "repair_manifest_consistent",
+      "status": "pass",
+      "summary": "1023 ledger rows; 0 problem(s)"
+    },
+    {
+      "details": {},
+      "hard": true,
+      "name": "no_secrets_in_outputs",
+      "status": "pass",
+      "summary": "files matching secret patterns: []"
+    }
+  ],
+  "hard_failures": [
+    "ratio_concentration"
+  ],
+  "overall": "FAIL",
+  "scope": "full",
+  "sections": {
+    "empty_cells_by_table": {
+      "eligible_answers": {
+        "evidence_requirements": 576,
+        "expected_concepts": 576,
+        "reference_answer": 576,
+        "repair_categories": 456,
+        "rubric": 576,
+        "source_replaced_question_id": 576
+      },
+      "question_bank": {
+        "eligibility_reason": 96,
+        "replaced_question_id": 104,
+        "source_replaced_question_id": 96
+      },
+      "repaired_ineligible_controls": {
+        "demonstrated_concepts": 71,
+        "incorrect_concepts": 71
+      },
+      "rubric": {
+        "evidence_requirements": 104,
+        "expected_concepts": 104
+      }
+    },
+    "label_distribution_eligible": {
+      "ALL": {
+        "n": 576,
+        "tiers": {
+          "FULL": {
+            "mean_ratio": 1.0,
+            "n": 96,
+            "share": 0.1667
+          },
+          "IRRELEVANT": {
+            "mean_ratio": 0.0,
+            "n": 96,
+            "share": 0.1667
+          },
+          "MISCONCEPTION": {
+            "mean_ratio": 0.7875,
+            "n": 96,
+            "share": 0.1667
+          },
+          "MISSING_CONCEPT": {
+            "mean_ratio": 0.7875,
+            "n": 96,
+            "share": 0.1667
+          },
+          "MOSTLY_CORRECT": {
+            "mean_ratio": 0.7875,
+            "n": 96,
+            "share": 0.1667
+          },
+          "PARTIAL": {
+            "mean_ratio": 0.6234,
+            "n": 96,
+            "share": 0.1667
+          }
+        }
+      },
+      "test": {
+        "n": 90,
+        "tiers": {
+          "FULL": {
+            "mean_ratio": 1.0,
+            "n": 15,
+            "share": 0.1667
+          },
+          "IRRELEVANT": {
+            "mean_ratio": 0.0,
+            "n": 15,
+            "share": 0.1667
+          },
+          "MISCONCEPTION": {
+            "mean_ratio": 0.8047,
+            "n": 15,
+            "share": 0.1667
+          },
+          "MISSING_CONCEPT": {
+            "mean_ratio": 0.8047,
+            "n": 15,
+            "share": 0.1667
+          },
+          "MOSTLY_CORRECT": {
+            "mean_ratio": 0.8047,
+            "n": 15,
+            "share": 0.1667
+          },
+          "PARTIAL": {
+            "mean_ratio": 0.62,
+            "n": 15,
+            "share": 0.1667
+          }
+        }
+      },
+      "train": {
+        "n": 420,
+        "tiers": {
+          "FULL": {
+            "mean_ratio": 1.0,
+            "n": 70,
+            "share": 0.1667
+          },
+          "IRRELEVANT": {
+            "mean_ratio": 0.0,
+            "n": 70,
+            "share": 0.1667
+          },
+          "MISCONCEPTION": {
+            "mean_ratio": 0.783,
+            "n": 70,
+            "share": 0.1667
+          },
+          "MISSING_CONCEPT": {
+            "mean_ratio": 0.783,
+            "n": 70,
+            "share": 0.1667
+          },
+          "MOSTLY_CORRECT": {
+            "mean_ratio": 0.783,
+            "n": 70,
+            "share": 0.1667
+          },
+          "PARTIAL": {
+            "mean_ratio": 0.6228,
+            "n": 70,
+            "share": 0.1667
+          }
+        }
+      },
+      "validation": {
+        "n": 66,
+        "tiers": {
+          "FULL": {
+            "mean_ratio": 1.0,
+            "n": 11,
+            "share": 0.1667
+          },
+          "IRRELEVANT": {
+            "mean_ratio": 0.0,
+            "n": 11,
+            "share": 0.1667
+          },
+          "MISCONCEPTION": {
+            "mean_ratio": 0.7927,
+            "n": 11,
+            "share": 0.1667
+          },
+          "MISSING_CONCEPT": {
+            "mean_ratio": 0.7927,
+            "n": 11,
+            "share": 0.1667
+          },
+          "MOSTLY_CORRECT": {
+            "mean_ratio": 0.7927,
+            "n": 11,
+            "share": 0.1667
+          },
+          "PARTIAL": {
+            "mean_ratio": 0.6318,
+            "n": 11,
+            "share": 0.1667
+          }
+        }
+      }
+    },
+    "original_canonical_only": {
+      "answers": 576,
+      "length_mark_pearson": 0.8106568292574906,
+      "ratio_concentration": 0.7579
+    },
+    "original_vs_repaired": {
+      "answers": {
+        "controls": 71,
+        "eligible": 576,
+        "original": 1002,
+        "quarantine": 355
+      },
+      "answers_by_split": {
+        "eligible": {
+          "test": 90,
+          "train": 420,
+          "validation": 66
+        },
+        "original": {
+          "test": 150,
+          "train": 702,
+          "validation": 150
+        }
+      },
+      "label_distribution": {
+        "eligible": {
+          "FULL": 96,
+          "IRRELEVANT": 96,
+          "MISCONCEPTION": 96,
+          "MISSING_CONCEPT": 96,
+          "MOSTLY_CORRECT": 96,
+          "PARTIAL": 96
+        },
+        "original": {
+          "FULL": 167,
+          "IRRELEVANT": 167,
+          "MISCONCEPTION": 167,
+          "MISSING_CONCEPT": 167,
+          "MOSTLY_CORRECT": 167,
+          "PARTIAL": 167
+        }
+      },
+      "length_mark_pearson": {
+        "original_all": 0.08877780168372715,
+        "repaired_eligible": 0.8106568292574906
+      },
+      "questions": {
+        "eligible": 96,
+        "ineligible": 71,
+        "original": 167
+      },
+      "ratio_concentration": {
+        "original_all": 0.7579,
+        "repaired_eligible": 0.7579
+      }
+    },
+    "quarantine_cells_with_nan_expected": 252
+  },
+  "warnings": [
+    "rubric_criterion_sums_ineligible",
+    "nan_in_ineligible_controls",
+    "duplicates_across_questions",
+    "near_duplicate_questions_across_splits",
+    "cross_split_identical_answer_strings",
+    "criterion_id_map",
+    "answer_length_vs_mark_pearson"
+  ]
+}

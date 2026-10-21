@@ -1,0 +1,1395 @@
+{
+  "bootstrap": {
+    "resamples": 2000,
+    "seed": 20261021
+  },
+  "caveats": [
+    "ground truth marks of the canonical questions are researcher-constructed tier marks, not expert marks",
+    "reference answers are generic templates, rubric rows are question-level (1-2 criteria); Condition E sees at most the first two expected concepts per criterion (legacy rubric construction)",
+    "repaired test = 15 questions / 90 answers (original 25 / 150); not comparable to any earlier figure except through the like-for-like original rows above"
+  ],
+  "documentation_vs_recomputed": {
+    "note": "Reproduced: Condition E MAE, Condition E RMSE, Condition E Pearson r. Not reproduced: Lexical baseline MAE. In the legacy reproduction 15 of 150 marking calls raised an exception (the overloaded `marks` column is 0 for IRRELEVANT answers, so the legacy rubric had max_marks 0) and were scored 0.0, which equals their label: the documented Condition E figures are therefore flattered on IRRELEVANT answers. The like-for-like row above uses max=question marks and excludes no answer.",
+    "reproduced": false,
+    "rows": {
+      "Condition E MAE": {
+        "documented": 4.64,
+        "recomputed": "4.640",
+        "reproduced": "True"
+      },
+      "Condition E Pearson r": {
+        "documented": 0.7243,
+        "recomputed": "0.7243",
+        "reproduced": "True"
+      },
+      "Condition E RMSE": {
+        "documented": 7.22,
+        "recomputed": "7.220",
+        "reproduced": "True"
+      },
+      "Condition E within +-2 marks": {
+        "documented": "56.0% (84/150)",
+        "recomputed": "56.0% (84/150)",
+        "reproduced": ""
+      },
+      "Lexical baseline MAE": {
+        "documented": 5.609,
+        "recomputed": "5.369",
+        "reproduced": "False"
+      },
+      "Lexical baseline within +-2 marks": {
+        "documented": "20.7%",
+        "recomputed": "24.7% (37/150)",
+        "reproduced": ""
+      }
+    }
+  },
+  "method": "offline recomputation; lexical token-overlap baseline and Condition E (mark_answer); logic from git f21dba4 experiments/run_evaluation.py",
+  "not_evaluable": {
+    "original test (legacy reproduction: max=answers.marks column, fallback rubric, failed calls scored 0)": [],
+    "original test (like-for-like: max=question marks, fallback rubric, failures excluded)": [],
+    "repaired eligible test": [],
+    "repaired eligible train": [],
+    "repaired eligible validation": []
+  },
+  "sets": {
+    "original test (legacy reproduction: max=answers.marks column, fallback rubric, failed calls scored 0)": {
+      "baseline": {
+        "failures": 0,
+        "failures_scored_zero": 0,
+        "overall": {
+          "mae": 5.369400000000001,
+          "mae_ci95_answer_bootstrap": [
+            4.778316666666666,
+            5.954775
+          ],
+          "mae_ci95_question_cluster_bootstrap": [
+            4.129121666666666,
+            6.605075
+          ],
+          "n": 150,
+          "pearson_r": 0.8193771692297205,
+          "rmse": 6.477810689834439,
+          "within_10pct_of_max": 0.12666666666666668,
+          "within_10pct_of_max_n": 19,
+          "within_2_marks": 0.24666666666666667,
+          "within_2_marks_n": 37
+        },
+        "per_tier": {
+          "FULL": {
+            "mae": 5.6912,
+            "mae_ci95_answer_bootstrap": [
+              4.277850000000001,
+              7.08443
+            ],
+            "mae_ci95_question_cluster_bootstrap": [
+              4.268370000000001,
+              7.100519999999999
+            ],
+            "n": 25,
+            "pearson_r": 0.868099731800343,
+            "rmse": 6.73168389037988,
+            "within_10pct_of_max": 0.08,
+            "within_10pct_of_max_n": 2,
+            "within_2_marks": 0.16,
+            "within_2_marks_n": 4
+          },
+          "IRRELEVANT": {
+            "mae": 3.523199999999999,
+            "mae_ci95_answer_bootstrap": [
+              1.79821,
+              5.240399999999999
+            ],
+            "mae_ci95_question_cluster_bootstrap": [
+              1.8034199999999998,
+              5.182909999999999
+            ],
+            "n": 25,
+            "pearson_r": 0.6709746413056645,
+            "rmse": 5.607921540107351,
+            "within_10pct_of_max": 0.6,
+            "within_10pct_of_max_n": 15,
+            "within_2_marks": 0.6,
+            "within_2_marks_n": 15
+          },
+          "MISCONCEPTION": {
+            "mae": 5.49,
+            "mae_ci95_answer_bootstrap": [
+              4.16989,
+              6.83761
+            ],
+            "mae_ci95_question_cluster_bootstrap": [
+              4.1819299999999995,
+              6.807719999999999
+            ],
+            "n": 25,
+            "pearson_r": 0.829380324954273,
+            "rmse": 6.435023853879642,
+            "within_10pct_of_max": 0.0,
+            "within_10pct_of_max_n": 0,
+            "within_2_marks": 0.28,
+            "within_2_marks_n": 7
+          },
+          "MISSING_CONCEPT": {
+            "mae": 5.6888,
+            "mae_ci95_answer_bootstrap": [
+              4.41117,
+              6.952479999999999
+            ],
+            "mae_ci95_question_cluster_bootstrap": [
+              4.453120000000001,
+              6.922509999999999
+            ],
+            "n": 25,
+            "pearson_r": 0.8439389113276597,
+            "rmse": 6.518301619287036,
+            "within_10pct_of_max": 0.0,
+            "within_10pct_of_max_n": 0,
+            "within_2_marks": 0.28,
+            "within_2_marks_n": 7
+          },
+          "MOSTLY_CORRECT": {
+            "mae": 5.4836,
+            "mae_ci95_answer_bootstrap": [
+              4.21044,
+              6.71964
+            ],
+            "mae_ci95_question_cluster_bootstrap": [
+              4.20116,
+              6.748199999999998
+            ],
+            "n": 25,
+            "pearson_r": 0.8081518949830463,
+            "rmse": 6.398316341038477,
+            "within_10pct_of_max": 0.08,
+            "within_10pct_of_max_n": 2,
+            "within_2_marks": 0.12,
+            "within_2_marks_n": 3
+          },
+          "PARTIAL": {
+            "mae": 6.339600000000001,
+            "mae_ci95_answer_bootstrap": [
+              5.1415299999999995,
+              7.587439999999999
+            ],
+            "mae_ci95_question_cluster_bootstrap": [
+              5.0409999999999995,
+              7.61417
+            ],
+            "n": 25,
+            "pearson_r": 0.6634184991071783,
+            "rmse": 7.083191088767831,
+            "within_10pct_of_max": 0.0,
+            "within_10pct_of_max_n": 0,
+            "within_2_marks": 0.04,
+            "within_2_marks_n": 1
+          }
+        }
+      },
+      "condition_e": {
+        "failures": 15,
+        "failures_scored_zero": 15,
+        "overall": {
+          "mae": 4.64,
+          "mae_ci95_answer_bootstrap": [
+            3.7266666666666666,
+            5.5535
+          ],
+          "mae_ci95_question_cluster_bootstrap": [
+            2.8533333333333335,
+            6.280166666666666
+          ],
+          "n": 150,
+          "pearson_r": 0.7242842848336652,
+          "rmse": 7.2203416354998975,
+          "within_10pct_of_max": 0.56,
+          "within_10pct_of_max_n": 84,
+          "within_2_marks": 0.56,
+          "within_2_marks_n": 84
+        },
+        "per_tier": {
+          "FULL": {
+            "mae": 4.0,
+            "mae_ci95_answer_bootstrap": [
+              2.0,
+              6.0
+            ],
+            "mae_ci95_question_cluster_bootstrap": [
+              2.0,
+              6.0
+            ],
+            "n": 25,
+            "pearson_r": 0.904093172635561,
+            "rmse": 6.324555320336759,
+            "within_10pct_of_max": 0.6,
+            "within_10pct_of_max_n": 15,
+            "within_2_marks": 0.6,
+            "within_2_marks_n": 15
+          },
+          "IRRELEVANT": {
+            "mae": 4.0,
+            "mae_ci95_answer_bootstrap": [
+              2.0,
+              6.0
+            ],
+            "mae_ci95_question_cluster_bootstrap": [
+              2.0,
+              6.0
+            ],
+            "n": 25,
+            "pearson_r": null,
+            "rmse": 6.324555320336759,
+            "within_10pct_of_max": 0.6,
+            "within_10pct_of_max_n": 15,
+            "within_2_marks": 0.6,
+            "within_2_marks_n": 15
+          },
+          "MISCONCEPTION": {
+            "mae": 4.0,
+            "mae_ci95_answer_bootstrap": [
+              2.0,
+              6.0
+            ],
+            "mae_ci95_question_cluster_bootstrap": [
+              2.0,
+              6.0
+            ],
+            "n": 25,
+            "pearson_r": 0.8262535801023546,
+            "rmse": 6.324555320336759,
+            "within_10pct_of_max": 0.6,
+            "within_10pct_of_max_n": 15,
+            "within_2_marks": 0.6,
+            "within_2_marks_n": 15
+          },
+          "MISSING_CONCEPT": {
+            "mae": 3.2,
+            "mae_ci95_answer_bootstrap": [
+              1.6,
+              5.2
+            ],
+            "mae_ci95_question_cluster_bootstrap": [
+              1.6,
+              4.8
+            ],
+            "n": 25,
+            "pearson_r": 0.8222489341345152,
+            "rmse": 5.656854249492381,
+            "within_10pct_of_max": 0.68,
+            "within_10pct_of_max_n": 17,
+            "within_2_marks": 0.68,
+            "within_2_marks_n": 17
+          },
+          "MOSTLY_CORRECT": {
+            "mae": 7.6,
+            "mae_ci95_answer_bootstrap": [
+              5.0,
+              10.52
+            ],
+            "mae_ci95_question_cluster_bootstrap": [
+              4.919,
+              10.48
+            ],
+            "n": 25,
+            "pearson_r": 0.362724913008485,
+            "rmse": 10.295630140987,
+            "within_10pct_of_max": 0.36,
+            "within_10pct_of_max_n": 9,
+            "within_2_marks": 0.36,
+            "within_2_marks_n": 9
+          },
+          "PARTIAL": {
+            "mae": 5.04,
+            "mae_ci95_answer_bootstrap": [
+              2.999,
+              7.24
+            ],
+            "mae_ci95_question_cluster_bootstrap": [
+              3.039,
+              7.08
+            ],
+            "n": 25,
+            "pearson_r": 0.5134882015163955,
+            "rmse": 7.402702209328699,
+            "within_10pct_of_max": 0.52,
+            "within_10pct_of_max_n": 13,
+            "within_2_marks": 0.52,
+            "within_2_marks_n": 13
+          }
+        }
+      },
+      "fallback_rubric_answers": 12,
+      "n_total": 150
+    },
+    "original test (like-for-like: max=question marks, fallback rubric, failures excluded)": {
+      "baseline": {
+        "failures": 0,
+        "failures_scored_zero": 0,
+        "overall": {
+          "mae": 4.6373999999999995,
+          "mae_ci95_answer_bootstrap": [
+            4.026455,
+            5.289958333333334
+          ],
+          "mae_ci95_question_cluster_bootstrap": [
+            3.256743333333333,
+            5.987406666666664
+          ],
+          "n": 150,
+          "pearson_r": 0.7586721925853408,
+          "rmse": 6.049799500809924,
+          "within_10pct_of_max": 0.3333333333333333,
+          "within_10pct_of_max_n": 50,
+          "within_2_marks": 0.4,
+          "within_2_marks_n": 60
+        },
+        "per_tier": {
+          "FULL": {
+            "mae": 5.6912,
+            "mae_ci95_answer_bootstrap": [
+              4.277850000000001,
+              7.08443
+            ],
+            "mae_ci95_question_cluster_bootstrap": [
+              4.268370000000001,
+              7.100519999999999
+            ],
+            "n": 25,
+            "pearson_r": 0.868099731800343,
+            "rmse": 6.73168389037988,
+            "within_10pct_of_max": 0.08,
+            "within_10pct_of_max_n": 2,
+            "within_2_marks": 0.16,
+            "within_2_marks_n": 4
+          },
+          "IRRELEVANT": {
+            "mae": 4.96,
+            "mae_ci95_answer_bootstrap": [
+              3.69941,
+              6.296549999999999
+            ],
+            "mae_ci95_question_cluster_bootstrap": [
+              3.7003399999999997,
+              6.218469999999999
+            ],
+            "n": 25,
+            "pearson_r": -0.4939969794250302,
+            "rmse": 5.962245214682133,
+            "within_10pct_of_max": 0.0,
+            "within_10pct_of_max_n": 0,
+            "within_2_marks": 0.36,
+            "within_2_marks_n": 9
+          },
+          "MISCONCEPTION": {
+            "mae": 4.200799999999999,
+            "mae_ci95_answer_bootstrap": [
+              2.59507,
+              5.85882
+            ],
+            "mae_ci95_question_cluster_bootstrap": [
+              2.5675200000000005,
+              5.8207299999999975
+            ],
+            "n": 25,
+            "pearson_r": 0.8165410510697367,
+            "rmse": 5.913376023897009,
+            "within_10pct_of_max": 0.52,
+            "within_10pct_of_max_n": 13,
+            "within_2_marks": 0.52,
+            "within_2_marks_n": 13
+          },
+          "MISSING_CONCEPT": {
+            "mae": 4.2796,
+            "mae_ci95_answer_bootstrap": [
+              2.68221,
+              5.887119999999997
+            ],
+            "mae_ci95_question_cluster_bootstrap": [
+              2.6571099999999994,
+              5.863209999999999
+            ],
+            "n": 25,
+            "pearson_r": 0.8337598866021616,
+            "rmse": 5.9220952373294375,
+            "within_10pct_of_max": 0.52,
+            "within_10pct_of_max_n": 13,
+            "within_2_marks": 0.48,
+            "within_2_marks_n": 12
+          },
+          "MOSTLY_CORRECT": {
+            "mae": 4.1824,
+            "mae_ci95_answer_bootstrap": [
+              2.7524,
+              5.654079999999999
+            ],
+            "mae_ci95_question_cluster_bootstrap": [
+              2.75519,
+              5.633359999999999
+            ],
+            "n": 25,
+            "pearson_r": 0.8201904259669982,
+            "rmse": 5.611836775958474,
+            "within_10pct_of_max": 0.36,
+            "within_10pct_of_max_n": 9,
+            "within_2_marks": 0.4,
+            "within_2_marks_n": 10
+          },
+          "PARTIAL": {
+            "mae": 4.510400000000001,
+            "mae_ci95_answer_bootstrap": [
+              2.9785899999999996,
+              6.15458
+            ],
+            "mae_ci95_question_cluster_bootstrap": [
+              2.92077,
+              6.119250000000001
+            ],
+            "n": 25,
+            "pearson_r": 0.6102666563355622,
+            "rmse": 6.099554737847674,
+            "within_10pct_of_max": 0.52,
+            "within_10pct_of_max_n": 13,
+            "within_2_marks": 0.48,
+            "within_2_marks_n": 12
+          }
+        }
+      },
+      "condition_e": {
+        "failures": 0,
+        "failures_scored_zero": 0,
+        "overall": {
+          "mae": 5.993333333333333,
+          "mae_ci95_answer_bootstrap": [
+            5.2165,
+            6.7635
+          ],
+          "mae_ci95_question_cluster_bootstrap": [
+            4.619833333333333,
+            7.300833333333329
+          ],
+          "n": 150,
+          "pearson_r": 0.6846934934702333,
+          "rmse": 7.710166448700486,
+          "within_10pct_of_max": 0.21333333333333335,
+          "within_10pct_of_max_n": 32,
+          "within_2_marks": 0.36,
+          "within_2_marks_n": 54
+        },
+        "per_tier": {
+          "FULL": {
+            "mae": 4.0,
+            "mae_ci95_answer_bootstrap": [
+              2.0,
+              6.0
+            ],
+            "mae_ci95_question_cluster_bootstrap": [
+              2.0,
+              6.0
+            ],
+            "n": 25,
+            "pearson_r": 0.904093172635561,
+            "rmse": 6.324555320336759,
+            "within_10pct_of_max": 0.6,
+            "within_10pct_of_max_n": 15,
+            "within_2_marks": 0.6,
+            "within_2_marks_n": 15
+          },
+          "IRRELEVANT": {
+            "mae": 4.0,
+            "mae_ci95_answer_bootstrap": [
+              2.0,
+              6.0
+            ],
+            "mae_ci95_question_cluster_bootstrap": [
+              2.0,
+              6.0
+            ],
+            "n": 25,
+            "pearson_r": null,
+            "rmse": 6.324555320336759,
+            "within_10pct_of_max": 0.6,
+            "within_10pct_of_max_n": 15,
+            "within_2_marks": 0.6,
+            "within_2_marks_n": 15
+          },
+          "MISCONCEPTION": {
+            "mae": 5.9,
+            "mae_ci95_answer_bootstrap": [
+              4.54,
+              7.32
+            ],
+            "mae_ci95_question_cluster_bootstrap": [
+              4.54,
+              7.28
+            ],
+            "n": 25,
+            "pearson_r": 0.8157341150751248,
+            "rmse": 6.870953354520754,
+            "within_10pct_of_max": 0.0,
+            "within_10pct_of_max_n": 0,
+            "within_2_marks": 0.32,
+            "within_2_marks_n": 8
+          },
+          "MISSING_CONCEPT": {
+            "mae": 5.1,
+            "mae_ci95_answer_bootstrap": [
+              3.68,
+              6.5
+            ],
+            "mae_ci95_question_cluster_bootstrap": [
+              3.6995,
+              6.5
+            ],
+            "n": 25,
+            "pearson_r": 0.8198801896351371,
+            "rmse": 6.261788881781308,
+            "within_10pct_of_max": 0.08,
+            "within_10pct_of_max_n": 2,
+            "within_2_marks": 0.4,
+            "within_2_marks_n": 10
+          },
+          "MOSTLY_CORRECT": {
+            "mae": 8.62,
+            "mae_ci95_answer_bootstrap": [
+              6.4195,
+              11.16
+            ],
+            "mae_ci95_question_cluster_bootstrap": [
+              6.38,
+              11.12
+            ],
+            "n": 25,
+            "pearson_r": 0.36191878323366183,
+            "rmse": 10.465658125507444,
+            "within_10pct_of_max": 0.0,
+            "within_10pct_of_max_n": 0,
+            "within_2_marks": 0.24,
+            "within_2_marks_n": 6
+          },
+          "PARTIAL": {
+            "mae": 8.34,
+            "mae_ci95_answer_bootstrap": [
+              7.1,
+              9.64
+            ],
+            "mae_ci95_question_cluster_bootstrap": [
+              7.02,
+              9.660499999999997
+            ],
+            "n": 25,
+            "pearson_r": 0.45645881874359695,
+            "rmse": 8.984987479123163,
+            "within_10pct_of_max": 0.0,
+            "within_10pct_of_max_n": 0,
+            "within_2_marks": 0.0,
+            "within_2_marks_n": 0
+          }
+        }
+      },
+      "fallback_rubric_answers": 12,
+      "n_total": 150
+    },
+    "repaired eligible test": {
+      "baseline": {
+        "failures": 0,
+        "failures_scored_zero": 0,
+        "overall": {
+          "mae": 1.9386666666666668,
+          "mae_ci95_answer_bootstrap": [
+            1.5833277777777777,
+            2.3058416666666663
+          ],
+          "mae_ci95_question_cluster_bootstrap": [
+            1.3917666666666666,
+            2.534141666666666
+          ],
+          "n": 90,
+          "pearson_r": 0.9739752238515381,
+          "rmse": 2.6159022237928626,
+          "within_10pct_of_max": 0.5111111111111111,
+          "within_10pct_of_max_n": 46,
+          "within_2_marks": 0.6222222222222222,
+          "within_2_marks_n": 56
+        },
+        "per_tier": {
+          "FULL": {
+            "mae": 4.152,
+            "mae_ci95_answer_bootstrap": [
+              3.061166666666666,
+              5.278166666666666
+            ],
+            "mae_ci95_question_cluster_bootstrap": [
+              3.0685833333333328,
+              5.3387166666666666
+            ],
+            "n": 15,
+            "pearson_r": 0.992567888411877,
+            "rmse": 4.710903664195792,
+            "within_10pct_of_max": 0.0,
+            "within_10pct_of_max_n": 0,
+            "within_2_marks": 0.13333333333333333,
+            "within_2_marks_n": 2
+          },
+          "IRRELEVANT": {
+            "mae": 2.3946666666666663,
+            "mae_ci95_answer_bootstrap": [
+              1.8912833333333334,
+              2.96935
+            ],
+            "mae_ci95_question_cluster_bootstrap": [
+              1.8893166666666668,
+              2.9555999999999982
+            ],
+            "n": 15,
+            "pearson_r": null,
+            "rmse": 2.613931904239282,
+            "within_10pct_of_max": 0.0,
+            "within_10pct_of_max_n": 0,
+            "within_2_marks": 0.6,
+            "within_2_marks_n": 9
+          },
+          "MISCONCEPTION": {
+            "mae": 0.8553333333333336,
+            "mae_ci95_answer_bootstrap": [
+              0.46063333333333345,
+              1.337433333333333
+            ],
+            "mae_ci95_question_cluster_bootstrap": [
+              0.4579833333333335,
+              1.3353333333333337
+            ],
+            "n": 15,
+            "pearson_r": 0.9905370433240223,
+            "rmse": 1.229403649471293,
+            "within_10pct_of_max": 0.8666666666666667,
+            "within_10pct_of_max_n": 13,
+            "within_2_marks": 0.8666666666666667,
+            "within_2_marks_n": 13
+          },
+          "MISSING_CONCEPT": {
+            "mae": 0.9999999999999998,
+            "mae_ci95_answer_bootstrap": [
+              0.5846333333333333,
+              1.4580333333333335
+            ],
+            "mae_ci95_question_cluster_bootstrap": [
+              0.5772833333333336,
+              1.4868833333333324
+            ],
+            "n": 15,
+            "pearson_r": 0.9942825419695034,
+            "rmse": 1.3361437048461515,
+            "within_10pct_of_max": 0.8666666666666667,
+            "within_10pct_of_max_n": 13,
+            "within_2_marks": 0.8,
+            "within_2_marks_n": 12
+          },
+          "MOSTLY_CORRECT": {
+            "mae": 1.9493333333333331,
+            "mae_ci95_answer_bootstrap": [
+              1.3759166666666665,
+              2.558666666666667
+            ],
+            "mae_ci95_question_cluster_bootstrap": [
+              1.3606500000000001,
+              2.556033333333333
+            ],
+            "n": 15,
+            "pearson_r": 0.9940661395570931,
+            "rmse": 2.2762923069471253,
+            "within_10pct_of_max": 0.4666666666666667,
+            "within_10pct_of_max_n": 7,
+            "within_2_marks": 0.5333333333333333,
+            "within_2_marks_n": 8
+          },
+          "PARTIAL": {
+            "mae": 1.2806666666666666,
+            "mae_ci95_answer_bootstrap": [
+              0.6626333333333334,
+              2.049566666666666
+            ],
+            "mae_ci95_question_cluster_bootstrap": [
+              0.6878666666666668,
+              2.066066666666666
+            ],
+            "n": 15,
+            "pearson_r": 0.9546734158546325,
+            "rmse": 1.8852568348459404,
+            "within_10pct_of_max": 0.8666666666666667,
+            "within_10pct_of_max_n": 13,
+            "within_2_marks": 0.8,
+            "within_2_marks_n": 12
+          }
+        }
+      },
+      "condition_e": {
+        "failures": 0,
+        "failures_scored_zero": 0,
+        "overall": {
+          "mae": 3.5444444444444443,
+          "mae_ci95_answer_bootstrap": [
+            2.6333333333333333,
+            4.583333333333333
+          ],
+          "mae_ci95_question_cluster_bootstrap": [
+            2.5775,
+            4.689166666666665
+          ],
+          "n": 90,
+          "pearson_r": 0.8010172118780703,
+          "rmse": 5.885009204184249,
+          "within_10pct_of_max": 0.3333333333333333,
+          "within_10pct_of_max_n": 30,
+          "within_2_marks": 0.5777777777777777,
+          "within_2_marks_n": 52
+        },
+        "per_tier": {
+          "FULL": {
+            "mae": 0.0,
+            "mae_ci95_answer_bootstrap": [
+              0.0,
+              0.0
+            ],
+            "mae_ci95_question_cluster_bootstrap": [
+              0.0,
+              0.0
+            ],
+            "n": 15,
+            "pearson_r": 0.9999999999999999,
+            "rmse": 0.0,
+            "within_10pct_of_max": 1.0,
+            "within_10pct_of_max_n": 15,
+            "within_2_marks": 1.0,
+            "within_2_marks_n": 15
+          },
+          "IRRELEVANT": {
+            "mae": 0.0,
+            "mae_ci95_answer_bootstrap": [
+              0.0,
+              0.0
+            ],
+            "mae_ci95_question_cluster_bootstrap": [
+              0.0,
+              0.0
+            ],
+            "n": 15,
+            "pearson_r": null,
+            "rmse": 0.0,
+            "within_10pct_of_max": 1.0,
+            "within_10pct_of_max_n": 15,
+            "within_2_marks": 1.0,
+            "within_2_marks_n": 15
+          },
+          "MISCONCEPTION": {
+            "mae": 3.1666666666666665,
+            "mae_ci95_answer_bootstrap": [
+              2.466666666666667,
+              3.933333333333333
+            ],
+            "mae_ci95_question_cluster_bootstrap": [
+              2.466666666666667,
+              3.9
+            ],
+            "n": 15,
+            "pearson_r": 0.996104181946559,
+            "rmse": 3.4665064065520874,
+            "within_10pct_of_max": 0.0,
+            "within_10pct_of_max_n": 0,
+            "within_2_marks": 0.5333333333333333,
+            "within_2_marks_n": 8
+          },
+          "MISSING_CONCEPT": {
+            "mae": 3.1666666666666665,
+            "mae_ci95_answer_bootstrap": [
+              2.466666666666667,
+              3.933333333333333
+            ],
+            "mae_ci95_question_cluster_bootstrap": [
+              2.466666666666667,
+              3.9
+            ],
+            "n": 15,
+            "pearson_r": 0.996104181946559,
+            "rmse": 3.4665064065520874,
+            "within_10pct_of_max": 0.0,
+            "within_10pct_of_max_n": 0,
+            "within_2_marks": 0.5333333333333333,
+            "within_2_marks_n": 8
+          },
+          "MOSTLY_CORRECT": {
+            "mae": 7.7,
+            "mae_ci95_answer_bootstrap": [
+              4.065833333333333,
+              11.733333333333333
+            ],
+            "mae_ci95_question_cluster_bootstrap": [
+              4.3,
+              11.802499999999988
+            ],
+            "n": 15,
+            "pearson_r": 0.23791234354923943,
+            "rmse": 10.764912137743314,
+            "within_10pct_of_max": 0.0,
+            "within_10pct_of_max_n": 0,
+            "within_2_marks": 0.4,
+            "within_2_marks_n": 6
+          },
+          "PARTIAL": {
+            "mae": 7.233333333333333,
+            "mae_ci95_answer_bootstrap": [
+              5.366666666666666,
+              9.40083333333333
+            ],
+            "mae_ci95_question_cluster_bootstrap": [
+              5.366666666666666,
+              9.4
+            ],
+            "n": 15,
+            "pearson_r": 0.5959874543593162,
+            "rmse": 8.239134258727269,
+            "within_10pct_of_max": 0.0,
+            "within_10pct_of_max_n": 0,
+            "within_2_marks": 0.0,
+            "within_2_marks_n": 0
+          }
+        }
+      },
+      "n_total": 90
+    },
+    "repaired eligible train": {
+      "baseline": {
+        "failures": 0,
+        "failures_scored_zero": 0,
+        "overall": {
+          "mae": 3.010666666666667,
+          "mae_ci95_answer_bootstrap": [
+            2.5948982142857138,
+            3.469673809523809
+          ],
+          "mae_ci95_question_cluster_bootstrap": [
+            2.333475,
+            3.8123113095238095
+          ],
+          "n": 420,
+          "pearson_r": 0.9574243909349921,
+          "rmse": 5.286159916864667,
+          "within_10pct_of_max": 0.4738095238095238,
+          "within_10pct_of_max_n": 199,
+          "within_2_marks": 0.5761904761904761,
+          "within_2_marks_n": 242
+        },
+        "per_tier": {
+          "FULL": {
+            "mae": 5.303571428571429,
+            "mae_ci95_answer_bootstrap": [
+              4.235160714285715,
+              6.506307142857142
+            ],
+            "mae_ci95_question_cluster_bootstrap": [
+              4.300028571428571,
+              6.4428642857142835
+            ],
+            "n": 70,
+            "pearson_r": 0.9842078094765851,
+            "rmse": 7.069396316922279,
+            "within_10pct_of_max": 0.0,
+            "within_10pct_of_max_n": 0,
+            "within_2_marks": 0.17142857142857143,
+            "within_2_marks_n": 12
+          },
+          "IRRELEVANT": {
+            "mae": 2.6632857142857143,
+            "mae_ci95_answer_bootstrap": [
+              2.2881285714285715,
+              3.098460714285714
+            ],
+            "mae_ci95_question_cluster_bootstrap": [
+              2.279117857142857,
+              3.097396428571428
+            ],
+            "n": 70,
+            "pearson_r": null,
+            "rmse": 3.17938291407086,
+            "within_10pct_of_max": 0.12857142857142856,
+            "within_10pct_of_max_n": 9,
+            "within_2_marks": 0.5571428571428572,
+            "within_2_marks_n": 39
+          },
+          "MISCONCEPTION": {
+            "mae": 1.9707142857142859,
+            "mae_ci95_answer_bootstrap": [
+              1.3276607142857142,
+              2.7392821428571428
+            ],
+            "mae_ci95_question_cluster_bootstrap": [
+              1.3888178571428569,
+              2.6756678571428547
+            ],
+            "n": 70,
+            "pearson_r": 0.9738979357210472,
+            "rmse": 3.4929432942924876,
+            "within_10pct_of_max": 0.7428571428571429,
+            "within_10pct_of_max_n": 52,
+            "within_2_marks": 0.7285714285714285,
+            "within_2_marks_n": 51
+          },
+          "MISSING_CONCEPT": {
+            "mae": 2.071857142857143,
+            "mae_ci95_answer_bootstrap": [
+              1.3359892857142857,
+              2.8786499999999995
+            ],
+            "mae_ci95_question_cluster_bootstrap": [
+              1.4156357142857143,
+              2.8519857142857146
+            ],
+            "n": 70,
+            "pearson_r": 0.9746845564990593,
+            "rmse": 3.780596513779274,
+            "within_10pct_of_max": 0.7428571428571429,
+            "within_10pct_of_max_n": 52,
+            "within_2_marks": 0.6857142857142857,
+            "within_2_marks_n": 48
+          },
+          "MOSTLY_CORRECT": {
+            "mae": 3.3044285714285713,
+            "mae_ci95_answer_bootstrap": [
+              2.240967857142857,
+              4.541903571428572
+            ],
+            "mae_ci95_question_cluster_bootstrap": [
+              2.3310571428571434,
+              4.484328571428571
+            ],
+            "n": 70,
+            "pearson_r": 0.9454680331475982,
+            "rmse": 5.79553116017604,
+            "within_10pct_of_max": 0.5571428571428572,
+            "within_10pct_of_max_n": 39,
+            "within_2_marks": 0.6285714285714286,
+            "within_2_marks_n": 44
+          },
+          "PARTIAL": {
+            "mae": 2.750142857142857,
+            "mae_ci95_answer_bootstrap": [
+              1.5016750000000003,
+              4.439285714285714
+            ],
+            "mae_ci95_question_cluster_bootstrap": [
+              1.5455142857142858,
+              4.472385714285714
+            ],
+            "n": 70,
+            "pearson_r": 0.943934995800824,
+            "rmse": 6.891613433317753,
+            "within_10pct_of_max": 0.6714285714285714,
+            "within_10pct_of_max_n": 47,
+            "within_2_marks": 0.6857142857142857,
+            "within_2_marks_n": 48
+          }
+        }
+      },
+      "condition_e": {
+        "failures": 0,
+        "failures_scored_zero": 0,
+        "overall": {
+          "mae": 4.144047619047619,
+          "mae_ci95_answer_bootstrap": [
+            3.632113095238095,
+            4.664315476190477
+          ],
+          "mae_ci95_question_cluster_bootstrap": [
+            3.518988095238095,
+            4.840595238095237
+          ],
+          "n": 420,
+          "pearson_r": 0.9357531360926725,
+          "rmse": 6.870702119801703,
+          "within_10pct_of_max": 0.3523809523809524,
+          "within_10pct_of_max_n": 148,
+          "within_2_marks": 0.5619047619047619,
+          "within_2_marks_n": 236
+        },
+        "per_tier": {
+          "FULL": {
+            "mae": 0.14285714285714285,
+            "mae_ci95_answer_bootstrap": [
+              0.0,
+              0.42857142857142855
+            ],
+            "mae_ci95_question_cluster_bootstrap": [
+              0.0,
+              0.42857142857142855
+            ],
+            "n": 70,
+            "pearson_r": 0.9977993314330159,
+            "rmse": 1.1952286093343936,
+            "within_10pct_of_max": 0.9857142857142858,
+            "within_10pct_of_max_n": 69,
+            "within_2_marks": 0.9857142857142858,
+            "within_2_marks_n": 69
+          },
+          "IRRELEVANT": {
+            "mae": 0.0,
+            "mae_ci95_answer_bootstrap": [
+              0.0,
+              0.0
+            ],
+            "mae_ci95_question_cluster_bootstrap": [
+              0.0,
+              0.0
+            ],
+            "n": 70,
+            "pearson_r": null,
+            "rmse": 0.0,
+            "within_10pct_of_max": 1.0,
+            "within_10pct_of_max_n": 70,
+            "within_2_marks": 1.0,
+            "within_2_marks_n": 70
+          },
+          "MISCONCEPTION": {
+            "mae": 4.335714285714285,
+            "mae_ci95_answer_bootstrap": [
+              3.4926785714285713,
+              5.3287499999999985
+            ],
+            "mae_ci95_question_cluster_bootstrap": [
+              3.4714285714285715,
+              5.335714285714285
+            ],
+            "n": 70,
+            "pearson_r": 0.9819983694873937,
+            "rmse": 5.875797818169035,
+            "within_10pct_of_max": 0.04285714285714286,
+            "within_10pct_of_max_n": 3,
+            "within_2_marks": 0.5142857142857142,
+            "within_2_marks_n": 36
+          },
+          "MISSING_CONCEPT": {
+            "mae": 4.335714285714285,
+            "mae_ci95_answer_bootstrap": [
+              3.4926785714285713,
+              5.3287499999999985
+            ],
+            "mae_ci95_question_cluster_bootstrap": [
+              3.4714285714285715,
+              5.335714285714285
+            ],
+            "n": 70,
+            "pearson_r": 0.9819983694873937,
+            "rmse": 5.875797818169035,
+            "within_10pct_of_max": 0.04285714285714286,
+            "within_10pct_of_max_n": 3,
+            "within_2_marks": 0.5142857142857142,
+            "within_2_marks_n": 36
+          },
+          "MOSTLY_CORRECT": {
+            "mae": 7.492857142857143,
+            "mae_ci95_answer_bootstrap": [
+              6.064107142857143,
+              9.193035714285713
+            ],
+            "mae_ci95_question_cluster_bootstrap": [
+              6.014107142857143,
+              9.121428571428572
+            ],
+            "n": 70,
+            "pearson_r": 0.8827758206592872,
+            "rmse": 9.97693769221226,
+            "within_10pct_of_max": 0.02857142857142857,
+            "within_10pct_of_max_n": 2,
+            "within_2_marks": 0.34285714285714286,
+            "within_2_marks_n": 24
+          },
+          "PARTIAL": {
+            "mae": 8.557142857142857,
+            "mae_ci95_answer_bootstrap": [
+              7.1425,
+              10.10017857142857
+            ],
+            "mae_ci95_question_cluster_bootstrap": [
+              7.15,
+              10.064464285714285
+            ],
+            "n": 70,
+            "pearson_r": 0.8534635841107843,
+            "rmse": 10.64055583940184,
+            "within_10pct_of_max": 0.014285714285714285,
+            "within_10pct_of_max_n": 1,
+            "within_2_marks": 0.014285714285714285,
+            "within_2_marks_n": 1
+          }
+        }
+      },
+      "n_total": 420
+    },
+    "repaired eligible validation": {
+      "baseline": {
+        "failures": 0,
+        "failures_scored_zero": 0,
+        "overall": {
+          "mae": 3.0986363636363636,
+          "mae_ci95_answer_bootstrap": [
+            1.8262045454545455,
+            4.801723484848485
+          ],
+          "mae_ci95_question_cluster_bootstrap": [
+            1.1187689393939395,
+            6.121893939393937
+          ],
+          "n": 66,
+          "pearson_r": 0.9782343958044257,
+          "rmse": 6.885396601767858,
+          "within_10pct_of_max": 0.5909090909090909,
+          "within_10pct_of_max_n": 39,
+          "within_2_marks": 0.6666666666666666,
+          "within_2_marks_n": 44
+        },
+        "per_tier": {
+          "FULL": {
+            "mae": 5.255454545454547,
+            "mae_ci95_answer_bootstrap": [
+              2.5287500000000005,
+              9.102204545454537
+            ],
+            "mae_ci95_question_cluster_bootstrap": [
+              2.5795909090909093,
+              8.740204545454546
+            ],
+            "n": 11,
+            "pearson_r": 0.9993498419931425,
+            "rmse": 7.655393226643912,
+            "within_10pct_of_max": 0.0,
+            "within_10pct_of_max_n": 0,
+            "within_2_marks": 0.18181818181818182,
+            "within_2_marks_n": 2
+          },
+          "IRRELEVANT": {
+            "mae": 2.847272727272727,
+            "mae_ci95_answer_bootstrap": [
+              1.7590909090909093,
+              4.546545454545453
+            ],
+            "mae_ci95_question_cluster_bootstrap": [
+              1.7590909090909093,
+              4.552727272727273
+            ],
+            "n": 11,
+            "pearson_r": null,
+            "rmse": 3.8204521388776156,
+            "within_10pct_of_max": 0.09090909090909091,
+            "within_10pct_of_max_n": 1,
+            "within_2_marks": 0.6363636363636364,
+            "within_2_marks_n": 7
+          },
+          "MISCONCEPTION": {
+            "mae": 1.2336363636363632,
+            "mae_ci95_answer_bootstrap": [
+              0.5018181818181818,
+              2.408363636363634
+            ],
+            "mae_ci95_question_cluster_bootstrap": [
+              0.5018181818181818,
+              2.3630227272727256
+            ],
+            "n": 11,
+            "pearson_r": 0.9985089312919816,
+            "rmse": 2.124688212420824,
+            "within_10pct_of_max": 0.9090909090909091,
+            "within_10pct_of_max_n": 10,
+            "within_2_marks": 0.8181818181818182,
+            "within_2_marks_n": 9
+          },
+          "MISSING_CONCEPT": {
+            "mae": 1.2572727272727278,
+            "mae_ci95_answer_bootstrap": [
+              0.19818181818181832,
+              3.000136363636364
+            ],
+            "mae_ci95_question_cluster_bootstrap": [
+              0.21536363636363687,
+              2.9591363636363646
+            ],
+            "n": 11,
+            "pearson_r": 0.9993570019580555,
+            "rmse": 2.8709437789371965,
+            "within_10pct_of_max": 1.0,
+            "within_10pct_of_max_n": 11,
+            "within_2_marks": 0.8181818181818182,
+            "within_2_marks_n": 9
+          },
+          "MOSTLY_CORRECT": {
+            "mae": 3.7181818181818183,
+            "mae_ci95_answer_bootstrap": [
+              0.846340909090909,
+              8.842454545454544
+            ],
+            "mae_ci95_question_cluster_bootstrap": [
+              0.8463636363636365,
+              8.553204545454545
+            ],
+            "n": 11,
+            "pearson_r": 0.9918092116868314,
+            "rmse": 8.36094492267471,
+            "within_10pct_of_max": 0.7272727272727273,
+            "within_10pct_of_max_n": 8,
+            "within_2_marks": 0.8181818181818182,
+            "within_2_marks_n": 9
+          },
+          "PARTIAL": {
+            "mae": 4.28,
+            "mae_ci95_answer_bootstrap": [
+              0.5551590909090911,
+              11.151840909090907
+            ],
+            "mae_ci95_question_cluster_bootstrap": [
+              0.5435454545454547,
+              11.069568181818179
+            ],
+            "n": 11,
+            "pearson_r": 0.9495821637385811,
+            "rmse": 11.33971780954006,
+            "within_10pct_of_max": 0.8181818181818182,
+            "within_10pct_of_max_n": 9,
+            "within_2_marks": 0.7272727272727273,
+            "within_2_marks_n": 8
+          }
+        }
+      },
+      "condition_e": {
+        "failures": 0,
+        "failures_scored_zero": 0,
+        "overall": {
+          "mae": 10.954545454545455,
+          "mae_ci95_answer_bootstrap": [
+            5.642424242424243,
+            17.37159090909091
+          ],
+          "mae_ci95_question_cluster_bootstrap": [
+            2.8028409090909094,
+            24.697727272727267
+          ],
+          "n": 66,
+          "pearson_r": 0.19850140214806464,
+          "rmse": 26.558682880813883,
+          "within_10pct_of_max": 0.3181818181818182,
+          "within_10pct_of_max_n": 21,
+          "within_2_marks": 0.5757575757575758,
+          "within_2_marks_n": 38
+        },
+        "per_tier": {
+          "FULL": {
+            "mae": 9.090909090909092,
+            "mae_ci95_answer_bootstrap": [
+              0.0,
+              27.272727272727273
+            ],
+            "mae_ci95_question_cluster_bootstrap": [
+              0.0,
+              27.272727272727273
+            ],
+            "n": 11,
+            "pearson_r": 0.2107615250002249,
+            "rmse": 30.15113445777636,
+            "within_10pct_of_max": 0.9090909090909091,
+            "within_10pct_of_max_n": 10,
+            "within_2_marks": 0.9090909090909091,
+            "within_2_marks_n": 10
+          },
+          "IRRELEVANT": {
+            "mae": 0.0,
+            "mae_ci95_answer_bootstrap": [
+              0.0,
+              0.0
+            ],
+            "mae_ci95_question_cluster_bootstrap": [
+              0.0,
+              0.0
+            ],
+            "n": 11,
+            "pearson_r": null,
+            "rmse": 0.0,
+            "within_10pct_of_max": 1.0,
+            "within_10pct_of_max_n": 11,
+            "within_2_marks": 1.0,
+            "within_2_marks_n": 11
+          },
+          "MISCONCEPTION": {
+            "mae": 11.5,
+            "mae_ci95_answer_bootstrap": [
+              2.4522727272727276,
+              28.04886363636362
+            ],
+            "mae_ci95_question_cluster_bootstrap": [
+              2.4545454545454546,
+              27.72954545454544
+            ],
+            "n": 11,
+            "pearson_r": 0.1527944130852518,
+            "rmse": 27.515697998844885,
+            "within_10pct_of_max": 0.0,
+            "within_10pct_of_max_n": 0,
+            "within_2_marks": 0.6363636363636364,
+            "within_2_marks_n": 7
+          },
+          "MISSING_CONCEPT": {
+            "mae": 11.5,
+            "mae_ci95_answer_bootstrap": [
+              2.4522727272727276,
+              28.04886363636362
+            ],
+            "mae_ci95_question_cluster_bootstrap": [
+              2.4545454545454546,
+              27.72954545454544
+            ],
+            "n": 11,
+            "pearson_r": 0.1527944130852518,
+            "rmse": 27.515697998844885,
+            "within_10pct_of_max": 0.0,
+            "within_10pct_of_max_n": 0,
+            "within_2_marks": 0.6363636363636364,
+            "within_2_marks_n": 7
+          },
+          "MOSTLY_CORRECT": {
+            "mae": 18.681818181818183,
+            "mae_ci95_answer_bootstrap": [
+              6.454545454545454,
+              37.22840909090908
+            ],
+            "mae_ci95_question_cluster_bootstrap": [
+              6.544318181818182,
+              35.72727272727273
+            ],
+            "n": 11,
+            "pearson_r": -0.3031216246731424,
+            "rmse": 31.870833060966575,
+            "within_10pct_of_max": 0.0,
+            "within_10pct_of_max_n": 0,
+            "within_2_marks": 0.2727272727272727,
+            "within_2_marks_n": 3
+          },
+          "PARTIAL": {
+            "mae": 14.954545454545455,
+            "mae_ci95_answer_bootstrap": [
+              5.440909090909091,
+              31.318181818181817
+            ],
+            "mae_ci95_question_cluster_bootstrap": [
+              5.454545454545454,
+              30.598863636363593
+            ],
+            "n": 11,
+            "pearson_r": 0.05190285474635485,
+            "rmse": 28.162273281175942,
+            "within_10pct_of_max": 0.0,
+            "within_10pct_of_max_n": 0,
+            "within_2_marks": 0.0,
+            "within_2_marks_n": 0
+          }
+        }
+      },
+      "n_total": 66
+    }
+  },
+  "table_md": "Recomputed offline on 2026-10-21 by `datasets/repair/evaluate_repaired.py` (no LLM, nothing tuned). Numbers quoted in older documents are 'reported by documentation, not recomputed here' unless listed in the last section.\n\n### repaired eligible test\n\n| set / method | n | MAE | RMSE | Pearson r | within +-2 marks | within 10% of max | MAE 95% CI (answer bootstrap) |\n|---|---|---|---|---|---|---|---|\n| baseline overall | 90 | 1.939 | 2.616 | 0.9740 | 56/90 (62.2%) | 46/90 (51.1%) | [1.583, 2.306] |\n| baseline FULL | 15 | 4.152 | 4.711 | 0.9926 | 2/15 (13.3%) | 0/15 (0.0%) | [3.061, 5.278] |\n| baseline MOSTLY_CORRECT | 15 | 1.949 | 2.276 | 0.9941 | 8/15 (53.3%) | 7/15 (46.7%) | [1.376, 2.559] |\n| baseline PARTIAL | 15 | 1.281 | 1.885 | 0.9547 | 12/15 (80.0%) | 13/15 (86.7%) | [0.663, 2.050] |\n| baseline MISSING_CONCEPT | 15 | 1.000 | 1.336 | 0.9943 | 12/15 (80.0%) | 13/15 (86.7%) | [0.585, 1.458] |\n| baseline MISCONCEPTION | 15 | 0.855 | 1.229 | 0.9905 | 13/15 (86.7%) | 13/15 (86.7%) | [0.461, 1.337] |\n| baseline IRRELEVANT | 15 | 2.395 | 2.614 | n/a | 9/15 (60.0%) | 0/15 (0.0%) | [1.891, 2.969] |\n| condition_e overall | 90 | 3.544 | 5.885 | 0.8010 | 52/90 (57.8%) | 30/90 (33.3%) | [2.633, 4.583] |\n| condition_e FULL | 15 | 0.000 | 0.000 | 1.0000 | 15/15 (100.0%) | 15/15 (100.0%) | [0.000, 0.000] |\n| condition_e MOSTLY_CORRECT | 15 | 7.700 | 10.765 | 0.2379 | 6/15 (40.0%) | 0/15 (0.0%) | [4.066, 11.733] |\n| condition_e PARTIAL | 15 | 7.233 | 8.239 | 0.5960 | 0/15 (0.0%) | 0/15 (0.0%) | [5.367, 9.401] |\n| condition_e MISSING_CONCEPT | 15 | 3.167 | 3.467 | 0.9961 | 8/15 (53.3%) | 0/15 (0.0%) | [2.467, 3.933] |\n| condition_e MISCONCEPTION | 15 | 3.167 | 3.467 | 0.9961 | 8/15 (53.3%) | 0/15 (0.0%) | [2.467, 3.933] |\n| condition_e IRRELEVANT | 15 | 0.000 | 0.000 | n/a | 15/15 (100.0%) | 15/15 (100.0%) | [0.000, 0.000] |\n\nfailed marking calls: 0 (excluded and counted, not scored)\n\nnot_evaluable answers: 0\n\n### repaired eligible validation\n\n| set / method | n | MAE | RMSE | Pearson r | within +-2 marks | within 10% of max | MAE 95% CI (answer bootstrap) |\n|---|---|---|---|---|---|---|---|\n| baseline overall | 66 | 3.099 | 6.885 | 0.9782 | 44/66 (66.7%) | 39/66 (59.1%) | [1.826, 4.802] |\n| baseline FULL | 11 | 5.255 | 7.655 | 0.9993 | 2/11 (18.2%) | 0/11 (0.0%) | [2.529, 9.102] |\n| baseline MOSTLY_CORRECT | 11 | 3.718 | 8.361 | 0.9918 | 9/11 (81.8%) | 8/11 (72.7%) | [0.846, 8.842] |\n| baseline PARTIAL | 11 | 4.280 | 11.340 | 0.9496 | 8/11 (72.7%) | 9/11 (81.8%) | [0.555, 11.152] |\n| baseline MISSING_CONCEPT | 11 | 1.257 | 2.871 | 0.9994 | 9/11 (81.8%) | 11/11 (100.0%) | [0.198, 3.000] |\n| baseline MISCONCEPTION | 11 | 1.234 | 2.125 | 0.9985 | 9/11 (81.8%) | 10/11 (90.9%) | [0.502, 2.408] |\n| baseline IRRELEVANT | 11 | 2.847 | 3.820 | n/a | 7/11 (63.6%) | 1/11 (9.1%) | [1.759, 4.547] |\n| condition_e overall | 66 | 10.955 | 26.559 | 0.1985 | 38/66 (57.6%) | 21/66 (31.8%) | [5.642, 17.372] |\n| condition_e FULL | 11 | 9.091 | 30.151 | 0.2108 | 10/11 (90.9%) | 10/11 (90.9%) | [0.000, 27.273] |\n| condition_e MOSTLY_CORRECT | 11 | 18.682 | 31.871 | -0.3031 | 3/11 (27.3%) | 0/11 (0.0%) | [6.455, 37.228] |\n| condition_e PARTIAL | 11 | 14.955 | 28.162 | 0.0519 | 0/11 (0.0%) | 0/11 (0.0%) | [5.441, 31.318] |\n| condition_e MISSING_CONCEPT | 11 | 11.500 | 27.516 | 0.1528 | 7/11 (63.6%) | 0/11 (0.0%) | [2.452, 28.049] |\n| condition_e MISCONCEPTION | 11 | 11.500 | 27.516 | 0.1528 | 7/11 (63.6%) | 0/11 (0.0%) | [2.452, 28.049] |\n| condition_e IRRELEVANT | 11 | 0.000 | 0.000 | n/a | 11/11 (100.0%) | 11/11 (100.0%) | [0.000, 0.000] |\n\nfailed marking calls: 0 (excluded and counted, not scored)\n\nnot_evaluable answers: 0\n\n### repaired eligible train\n\n| set / method | n | MAE | RMSE | Pearson r | within +-2 marks | within 10% of max | MAE 95% CI (answer bootstrap) |\n|---|---|---|---|---|---|---|---|\n| baseline overall | 420 | 3.011 | 5.286 | 0.9574 | 242/420 (57.6%) | 199/420 (47.4%) | [2.595, 3.470] |\n| baseline FULL | 70 | 5.304 | 7.069 | 0.9842 | 12/70 (17.1%) | 0/70 (0.0%) | [4.235, 6.506] |\n| baseline MOSTLY_CORRECT | 70 | 3.304 | 5.796 | 0.9455 | 44/70 (62.9%) | 39/70 (55.7%) | [2.241, 4.542] |\n| baseline PARTIAL | 70 | 2.750 | 6.892 | 0.9439 | 48/70 (68.6%) | 47/70 (67.1%) | [1.502, 4.439] |\n| baseline MISSING_CONCEPT | 70 | 2.072 | 3.781 | 0.9747 | 48/70 (68.6%) | 52/70 (74.3%) | [1.336, 2.879] |\n| baseline MISCONCEPTION | 70 | 1.971 | 3.493 | 0.9739 | 51/70 (72.9%) | 52/70 (74.3%) | [1.328, 2.739] |\n| baseline IRRELEVANT | 70 | 2.663 | 3.179 | n/a | 39/70 (55.7%) | 9/70 (12.9%) | [2.288, 3.098] |\n| condition_e overall | 420 | 4.144 | 6.871 | 0.9358 | 236/420 (56.2%) | 148/420 (35.2%) | [3.632, 4.664] |\n| condition_e FULL | 70 | 0.143 | 1.195 | 0.9978 | 69/70 (98.6%) | 69/70 (98.6%) | [0.000, 0.429] |\n| condition_e MOSTLY_CORRECT | 70 | 7.493 | 9.977 | 0.8828 | 24/70 (34.3%) | 2/70 (2.9%) | [6.064, 9.193] |\n| condition_e PARTIAL | 70 | 8.557 | 10.641 | 0.8535 | 1/70 (1.4%) | 1/70 (1.4%) | [7.143, 10.100] |\n| condition_e MISSING_CONCEPT | 70 | 4.336 | 5.876 | 0.9820 | 36/70 (51.4%) | 3/70 (4.3%) | [3.493, 5.329] |\n| condition_e MISCONCEPTION | 70 | 4.336 | 5.876 | 0.9820 | 36/70 (51.4%) | 3/70 (4.3%) | [3.493, 5.329] |\n| condition_e IRRELEVANT | 70 | 0.000 | 0.000 | n/a | 70/70 (100.0%) | 70/70 (100.0%) | [0.000, 0.000] |\n\nfailed marking calls: 0 (excluded and counted, not scored)\n\nnot_evaluable answers: 0\n\n### original test (legacy reproduction: max=answers.marks column, fallback rubric, failed calls scored 0)\n\n| set / method | n | MAE | RMSE | Pearson r | within +-2 marks | within 10% of max | MAE 95% CI (answer bootstrap) |\n|---|---|---|---|---|---|---|---|\n| baseline overall | 150 | 5.369 | 6.478 | 0.8194 | 37/150 (24.7%) | 19/150 (12.7%) | [4.778, 5.955] |\n| baseline FULL | 25 | 5.691 | 6.732 | 0.8681 | 4/25 (16.0%) | 2/25 (8.0%) | [4.278, 7.084] |\n| baseline MOSTLY_CORRECT | 25 | 5.484 | 6.398 | 0.8082 | 3/25 (12.0%) | 2/25 (8.0%) | [4.210, 6.720] |\n| baseline PARTIAL | 25 | 6.340 | 7.083 | 0.6634 | 1/25 (4.0%) | 0/25 (0.0%) | [5.142, 7.587] |\n| baseline MISSING_CONCEPT | 25 | 5.689 | 6.518 | 0.8439 | 7/25 (28.0%) | 0/25 (0.0%) | [4.411, 6.952] |\n| baseline MISCONCEPTION | 25 | 5.490 | 6.435 | 0.8294 | 7/25 (28.0%) | 0/25 (0.0%) | [4.170, 6.838] |\n| baseline IRRELEVANT | 25 | 3.523 | 5.608 | 0.6710 | 15/25 (60.0%) | 15/25 (60.0%) | [1.798, 5.240] |\n| condition_e overall | 150 | 4.640 | 7.220 | 0.7243 | 84/150 (56.0%) | 84/150 (56.0%) | [3.727, 5.553] |\n| condition_e FULL | 25 | 4.000 | 6.325 | 0.9041 | 15/25 (60.0%) | 15/25 (60.0%) | [2.000, 6.000] |\n| condition_e MOSTLY_CORRECT | 25 | 7.600 | 10.296 | 0.3627 | 9/25 (36.0%) | 9/25 (36.0%) | [5.000, 10.520] |\n| condition_e PARTIAL | 25 | 5.040 | 7.403 | 0.5135 | 13/25 (52.0%) | 13/25 (52.0%) | [2.999, 7.240] |\n| condition_e MISSING_CONCEPT | 25 | 3.200 | 5.657 | 0.8222 | 17/25 (68.0%) | 17/25 (68.0%) | [1.600, 5.200] |\n| condition_e MISCONCEPTION | 25 | 4.000 | 6.325 | 0.8263 | 15/25 (60.0%) | 15/25 (60.0%) | [2.000, 6.000] |\n| condition_e IRRELEVANT | 25 | 4.000 | 6.325 | n/a | 15/25 (60.0%) | 15/25 (60.0%) | [2.000, 6.000] |\n\nfailed marking calls: 15 (scored 0.0 as the legacy script did: 15)\n\nnot_evaluable answers: 0\n\n### original test (like-for-like: max=question marks, fallback rubric, failures excluded)\n\n| set / method | n | MAE | RMSE | Pearson r | within +-2 marks | within 10% of max | MAE 95% CI (answer bootstrap) |\n|---|---|---|---|---|---|---|---|\n| baseline overall | 150 | 4.637 | 6.050 | 0.7587 | 60/150 (40.0%) | 50/150 (33.3%) | [4.026, 5.290] |\n| baseline FULL | 25 | 5.691 | 6.732 | 0.8681 | 4/25 (16.0%) | 2/25 (8.0%) | [4.278, 7.084] |\n| baseline MOSTLY_CORRECT | 25 | 4.182 | 5.612 | 0.8202 | 10/25 (40.0%) | 9/25 (36.0%) | [2.752, 5.654] |\n| baseline PARTIAL | 25 | 4.510 | 6.100 | 0.6103 | 12/25 (48.0%) | 13/25 (52.0%) | [2.979, 6.155] |\n| baseline MISSING_CONCEPT | 25 | 4.280 | 5.922 | 0.8338 | 12/25 (48.0%) | 13/25 (52.0%) | [2.682, 5.887] |\n| baseline MISCONCEPTION | 25 | 4.201 | 5.913 | 0.8165 | 13/25 (52.0%) | 13/25 (52.0%) | [2.595, 5.859] |\n| baseline IRRELEVANT | 25 | 4.960 | 5.962 | -0.4940 | 9/25 (36.0%) | 0/25 (0.0%) | [3.699, 6.297] |\n| condition_e overall | 150 | 5.993 | 7.710 | 0.6847 | 54/150 (36.0%) | 32/150 (21.3%) | [5.216, 6.763] |\n| condition_e FULL | 25 | 4.000 | 6.325 | 0.9041 | 15/25 (60.0%) | 15/25 (60.0%) | [2.000, 6.000] |\n| condition_e MOSTLY_CORRECT | 25 | 8.620 | 10.466 | 0.3619 | 6/25 (24.0%) | 0/25 (0.0%) | [6.420, 11.160] |\n| condition_e PARTIAL | 25 | 8.340 | 8.985 | 0.4565 | 0/25 (0.0%) | 0/25 (0.0%) | [7.100, 9.640] |\n| condition_e MISSING_CONCEPT | 25 | 5.100 | 6.262 | 0.8199 | 10/25 (40.0%) | 2/25 (8.0%) | [3.680, 6.500] |\n| condition_e MISCONCEPTION | 25 | 5.900 | 6.871 | 0.8157 | 8/25 (32.0%) | 0/25 (0.0%) | [4.540, 7.320] |\n| condition_e IRRELEVANT | 25 | 4.000 | 6.325 | n/a | 15/25 (60.0%) | 15/25 (60.0%) | [2.000, 6.000] |\n\nfailed marking calls: 0 (excluded and counted, not scored)\n\nnot_evaluable answers: 0\n\n### Documentation claims vs recomputation\n\n| quantity | reported by documentation (not recomputed here) | recomputed here on the original test split (legacy settings) | reproduced |\n|---|---|---|---|\n| Condition E MAE | 4.64 | 4.640 | True |\n| Condition E RMSE | 7.22 | 7.220 | True |\n| Condition E Pearson r | 0.7243 | 0.7243 | True |\n| Condition E within +-2 marks | 56.0% (84/150) | 56.0% (84/150) |  |\n| Lexical baseline MAE | 5.609 | 5.369 | False |\n| Lexical baseline within +-2 marks | 20.7% | 24.7% (37/150) |  |\n\nReproduced: Condition E MAE, Condition E RMSE, Condition E Pearson r. Not reproduced: Lexical baseline MAE. In the legacy reproduction 15 of 150 marking calls raised an exception (the overloaded `marks` column is 0 for IRRELEVANT answers, so the legacy rubric had max_marks 0) and were scored 0.0, which equals their label: the documented Condition E figures are therefore flattered on IRRELEVANT answers. The like-for-like row above uses max=question marks and excludes no answer.\n"
+}

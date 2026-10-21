@@ -1,0 +1,5 @@
+answer_id,question_id,split,answer_quality,expected_mark,identical_to,review_status,reason,action
+SA-PP-SE3010-089-MOSTLY_CORRECT,PP-SE3010-089,train,MOSTLY_CORRECT,20.0,SA-PP-SE3010-089-PARTIAL,needs_review,identical student_answer text under different labels within the same question,kept in the eligible set and flagged; text not rewritten; reviewer decides the label
+SA-PP-SE3010-089-PARTIAL,PP-SE3010-089,train,PARTIAL,20.0,SA-PP-SE3010-089-MOSTLY_CORRECT,needs_review,identical student_answer text under different labels within the same question,kept in the eligible set and flagged; text not rewritten; reviewer decides the label
+SA-PP-SE3080-102-FULL,PP-SE3080-102,train,FULL,20.0,SA-PP-SE3080-102-PARTIAL,needs_review,identical student_answer text under different labels within the same question,kept in the eligible set and flagged; text not rewritten; reviewer decides the label
+SA-PP-SE3080-102-PARTIAL,PP-SE3080-102,train,PARTIAL,20.0,SA-PP-SE3080-102-FULL,needs_review,identical student_answer text under different labels within the same question,kept in the eligible set and flagged; text not rewritten; reviewer decides the label
