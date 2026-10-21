@@ -14,6 +14,7 @@ from pathlib import Path
 from typing import Any
 
 from . import DATASET_VERSION, tier_spec_sha256
+from .source import SOURCE_FILE_LABEL
 
 QUESTION_COLUMNS = [
     "question_id", "parent_question_id", "part_label", "module_code", "source_type", "split",
@@ -33,14 +34,9 @@ ANSWER_COLUMNS = [
     "verification", "check_flags", "dataset_version",
 ]  # fmt: skip
 EXCLUDED_COLUMNS = [
-    "question_id",
-    "module_code",
-    "source_type",
-    "question_text_raw",
-    "stage",
-    "reason",
-    "dataset_version",
-]
+    "question_id", "parent_question_id", "module_code", "source_type", "question_text_raw", "stage",
+    "exclusion_class", "reason", "diagnostic", "source_file", "source_row", "dataset_version",
+]  # fmt: skip
 REJECTED_COLUMNS = ["answer_id", "question_id", "tier", "student_answer", "reasons", "dataset_version"]
 EXPERT_COLUMNS = [
     "answer_id", "question_id", "module_code", "question_text", "max_marks", "student_answer",
@@ -178,11 +174,16 @@ def write_release(out_dir: Path, data: ReleaseData, spec: dict, seed: int) -> di
         "rubric_status": "llm_drafted_unverified",
         "seed": seed,
         "n_per_tier": meta.get("n_per_tier"),
+        "generator_provider": meta.get("generator_provider"),
         "generator_model": meta.get("generator_model"),
+        "verifier_provider": meta.get("verifier_provider"),
         "verifier_model": meta.get("verifier_model"),
+        "verifier_same_model_family_as_generator": meta.get("verifier_same_model_family_as_generator"),
         "prompt_hashes": meta.get("prompt_hashes"),
         "tier_spec_sha256": tier_spec_sha256(),
         "source_questions": meta.get("source_questions"),
+        "source_file": SOURCE_FILE_LABEL,
+        "source_question_ids": meta.get("source_question_ids"),
         "counts": {
             "questions": len(data.questions),
             "parent_questions": len({q["parent_question_id"] for q in data.questions}),
@@ -193,7 +194,11 @@ def write_release(out_dir: Path, data: ReleaseData, spec: dict, seed: int) -> di
             "answers_by_tier": dict(sorted(by_tier.items())),
             "answers_by_split": dict(sorted(Counter(a["split"] for a in data.answers).items())),
             "questions_by_split": dict(sorted(Counter(q["split"] for q in data.questions).items())),
+            "excluded_by_class": dict(sorted(Counter(e["exclusion_class"] for e in data.excluded).items())),
             "excluded_by_reason": dict(sorted(Counter(e["reason"] for e in data.excluded).items())),
+            "excluded_top_reasons": [
+                {"reason": r, "count": n} for r, n in Counter(e["reason"] for e in data.excluded).most_common(10)
+            ],
         },
         "agreement": agreement_stats(data.answers),
         "files": {},
@@ -236,8 +241,9 @@ def render_card(manifest: dict, spec: dict) -> str:
         "## Status and provenance",
         f"- expert_validation: **{manifest['expert_validation']}** (no human has verified labels or rubrics; "
         f"rubric_status = `{manifest['rubric_status']}`).",
-        f"- Generator model: `{manifest['generator_model']}`; "
-        f"independent blind-grader model: `{manifest['verifier_model']}`.",
+        f"- Generator: `{manifest.get('generator_provider')}` / `{manifest['generator_model']}`; "
+        f"independent blind-grader: `{manifest.get('verifier_provider')}` / `{manifest['verifier_model']}` "
+        f"(same model family as generator: {manifest.get('verifier_same_model_family_as_generator')}).",
         f"- Seed: {manifest['seed']}; answers per core tier per question: {manifest['n_per_tier']}.",
         f"- tier_spec sha256: `{manifest['tier_spec_sha256']}`.",
         "- Questions are cut verbatim from the exam source; reference answers, rubrics, student answers and labels are "
@@ -253,6 +259,7 @@ def render_card(manifest: dict, spec: dict) -> str:
         "",
         "Answers by split: " + ", ".join(f"{k}={v}" for k, v in c["answers_by_split"].items()),
         "Questions by split: " + ", ".join(f"{k}={v}" for k, v in c["questions_by_split"].items()),
+        "Exclusions by class: " + (", ".join(f"{k}={v}" for k, v in c["excluded_by_class"].items()) or "none"),
         "Exclusions by reason: " + (", ".join(f"{k}={v}" for k, v in c["excluded_by_reason"].items()) or "none"),
         "",
         "## Tiers and label rules",
@@ -263,6 +270,9 @@ def render_card(manifest: dict, spec: dict) -> str:
         "Style (concise/standard/verbose) and register (formal/informal/minor_typos) are drawn independently of tier.",
         "",
         "## Validation thresholds enforced by `validate_dataset.py`",
+        f"Label-ratio concentration check (`max_share_on_top7_ratios` = {th['max_share_on_top7_ratios']}): "
+        f"{th['ratio_metric_scope']}.",
+        "",
         _table(["threshold", "value"], [[k, v] for k, v in th.items() if not isinstance(v, dict)]),
         "",
         "## Blind-grader agreement (verification only; flagged rows are kept with needs_review=True)",

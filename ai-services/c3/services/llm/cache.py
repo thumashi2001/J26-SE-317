@@ -43,12 +43,19 @@ class CachedLLMProvider(BaseLLMProvider):
         self._entries: dict[str, dict[str, Any]] = {}
         self.hits = 0
         self.misses = 0
+        self._needs_newline = False
         self._load()
 
     def _load(self) -> None:
         if not self.cache_file.exists():
             return
-        with self.cache_file.open(encoding="utf-8") as fh:
+        with self.cache_file.open("rb") as raw:
+            raw.seek(0, 2)
+            if raw.tell():
+                raw.seek(-1, 2)
+                # a torn final line (no trailing newline) must not swallow the next appended record
+                self._needs_newline = raw.read(1) != b"\n"
+        with self.cache_file.open(encoding="utf-8", errors="replace") as fh:
             for line in fh:
                 line = line.strip()
                 if not line:
@@ -57,7 +64,8 @@ class CachedLLMProvider(BaseLLMProvider):
                     entry = json.loads(line)
                 except json.JSONDecodeError:
                     continue  # tolerate a torn final line from an interrupted run
-                self._entries[entry["key"]] = entry
+                if isinstance(entry, dict) and "key" in entry and isinstance(entry.get("response"), dict):
+                    self._entries[entry["key"]] = entry
 
     def is_available(self) -> bool:
         return self.inner.is_available()
@@ -89,5 +97,6 @@ class CachedLLMProvider(BaseLLMProvider):
             with self._lock:
                 self._entries[key] = record
                 with self.cache_file.open("a", encoding="utf-8") as fh:
-                    fh.write(json.dumps(record, ensure_ascii=False) + "\n")
+                    fh.write(("\n" if self._needs_newline else "") + json.dumps(record, ensure_ascii=False) + "\n")
+                self._needs_newline = False
         return response

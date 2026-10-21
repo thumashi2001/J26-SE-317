@@ -30,3 +30,28 @@ def _reset_singletons():
                 value.clear()
             elif value is not None:
                 setattr(mod, name, None)
+
+
+@pytest.fixture(autouse=True)
+def _hermetic_offline(monkeypatch, request):
+    """Offline tests never read ai-services/c3/.env, never see API keys and can never open a real HTTP connection.
+
+    httpx.MockTransport (used by the stubbed-HTTP tests) is a different class and keeps working. Tests marked
+    live_llm are the only ones allowed to talk to real providers.
+    """
+    if request.node.get_closest_marker("live_llm"):
+        yield
+        return
+    import httpx
+
+    import datasets.generator.roles as roles
+
+    monkeypatch.setattr(roles, "ENV_FILE", Path(__file__).parent / "_no_such_dir" / ".env")
+    for name in ("GEMINI_API_KEY", "OPENAI_API_KEY"):
+        monkeypatch.delenv(name, raising=False)
+
+    def _blocked(self, request):  # noqa: ARG001
+        raise RuntimeError("real network access is blocked in offline tests (use httpx.MockTransport)")
+
+    monkeypatch.setattr(httpx.HTTPTransport, "handle_request", _blocked)
+    yield

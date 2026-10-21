@@ -2,14 +2,19 @@
 """Release validator for the C3 synthetic dataset (CLI + importable `validate_release`).
 
 python datasets/validate_dataset.py [datasets/c3_synthetic_v6]     # exit 1 on any violation
+python datasets/validate_dataset.py <dir> --json [path]            # also write a machine-readable report
+                                                                   # (default <dir>/validation_report.json)
+python datasets/validate_dataset.py <dir> --source datasets/source/questions_source.csv   # check coverage vs the file
 """
 
 from __future__ import annotations
 
+import argparse
 import json
 import sys
 from collections import Counter, defaultdict
 from dataclasses import dataclass, field
+from datetime import UTC, datetime
 from pathlib import Path
 
 import pandas as pd
@@ -32,11 +37,16 @@ from datasets.generator.checks import (  # noqa: E402
     split_sentences,
     tier_order_violations,
 )
+from datasets.generator.roles import load_env  # noqa: E402
 from datasets.generator.splitting import SPLITS, build_parent_docs, max_cross_split_cosine  # noqa: E402
 from datasets.generator.writer import OPTIONAL_EMPTY, sha256_file  # noqa: E402
 from services.marking.rubric_validator import RubricValidationError, validate_rubric  # noqa: E402
 
 DEFAULT_DIR = C3_ROOT / "datasets" / "c3_synthetic_v6"
+EXCLUSION_CLASSES_ALLOWED = {"intentional_scope", "intentional_quality"}  # processing_failure is never a valid row
+EXCLUDED_TRACE_COLUMNS = ["parent_question_id", "exclusion_class", "reason", "diagnostic", "source_file", "source_row"]
+REPORT_SCHEMA = "c3-validation-report/1"
+MAX_REPORT_IDS = 20
 ALL_CODES = [
     "FILE_MISSING", "NAN_VALUE", "JSON_INVALID", "VERSION_MISMATCH", "MANIFEST_HASH", "MANIFEST_COUNTS",
     "MANIFEST_SPEC", "MARK_RANGE", "NORMALIZED_MISMATCH", "CRITERION_UNKNOWN", "CRITERION_SUM", "LEVEL_MISMATCH",
@@ -45,7 +55,8 @@ ALL_CODES = [
     "LENGTH_CORR_WITHIN", "LOW_SENTENCE_DIVERSITY", "IRRELEVANT_SHARED", "CUE_LEAK", "BANNED_PHRASE",
     "SPLIT_DUP_ANSWER", "SPLIT_NEAR_DUP_ANSWER", "SPLIT_QUESTION_SIMILARITY", "SPLIT_INCONSISTENT",
     "MODULE_SPLIT_COVERAGE", "EVIDENCE_SPAN_RANGE", "EVIDENCE_STALE", "MINDMAP_EDGE", "PLACEHOLDER_CONCEPT",
-    "STATUS_UNSET", "EDGE_TIER_MISSING", "EXCLUDED_NO_REASON", "EXCLUDED_ALSO_KEPT",
+    "STATUS_UNSET", "EDGE_TIER_MISSING", "EXCLUDED_NO_REASON", "EXCLUDED_ALSO_KEPT", "EXCLUDED_UNTRACEABLE",
+    "UNACCOUNTED_SOURCE_QUESTION",
 ]  # fmt: skip
 JSON_COLS = {
     "questions": ["expected_concepts", "concept_graph"],
@@ -86,11 +97,25 @@ def _json_cols(df: pd.DataFrame, cols: list[str], table: str, out: list[Violatio
     return parsed
 
 
-def validate_release(directory: str | Path, spec: dict | None = None) -> list[Violation]:  # noqa: C901
-    d = Path(directory)
-    spec = spec or load_tier_spec()
+def validate_release(
+    directory: str | Path, spec: dict | None = None, source_csv: str | Path | None = None
+) -> list[Violation]:
+    """Return all violations (empty list = release passes). See `validate_with_stats` for the informational data."""
+    return validate_with_stats(directory, spec, source_csv)[0]
+
+
+def validate_with_stats(
+    directory: str | Path, spec: dict | None = None, source_csv: str | Path | None = None
+) -> tuple[list[Violation], dict]:
+    """(violations, stats). stats = informational numbers + warnings for the report; never changes pass/fail."""
+    stats: dict = {"warnings": [], "complete": False}
+    return _validate(Path(directory), spec or load_tier_spec(), source_csv, stats), stats
+
+
+def _validate(d: Path, spec: dict, source_csv: str | Path | None, stats: dict) -> list[Violation]:  # noqa: C901
     th = spec["thresholds"]
     out: list[Violation] = []
+    warnings: list[str] = stats["warnings"]
 
     split_files = [f"{k}_{s}.csv" for k in ("questions", "answers") for s in SPLITS]
     required = ["questions.csv", "rubrics.csv", "answers.csv", "excluded_questions.csv", "manifest.json", *split_files]
@@ -169,9 +194,11 @@ def validate_release(directory: str | Path, spec: dict | None = None) -> list[Vi
     if noreason:
         out.append(Violation("EXCLUDED_NO_REASON", "excluded questions without a reason", noreason))
     kept_parents = set(q["parent_question_id"])
-    both = sorted(set(ex["question_id"]) & (kept_parents | set(q["question_id"])))
+    ex_parent = ex["parent_question_id"] if "parent_question_id" in ex else ex["question_id"]
+    both = sorted((set(ex["question_id"]) | set(ex_parent)) & (kept_parents | set(q["question_id"])))
     if both:
         out.append(Violation("EXCLUDED_ALSO_KEPT", "question is both excluded and kept", both))
+    _check_exclusion_traceability(ex, ex_parent, q, manifest, source_csv, out, warnings)
 
     # rubrics -------------------------------------------------------------------------------------------------------------
     qmax = dict(zip(q["question_id"], q["max_marks"].astype(float), strict=True))
@@ -323,9 +350,27 @@ def validate_release(directory: str | Path, spec: dict | None = None) -> list[Vi
     conc = ratio_concentration(list(norm))
     if conc > th["max_share_on_top7_ratios"]:
         out.append(Violation("RATIO_CONCENTRATION", f"top-7 ratio share {conc:.3f} > {th['max_share_on_top7_ratios']}"))
+    # informational only: the same metric per split (the enforced check above is dataset-wide)
+    per_split_conc = {s: ratio_concentration([float(x) for x in a[a["split"] == s]["_norm"]]) for s in SPLITS}
+    stats["ratio_concentration"] = {
+        "scope": th.get("ratio_metric_scope", ""),
+        "threshold": th["max_share_on_top7_ratios"],
+        "dataset_wide": round(conc, 4),
+        "enforced": True,
+        "per_split_informational": {s: round(v, 4) for s, v in per_split_conc.items()},
+    }
+    for s, v in per_split_conc.items():
+        if v > th["max_share_on_top7_ratios"]:
+            warnings.append(
+                f"ratio concentration in split '{s}' is {v:.3f} > {th['max_share_on_top7_ratios']} "
+                "(informational only; the enforced check is dataset-wide)"
+            )
+    stats["tier_means"] = {t: round(float(g["_norm"].mean()), 4) for t, g in a.groupby("tier")}
+    stats["length_correlation"] = {"overall_pearson": None, "within_question_mean_pearson": None, "n_within": 0}
     sub = a[~a["tier"].isin(th["length_corr_exclude_tiers"])]
     if len(sub) > 3:
         rr = pearson(list(sub["_wc"]), list(sub["_norm"]))
+        stats["length_correlation"]["overall_pearson"] = round(rr, 4)
         if abs(rr) > th["max_length_mark_pearson"]:
             out.append(
                 Violation(
@@ -334,6 +379,9 @@ def validate_release(directory: str | Path, spec: dict | None = None) -> list[Vi
                 )
             )  # noqa: E501
         within = [pearson(list(g["_wc"]), list(g["_norm"])) for _, g in sub.groupby("question_id") if len(g) >= 6]
+        if within:
+            stats["length_correlation"]["within_question_mean_pearson"] = round(sum(within) / len(within), 4)
+            stats["length_correlation"]["n_within"] = len(within)
         if within and abs(sum(within) / len(within)) > th["max_length_mark_pearson"]:
             out.append(
                 Violation(
@@ -343,6 +391,7 @@ def validate_release(directory: str | Path, spec: dict | None = None) -> list[Vi
             )  # noqa: E501
     texts = [t for t in a["student_answer"] if t.strip()]
     dr = distinct_sentence_ratio(texts)
+    stats["distinct_sentence_ratio"] = round(dr, 4)
     if dr < th["min_distinct_sentence_ratio"]:
         out.append(
             Violation(
@@ -370,6 +419,7 @@ def validate_release(directory: str | Path, spec: dict | None = None) -> list[Vi
         acc = cue_classifier_accuracy(
             list(train["student_answer"]), list(train["tier"]), list(test["student_answer"]), list(test["tier"])
         )  # noqa: E501
+        stats["cue_classifier_accuracy"] = round(acc, 4)
         if acc > th["max_cue_classifier_accuracy"]:
             out.append(
                 Violation(
@@ -488,10 +538,55 @@ def validate_release(directory: str | Path, spec: dict | None = None) -> list[Vi
                 mm_bad,
             )
         )  # noqa: E501
+    stats["complete"] = True
     return out
 
 
-def print_report(violations: list[Violation]) -> None:
+def _check_exclusion_traceability(  # noqa: C901
+    ex: pd.DataFrame, ex_parent: pd.Series, q: pd.DataFrame, manifest: dict,
+    source_csv: str | Path | None, out: list[Violation], warnings: list[str],
+) -> None:  # fmt: skip
+    """Every excluded row is classified/traceable and every source question is kept or excluded."""
+    missing_cols = [c for c in EXCLUDED_TRACE_COLUMNS if c not in ex.columns]
+    if missing_cols:
+        out.append(Violation("EXCLUDED_UNTRACEABLE", f"excluded_questions.csv lacks columns {missing_cols}"))
+    else:
+        bad_class = [x for x, c in zip(ex["question_id"], ex["exclusion_class"], strict=True)
+                     if c not in EXCLUSION_CLASSES_ALLOWED]  # fmt: skip
+        no_file = [x for x, f in zip(ex["question_id"], ex["source_file"], strict=True) if not f.strip()]
+        bad_row = [x for x, r in zip(ex["question_id"], ex["source_row"], strict=True)
+                   if not r.strip().isdigit() or int(r) < 1]  # fmt: skip
+        for ids, msg in (
+            (bad_class, "exclusion_class missing or not intentional_scope/intentional_quality "
+                        "(processing failures must never be written as exclusions)"),
+            (no_file, "source_file missing"),
+            (bad_row, "source_row missing or not a 1-based row index"),
+        ):  # fmt: skip
+            if ids:
+                out.append(Violation("EXCLUDED_UNTRACEABLE", msg, ids))
+    source_ids = manifest.get("source_question_ids")
+    if source_csv is not None:
+        file_ids = pd.read_csv(source_csv, dtype=str, keep_default_na=False)["question_id"].str.strip().tolist()
+        n = manifest.get("source_questions")
+        source_ids = file_ids[:n] if isinstance(n, int) and n > 0 else file_ids
+    if not source_ids:
+        warnings.append("source coverage check skipped: manifest has no source_question_ids and no --source given")
+        return
+    if not missing_cols:
+        pos = {sid: i + 1 for i, sid in enumerate(source_ids)}
+        wrong = [x for x, p, r in zip(ex["question_id"], ex_parent, ex["source_row"], strict=True)
+                 if p in pos and r.strip().isdigit() and int(r) != pos[p]]  # fmt: skip
+        if wrong:
+            out.append(
+                Violation("EXCLUDED_UNTRACEABLE", "source_row does not match the question's position in the source", wrong)
+            )
+    accounted = set(q["parent_question_id"]) | set(q["question_id"]) | set(ex_parent) | set(ex["question_id"])
+    lost = [sid for sid in source_ids if sid not in accounted]
+    if lost:
+        out.append(Violation("UNACCOUNTED_SOURCE_QUESTION", "source questions neither kept nor excluded", lost))
+
+
+def print_report(violations: list[Violation], stats: dict | None = None) -> None:
     by_code: dict[str, list[Violation]] = defaultdict(list)
     for v in violations:
         by_code[v.code].append(v)
@@ -503,13 +598,78 @@ def print_report(violations: list[Violation]) -> None:
         print(" -", v)
     summary = Counter(v.code for v in violations)
     print(f"\n{len(violations)} violation(s) across {len(summary)} check(s)" if violations else "\nAll checks passed")
+    if stats and "ratio_concentration" in stats:
+        rc = stats["ratio_concentration"]
+        print(f"\nratio concentration (enforced, dataset-wide): {rc['dataset_wide']} (max {rc['threshold']})")
+        print("ratio concentration per split (informational): " + ", ".join(
+            f"{s}={v}" for s, v in rc["per_split_informational"].items()))  # fmt: skip
+    for w in (stats or {}).get("warnings", []):
+        print(f"WARNING: {w}")
+
+
+def build_report(directory: str | Path, violations: list[Violation], stats: dict, spec: dict | None = None) -> dict:
+    """Machine-readable validation report (JSON-serialisable)."""
+    d = Path(directory)
+    spec = spec or load_tier_spec()
+    manifest: dict = {}
+    if (d / "manifest.json").exists():
+        manifest = json.loads((d / "manifest.json").read_text(encoding="utf-8"))
+    files = {}
+    if d.is_dir():
+        files = {p.name: {"sha256": sha256_file(p), "bytes": p.stat().st_size}
+                 for p in sorted(d.iterdir()) if p.is_file() and p.name != "validation_report.json"}  # fmt: skip
+    counts: dict = {}
+    if (d / "questions.csv").exists() and (d / "answers.csv").exists():
+        q, a = _read(d / "questions.csv"), _read(d / "answers.csv")
+        counts = {
+            "questions": len(q), "answers": len(a),
+            "questions_by_split": dict(sorted(Counter(q["split"]).items())),
+            "answers_by_split": dict(sorted(Counter(a["split"]).items())),
+        }  # fmt: skip
+        if (d / "excluded_questions.csv").exists():
+            ex = _read(d / "excluded_questions.csv")
+            counts["excluded_questions"] = len(ex)
+            by_class = Counter(ex["exclusion_class"]) if "exclusion_class" in ex else Counter()
+            counts["excluded_by_class"] = dict(sorted(by_class.items()))
+    failed = {v.code for v in violations}
+    complete = bool(stats.get("complete"))
+    return {
+        "report_schema": REPORT_SCHEMA,
+        "generated_at": datetime.now(UTC).isoformat(timespec="seconds"),
+        "dataset_version": manifest.get("dataset_version"),
+        "directory": str(d),
+        "passed": not violations,
+        "counts": counts,
+        "files": files,
+        "checks": [{"code": c, "passed": c not in failed, "ran": complete or c in failed} for c in ALL_CODES],
+        "violations": [
+            {"code": v.code, "message": v.message, "n_ids": len(v.ids), "ids": v.ids[:MAX_REPORT_IDS]}
+            for v in violations
+        ],
+        "warnings": stats.get("warnings", []),
+        "ratio_concentration": stats.get("ratio_concentration"),
+        "tier_means": stats.get("tier_means"),
+        "length_correlation": stats.get("length_correlation"),
+        "distinct_sentence_ratio": stats.get("distinct_sentence_ratio"),
+        "cue_classifier_accuracy": stats.get("cue_classifier_accuracy"),
+        "thresholds": {k: v for k, v in spec["thresholds"].items() if not isinstance(v, dict)},
+    }
 
 
 def main(argv: list[str] | None = None) -> int:
-    args = sys.argv[1:] if argv is None else argv
-    target = Path(args[0]) if args else DEFAULT_DIR
-    violations = validate_release(target)
-    print_report(violations)
+    load_env()  # ai-services/c3/.env; real environment variables still win (dotenv override=False)
+    ap = argparse.ArgumentParser(description="Validate a C3 dataset release (exit 1 on any violation).")
+    ap.add_argument("directory", nargs="?", type=Path, default=DEFAULT_DIR)
+    ap.add_argument("--json", nargs="?", const="", default=None, metavar="PATH",
+                    help="write a machine-readable report (default <directory>/validation_report.json)")  # fmt: skip
+    ap.add_argument("--source", type=Path, default=None, help="source CSV to check question coverage against")
+    args = ap.parse_args(sys.argv[1:] if argv is None else argv)
+    violations, stats = validate_with_stats(args.directory, source_csv=args.source)
+    print_report(violations, stats)
+    if args.json is not None:
+        path = Path(args.json) if args.json else args.directory / "validation_report.json"
+        path.write_text(json.dumps(build_report(args.directory, violations, stats), indent=2) + "\n", encoding="utf-8")
+        print(f"Wrote validation report to {path}")
     return 1 if violations else 0
 
 

@@ -1,7 +1,18 @@
 """
 AdaptiveLearnSE Component 3 — Shared HTTP helpers for real LLM/embedding providers.
 Retry with exponential backoff on 429/5xx (honouring Retry-After) and a process-wide
-requests-per-minute limiter configured through C3_LLM_RPM.
+requests-per-minute limiter.
+
+Rate limiting semantics
+-----------------------
+C3_LLM_RPM is the number of requests STARTED per minute, per provider key, shared by every thread of the
+process (e.g. 30 -> one request start at most every 2 s). It is NOT a concurrency limit: slow requests may
+overlap. Every attempt counts, including each retry after a 429/5xx. 0 or unset disables limiting.
+Optional per-provider overrides C3_LLM_RPM_GEMINI / C3_LLM_RPM_OPENAI take precedence for that provider
+(and its embedding key) so one provider's quota does not throttle the other; unset or empty they fall back
+to C3_LLM_RPM, and an explicit 0 disables limiting for that provider only. Keys are "gemini",
+"gemini-embedding", "openai", "openai-embedding"; each key has its own limiter, so the chat and embedding
+endpoints of one provider are limited independently.
 """
 
 import os
@@ -34,13 +45,22 @@ class RateLimiter:
 
 
 _limiters: dict[str, RateLimiter] = {}
+_limiters_lock = threading.Lock()
+
+
+def rpm_for(key: str) -> float:
+    """Requests-per-minute for a limiter key: C3_LLM_RPM_<PROVIDER> if set, else C3_LLM_RPM, else 0 (unlimited)."""
+    provider = key.split("-")[0].upper()
+    specific = os.getenv(f"C3_LLM_RPM_{provider}", "").strip()
+    return float(specific or os.getenv("C3_LLM_RPM", "0") or 0)
 
 
 def get_rate_limiter(key: str) -> RateLimiter:
-    """One limiter per provider key, sized from C3_LLM_RPM (default 0 = unlimited)."""
-    if key not in _limiters:
-        _limiters[key] = RateLimiter(float(os.getenv("C3_LLM_RPM", "0") or 0))
-    return _limiters[key]
+    """One limiter per provider key (thread-safe: concurrent first callers must share the same instance)."""
+    with _limiters_lock:
+        if key not in _limiters:
+            _limiters[key] = RateLimiter(rpm_for(key))
+        return _limiters[key]
 
 
 def _backoff(attempt: int) -> float:
@@ -90,8 +110,14 @@ def post_json_with_retry(
             client.close()
 
 
-def get_json(url: str, *, headers: dict[str, str], timeout: float = 15.0) -> dict[str, Any]:
-    with httpx.Client(timeout=timeout) as client:
-        res = client.get(url, headers=headers)
+def get_json(
+    url: str, *, headers: dict[str, str], timeout: float = 15.0, client: httpx.Client | None = None
+) -> dict[str, Any]:
+    if client is not None:
+        res = client.get(url, headers=headers, timeout=timeout)
+        res.raise_for_status()
+        return res.json()
+    with httpx.Client(timeout=timeout) as owned:
+        res = owned.get(url, headers=headers)
         res.raise_for_status()
         return res.json()

@@ -6,7 +6,7 @@ from __future__ import annotations
 import logging
 from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from pathlib import Path
 
 from . import DATASET_VERSION
@@ -21,7 +21,7 @@ from .checks import (
 from .llm_tasks import DraftedRubric, GeneratedAnswer, LLMTaskError, LLMTasks, LLMValidationError
 from .planning import AnswerPlan, TierCollapse, build_question_plans, deterministic_answer
 from .prompts import prompt_hashes
-from .source import SourceQuestion, normalize_ws, ocr_noise_ratio
+from .source import SOURCE_FILE_LABEL, SourceQuestion, normalize_ws, ocr_noise_ratio
 from .splitting import SplitError, build_parent_docs, check_answer_leakage, split_parents
 from .writer import ReleaseData
 
@@ -56,6 +56,24 @@ class Outcome:
     failure: dict | None = None
 
 
+# exclusion_class values: intentional_* are deliberate dataset decisions; processing_failure never reaches the CSV
+EXCLUSION_CLASSES = ("intentional_scope", "intentional_quality", "processing_failure")
+
+
+def exclusion_class(stage: str) -> str:
+    return "intentional_scope" if stage == "scope" else "intentional_quality"
+
+
+def make_exclusion(q: SourceQuestion, stage: str, reason: str, diagnostic: str, qid: str | None = None) -> dict:
+    """One excluded_questions.csv row. qid is the part id when only one part of a parent failed."""
+    return {
+        "question_id": qid or q.question_id, "parent_question_id": q.question_id, "module_code": q.module_code,
+        "source_type": q.source_type, "question_text_raw": q.question_text, "stage": stage,
+        "exclusion_class": exclusion_class(stage), "reason": reason, "diagnostic": diagnostic or reason,
+        "source_file": SOURCE_FILE_LABEL, "source_row": q.source_row, "dataset_version": DATASET_VERSION,
+    }  # fmt: skip
+
+
 def _concept_status_flags(plan: AnswerPlan, status: dict[str, str]) -> list[str]:
     flags = []
     if plan.tier in ("FULL", "PARAPHRASE_FULL", "TYPO_FULL") and "incorrect" in status.values():
@@ -83,7 +101,9 @@ class Pipeline:
         generator_model: str,
         verifier_model: str,
         workers: int = 1,
+        extra_meta: dict | None = None,
     ) -> None:
+        self.extra_meta = dict(extra_meta or {})
         self.tasks, self.spec, self.seed, self.n = tasks, spec, seed, n_per_tier
         self.generator_model, self.verifier_model, self.workers = generator_model, verifier_model, workers
         self.th = spec["thresholds"]
@@ -93,13 +113,9 @@ class Pipeline:
     def process_question(self, q: SourceQuestion) -> Outcome:
         out = Outcome(q.question_id)
 
-        def exclude(stage: str, reason: str) -> Outcome:
+        def exclude(stage: str, reason: str, diagnostic: str, qid: str | None = None) -> Outcome:
             out.parts, out.answers, out.rejected = [], [], []
-            out.excluded = {
-                "question_id": q.question_id, "module_code": q.module_code, "source_type": q.source_type,
-                "question_text_raw": q.question_text, "stage": stage, "reason": reason,
-                "dataset_version": DATASET_VERSION,
-            }  # fmt: skip
+            out.excluded = make_exclusion(q, stage, reason, diagnostic, qid)
             return out
 
         try:
@@ -109,20 +125,27 @@ class Pipeline:
                 try:
                     cleaned = self.tasks.clean_text(q.question_id, q.question_text)
                 except LLMValidationError as exc:
-                    return exclude("ocr", f"ocr_noise_unrepairable: {exc.message}")
+                    return exclude("ocr", "ocr_noise_unrepairable", f"ocr_noise_ratio={ratio:.3f}; {exc.message}")
                 new_ratio = ocr_noise_ratio(cleaned)
                 if new_ratio > self.th["max_ocr_noise_ratio"]:
-                    return exclude("ocr", f"ocr_noise_ratio_{ratio:.3f}_remains_{new_ratio:.3f}_after_cleaning")
+                    return exclude(
+                        "ocr",
+                        "ocr_noise_unrepairable",
+                        f"ocr_noise_ratio={ratio:.3f}; still {new_ratio:.3f} after cleaning "
+                        f"(max {self.th['max_ocr_noise_ratio']})",
+                    )
                 text, ratio = cleaned, new_ratio
             work = SourceQuestion(
-                q.question_id, q.module_code, q.source_type, q.legacy_replaced_question_id, text, q.marks
+                q.question_id, q.module_code, q.source_type, q.legacy_replaced_question_id, text, q.marks, q.source_row
             )
             try:
                 st = self.tasks.structure_question(work)
             except LLMValidationError as exc:
-                return exclude("structure", f"structure_invalid: {exc.message}")
+                return exclude("structure", "structure_invalid_after_retries", exc.message)
             if not st.answerable:
-                return exclude("scope", st.exclusion_reason)
+                return exclude(
+                    "scope", st.exclusion_reason, f"not answerable as written text (model reason: {st.exclusion_reason})"
+                )
             multi = len(st.parts) > 1
             for p in st.parts:
                 qid = f"{q.question_id}-{p.part_label}" if multi else q.question_id
@@ -133,7 +156,7 @@ class Pipeline:
                 try:
                     draft = self.tasks.draft_rubric(qid, q.module_code, p.marks, body)
                 except LLMValidationError as exc:
-                    return exclude("rubric", f"rubric_invalid_after_retries ({qid}): {exc.message}")
+                    return exclude("rubric", "rubric_invalid_after_retries", exc.message, qid)
                 out.parts.append(
                     PartCtx(qid, q.question_id, p.part_label, q.module_code, q.source_type, p.marks, raw, body,
                             ratio, st.answer_type, draft, st.prompt_hash)
@@ -145,28 +168,34 @@ class Pipeline:
                         part.question_id, part.draft.rubric, self.spec, self.seed, self.n, misc
                     )
                 except TierCollapse as exc:
-                    return exclude("planning", f"tier_collapse ({part.question_id}): {exc}")
+                    return exclude("planning", "tier_collapse", str(exc), part.question_id)
             for part in out.parts:
                 self._answers_for_part(part, out)
             for part in out.parts:
-                reason = self._missing_tier_reason(part, out)
-                if reason:
-                    return exclude("generation", reason)
+                missing = self._missing_tier_reason(part, out)
+                if missing:
+                    return exclude("generation", missing[0], missing[1], part.question_id)
             return out
         except LLMTaskError as exc:
             out.failure = {"question_id": q.question_id, "task": exc.task, "key": exc.key, "message": exc.message}
             return out
+        except Exception as exc:  # noqa: BLE001 - unexpected bugs are processing failures, never silent exclusions
+            out.failure = {
+                "question_id": q.question_id, "task": "unexpected", "key": type(exc).__name__, "message": str(exc),
+            }  # fmt: skip
+            return out
 
-    def _missing_tier_reason(self, part: PartCtx, out: Outcome) -> str:
+    def _missing_tier_reason(self, part: PartCtx, out: Outcome) -> tuple[str, str] | None:
+        """(reason, diagnostic) when the part cannot keep a complete, ordered set of core tiers, else None."""
         mine = [a for a in out.answers if a["question_id"] == part.question_id]
         have = {a["tier"] for a in mine}
         gone = [t for t in self.spec["core_tiers"] if t not in have]
         if gone:
-            return f"tier_missing_after_rejection ({part.question_id}): {gone}"
+            return "tier_missing_after_rejection", f"{part.question_id}: no accepted answer for tiers {gone}"
         means = {t: sum(a["normalized_mark"] for a in mine if a["tier"] == t) / sum(1 for a in mine if a["tier"] == t)
                  for t in self.spec["core_tiers"]}  # fmt: skip
         bad = tier_order_violations(means, self.spec)
-        return f"tier_collapse_after_rejection ({part.question_id}): {bad[0]}" if bad else ""
+        return ("tier_collapse_after_rejection", f"{part.question_id}: {bad[0]}") if bad else None
 
     # -- generation -----------------------------------------------------------------------------------------
     def _answer_specs(self, part: PartCtx, tier: str, plans: list[AnswerPlan]) -> str:
@@ -386,6 +415,8 @@ class Pipeline:
 
     # -- full run --------------------------------------------------------------------------------------------------
     def run(self, questions: list[SourceQuestion]) -> tuple[ReleaseData | None, list[dict]]:
+        questions = [replace(q, source_row=i) if not q.source_row else q for i, q in enumerate(questions, 1)]
+        src_of = {q.question_id: q for q in questions}
         if self.workers > 1:
             with ThreadPoolExecutor(max_workers=self.workers) as pool:
                 outcomes = list(pool.map(self.process_question, questions))
@@ -405,13 +436,11 @@ class Pipeline:
         for o in outcomes:
             if o.excluded is None:
                 for part in o.parts:
-                    reason = self._missing_tier_reason(part, o)
-                    if reason:
-                        o.excluded = {
-                            "question_id": o.source_id, "module_code": part.module_code, "source_type": part.source_type,
-                            "question_text_raw": part.raw, "stage": "dedupe", "reason": reason,
-                            "dataset_version": DATASET_VERSION,
-                        }  # fmt: skip
+                    missing = self._missing_tier_reason(part, o)
+                    if missing:
+                        src = src_of[o.source_id]
+                        o.excluded = make_exclusion(src, "dedupe", missing[0], missing[1], part.question_id)
+                        o.excluded["question_text_raw"] = part.raw
                         excluded.append(o.excluded)
                         break
         kept = [o for o in outcomes if o.excluded is None]
@@ -441,7 +470,9 @@ class Pipeline:
             "n_per_tier": self.n, "generator_model": self.generator_model, "verifier_model": self.verifier_model,
             "prompt_hashes": prompt_hashes(), "source_questions": len(questions),
             "llm_calls_this_run": dict(self.tasks.stats.calls),
+            "source_question_ids": [q.question_id for q in questions],
         }  # fmt: skip
+        meta.update(self.extra_meta)
         rejected = [r for o in kept for r in o.rejected]
         return ReleaseData(q_rows, rubric_rows, a_rows, excluded, rejected, meta), []
 

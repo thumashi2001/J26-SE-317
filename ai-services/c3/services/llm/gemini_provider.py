@@ -45,6 +45,7 @@ class GeminiProvider(BaseLLMProvider):
         self.api_key = api_key if api_key is not None else os.getenv("GEMINI_API_KEY", "")
         self.model = model or os.getenv("C3_GEMINI_MODEL", DEFAULT_GEMINI_MODEL)
         self.base_url = (base_url or os.getenv("GEMINI_BASE_URL", GEMINI_BASE_URL)).rstrip("/")
+        self.http_client: httpx.Client | None = None  # optional injected client (tests / preflight)
 
     def _headers(self) -> dict[str, str]:
         return {"x-goog-api-key": self.api_key, "Content-Type": "application/json"}
@@ -53,7 +54,7 @@ class GeminiProvider(BaseLLMProvider):
         return bool(self.api_key) and not self.api_key.lower().startswith("change-me")
 
     def list_models(self) -> list[dict[str, Any]]:
-        data = get_json(f"{self.base_url}/models?pageSize=1000", headers=self._headers())
+        data = get_json(f"{self.base_url}/models?pageSize=1000", headers=self._headers(), client=self.http_client)
         return data.get("models", [])
 
     def verify_model(self, model: str | None = None) -> tuple[bool, str]:
@@ -66,8 +67,17 @@ class GeminiProvider(BaseLLMProvider):
                         return True, "ok"
                     return False, f"{wanted} does not support generateContent"
             return False, f"{wanted} not found in ListModels"
+        except httpx.HTTPStatusError as exc:
+            code = exc.response.status_code
+            hint = {
+                400: " (Gemini reports an invalid API key as 400)",
+                401: " (authentication error)",
+                403: " (authentication/permission error)",
+                429: " (rate limited / quota)",
+            }.get(code, "")
+            return False, f"ListModels failed: HTTP {code}{hint}"
         except Exception as exc:
-            return False, f"ListModels failed: {exc}"
+            return False, f"ListModels failed: {type(exc).__name__}: {exc}"
 
     def health_check(self) -> dict[str, Any]:
         return {

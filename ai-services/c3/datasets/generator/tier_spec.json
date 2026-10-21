@@ -49,6 +49,7 @@
     "length_corr_exclude_tiers": ["EMPTY", "TOO_SHORT"],
     "max_share_on_top7_ratios": 0.45,
     "ratio_metric": "share of answers on the 7 most frequent normalized-mark ratios (3 d.p.), excluding the structural anchors 0 and 1",
+    "ratio_metric_scope": "dataset-wide, hard check, labels strictly between 0 and 1, top-7 most frequent ratios rounded to 3 d.p., denominator = number of such labels",
     "min_distinct_sentence_ratio": 0.7,
     "max_cross_split_cosine": 0.8,
     "max_answer_near_duplicate_cosine": 0.9,

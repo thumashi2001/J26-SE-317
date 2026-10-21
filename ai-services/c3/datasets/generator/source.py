@@ -11,6 +11,7 @@ import pandas as pd
 from . import C3_ROOT
 
 SOURCE_CSV = C3_ROOT / "datasets" / "source" / "questions_source.csv"
+SOURCE_FILE_LABEL = SOURCE_CSV.relative_to(C3_ROOT).as_posix()  # "datasets/source/questions_source.csv"
 SOURCE_COLUMNS = ["question_id", "module_code", "source_type", "legacy_replaced_question_id", "question_text", "marks"]
 
 _BAD_CHARS = set("\ufffd\u00ac\u00a6\u00a7\u00a4\u00b6\u00bf\u00a1\u25a0\u25a1\u25aa")
@@ -35,6 +36,7 @@ class SourceQuestion:
     legacy_replaced_question_id: str
     question_text: str
     marks: float
+    source_row: int = 0  # 1-based data-row index in SOURCE_CSV (0 = not loaded from the file)
 
 
 def normalize_ws(text: str) -> str:
@@ -54,8 +56,9 @@ def load_source(path: Path | None = None, limit: int | None = None) -> list[Sour
             legacy_replaced_question_id=r.legacy_replaced_question_id.strip(),
             question_text=r.question_text,
             marks=float(r.marks),
+            source_row=i,
         )
-        for r in frame.itertuples(index=False)
+        for i, r in enumerate(frame.itertuples(index=False), 1)
     ]
     if len({q.question_id for q in rows}) != len(rows):
         raise ValueError("duplicate question_id in source")
