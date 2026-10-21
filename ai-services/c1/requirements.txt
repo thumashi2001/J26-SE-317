@@ -1,8 +1,1 @@
-fastapi
-uvicorn
-pandas
-numpy
-scikit-learn
-pymongo
-python-dotenv
-pydantic
+# Python dependencies for C1 will be selected during implementation.

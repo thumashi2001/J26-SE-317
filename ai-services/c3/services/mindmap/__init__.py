@@ -1,1 +1,0 @@
-# Initialize mindmap service

@@ -1,7 +1,0 @@
-# Development / test-only dependencies for C4 research inference.
-# Keep separate from production runtime install where practical.
-#
-#   python -m pip install -c constraints-runtime.txt -r requirements.txt -r requirements-dev.txt
-
-pytest==9.0.3
-httpx==0.28.1
