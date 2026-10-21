@@ -44,9 +44,6 @@ def _hermetic_offline(monkeypatch, request):
         return
     import httpx
 
-    import datasets.generator.roles as roles
-
-    monkeypatch.setattr(roles, "ENV_FILE", Path(__file__).parent / "_no_such_dir" / ".env")
     for name in ("GEMINI_API_KEY", "OPENAI_API_KEY"):
         monkeypatch.delenv(name, raising=False)
 

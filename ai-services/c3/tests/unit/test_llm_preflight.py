@@ -1,37 +1,17 @@
-"""Generator/verifier roles, .env loading, blind-grade isolation and model preflight.
-
-Everything here is offline: HTTP is stubbed with httpx.MockTransport or patched, providers are fakes, and the
-conftest autouse fixture blocks real network access. Keys used below are obviously fake test strings.
-"""
+# ruff: noqa: E501
+"""Model preflight: Gemini/OpenAI model checks (HTTP stubbed), live-probe regression, run_experiments --preflight."""
 
 from __future__ import annotations
 
 import json
-import re
 import sys
 
 import httpx
 import pytest
-from test_dataset_generator import SPEC, FakeProvider, make_questions
 
-import datasets.generate_c3_dataset as gen_cli
-import datasets.generator.roles as roles
-from datasets.generator import prompts
-from datasets.generator.llm_tasks import LLMTasks, rubric_text
-from datasets.generator.pipeline import Pipeline
-from datasets.generator.roles import (
-    Role,
-    RoleConfigError,
-    load_env,
-    missing_key_vars,
-    resolve_roles,
-    role_meta,
-    same_family,
-    verifier_cache_name,
-)
 from services.llm.base import LLMRequest
+from services.llm.cache import request_cache_key
 from services.llm.gemini_provider import GeminiProvider
-from services.llm.openai_provider import OpenAIProvider
 from services.llm.preflight import (
     ModelRequirement,
     all_ok,
@@ -41,185 +21,6 @@ from services.llm.preflight import (
 
 FAKE_GEMINI = "test-gemini-key-AAAA1111"
 FAKE_OPENAI = "test-openai-key-BBBB2222"
-ROLE_VARS = (
-    "C3_GENERATOR_MODEL", "C3_VERIFIER_PROVIDER", "C3_VERIFIER_MODEL", "GEMINI_API_KEY", "OPENAI_API_KEY",
-)  # fmt: skip
-
-
-@pytest.fixture
-def clean_env(monkeypatch):
-    for name in ROLE_VARS:
-        monkeypatch.setenv(name, "placeholder")  # registers an undo so values set by load_env cannot leak
-        monkeypatch.delenv(name)
-    return monkeypatch
-
-
-class RealFlagFake(FakeProvider):
-    """FakeProvider whose responses are flagged real so CachedLLMProvider stores them (pipeline logic only)."""
-
-    def generate(self, request):
-        res = super().generate(request)
-        res.is_real_execution = True
-        return res
-
-
-# -- .env loading -------------------------------------------------------------------------------------------
-def test_load_env_reads_dotenv_and_real_environment_wins(tmp_path, clean_env):
-    env_file = tmp_path / ".env"
-    env_file.write_text("C3_VERIFIER_MODEL=from-dotenv\nC3_GENERATOR_MODEL=gen-from-dotenv\n", encoding="utf-8")
-    clean_env.setattr(roles, "ENV_FILE", env_file)
-    clean_env.setenv("C3_GENERATOR_MODEL", "gen-from-real-env")
-    load_env()
-    generator, verifier = resolve_roles()
-    assert generator.model == "gen-from-real-env"  # a real environment variable beats .env
-    assert verifier.model == "from-dotenv"  # .env fills what the environment leaves unset
-
-
-def test_cli_entry_points_call_load_env(clean_env, monkeypatch):
-    calls = []
-    monkeypatch.setattr(gen_cli, "load_env", lambda: calls.append("generate"))
-    gen_cli.main(["--dry-run", "--limit", "2"])
-    import datasets.validate_dataset as val
-
-    monkeypatch.setattr(val, "load_env", lambda: calls.append("validate"))
-    val.main(["/no/such/dir"])
-    assert calls == ["generate", "validate"]
-
-
-# -- roles ------------------------------------------------------------------------------------------------------
-def test_default_roles_generator_gemini_verifier_openai(clean_env):
-    generator, verifier = resolve_roles()
-    assert (generator.provider, generator.model) == ("gemini", "gemini-3-flash-preview")
-    assert (verifier.provider, verifier.model) == ("openai", "gpt-4o-mini")
-    assert isinstance(generator.build(), GeminiProvider) and isinstance(verifier.build(), OpenAIProvider)
-    assert generator.build().model == "gemini-3-flash-preview" and verifier.build().model == "gpt-4o-mini"
-    meta = role_meta(generator, verifier)
-    assert meta["verifier_same_model_family_as_generator"] is False
-    assert verifier_cache_name(verifier) == "verifier_openai.jsonl"
-
-
-def test_gemini_verifier_is_same_family_and_has_its_own_cache_file(clean_env):
-    clean_env.setenv("C3_VERIFIER_PROVIDER", "gemini")
-    clean_env.setenv("C3_VERIFIER_MODEL", "gemini-2.5-flash")
-    generator, verifier = resolve_roles()
-    assert isinstance(verifier.build(), GeminiProvider) and verifier.build().model == "gemini-2.5-flash"
-    assert same_family(generator, verifier) is True
-    assert verifier_cache_name(verifier) == "verifier_gemini.jsonl"
-
-
-def test_unknown_verifier_provider_is_rejected(clean_env):
-    clean_env.setenv("C3_VERIFIER_PROVIDER", "anthropic")
-    with pytest.raises(RoleConfigError, match="gemini, openai"):
-        resolve_roles()
-
-
-def test_missing_key_vars_reports_names_only(clean_env):
-    generator, verifier = resolve_roles()
-    assert missing_key_vars([generator, verifier]) == ["GEMINI_API_KEY", "OPENAI_API_KEY"]
-    clean_env.setenv("GEMINI_API_KEY", FAKE_GEMINI)
-    assert missing_key_vars([generator, verifier]) == ["OPENAI_API_KEY"]
-    clean_env.setenv("C3_VERIFIER_PROVIDER", "gemini")
-    assert missing_key_vars(list(resolve_roles())) == []
-
-
-def test_cli_missing_keys_names_only_variable_names_and_exits_2(clean_env, capsys, tmp_path):
-    clean_env.setenv("GEMINI_API_KEY", FAKE_GEMINI)
-    assert gen_cli.main(["--limit", "1", "--out", str(tmp_path / "o")]) == 2
-    err = capsys.readouterr().err
-    assert "OPENAI_API_KEY" in err and "GEMINI_API_KEY" not in err  # only the MISSING variable is named
-    assert FAKE_GEMINI not in err
-
-
-def test_dry_run_prints_roles_models_and_required_env_names(clean_env, capsys):
-    clean_env.setenv("GEMINI_API_KEY", FAKE_GEMINI)
-    assert gen_cli.main(["--dry-run", "--limit", "5"]) == 0
-    out = capsys.readouterr().out
-    assert "generator" in out and "gemini / gemini-3-flash-preview" in out and "GEMINI_API_KEY (set)" in out
-    assert "verifier" in out and "openai / gpt-4o-mini" in out and "OPENAI_API_KEY (NOT SET)" in out
-    assert "C3_VERIFIER_PROVIDER" in out and "verifier_openai.jsonl" in out
-    assert FAKE_GEMINI not in out
-
-
-# -- blind grader isolation ---------------------------------------------------------------------------------------
-class RecordingGrader(RealFlagFake):
-    pass
-
-
-def test_blind_grade_prompt_contains_only_question_rubric_and_answer(clean_env):
-    gen, ver = RealFlagFake(), RecordingGrader()
-    tasks = LLMTasks(gen, ver, SPEC, sleep=lambda s: None)
-    pipe = Pipeline(tasks, SPEC, 7, 2, "g", "v")
-    data, failures = pipe.run(make_questions(10))
-    assert data is not None and not failures
-    assert ver.prompts and all(p.startswith("Mark the student answer") for p in ver.prompts)
-    assert not any(p.startswith(("Analyse", "Draft", "You will write")) for p in ver.prompts)
-    forbidden_words = [
-        *SPEC["core_tiers"], *SPEC["edge_tiers"], *SPEC["styles"], *SPEC["registers"],
-        "keyword_stuffed", "generic_padding", "unrelated_essay", "same_domain_wrong_topic",
-        "expected_mark", "normalized", "target", "sub_kind", "register",
-    ]  # fmt: skip
-    pattern = re.compile("|".join(re.escape(w) for w in forbidden_words))
-    answer_ids = [a["answer_id"] for a in data.answers]
-    for prompt in ver.prompts:
-        assert not pattern.search(prompt), pattern.search(prompt).group(0)
-        assert not any(aid in prompt for aid in answer_ids)  # ids embed the tier name
-
-
-def test_blind_grade_prompt_is_exactly_question_marks_rubric_answer(clean_env):
-    from datasets.generator.llm_tasks import validate_draft
-
-    ver = RecordingGrader()
-    tasks = LLMTasks(RealFlagFake(), ver, SPEC, sleep=lambda s: None)
-    draft = validate_draft(FakeProvider()._rubric("QUESTION_ID: Z1\nTOTAL_MARKS: 10\n"), "Z1", 10.0, SPEC)
-    tasks.blind_grade("Z1-FULL-1", "Explain caching.", 10.0, draft.rubric, "My answer text.")
-    expected = prompts.render(
-        prompts.BLIND_GRADE, marks="10", question_text="Explain caching.", rubric=rubric_text(draft.rubric),
-        answer="My answer text.",
-    )  # fmt: skip
-    assert ver.prompts == [expected]
-
-
-# -- manifest + end-to-end CLI with fakes -----------------------------------------------------------------------------
-@pytest.fixture
-def cli_env(clean_env, monkeypatch):
-    fakes = {"generator": RealFlagFake(), "verifier": RealFlagFake()}
-    monkeypatch.setattr(Role, "build", lambda self: fakes[self.name])
-    monkeypatch.setattr(gen_cli, "load_source", lambda limit=None: make_questions(12))
-    monkeypatch.setattr(gen_cli, "preflight_or_report", lambda reqs, path, **kw: (True, "  [ok] stubbed preflight"))
-    return fakes
-
-
-def test_cli_run_records_roles_in_manifest_and_uses_separate_verifier_cache(cli_env, tmp_path, capsys):
-    out = tmp_path / "rel"
-    assert gen_cli.main(["--out", str(out), "--seed", "5"]) == 0
-    manifest = json.loads((out / "manifest.json").read_text(encoding="utf-8"))
-    assert manifest["generator_provider"] == "gemini" and manifest["generator_model"] == "gemini-3-flash-preview"
-    assert manifest["verifier_provider"] == "openai" and manifest["verifier_model"] == "gpt-4o-mini"
-    assert manifest["verifier_same_model_family_as_generator"] is False
-    cache = out / "_llm_cache"
-    assert (cache / "generator.jsonl").stat().st_size > 0 and (cache / "verifier_openai.jsonl").stat().st_size > 0
-    assert not (cache / "verifier.jsonl").exists()
-    assert (out / "validation_report.json").exists()
-    card = (out / "DATASET_CARD.md").read_text(encoding="utf-8")
-    assert "same model family as generator: False" in card
-    assert SPEC["thresholds"]["ratio_metric_scope"] in card  # card states the ratio-metric scope from tier_spec
-    assert "Model preflight" in capsys.readouterr().out
-
-
-def test_cli_aborts_with_exit_2_when_preflight_fails_and_makes_no_provider_call(cli_env, monkeypatch, tmp_path, capsys):
-    monkeypatch.setattr(
-        gen_cli, "preflight_or_report",
-        lambda reqs, path, **kw: (False, "  [FAIL] verifier: openai/gpt-x - model 'gpt-x' not found (HTTP 404)"),
-    )  # fmt: skip
-    assert gen_cli.main(["--out", str(tmp_path / "o")]) == 2
-    captured = capsys.readouterr()
-    assert "not found (HTTP 404)" in captured.out and "preflight failed" in captured.err
-    assert cli_env["generator"].prompts == [] and cli_env["verifier"].prompts == []
-
-
-def test_cli_preflight_flag_only_verifies_and_never_generates(cli_env, tmp_path):
-    assert gen_cli.main(["--preflight", "--out", str(tmp_path / "o")]) == 0
-    assert cli_env["generator"].prompts == [] and not (tmp_path / "o" / "manifest.json").exists()
 
 
 # -- preflight ---------------------------------------------------------------------------------------------
@@ -403,7 +204,6 @@ def test_run_experiments_preflight_flag_ok_returns_0(exp, monkeypatch, tmp_path)
 
 
 def test_llm_request_cache_key_distinguishes_model_so_roles_never_share_answers():
-    from services.llm.cache import request_cache_key
 
     req = LLMRequest(prompt="same")
     assert request_cache_key("openai", "gpt-a", req) != request_cache_key("openai", "gpt-b", req)

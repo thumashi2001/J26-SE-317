@@ -1,8 +1,7 @@
 # ruff: noqa: E501
-"""Rate-limit / resume safety of the LLM layer and the dataset generator (stubbed HTTP + fake providers only).
+"""Cache and rate-limit safety of the LLM layer (stubbed HTTP + fake providers only).
 
-Covers: retries produce one cache record, --resume reuses the cache with zero duplicate calls and byte-identical
-outputs, torn cache lines, the C3_LLM_RPM limiter (spacing, sharing across threads, per-provider overrides) and
+Covers: torn cache lines, non-record cache lines, the C3_LLM_RPM limiter (spacing, sharing across threads, per-provider overrides) and
 HTTP 429 Retry-After handling.
 """
 
@@ -14,17 +13,10 @@ from types import SimpleNamespace
 
 import httpx
 import pytest
-from test_dataset_generator import SPEC, FakeProvider, make_questions
 
-import services.llm.gemini_provider as gemini_mod
 import services.llm.http_utils as hu
-from datasets.generator.llm_tasks import LLMTasks
-from datasets.generator.pipeline import Pipeline
-from datasets.generator.source import SourceQuestion
-from datasets.generator.writer import write_release
-from services.llm.base import LLMRequest, LLMResponse
-from services.llm.cache import CachedLLMProvider, request_cache_key
-from services.llm.gemini_provider import GeminiProvider
+from services.llm.base import BaseLLMProvider, LLMRequest, LLMResponse
+from services.llm.cache import CachedLLMProvider
 
 FAKE_KEY = "test-gemini-key-CCCC3333"
 
@@ -67,136 +59,20 @@ def gemini_ok(text):
     }
 
 
-STRUCTURE_REPLY = json.dumps(
-    {
-        "answerable_as_written_text": True, "exclusion_reason": "", "stem": "", "marks_stated": False,
-        "answer_type": "explanation", "parts": [{"part_label": "", "text": "Explain foo.", "marks": 5}],
-    }
-)  # fmt: skip
+# -- cache ------------------------------------------------------------------------------
+class RecordingProvider(BaseLLMProvider):
+    def __init__(self):
+        super().__init__("fake")
+        self.prompts: list[str] = []
+
+    def is_available(self):
+        return True
+
+    def health_check(self):
+        return {}
 
 
-# -- (a) a retried request is cached and consumed exactly once ----------------------------------------------------------
-def test_retry_inside_post_json_yields_one_cache_record_and_one_output_record(monkeypatch, tmp_path):
-    state = sleeps_recorder(monkeypatch)
-    calls = []
-
-    def handler(request):
-        calls.append(request)
-        if len(calls) == 1:
-            return httpx.Response(503, json={"error": "overloaded"})
-        return httpx.Response(200, json=gemini_ok(STRUCTURE_REPLY))
-
-    monkeypatch.setattr(gemini_mod, "post_json_with_retry", mock_post(handler))
-    cached = CachedLLMProvider(GeminiProvider(api_key=FAKE_KEY, model="gemini-test"), tmp_path / "gen.jsonl")
-    tasks = LLMTasks(cached, cached, SPEC, sleep=lambda s: None)
-    q = SourceQuestion("QA", "SE3010", "synthetic", "", "Explain foo.", 5.0)
-
-    result = tasks.structure_question(q)  # the "output record"
-    assert [p.text for p in result.parts] == ["Explain foo."] and len(result.parts) == 1
-    assert len(calls) == 2 and state.sleeps == [1.0]  # one 503 -> one backoff -> success
-    lines = [json.loads(x) for x in (tmp_path / "gen.jsonl").read_text(encoding="utf-8").splitlines() if x.strip()]
-    assert len(lines) == 1 and lines[0]["response"]["retries"] == 1  # one record, retry count preserved
-    assert FAKE_KEY not in (tmp_path / "gen.jsonl").read_text(encoding="utf-8")
-
-    again = tasks.structure_question(q)  # identical request: served from cache, no new HTTP call, no new record
-    assert len(calls) == 2 and again.parts[0].text == "Explain foo."
-    assert len((tmp_path / "gen.jsonl").read_text(encoding="utf-8").splitlines()) == 1
-
-
-def test_failed_attempts_are_never_cached(monkeypatch, tmp_path):
-    sleeps_recorder(monkeypatch)
-    monkeypatch.setenv("C3_LLM_MAX_RETRIES", "1")
-    monkeypatch.setattr(gemini_mod, "post_json_with_retry", mock_post(lambda r: httpx.Response(503, json={})))
-    cached = CachedLLMProvider(GeminiProvider(api_key=FAKE_KEY, model="gemini-test"), tmp_path / "c.jsonl")
-    res = cached.generate(LLMRequest(prompt="x"))
-    assert not res.is_success
-    assert not (tmp_path / "c.jsonl").exists() or (tmp_path / "c.jsonl").read_text(encoding="utf-8") == ""
-
-
-# -- (b) resume after an interruption ----------------------------------------------------------------------------------------
-class CountingReal(FakeProvider):
-    """Deterministic fake flagged as real (so it is cached). Counts successful calls by request key and can fail."""
-
-    def __init__(self, shared: dict, role: str):
-        super().__init__()
-        self.shared, self.role = shared, role
-
-    def generate(self, request):
-        if self.shared.get("interrupt_after") is not None and len(self.shared["ok_keys"]) >= self.shared["interrupt_after"]:
-            if self.shared["mode"] == "keyboard":
-                raise KeyboardInterrupt
-            raise RuntimeError("simulated provider outage")
-        res = super().generate(request)
-        res.is_real_execution = True
-        self.shared["ok_keys"].append((self.role, request_cache_key("fake", "fake", request)))
-        return res
-
-
-def run_pipeline(out, shared, questions, resume_cache=True):
-    cache = out / "_llm_cache"
-    gen = CachedLLMProvider(CountingReal(shared, "generator"), cache / "generator.jsonl")
-    ver = CachedLLMProvider(CountingReal(shared, "verifier"), cache / "verifier_openai.jsonl")
-    tasks = LLMTasks(gen, ver, SPEC, sleep=lambda s: None)
-    pipe = Pipeline(tasks, SPEC, 4242, 2, "fake-gen", "fake-ver")
-    data, failures = pipe.run(questions)
-    return data, failures, (gen, ver)
-
-
-def release_bytes(out):
-    return {p.name: p.read_bytes() for p in sorted(out.iterdir()) if p.is_file()}
-
-
-@pytest.fixture(scope="module")
-def reference(tmp_path_factory):
-    out = tmp_path_factory.mktemp("uninterrupted")
-    shared = {"ok_keys": [], "interrupt_after": None, "mode": "keyboard"}
-    qs = make_questions(12)
-    data, failures, _ = run_pipeline(out, shared, qs)
-    assert data is not None and not failures
-    write_release(out, data, SPEC, 4242)
-    return SimpleNamespace(out=out, calls=list(shared["ok_keys"]), questions=qs)
-
-
-@pytest.mark.parametrize("mode", ["keyboard", "outage"])
-def test_resume_reuses_cache_without_duplicate_calls_and_gives_identical_files(reference, tmp_path, mode):
-    n_ref = len(reference.calls)
-    assert n_ref > 40 and len(set(reference.calls)) == n_ref  # the reference run itself never repeats a request
-    stop = n_ref // 2
-    shared = {"ok_keys": [], "interrupt_after": stop, "mode": mode}
-    if mode == "keyboard":
-        with pytest.raises(KeyboardInterrupt):
-            run_pipeline(tmp_path, shared, reference.questions)
-    else:
-        data, failures, _ = run_pipeline(tmp_path, shared, reference.questions)
-        assert data is None and failures and all(f["task"] in ("unexpected", "structure_question") or f["message"]
-                                                 for f in failures)  # fmt: skip
-    first_phase = list(shared["ok_keys"])
-    assert len(first_phase) == stop
-
-    shared2 = {"ok_keys": [], "interrupt_after": None, "mode": mode}
-    data, failures, (gen, ver) = run_pipeline(tmp_path, shared2, reference.questions)
-    assert data is not None and not failures
-    write_release(tmp_path, data, SPEC, 4242)
-
-    second_phase = shared2["ok_keys"]
-    assert not set(first_phase) & set(second_phase)  # nothing that completed before was asked again
-    assert len(first_phase) + len(second_phase) == n_ref  # exactly the work of one uninterrupted run
-    assert set(first_phase) | set(second_phase) == set(reference.calls)
-    assert gen.hits + ver.hits >= len(first_phase) // 2 and gen.hits + ver.hits > 0
-
-    a, b = release_bytes(reference.out), release_bytes(tmp_path)
-    assert set(a) == set(b)
-    assert {k for k in a if a[k] != b[k]} == set()  # byte-identical release files for the same seed
-
-
-def test_cache_has_one_record_per_distinct_request_after_resume(reference):
-    for name in ("generator.jsonl", "verifier_openai.jsonl"):
-        keys = [json.loads(x)["key"] for x in (reference.out / "_llm_cache" / name).read_text("utf-8").splitlines()]
-        assert len(keys) == len(set(keys)) > 0
-
-
-# -- (c) torn cache line ------------------------------------------------------------------------------------------------------------
-class OnePrompt(FakeProvider):
+class OnePrompt(RecordingProvider):
     def generate(self, request):
         res = LLMResponse(raw_content=json.dumps({"v": request.prompt}), parsed_json={"v": request.prompt},
                           model_identifier="m", provider_name="fake", is_real_execution=True)  # fmt: skip

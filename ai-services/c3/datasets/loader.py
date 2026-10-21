@@ -1,7 +1,11 @@
 """
 AdaptiveLearnSE Component 3 — Synthetic dataset release loader (C3-v6).
 
-Reads a release directory produced by datasets/generate_c3_dataset.py:
+Reads a C3-v6 release directory (questions.csv, rubrics.csv, answers.csv, manifest.json).
+NOTE: the LLM generator that produced v6 releases was removed; the authoritative dataset is now the repaired
+C3-Phase3-v5 set in datasets/c3_phase3_v5_repaired (different schema, see its DATASET_CARD.md). This loader
+and experiments/ target the v6 schema and need an adapter before they can run on the repaired set.
+Previously:
 questions.csv, rubrics.csv, answers.csv and manifest.json. Hashes recorded in the manifest are
 verified on load so experiments always run against exactly the released files. Nothing here
 fabricates or repairs data: malformed files raise ReleaseError.
@@ -113,7 +117,7 @@ def load_release(path: str | Path | None = None, verify_hashes: bool = True) -> 
     manifest_path = root / "manifest.json"
     if not manifest_path.exists():
         raise ReleaseError(
-            f"No dataset release at {root}. Generate it with: python datasets/generate_c3_dataset.py"
+            f"No dataset release at {root}. The v6 generator was removed; see datasets/c3_phase3_v5_repaired"
         )
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
 

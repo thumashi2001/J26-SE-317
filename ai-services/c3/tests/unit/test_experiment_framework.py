@@ -79,7 +79,7 @@ class TestLoader:
             load_release(tmp_path)
 
     def test_missing_release_gives_actionable_error(self, tmp_path):
-        with pytest.raises(ReleaseError, match="generate"):
+        with pytest.raises(ReleaseError, match="repaired"):
             load_release(tmp_path / "nope")
 
     def test_invalid_split_name(self, tmp_path):
