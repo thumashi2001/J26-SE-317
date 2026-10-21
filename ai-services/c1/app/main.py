@@ -111,6 +111,7 @@ def twin_forecast(req: ForecastRequest):
         req.sessions_per_week,
     )
 
+# TRAINED MODEL endpoint. Calls ml/service.py, which loads models/gbm_next_answer.joblib (saved by train_compare.py).
 
 @app.post("/twin/predict-correct")
 def twin_predict_correct(req: PredictRequest):
