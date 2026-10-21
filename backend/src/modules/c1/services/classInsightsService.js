@@ -1,11 +1,45 @@
 import { summarise } from './adminSummaryService.js';
 import { levelFrom } from './levelService.js';
+import { decay } from './planService.js';
 
 // Class view for lecturers (Component 1).
 // Lecturers are not linked to individual students yet, so "the class" is every registered student.
 // Names are shown so a lecturer can follow up. Student IDs never leave this file.
 const MAX_LISTED = 8;
 const RANK = { High: 0, Medium: 1 };
+const MAX_HEATMAP_ROWS = 30;
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+// Mastery heat map: one row per student, one column per topic, each cell is the estimated score now
+// (the twin score after forgetting). A topic the student has not practised stays null (shown grey).
+// Rows are ordered weakest student first. Student IDs never leave this file.
+export function buildHeatmap({ students, states, now = new Date() }) {
+  const info = Object.fromEntries(students.map((s) => [s.student_id, s]));
+  const rated = states.filter((s) => s.diagnostic_completed && info[s.student_id]);
+  const topics = [...new Set(rated.flatMap((s) => Object.keys(s.mastery || {})))].sort();
+  const rows = rated.map((s) => {
+    const scores = {};
+    let sum = 0;
+    let n = 0;
+    for (const t of topics) {
+      const m = (s.mastery || {})[t];
+      if (!m) { scores[t] = null; continue; }
+      const days = m.last_practiced ? Math.max(0, (now.getTime() - new Date(m.last_practiced).getTime()) / DAY_MS) : 0;
+      scores[t] = Math.round(decay(m.score, days, m.practice_sessions || 0));
+      sum += scores[t];
+      n += 1;
+    }
+    return { name: info[s.student_id].name || 'Student', average: n ? Math.round(sum / n) : 0, scores };
+  });
+  rows.sort((a, b) => a.average - b.average);
+  const topicAverage = Object.fromEntries(
+    topics.map((t) => {
+      const v = rows.map((r) => r.scores[t]).filter((x) => x !== null);
+      return [t, v.length ? Math.round(v.reduce((a, b) => a + b, 0) / v.length) : null];
+    }),
+  );
+  return { topics, topicAverage, rows: rows.slice(0, MAX_HEATMAP_ROWS), totalStudents: rows.length };
+}
 
 // Pure part, easy to test: the lists in, the class view out.
 export function buildClass({ students, states, events, now = new Date() }) {
@@ -46,6 +80,7 @@ export function buildClass({ students, states, events, now = new Date() }) {
     notRated: Math.max(0, base.diagnosticDone - base.risk.Low - base.risk.Medium - base.risk.High),
     weakestTopics: base.weakestTopics,
     needAttention,
+    heatmap: buildHeatmap({ students, states, now }),
     generatedAt: base.generatedAt,
   };
 }

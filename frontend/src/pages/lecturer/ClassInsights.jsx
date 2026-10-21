@@ -3,6 +3,7 @@ import { useAuth } from '../../context/AuthContext.jsx';
 import { getClassInsights } from '../../services/lecturerApi.js';
 import { prettyTopic } from '../../utils/topics.js';
 import Avatar from '../../components/ui/Avatar.jsx';
+import MasteryHeatmap from './MasteryHeatmap.jsx';
 import '../../components/admin/c1card.css';
 import './classinsights.css';
 
@@ -102,6 +103,8 @@ export default function ClassInsights() {
               ))}
             </ol>
           </div>
+
+          <MasteryHeatmap heatmap={data.heatmap} />
         </section>
       )}
     </div>

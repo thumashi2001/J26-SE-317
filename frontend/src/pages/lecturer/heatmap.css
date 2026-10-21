@@ -1,0 +1,42 @@
+.hm { margin-top: 22px; padding-top: 16px; border-top: 1px solid var(--line); }
+.hm h4 { margin: 0 0 4px; }
+.hm p { margin: 0; }
+.hm-top { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px 28px; align-items: flex-start; }
+.hm-top > div:first-child { flex: 1 1 340px; max-width: 640px; }
+.hm-scale { flex: 0 0 auto; width: 220px; font-size: 0.78rem; color: var(--muted); }
+.hm-bar { height: 10px; border-radius: 6px; background: linear-gradient(90deg, var(--weak), var(--fair), var(--strong)); }
+.hm-ticks { display: flex; justify-content: space-between; margin-top: 3px; }
+.hm-na { display: flex; align-items: center; gap: 6px; margin-top: 6px; }
+.hm-na i { width: 12px; height: 12px; border-radius: 4px; background: var(--grey-bg); border: 1px solid var(--line-strong); }
+.hm-read { margin: 12px 0 8px !important; min-height: 1.4em; font-size: 0.9rem; font-weight: 600; color: var(--text-2); }
+
+.hm-scroll { overflow: auto; max-height: 560px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+.hm-table { border-collapse: separate; border-spacing: 3px; font-size: 0.74rem; }
+.hm-table th, .hm-table td { padding: 0; }
+
+.hm-table thead th { position: sticky; background: var(--panel); z-index: 2; }
+.hm-mods th { top: 0; height: 26px; }
+.hm-table thead tr:nth-child(2) th { top: 29px; }
+.hm-mod { font-size: 0.72rem; letter-spacing: 0.04em; color: var(--text-2); border-radius: 6px; background: var(--surface-soft) !important; border: 1px solid var(--line); }
+.hm-topic { height: 150px; vertical-align: bottom; font-weight: 500; color: var(--muted); }
+.hm-topic span { display: inline-block; writing-mode: vertical-rl; transform: rotate(180deg); white-space: nowrap; padding: 4px 0; }
+.hm-topic.on { color: var(--text); font-weight: 700; }
+.hm-topic.first, .hm-table td.first { border-left: 9px solid var(--panel); background-clip: padding-box; }
+
+.hm-table th.hm-name { position: sticky; left: 0; z-index: 3; background: var(--panel); text-align: left; min-width: 150px; max-width: 150px; padding: 0 8px 0 10px; font-weight: 600; white-space: nowrap; }
+.hm-table thead th.hm-name { z-index: 4; vertical-align: bottom; padding-bottom: 6px; }
+.hm-corner small { display: block; font-weight: 500; color: var(--muted); font-size: 0.7rem; }
+.hm-name { display: table-cell; }
+.hm-name .hm-who { display: inline-block; max-width: 98px; overflow: hidden; text-overflow: ellipsis; vertical-align: middle; }
+.hm-name b { float: right; min-width: 26px; height: 22px; line-height: 22px; text-align: center; border-radius: 6px; color: #fff; font-size: 0.7rem; margin-top: 1px; }
+
+.hm-table td { width: 28px; min-width: 28px; height: 26px; text-align: center; border-radius: 6px; color: #fff; font-weight: 700; font-size: 0.7rem; cursor: default; transition: transform 0.08s; }
+.hm-table td.none { background: var(--grey-bg); border: 1px solid var(--line); }
+.hm-table td.lit { filter: brightness(1.12) saturate(1.1); }
+.hm-table td.none.lit { filter: none; }
+.hm-table td:hover { transform: scale(1.18); outline: 2px solid var(--text); outline-offset: -1px; position: relative; z-index: 1; }
+.hm-table tr.on th.hm-name { color: var(--primary); }
+.hm-avg td { height: 28px; }
+.hm-avg th.hm-name { border-bottom: 0; color: var(--text-2); }
+.hm .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+@media (max-width: 640px) { .hm-scale { width: 100%; } }
