@@ -1,0 +1,1033 @@
+{
+  "record_counts": {
+    "train": 702,
+    "validation": 150,
+    "test": 150,
+    "total_splits": 1002,
+    "master_02_final": 1002,
+    "question_bank": 167
+  },
+  "question_partitioning": {
+    "train_questions": 117,
+    "validation_questions": 25,
+    "test_questions": 25,
+    "is_disjoint": true
+  },
+  "nan_defect_count": 126,
+  "nan_records": [
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3010-082",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "nan The response gives less supporting detail for one part of the explanation."
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3010-082",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "The response correctly explains one part of nan but gives incomplete coverage of the remai"
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3010-084",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "nan The response gives less supporting detail for one part of the explanation."
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3010-084",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "The response correctly explains one part of nan but gives incomplete coverage of the remai"
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3010-090",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "nan The response gives less supporting detail for one part of the explanation."
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3010-090",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "The response correctly explains one part of nan but gives incomplete coverage of the remai"
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3010-091",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "nan The response gives less supporting detail for one part of the explanation."
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3010-091",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "The response correctly explains one part of nan but gives incomplete coverage of the remai"
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3010-093",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "nan The response gives less supporting detail for one part of the explanation."
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3010-093",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "The response correctly explains one part of nan but gives incomplete coverage of the remai"
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3020-029",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "nan The response gives less supporting detail for one part of the explanation."
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3020-029",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "The response correctly explains one part of nan but gives incomplete coverage of the remai"
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3020-033",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "nan The response gives less supporting detail for one part of the explanation."
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3020-033",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "The response correctly explains one part of nan but gives incomplete coverage of the remai"
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3020-034",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "nan The response gives less supporting detail for one part of the explanation."
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3020-034",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "The response correctly explains one part of nan but gives incomplete coverage of the remai"
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3020-038",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "nan The response gives less supporting detail for one part of the explanation."
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3020-038",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "The response correctly explains one part of nan but gives incomplete coverage of the remai"
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3020-041",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "nan The response gives less supporting detail for one part of the explanation."
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3020-041",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "The response correctly explains one part of nan but gives incomplete coverage of the remai"
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3030-060",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "nan The response gives less supporting detail for one part of the explanation."
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3030-060",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "The response correctly explains one part of nan but gives incomplete coverage of the remai"
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3030-063",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "nan The response gives less supporting detail for one part of the explanation."
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3030-063",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "The response correctly explains one part of nan but gives incomplete coverage of the remai"
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3030-064",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "nan The response gives less supporting detail for one part of the explanation."
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3030-064",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "The response correctly explains one part of nan but gives incomplete coverage of the remai"
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3030-069",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "nan The response gives less supporting detail for one part of the explanation."
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3030-069",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "The response correctly explains one part of nan but gives incomplete coverage of the remai"
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3030-071",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "nan The response gives less supporting detail for one part of the explanation."
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3030-071",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "The response correctly explains one part of nan but gives incomplete coverage of the remai"
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3030-072",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "nan The response gives less supporting detail for one part of the explanation."
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3030-072",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "The response correctly explains one part of nan but gives incomplete coverage of the remai"
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3030-074",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "nan The response gives less supporting detail for one part of the explanation."
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3030-074",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "The response correctly explains one part of nan but gives incomplete coverage of the remai"
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3030-076",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "nan The response gives less supporting detail for one part of the explanation."
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3030-076",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "The response correctly explains one part of nan but gives incomplete coverage of the remai"
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3030-080",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "nan The response gives less supporting detail for one part of the explanation."
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3030-080",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "The response correctly explains one part of nan but gives incomplete coverage of the remai"
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3050-113",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "nan The response gives less supporting detail for one part of the explanation."
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3050-113",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "The response correctly explains one part of nan but gives incomplete coverage of the remai"
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3050-115",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "nan The response gives less supporting detail for one part of the explanation."
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3050-115",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "The response correctly explains one part of nan but gives incomplete coverage of the remai"
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3060-016",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "nan The response gives less supporting detail for one part of the explanation."
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3060-016",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "The response correctly explains one part of nan but gives incomplete coverage of the remai"
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3060-042",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "nan The response gives less supporting detail for one part of the explanation."
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3060-042",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "The response correctly explains one part of nan but gives incomplete coverage of the remai"
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3060-043",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "nan The response gives less supporting detail for one part of the explanation."
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3060-043",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "The response correctly explains one part of nan but gives incomplete coverage of the remai"
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3060-047",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "nan The response gives less supporting detail for one part of the explanation."
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3060-047",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "The response correctly explains one part of nan but gives incomplete coverage of the remai"
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3060-048",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "nan The response gives less supporting detail for one part of the explanation."
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3060-048",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "The response correctly explains one part of nan but gives incomplete coverage of the remai"
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3060-049",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "nan The response gives less supporting detail for one part of the explanation."
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3060-049",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "The response correctly explains one part of nan but gives incomplete coverage of the remai"
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3060-052",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "nan The response gives less supporting detail for one part of the explanation."
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3060-052",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "The response correctly explains one part of nan but gives incomplete coverage of the remai"
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3060-054",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "nan The response gives less supporting detail for one part of the explanation."
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3060-054",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "The response correctly explains one part of nan but gives incomplete coverage of the remai"
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3060-056",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "nan The response gives less supporting detail for one part of the explanation."
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3060-056",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "The response correctly explains one part of nan but gives incomplete coverage of the remai"
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3060-057",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "nan The response gives less supporting detail for one part of the explanation."
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3060-057",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "The response correctly explains one part of nan but gives incomplete coverage of the remai"
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3060-059",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "nan The response gives less supporting detail for one part of the explanation."
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3060-059",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "The response correctly explains one part of nan but gives incomplete coverage of the remai"
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3070-010",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "nan The response gives less supporting detail for one part of the explanation."
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3070-010",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "The response correctly explains one part of nan but gives incomplete coverage of the remai"
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3070-019",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "nan The response gives less supporting detail for one part of the explanation."
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3070-019",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "The response correctly explains one part of nan but gives incomplete coverage of the remai"
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3070-021",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "nan The response gives less supporting detail for one part of the explanation."
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3070-021",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "The response correctly explains one part of nan but gives incomplete coverage of the remai"
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3070-023",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "nan The response gives less supporting detail for one part of the explanation."
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3070-023",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "The response correctly explains one part of nan but gives incomplete coverage of the remai"
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3070-024",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "nan The response gives less supporting detail for one part of the explanation."
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3070-024",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "The response correctly explains one part of nan but gives incomplete coverage of the remai"
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3070-026",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "nan The response gives less supporting detail for one part of the explanation."
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3070-026",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "The response correctly explains one part of nan but gives incomplete coverage of the remai"
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3070-027",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "nan The response gives less supporting detail for one part of the explanation."
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3070-027",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "The response correctly explains one part of nan but gives incomplete coverage of the remai"
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3080-101",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "nan The response gives less supporting detail for one part of the explanation."
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3080-101",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "The response correctly explains one part of nan but gives incomplete coverage of the remai"
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3080-106",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "nan The response gives less supporting detail for one part of the explanation."
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-PP-SE3080-106",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "The response correctly explains one part of nan but gives incomplete coverage of the remai"
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-SYN-SE3060-033",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "nan The response gives less supporting detail for one part of the explanation."
+    },
+    {
+      "split": "train",
+      "question_id": "SYN-REPL-SYN-SE3060-033",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "The response correctly explains one part of nan but gives incomplete coverage of the remai"
+    },
+    {
+      "split": "validation",
+      "question_id": "SYN-REPL-PP-SE3010-081",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "nan The response gives less supporting detail for one part of the explanation."
+    },
+    {
+      "split": "validation",
+      "question_id": "SYN-REPL-PP-SE3010-081",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "The response correctly explains one part of nan but gives incomplete coverage of the remai"
+    },
+    {
+      "split": "validation",
+      "question_id": "SYN-REPL-PP-SE3010-094",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "nan The response gives less supporting detail for one part of the explanation."
+    },
+    {
+      "split": "validation",
+      "question_id": "SYN-REPL-PP-SE3010-094",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "The response correctly explains one part of nan but gives incomplete coverage of the remai"
+    },
+    {
+      "split": "validation",
+      "question_id": "SYN-REPL-PP-SE3030-062",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "nan The response gives less supporting detail for one part of the explanation."
+    },
+    {
+      "split": "validation",
+      "question_id": "SYN-REPL-PP-SE3030-062",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "The response correctly explains one part of nan but gives incomplete coverage of the remai"
+    },
+    {
+      "split": "validation",
+      "question_id": "SYN-REPL-PP-SE3030-070",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "nan The response gives less supporting detail for one part of the explanation."
+    },
+    {
+      "split": "validation",
+      "question_id": "SYN-REPL-PP-SE3030-070",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "The response correctly explains one part of nan but gives incomplete coverage of the remai"
+    },
+    {
+      "split": "validation",
+      "question_id": "SYN-REPL-PP-SE3030-077",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "nan The response gives less supporting detail for one part of the explanation."
+    },
+    {
+      "split": "validation",
+      "question_id": "SYN-REPL-PP-SE3030-077",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "The response correctly explains one part of nan but gives incomplete coverage of the remai"
+    },
+    {
+      "split": "validation",
+      "question_id": "SYN-REPL-PP-SE3050-116",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "nan The response gives less supporting detail for one part of the explanation."
+    },
+    {
+      "split": "validation",
+      "question_id": "SYN-REPL-PP-SE3050-116",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "The response correctly explains one part of nan but gives incomplete coverage of the remai"
+    },
+    {
+      "split": "validation",
+      "question_id": "SYN-REPL-PP-SE3060-014",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "nan The response gives less supporting detail for one part of the explanation."
+    },
+    {
+      "split": "validation",
+      "question_id": "SYN-REPL-PP-SE3060-014",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "The response correctly explains one part of nan but gives incomplete coverage of the remai"
+    },
+    {
+      "split": "validation",
+      "question_id": "SYN-REPL-PP-SE3060-053",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "nan The response gives less supporting detail for one part of the explanation."
+    },
+    {
+      "split": "validation",
+      "question_id": "SYN-REPL-PP-SE3060-053",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "The response correctly explains one part of nan but gives incomplete coverage of the remai"
+    },
+    {
+      "split": "validation",
+      "question_id": "SYN-REPL-PP-SE3070-017",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "nan The response gives less supporting detail for one part of the explanation."
+    },
+    {
+      "split": "validation",
+      "question_id": "SYN-REPL-PP-SE3070-017",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "The response correctly explains one part of nan but gives incomplete coverage of the remai"
+    },
+    {
+      "split": "validation",
+      "question_id": "SYN-REPL-PP-SE3070-018",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "nan The response gives less supporting detail for one part of the explanation."
+    },
+    {
+      "split": "validation",
+      "question_id": "SYN-REPL-PP-SE3070-018",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "The response correctly explains one part of nan but gives incomplete coverage of the remai"
+    },
+    {
+      "split": "validation",
+      "question_id": "SYN-REPL-PP-SE3080-098",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "nan The response gives less supporting detail for one part of the explanation."
+    },
+    {
+      "split": "validation",
+      "question_id": "SYN-REPL-PP-SE3080-098",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "The response correctly explains one part of nan but gives incomplete coverage of the remai"
+    },
+    {
+      "split": "validation",
+      "question_id": "SYN-REPL-PP-SE3080-103",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "nan The response gives less supporting detail for one part of the explanation."
+    },
+    {
+      "split": "validation",
+      "question_id": "SYN-REPL-PP-SE3080-103",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "The response correctly explains one part of nan but gives incomplete coverage of the remai"
+    },
+    {
+      "split": "validation",
+      "question_id": "SYN-REPL-PP-SE3080-105",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "nan The response gives less supporting detail for one part of the explanation."
+    },
+    {
+      "split": "validation",
+      "question_id": "SYN-REPL-PP-SE3080-105",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "The response correctly explains one part of nan but gives incomplete coverage of the remai"
+    },
+    {
+      "split": "test",
+      "question_id": "SYN-REPL-PP-SE3030-066",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "nan The response gives less supporting detail for one part of the explanation."
+    },
+    {
+      "split": "test",
+      "question_id": "SYN-REPL-PP-SE3030-066",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "The response correctly explains one part of nan but gives incomplete coverage of the remai"
+    },
+    {
+      "split": "test",
+      "question_id": "SYN-REPL-PP-SE3030-067",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "nan The response gives less supporting detail for one part of the explanation."
+    },
+    {
+      "split": "test",
+      "question_id": "SYN-REPL-PP-SE3030-067",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "The response correctly explains one part of nan but gives incomplete coverage of the remai"
+    },
+    {
+      "split": "test",
+      "question_id": "SYN-REPL-PP-SE3050-114",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "nan The response gives less supporting detail for one part of the explanation."
+    },
+    {
+      "split": "test",
+      "question_id": "SYN-REPL-PP-SE3050-114",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "The response correctly explains one part of nan but gives incomplete coverage of the remai"
+    },
+    {
+      "split": "test",
+      "question_id": "SYN-REPL-PP-SE3060-044",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "nan The response gives less supporting detail for one part of the explanation."
+    },
+    {
+      "split": "test",
+      "question_id": "SYN-REPL-PP-SE3060-044",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "The response correctly explains one part of nan but gives incomplete coverage of the remai"
+    },
+    {
+      "split": "test",
+      "question_id": "SYN-REPL-PP-SE3060-046",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "nan The response gives less supporting detail for one part of the explanation."
+    },
+    {
+      "split": "test",
+      "question_id": "SYN-REPL-PP-SE3060-046",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "The response correctly explains one part of nan but gives incomplete coverage of the remai"
+    },
+    {
+      "split": "test",
+      "question_id": "SYN-REPL-PP-SE3060-058",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "nan The response gives less supporting detail for one part of the explanation."
+    },
+    {
+      "split": "test",
+      "question_id": "SYN-REPL-PP-SE3060-058",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "The response correctly explains one part of nan but gives incomplete coverage of the remai"
+    },
+    {
+      "split": "test",
+      "question_id": "SYN-REPL-PP-SE3070-011",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "nan The response gives less supporting detail for one part of the explanation."
+    },
+    {
+      "split": "test",
+      "question_id": "SYN-REPL-PP-SE3070-011",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "The response correctly explains one part of nan but gives incomplete coverage of the remai"
+    },
+    {
+      "split": "test",
+      "question_id": "SYN-REPL-PP-SE3070-020",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "nan The response gives less supporting detail for one part of the explanation."
+    },
+    {
+      "split": "test",
+      "question_id": "SYN-REPL-PP-SE3070-020",
+      "answer_type": "short_or_essay",
+      "expected_mark": 10.0,
+      "max_marks": 10.0,
+      "student_answer_snippet": "The response correctly explains one part of nan but gives incomplete coverage of the remai"
+    }
+  ],
+  "cross_split_duplicates_count": 14,
+  "cross_split_duplicates_breakdown": {
+    "train_val": 12,
+    "train_test": 12,
+    "val_test": 10
+  }
+}
