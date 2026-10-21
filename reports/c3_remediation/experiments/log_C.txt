@@ -1,0 +1,34 @@
+== running C
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+C:\Users\M S I\Desktop\Reserach\DEVELOPMENT\ADAPTIVE_LEARN_SE\ai-services\c3\.venv_c3\Lib\site-packages\huggingface_hub\file_download.py:149: UserWarning: `huggingface_hub` cache-system uses symlinks by default to efficiently store duplicated files but your machine does not support them in C:\Users\M S I\.cache\huggingface\hub\models--roberta-base. Caching files will still work but in a degraded version that might require more space on your disk. This warning can be disabled by setting the `HF_HUB_DISABLE_SYMLINKS_WARNING` environment variable. For more details, see https://huggingface.co/docs/huggingface_hub/how-to-cache#limitations.
+To support symlinks on Windows, you either need to activate Developer Mode or to run Python as an administrator. In order to activate developer mode, see this article: https://docs.microsoft.com/en-us/windows/apps/get-started/enable-your-device-for-development
+  warnings.warn(message)
+C:\Users\M S I\Desktop\Reserach\DEVELOPMENT\ADAPTIVE_LEARN_SE\ai-services\c3\.venv_c3\Lib\site-packages\huggingface_hub\file_download.py:149: UserWarning: `huggingface_hub` cache-system uses symlinks by default to efficiently store duplicated files but your machine does not support them in C:\Users\M S I\.cache\huggingface\hub. Caching files will still work but in a degraded version that might require more space on your disk. This warning can be disabled by setting the `HF_HUB_DISABLE_SYMLINKS_WARNING` environment variable. For more details, see https://huggingface.co/docs/huggingface_hub/how-to-cache#limitations.
+To support symlinks on Windows, you either need to activate Developer Mode or to run Python as an administrator. In order to activate developer mode, see this article: https://docs.microsoft.com/en-us/windows/apps/get-started/enable-your-device-for-development
+  warnings.warn(message)
+Loading weights:   0%|          | 0/197 [00:00<?, ?it/s]Loading weights:  13%|#2        | 25/197 [00:00<00:00, 230.79it/s]Loading weights:  25%|##4       | 49/197 [00:00<00:00, 200.13it/s]Loading weights:  36%|###5      | 70/197 [00:00<00:00, 181.12it/s]Loading weights: 100%|##########| 197/197 [00:00<00:00, 510.53it/s]
+[transformers] [1mRobertaModel LOAD REPORT[0m from: roberta-base
+Key                       | Status     | 
+--------------------------+------------+-
+lm_head.dense.bias        | UNEXPECTED | 
+lm_head.bias              | UNEXPECTED | 
+lm_head.dense.weight      | UNEXPECTED | 
+lm_head.layer_norm.bias   | UNEXPECTED | 
+lm_head.layer_norm.weight | UNEXPECTED | 
+pooler.dense.weight       | MISSING    | 
+pooler.dense.bias         | MISSING    | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+- MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+C:\Users\M S I\Desktop\Reserach\DEVELOPMENT\ADAPTIVE_LEARN_SE\ai-services\c3\experiments\model_comparison.py:249: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at C:\actions-runner\_work\pytorch\pytorch\torch\csrc\autograd\generated\python_variable_methods.cpp:821.)
+  tot += float(loss) * len(ix)
+{'epoch': 1, 'train_mse': 0.06866841051372495, 'validation_nmae': 0.05511278353179947, 'elapsed_s': 261.8}
+{'epoch': 2, 'train_mse': 0.008464262572890935, 'validation_nmae': 0.05814798883896207, 'elapsed_s': 749.2}
+{'epoch': 3, 'train_mse': 0.009024126345433054, 'validation_nmae': 0.05423274645186735, 'elapsed_s': 915.7}
+{'epoch': 4, 'train_mse': 0.006177745890381991, 'validation_nmae': 0.03855965771585364, 'elapsed_s': 1360.5}
+{'epoch': 5, 'train_mse': 0.004785687655710907, 'validation_nmae': 0.03770649259726545, 'elapsed_s': 1519.5}
+{'epoch': 6, 'train_mse': 0.004624098766916136, 'validation_nmae': 0.037993540871803726, 'elapsed_s': 1991.5}
+C_roberta_base_finetuned val nMAE 0.0377 test nMAE 0.0382
+ALLDONE

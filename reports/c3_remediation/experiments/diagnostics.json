@@ -1,0 +1,37 @@
+{
+ "per_tier_test_nmae": {
+  "C_roberta_base_finetuned": {
+   "FULL": 0.073,
+   "IRRELEVANT": 0.002,
+   "MISCONCEPTION": 0.031,
+   "MISSING_CONCEPT": 0.018,
+   "MOSTLY_CORRECT": 0.058,
+   "PARTIAL": 0.047
+  },
+  "A1_tfidf_ridge": {
+   "FULL": 0.191,
+   "IRRELEVANT": 0.01,
+   "MISCONCEPTION": 0.044,
+   "MISSING_CONCEPT": 0.042,
+   "MOSTLY_CORRECT": 0.03,
+   "PARTIAL": 0.17
+  },
+  "B1_sbert_features_ridge": {
+   "FULL": 0.169,
+   "IRRELEVANT": 0.026,
+   "MISCONCEPTION": 0.045,
+   "MISSING_CONCEPT": 0.046,
+   "MOSTLY_CORRECT": 0.045,
+   "PARTIAL": 0.174
+  }
+ },
+ "diagnostics": {
+  "length_only_ridge": {
+   "validation_nmae": 0.07477740214811746,
+   "test_nmae": 0.06736608337424528,
+   "test_qwk": 0.9542475653824952,
+   "test_pearson": 0.9636537357341943
+  }
+ },
+ "note": "diagnostic only; not a candidate, not used for selection"
+}
