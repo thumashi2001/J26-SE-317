@@ -7,17 +7,13 @@ import jwt from 'jsonwebtoken';
 
 const EXPIRES_IN = '7d';
 const STAFF_EXPIRES_IN = '12h'; // lecturers and admins sign in again each day, so a removed lecturer loses access quickly
-let warned = false;
 
+// AUTH_SECRET is mandatory in every environment: there is no built-in fallback secret, because a default that
+// lives in the source code would let anyone forge lecturer/admin tokens. Set it in backend/.env (see .env.example).
 function secret() {
   const s = process.env.AUTH_SECRET;
-  if (s) return s;
-  if (process.env.NODE_ENV === 'production') throw new Error('AUTH_SECRET is not set');
-  if (!warned) {
-    console.warn('AUTH_SECRET is not set in backend/.env. Using an insecure development secret.');
-    warned = true;
-  }
-  return 'dev-only-secret-change-me';
+  if (!s || !s.trim()) throw new Error('AUTH_SECRET is not set. Define a long random value in backend/.env');
+  return s;
 }
 
 export function signToken({ sub, role }) {

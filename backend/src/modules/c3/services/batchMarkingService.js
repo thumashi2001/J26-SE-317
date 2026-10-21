@@ -11,6 +11,19 @@ function httpError(status, message) {
   return err;
 }
 
+function requireStringId(id) {
+  if (typeof id !== 'string' || !id.trim()) throw httpError(400, 'A valid batch identifier is required');
+  return id.trim();
+}
+
+// A batch belongs to the lecturer who created it. Admins may oversee every batch (documented RBAC assumption).
+function assertBatchAccess(setup, lecturerId, role) {
+  if (role === 'admin') return;
+  if (!lecturerId || String(setup.created_by) !== String(lecturerId)) {
+    throw httpError(403, 'You do not have access to this assessment batch');
+  }
+}
+
 function parseId(id) {
   if (!id) return null;
   if (ObjectId.isValid(id) && typeof id === 'string' && id.length === 24) {
@@ -247,8 +260,8 @@ export async function listBatchSetups({ lecturerId, role }) {
 /**
  * Retrieves a single batch setup and its associated student results.
  */
-export async function getBatchSetup(setupId, role) {
-  const parsed = parseId(setupId);
+export async function getBatchSetup(setupId, role, lecturerId) {
+  const parsed = parseId(requireStringId(setupId));
   const setup = await batchSetupsCol().findOne({
     $or: [{ _id: parsed }, { batch_id: String(setupId) }, { _id: String(setupId) }],
   });
@@ -256,6 +269,7 @@ export async function getBatchSetup(setupId, role) {
   if (!setup) {
     throw httpError(404, 'Assessment batch setup not found');
   }
+  assertBatchAccess(setup, lecturerId, role);
 
   const batchId = setup.batch_id;
 
@@ -340,8 +354,8 @@ export async function getBatchSetup(setupId, role) {
 /**
  * Validates multiple student answers against a batch setup prior to marking.
  */
-export async function validateBatchAnswers({ setupId, items }) {
-  const parsed = parseId(setupId);
+export async function validateBatchAnswers({ setupId, items, lecturerId, role }) {
+  const parsed = parseId(requireStringId(setupId));
   const setup = await batchSetupsCol().findOne({
     $or: [{ _id: parsed }, { batch_id: String(setupId) }, { _id: String(setupId) }],
   });
@@ -349,6 +363,7 @@ export async function validateBatchAnswers({ setupId, items }) {
   if (!setup) {
     throw httpError(404, 'Assessment batch setup not found');
   }
+  assertBatchAccess(setup, lecturerId, role);
 
   if (!Array.isArray(items) || items.length === 0) {
     throw httpError(400, 'A non-empty list of student answers is required');
@@ -457,8 +472,8 @@ export async function validateBatchAnswers({ setupId, items }) {
 /**
  * Executes automated batch marking for all valid student answers against the shared setup.
  */
-export async function processBatchMarking({ lecturerId, setupId, items, aiUrl }) {
-  const parsed = parseId(setupId);
+export async function processBatchMarking({ lecturerId, role, setupId, items, aiUrl }) {
+  const parsed = parseId(requireStringId(setupId));
   const setup = await batchSetupsCol().findOne({
     $or: [{ _id: parsed }, { batch_id: String(setupId) }, { _id: String(setupId) }],
   });
@@ -466,9 +481,10 @@ export async function processBatchMarking({ lecturerId, setupId, items, aiUrl })
   if (!setup) {
     throw httpError(404, 'Assessment batch setup not found');
   }
+  assertBatchAccess(setup, lecturerId, role);
 
   const isMcq = setup.answer_type === 'mcq' || setup.answer_type === 'multiple-choice';
-  const validation = await validateBatchAnswers({ setupId: setup.batch_id, items });
+  const validation = await validateBatchAnswers({ setupId: setup.batch_id, items, lecturerId, role });
 
   if (validation.valid_count === 0) {
     throw httpError(400, 'No valid student answers found in the submitted batch');
@@ -550,11 +566,12 @@ export async function processBatchMarking({ lecturerId, setupId, items, aiUrl })
 /**
  * Finalizes all eligible submissions in a batch in one confirmed operation.
  */
-export async function finalizeBatchSubmissions({ lecturerId, batchId }) {
-  const setup = await batchSetupsCol().findOne({ batch_id: String(batchId) });
+export async function finalizeBatchSubmissions({ lecturerId, role, batchId }) {
+  const setup = await batchSetupsCol().findOne({ batch_id: requireStringId(batchId) });
   if (!setup) {
     throw httpError(404, 'Assessment batch setup not found');
   }
+  assertBatchAccess(setup, lecturerId, role);
 
   const submissions = await submissionsCol()
     .find({ batch_id: setup.batch_id })

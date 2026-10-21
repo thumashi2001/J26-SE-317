@@ -3,6 +3,7 @@ import * as aiClient from '../services/aiClient.js';
 import * as submissionSvc from '../services/submissionService.js';
 import * as mcqSvc from '../services/mcqMarkingService.js';
 import * as batchSvc from '../services/batchMarkingService.js';
+import { resolveStudentAssessment } from '../services/assessmentConfig.js';
 
 const AI_URL = () => process.env.C3_AI_URL || 'http://127.0.0.1:8003';
 
@@ -57,16 +58,21 @@ export const unsupportedOcrHandler = handle(async () => {
 });
 
 export const assessAnswer = handle(async (req) => {
-  const { student_id, ...payload } = req.body || {};
+  const { student_id, ...rawPayload } = req.body || {};
   const effectiveStudentId = resolveStudentId(req, student_id);
 
-  if (payload.image || payload.file || payload.scanned_document) {
+  if (rawPayload.image || rawPayload.file || rawPayload.scanned_document) {
     const err = new Error(
       'Scanned answer OCR processing is currently unsupported. C3 evaluates natural-language text responses directly. Please provide a typed answer.'
     );
     err.status = 400;
     throw err;
   }
+
+  // Students never choose the question, answer key or rubric: those come from the server.
+  const payload = req.user.role === 'student'
+    ? await resolveStudentAssessment(rawPayload)
+    : { ...rawPayload, config_source: 'lecturer_supplied' };
 
   let aiResult;
   if (isMcqPayload(payload)) {
@@ -77,7 +83,7 @@ export const assessAnswer = handle(async (req) => {
     aiResult = await aiClient.assessAnswer(AI_URL(), payload);
   }
 
-  // If DB persistence is available, store submission and result
+  // Persistence must succeed: never report an unsaved result as saved.
   try {
     const { submissionId, resultId } = await submissionSvc.createSubmissionWithResult({
       studentId: effectiveStudentId,
@@ -88,14 +94,15 @@ export const assessAnswer = handle(async (req) => {
       ...aiResult,
       submission_id: submissionId,
       result_id: resultId,
+      persisted: true,
       status: 'pending_review',
     };
   } catch (err) {
-    // If DB is not connected or in standalone test environment without DB, still return AI result
-    return {
-      ...aiResult,
-      status: 'pending_review',
-    };
+    if (err.status && err.status < 500) throw err;
+    console.error('[c3] could not save assessment:', err.message);
+    const failure = new Error('The assessment was marked but could not be saved. Please try again');
+    failure.status = 503;
+    throw failure;
   }
 });
 
@@ -148,7 +155,7 @@ export const listBatchSetups = handle(async (req) => {
 
 export const getBatchSetup = handle(async (req) => {
   const { id } = req.params;
-  return batchSvc.getBatchSetup(id, req.user.role);
+  return batchSvc.getBatchSetup(id, req.user.role, req.user.sub);
 });
 
 export const validateBatchAnswers = handle(async (req) => {
@@ -156,6 +163,8 @@ export const validateBatchAnswers = handle(async (req) => {
   return batchSvc.validateBatchAnswers({
     setupId: setup_id,
     items,
+    lecturerId: req.user.sub,
+    role: req.user.role,
   });
 });
 
@@ -163,6 +172,7 @@ export const processBatchMarking = handle(async (req) => {
   const { setup_id, items } = req.body || {};
   return batchSvc.processBatchMarking({
     lecturerId: req.user.sub,
+    role: req.user.role,
     setupId: setup_id,
     items,
     aiUrl: AI_URL(),
@@ -173,6 +183,7 @@ export const finalizeBatchSubmissions = handle(async (req) => {
   const { batchId } = req.params;
   return batchSvc.finalizeBatchSubmissions({
     lecturerId: req.user.sub,
+    role: req.user.role,
     batchId,
   });
 });

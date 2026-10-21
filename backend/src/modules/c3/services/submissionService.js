@@ -87,6 +87,12 @@ export async function createSubmissionWithResult({ studentId, payload, aiResult 
   let resultId;
 
   if (existingSub) {
+    // A reviewed or finalized submission is the lecturer's record; it can never be silently reopened or overwritten.
+    const existingStatus = existingSub.status || 'pending_review';
+    const priorRes = await resultsCol().findOne({ submission_id: String(existingSub._id) });
+    if (existingStatus !== 'pending_review' || (priorRes && priorRes.status && priorRes.status !== 'pending_review')) {
+      throw httpError(409, 'This submission has already been reviewed or finalized and cannot be resubmitted');
+    }
     submissionId = String(existingSub._id);
     await submissionsCol().updateOne(
       { _id: existingSub._id },
@@ -186,6 +192,9 @@ export async function createSubmissionWithResult({ studentId, payload, aiResult 
  * Students only see their own submissions; lecturers see all submissions.
  */
 export async function listSubmissions({ studentId, role, status, batchId }) {
+  if ((status !== undefined && typeof status !== 'string') || (batchId !== undefined && typeof batchId !== 'string')) {
+    throw httpError(400, 'Invalid filter');
+  }
   const query = {};
   if (role !== 'lecturer' && role !== 'admin') {
     query.student_id = studentId;
@@ -363,12 +372,17 @@ export async function reviewSubmission(submissionId, lecturerId, { decision, new
     finalMark = automatedMark;
   } else {
     // Overridden
-    if (new_mark === undefined || new_mark === null || isNaN(Number(new_mark))) {
+    const markIsNumeric = (typeof new_mark === 'number') || (typeof new_mark === 'string' && new_mark.trim() !== '');
+    const num = markIsNumeric ? Number(new_mark) : NaN;
+    if (!Number.isFinite(num)) {
       throw httpError(400, 'A valid new mark is required for an override');
     }
-    const num = Number(new_mark);
     if (num < 0) {
       throw httpError(400, 'Mark cannot be negative');
+    }
+    const possible = Number(result.total_possible_marks);
+    if (Number.isFinite(possible) && possible > 0 && num > possible) {
+      throw httpError(400, `Mark cannot exceed the total possible marks (${possible})`);
     }
     finalMark = num;
 
@@ -376,6 +390,7 @@ export async function reviewSubmission(submissionId, lecturerId, { decision, new
       throw httpError(400, 'An override reason is required when overriding the AI mark');
     }
     reason = String(override_reason).trim();
+    if (reason.length > 2000) throw httpError(400, 'Override reason is too long (maximum 2000 characters)');
   }
 
   const now = new Date();
@@ -389,10 +404,13 @@ export async function reviewSubmission(submissionId, lecturerId, { decision, new
     updated_at: now,
   };
 
-  await resultsCol().updateOne(
-    { _id: result._id },
+  const reviewWrite = await resultsCol().updateOne(
+    { _id: result._id, status: { $ne: 'finalized' } },
     { $set: updateData }
   );
+  if (reviewWrite && reviewWrite.matchedCount === 0) {
+    throw httpError(409, 'This assessment has already been finalized and cannot be modified');
+  }
 
   await submissionsCol().updateOne(
     { _id: submission._id },
@@ -437,16 +455,21 @@ export async function finalizeSubmission(submissionId, lecturerId) {
   }
 
   const now = new Date();
-  await resultsCol().updateOne(
-    { _id: result._id },
+  // Conditional write: only one of several concurrent finalize requests can win.
+  const finalizeWrite = await resultsCol().updateOne(
+    { _id: result._id, status: { $ne: 'finalized' } },
     {
       $set: {
         status: 'finalized',
         finalized_at: now,
+        finalized_by: lecturerId,
         updated_at: now,
       },
     }
   );
+  if (finalizeWrite && finalizeWrite.matchedCount === 0) {
+    throw httpError(409, 'This assessment has already been finalized');
+  }
 
   await submissionsCol().updateOne(
     { _id: submission._id },
