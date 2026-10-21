@@ -89,10 +89,10 @@ def test_cli_entry_points_call_load_env(clean_env, monkeypatch):
 # -- roles ------------------------------------------------------------------------------------------------------
 def test_default_roles_generator_gemini_verifier_openai(clean_env):
     generator, verifier = resolve_roles()
-    assert (generator.provider, generator.model) == ("gemini", "gemini-3.8-flash")
+    assert (generator.provider, generator.model) == ("gemini", "gemini-3-flash-preview")
     assert (verifier.provider, verifier.model) == ("openai", "gpt-4o-mini")
     assert isinstance(generator.build(), GeminiProvider) and isinstance(verifier.build(), OpenAIProvider)
-    assert generator.build().model == "gemini-3.8-flash" and verifier.build().model == "gpt-4o-mini"
+    assert generator.build().model == "gemini-3-flash-preview" and verifier.build().model == "gpt-4o-mini"
     meta = role_meta(generator, verifier)
     assert meta["verifier_same_model_family_as_generator"] is False
     assert verifier_cache_name(verifier) == "verifier_openai.jsonl"
@@ -134,7 +134,7 @@ def test_dry_run_prints_roles_models_and_required_env_names(clean_env, capsys):
     clean_env.setenv("GEMINI_API_KEY", FAKE_GEMINI)
     assert gen_cli.main(["--dry-run", "--limit", "5"]) == 0
     out = capsys.readouterr().out
-    assert "generator" in out and "gemini / gemini-3.8-flash" in out and "GEMINI_API_KEY (set)" in out
+    assert "generator" in out and "gemini / gemini-3-flash-preview" in out and "GEMINI_API_KEY (set)" in out
     assert "verifier" in out and "openai / gpt-4o-mini" in out and "OPENAI_API_KEY (NOT SET)" in out
     assert "C3_VERIFIER_PROVIDER" in out and "verifier_openai.jsonl" in out
     assert FAKE_GEMINI not in out
@@ -193,7 +193,7 @@ def test_cli_run_records_roles_in_manifest_and_uses_separate_verifier_cache(cli_
     out = tmp_path / "rel"
     assert gen_cli.main(["--out", str(out), "--seed", "5"]) == 0
     manifest = json.loads((out / "manifest.json").read_text(encoding="utf-8"))
-    assert manifest["generator_provider"] == "gemini" and manifest["generator_model"] == "gemini-3.8-flash"
+    assert manifest["generator_provider"] == "gemini" and manifest["generator_model"] == "gemini-3-flash-preview"
     assert manifest["verifier_provider"] == "openai" and manifest["verifier_model"] == "gpt-4o-mini"
     assert manifest["verifier_same_model_family_as_generator"] is False
     cache = out / "_llm_cache"

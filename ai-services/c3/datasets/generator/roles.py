@@ -19,9 +19,9 @@ from services.llm.preflight import KEY_ENV, ModelRequirement
 from . import C3_ROOT
 
 ENV_FILE: Path = C3_ROOT / ".env"  # tests point this at a temp file
-DEFAULT_GENERATOR_MODEL = "gemini-3.8-flash"
+DEFAULT_GENERATOR_MODEL = "gemini-3-flash-preview"
 DEFAULT_VERIFIER_PROVIDER = "openai"
-DEFAULT_VERIFIER_MODELS = {"openai": DEFAULT_OPENAI_MODEL, "gemini": "gemini-3.1-flash-lite"}
+DEFAULT_VERIFIER_MODELS = {"openai": DEFAULT_OPENAI_MODEL, "gemini": "gemini-3.5-flash-lite"}
 VERIFIER_PROVIDERS = ("gemini", "openai")
 
 
