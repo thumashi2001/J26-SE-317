@@ -17,6 +17,42 @@ FAST_SEC = 8.0
 def twin_decay(score, days, sessions):
     stab = BASE_STAB * (1 + STAB_GAIN * sessions)
     return score * (FLOOR + (1 - FLOOR) * math.exp(-max(days, 0.0) / stab))
+    
+# The 22 features. Every one is calculated from what happened BEFORE the answer being predicted (no data leakage).
+#
+# --- Group 1: past answers on this topic ---
+# n_prev         how many earlier answers the student gave on this topic
+# succ           how many of them were right
+# fail           how many of them were wrong
+# ema            recent weighted average of the results on this topic (starts at 0.5)
+# last_correct   was the last answer on this topic right? (1 or 0, and -1 if there is none yet)
+# has_prev       1 if the student has answered this topic before, else 0
+#
+# --- Group 2: forgetting ---
+# days_since     days since the last practice of this topic (60 if never practised)
+# n_sessions     number of practice sessions on this topic
+# twin_score     the rule-based twin's score for this topic (0 to 100)
+# twin_p         the twin's chance of a correct answer (kept between 0.03 and 0.97)
+#
+# --- Group 3: the student overall ---
+# stu_n          total answers the student has given so far
+# stu_acc        the student's overall accuracy, smoothed as (right + 1) / (total + 2)
+# stu_acc10      accuracy over the last 10 answers
+# mod_acc        accuracy on the other topics of the same module
+# sess_acc       accuracy so far in this quiz (-1 at the first question)
+#
+# --- Group 4: behaviour (over the last 20 answers) ---
+# stu_time_ratio how fast the student answers compared with the usual 32 seconds (log scale)
+# stu_fast       share of very fast answers (under 8 seconds)
+# stu_hint       share of answers where a hint was used
+# stu_leave      share of answers where the student left the browser tab
+#
+# --- Group 5: question context ---
+# q_in_session   position of the question in the quiz
+# is_multi       1 if it is a select-all (multi-answer) question
+# is_diag        1 if it is the diagnostic test
+#
+# A 23rd column, topic_prior (average correctness of the topic, from training students only), is added in train_compare.py.
 
 
 FEATURES = [
