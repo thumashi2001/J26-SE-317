@@ -27,7 +27,7 @@ router.get('/insights/:studentId', insights.getInsights);
 router.get('/behaviour/:studentId', insights.getBehaviour);
 router.get('/plan/:studentId', plan.getPlan);
 router.get('/level/:studentId', level.getLevel);
-router.get('/predict/:studentId', prediction.getPredictions);
+router.get('/predict/:studentId', prediction.getPredictions);// Trained model: chance of a correct answer per practised topic (gradient boosting). Handled by predictionController
 router.get('/class', requireRole('lecturer'), classInsights.classInsights); // lecturer Class insights page
 router.put('/exam-date', plan.setExamDate);
 router.get('/practice/topics', practice.topics);
