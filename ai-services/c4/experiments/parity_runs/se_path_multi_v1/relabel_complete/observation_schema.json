@@ -1,0 +1,32 @@
+{
+  "protocol": "se-path-multi-v1",
+  "dim": 101,
+  "n_topics": 46,
+  "n_actions": 184,
+  "action_types": [
+    "practice",
+    "revision",
+    "quiz",
+    "coding"
+  ],
+  "action_layout": "type_index * n_topics + topic_index",
+  "extras": [
+    "mean_mastery",
+    "frac_mastered",
+    "elapsed_env_step_frac",
+    "recent_accuracy",
+    "recent_accuracy_observed",
+    "engagement_completion_rate",
+    "engagement_observed",
+    "exam_urgency",
+    "exam_date_known"
+  ],
+  "catalogue_hash": "95aaba520a28a494e9d6fed0c30de5999b6d47f376368424fb211acb434a1622",
+  "no_prior_strength": true,
+  "coding_content_ids": [],
+  "cold_start": {
+    "recent_accuracy": "0.5 default when recent_accuracy_observed=0",
+    "engagement_completion_rate": "0 when engagement_observed=0 (not zero mastery)",
+    "exam_urgency": "0 when exam_date_known=0"
+  }
+}

@@ -92,3 +92,6 @@ docs/pp1/screenshots/
 evidence/
 **/evidence/
 **/screenshots/
+
+# Local C4 Colab source ZIP at repo root (do not ignore every *.zip)
+/c4-source.zip

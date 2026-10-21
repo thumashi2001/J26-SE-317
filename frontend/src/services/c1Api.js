@@ -44,4 +44,6 @@ export const saveExamDate = (studentId, module, examDate) => api('/c1/exam-date'
 export const getLevel = (studentId) => api(`/c1/level/${encodeURIComponent(studentId)}`);
 
 // Trained model (gradient boosting): chance of a correct answer on each topic the student has practised.
+// TRAINED MODEL (gradient boosting). Asks the backend for the chance of a correct answer on each topic the
+// student has practised. The backend then asks the Python AI service, which runs the model saved from train_compare.py.
 export const getPrediction = (studentId) => api(`/c1/predict/${encodeURIComponent(studentId)}`);

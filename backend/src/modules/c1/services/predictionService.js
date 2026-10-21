@@ -42,7 +42,8 @@ export async function getPredictions(db, studentId, aiUrl, now = new Date(), ai 
   const { events, start } = toModelEvents(logged);
   const base = { studentId, model: 'Gradient boosting', trainedOn: 'synthetic students', generatedAt: now.toISOString() };
   if (!events.length) return { ...base, topics: {} };
-
+    // Sends the student's logged answers to the Python AI service, which builds the same 22 features used in
+  // training and runs the gradient boosting model. It replies with a chance (0 to 1) for each topic. 
   const reply = await ai(aiUrl, '/twin/predict-correct', { as_of_day: (now.getTime() - start) / DAY_MS, events });
   const topics = {};
   for (const [topic, r] of Object.entries(reply.topics || {})) {

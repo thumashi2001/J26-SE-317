@@ -14,6 +14,8 @@ import DashboardPage from './pages/c1/DashboardPage.jsx';
 import TopicInsightsPage from './pages/c1/TopicInsightsPage.jsx';
 import TopicPage from './pages/c1/TopicPage.jsx';
 import PracticePage from './pages/c1/PracticePage.jsx';
+import PathPage from './pages/c4/PathPage.jsx';
+import LecturerPathPage from './pages/c4/LecturerPathPage.jsx';
 import ProfilePage from './pages/ProfilePage.jsx';
 import LecturerHome from './pages/lecturer/LecturerHome.jsx';
 import ClassInsights from './pages/lecturer/ClassInsights.jsx';
@@ -81,7 +83,8 @@ export default function App() {
         <Route path="/c3" element={<AssessmentPage />} />
         <Route path="/c3/*" element={<AssessmentPage />} />
 
-        <Route path="/c4/*" element={<ComingSoon title="Adaptive Learning Path" owner="Muthumali W G G A S" />} />
+        <Route path="/c4" element={<PathPage />} />
+        <Route path="/c4/*" element={<PathPage />} />
       </Route>
 
       {/* Lecturer Area */}
@@ -100,7 +103,8 @@ export default function App() {
         <Route path="/c3/review" element={<LecturerQueuePage />} />
         <Route path="/c3/review/:submissionId" element={<LecturerReviewPage />} />
 
-        <Route path="/lecturer/c4/*" element={<ComingSoon title="Adaptive paths" owner="Muthumali W G G A S" text="Study plans recommended to students." />} />
+        <Route path="/lecturer/c4" element={<LecturerPathPage />} />
+        <Route path="/lecturer/c4/*" element={<LecturerPathPage />} />
       </Route>
 
       {/* Administrator Area */}

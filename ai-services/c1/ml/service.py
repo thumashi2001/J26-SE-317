@@ -15,7 +15,8 @@ _BUNDLE = None
 _COLUMNS = ["day", "topic", "module", "source", "session_id", "q_in_session", "question_type",
             "correct", "time_sec", "hint_used", "tab_leaves"]
 
-
+# Loads the saved gradient boosting model once and keeps it in memory. The file holds the model, the feature list
+# and the topic difficulty values from training, so the app builds exactly the same features as in training. 
 def _bundle():
     global _BUNDLE
     if _BUNDLE is None:

@@ -1,0 +1,39 @@
+# Scoped runtime pins captured from the Windows environment where
+# MaskablePPO research inference and tests/test_inference_service.py (11 passed)
+# were executed. Do not claim other machines are verified without re-running tests.
+#
+# Python: 3.13.9 (tags/v3.13.9:8183fa5, Oct 14 2025, 14:09:13) [MSC v.1944 64 bit (AMD64)]
+# Captured: 2026-10-12 (local inference handoff)
+#
+# Install (runtime only):
+#   python -m pip install -c constraints-runtime.txt -r requirements.txt
+#
+# Install (runtime + tests):
+#   python -m pip install -c constraints-runtime.txt -r requirements.txt -r requirements-dev.txt
+
+fastapi==0.115.0
+uvicorn==0.30.6
+starlette==0.38.6
+pydantic==2.11.10
+numpy==2.2.6
+pandas==2.3.3
+gymnasium==1.4.0
+stable_baselines3==2.9.0
+sb3_contrib==2.9.0
+torch==2.14.1
+cloudpickle==3.1.2
+httpx==0.28.1
+anyio==4.11.0
+certifi==2025.11.12
+click==8.3.1
+filelock==3.20.0
+h11==0.16.0
+httpcore==1.0.9
+idna==3.11
+Jinja2==3.1.6
+mpmath==1.3.0
+networkx==3.5
+packaging==25.0
+pillow==11.3.0
+sympy==1.14.0
+typing_extensions==4.15.0

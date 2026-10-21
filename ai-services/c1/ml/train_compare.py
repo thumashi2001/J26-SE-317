@@ -89,13 +89,23 @@ def main():
     tr, va, te = (real[real.split == k] for k in ("train", "val", "test"))
     preds = {}
 
+    # MODEL 1, Global average: baseline. Gives every answer the same chance (the training students' correct rate).
+    # It knows nothing, so its AUC is exactly 0.50 (a coin flip). 
     preds["global_mean"] = np.full(len(df), tr.correct.mean())
+    # MODEL 2, Topic average: baseline. Uses only how hard the topic is (topic_prior, from training students only).
     preds["topic_mean"] = df.topic_prior.values
+    # MODEL 3, Rule-based twin: our own formula from the app (score by topic plus a forgetting curve).
+    # The forgetting rule is twin_decay() in features.py. twin_p is its chance of a correct answer.
     preds["rule_twin"] = df.twin_p.values
+    # MODEL 3b, Twin + calibration: same twin, but a small logistic fix (fitted on training students)
+    # corrects its scale. The ranking stays the same. This cut the exam error from 22.2 to 3.2 marks.
     cal = LogisticRegression(C=10).fit(tr[["twin_score"]], tr.correct)
     preds["twin_cal"] = cal.predict_proba(df[["twin_score"]])[:, 1]
 
-    # ---- BKT (fit on training students only)
+    # ---- MODELS 4 and 5, BKT and BKT with forgetting (fit on training students only).
+    # BKT is a classic education model: it tracks "does the student know this skill or not" and updates
+    # after each answer. The only difference between the two is the forget flag in the loop below
+    # (True adds the idea that knowledge fades over time). The model code is in bkt.py.
     obs, gap, idx = bkt.make_sequences(df)
     train_rows = set(tr.index)
     in_train = np.array([df.student_id.values[i[0]] in split["train"] for i in idx])
@@ -118,6 +128,9 @@ def main():
         print(f"{key} fitted in {time.time() - t1:.0f}s", [None if x is None else round(float(x), 3) for x in pr])
 
     # ---- PFA
+    # ---- MODEL 6, PFA (Performance Factors Analysis).
+    # A classic logistic model. Inputs are the counts of earlier right (succ) and wrong (fail) answers on the
+    # topic, plus one column per topic. It does not use time or behaviour.
     topics = sorted(df.topic.unique())
     def pfa_X(d):
         base = np.column_stack([np.log1p(d.succ), np.log1p(d.fail)])
@@ -127,11 +140,19 @@ def main():
     preds["pfa"] = pfa.predict_proba(pfa_X(df))[:, 1]
 
     # ---- logistic regression, MLP, gradient boosting on the rich history features
+    # ---- MODELS 7, 8 and 9 use all 22 features plus topic_prior (X_cols).
+    # MODEL 7, Logistic regression: adds up the features with weights. Simple, fast, easy to explain.
     lr = make_pipeline(StandardScaler(), LogisticRegression(C=0.5, max_iter=1000)).fit(tr[X_cols], tr.correct)
     preds["logreg"] = lr.predict_proba(df[X_cols])[:, 1]
+    # MODEL 8, Neural network (MLP): two hidden layers (64 and 32 units). Can learn curved patterns.
+    # Early stopping keeps it from memorising the training data.
     mlp = make_pipeline(StandardScaler(), MLPClassifier((64, 32), alpha=1e-3, early_stopping=True, validation_fraction=0.15, max_iter=200, random_state=SEED)).fit(tr[X_cols], tr.correct)
     preds["mlp"] = mlp.predict_proba(df[X_cols])[:, 1]
-
+    
+    # MODEL 9, Gradient boosting: hundreds of small decision trees, each fixing the mistakes of the last.
+    # Tuning: try 4 combinations (learning rate 0.04 or 0.08, 8 or 20 leaves). Pick the lowest validation
+    # log loss, never the test students. Early stopping (patience 25) and L2 = 1.0 reduce overfitting.
+    # It scored the highest test AUC by a very small margin (0.657), tied with logistic and the MLP.
     best_gbm, best_ll = None, 9
     for lrt in (0.04, 0.08):
         for leaves in (8, 20):
@@ -263,7 +284,9 @@ def main():
     print("\nIMPORTANCE", [(a, round(b, 4)) for a, b in imp[:8]])
     print("\nLATENCY", {k: round(v, 2) for k, v in lat.items()})
     print("\nHISTORY", {lab: {k: (None if v is None else round(v, 3)) for k, v in d.items()} for lab, d in cold.items()})
-
+    
+    # Save the gradient boosting model, its feature list and topic_prior. The app loads this file in
+    # ml/service.py. Note: the app study plan currently uses the plain rule-based twin. Calibration is only tested here. 
     joblib.dump(dict(model=gbm, features=X_cols, topic_prior=prior.to_dict(), config=best_cfg), M("gbm_next_answer.joblib"))
 
 

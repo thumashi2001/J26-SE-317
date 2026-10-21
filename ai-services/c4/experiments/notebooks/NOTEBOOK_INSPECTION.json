@@ -1,0 +1,83 @@
+{
+  "inspected_utc_note": "Generated during organize_colab_backup viva packaging; not a Colab artifact.",
+  "notebooks": [
+    {
+      "file": "01_assistments_data_preparation_executed.ipynb",
+      "code_cells": 20,
+      "cells_with_outputs": 15,
+      "errors": [],
+      "stages": [
+        "configuration",
+        "dependency_install",
+        "source_zip_extract",
+        "drive_output_dirs",
+        "assistments_csv_acquire",
+        "data_preparation",
+        "quality_report_peek"
+      ],
+      "full_training": false,
+      "final_evaluation": false
+    },
+    {
+      "file": "02_assistments_smoke_training_executed.ipynb",
+      "code_cells": 6,
+      "cells_with_outputs": 6,
+      "errors": [],
+      "stages": ["assistments_smoke_training_pipeline"],
+      "full_training": false,
+      "final_evaluation": false,
+      "note": "Smoke-only; /content paths and upload widgets."
+    },
+    {
+      "file": "05_se_path_simulation_executed.ipynb",
+      "code_cells": 17,
+      "cells_with_outputs": 15,
+      "errors": [],
+      "stages": [
+        "dependencies",
+        "zip_upload_extract",
+        "drive_mount",
+        "contract",
+        "smoke_train_val",
+        "comparison_table",
+        "full_training_gated_source_true",
+        "final_eval_gated_source_false"
+      ],
+      "full_training_flag_in_source": true,
+      "final_evaluation_flag_in_source": false,
+      "note": "Final-test CSV exists in archive run folder; not claimed from notebook final-eval cell."
+    },
+    {
+      "file": "06_se_supervised_simulation_executed.ipynb",
+      "code_cells": 16,
+      "cells_with_outputs": 13,
+      "errors": [],
+      "stages": [
+        "dependencies",
+        "zip_upload",
+        "imports",
+        "smoke",
+        "validation_selection",
+        "full_training_gated",
+        "final_test_gated",
+        "threshold_accuracy_table"
+      ],
+      "accuracy_table_present": true,
+      "accuracy_table_cell_execution_count": 17,
+      "accuracy_table": {
+        "response_correct_predictions": 9425,
+        "response_n": 14194,
+        "response_accuracy_percent": 66.4,
+        "pass_correct_predictions": 248,
+        "pass_n": 300,
+        "pass_accuracy_percent": 82.67,
+        "probability_threshold": 0.5
+      },
+      "note": "Accuracy table is notebook-computed at threshold 0.5; final_test_metrics.json does not store accuracy."
+    }
+  ],
+  "missing": [
+    "Executed ASSISTments full-training notebook",
+    "Executed ASSISTments final-evaluation notebook"
+  ]
+}
