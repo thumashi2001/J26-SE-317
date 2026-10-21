@@ -67,6 +67,12 @@ ai-services/c2/outputs/syllabus_reviews/
 
 ai-services/c2/outputs/question_classification_reviews/
 
+# C2 synthetic dataset CSV exports (viva only)
+/ai-services/c2/outputs/dataset_exports/
+
+# C2 dataset export utility
+/ai-services/c2/scripts/export_synthetic_datasets_csv.py
+
 # C2 lecturer-generated and approval runtime data
 /ai-services/c2/datasets/generated_questions/lecturer_approved_questions.json
 /ai-services/c2/outputs/taxonomy_approvals/approvals.json
