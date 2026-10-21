@@ -1,0 +1,57 @@
+
+{
+  "schema_version": "1.0",
+  "description": "Standardized topic classification record schema for Component 2 examination questions.",
+  "required_fields": [
+    "question_id",
+    "module_key",
+    "topic_id",
+    "subtopic",
+    "classification_method",
+    "confidence_score",
+    "verification_status"
+  ],
+  "field_definitions": {
+    "question_id": {
+      "type": "string",
+      "description": "Unique question identifier from the question repository."
+    },
+    "module_key": {
+      "type": "string",
+      "description": "Module identifier from modules.json."
+    },
+    "topic_id": {
+      "type": ["string", "null"],
+      "description": "Topic identifier from topic_taxonomies.json. Null when no topic has been assigned."
+    },
+    "subtopic": {
+      "type": ["string", "null"],
+      "description": "Optional subtopic from the module taxonomy."
+    },
+    "classification_method": {
+      "type": "string",
+      "allowed_values": [
+        "unclassified",
+        "manual",
+        "rule_based",
+        "ml_model",
+        "hybrid"
+      ]
+    },
+    "confidence_score": {
+      "type": ["number", "null"],
+      "minimum": 0.0,
+      "maximum": 1.0,
+      "description": "Model or rule confidence. Null if unavailable."
+    },
+    "verification_status": {
+      "type": "string",
+      "allowed_values": [
+        "unverified",
+        "pending_review",
+        "verified",
+        "rejected"
+      ]
+    }
+  }
+}

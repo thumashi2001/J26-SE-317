@@ -1,0 +1,283 @@
+{
+  "domain": "se_simulation",
+  "episodes": [
+    {
+      "domain": "se_simulation",
+      "episode_seed": 7010000,
+      "invalid_action_rate": 0.0,
+      "net_mean_mastery_change": 0.10727277398109436,
+      "net_total_mastery_change": 2.359999656677246,
+      "return": 13.359999835491172,
+      "selected_topic_mastery_gain_sum": 2.3599998354911804,
+      "synthetic": true,
+      "termination_reason": "max_episode_steps",
+      "valid_practice_count": 40
+    },
+    {
+      "domain": "se_simulation",
+      "episode_seed": 7010001,
+      "invalid_action_rate": 0.0,
+      "net_mean_mastery_change": 0.08173918724060059,
+      "net_total_mastery_change": 1.8800010681152344,
+      "return": 8.880000144243244,
+      "selected_topic_mastery_gain_sum": 1.8800001442432404,
+      "synthetic": true,
+      "termination_reason": "max_episode_steps",
+      "valid_practice_count": 40
+    },
+    {
+      "domain": "se_simulation",
+      "episode_seed": 7010002,
+      "invalid_action_rate": 0.0,
+      "net_mean_mastery_change": 0.08545449376106262,
+      "net_total_mastery_change": 1.8799991607666016,
+      "return": 8.880000054836271,
+      "selected_topic_mastery_gain_sum": 1.8800000548362732,
+      "synthetic": true,
+      "termination_reason": "max_episode_steps",
+      "valid_practice_count": 40
+    },
+    {
+      "domain": "se_simulation",
+      "episode_seed": 7010003,
+      "invalid_action_rate": 0.0,
+      "net_mean_mastery_change": 0.07181820273399353,
+      "net_total_mastery_change": 1.5799999237060547,
+      "return": 6.079999923706058,
+      "selected_topic_mastery_gain_sum": 1.5799999237060547,
+      "synthetic": true,
+      "termination_reason": "max_episode_steps",
+      "valid_practice_count": 40
+    },
+    {
+      "domain": "se_simulation",
+      "episode_seed": 7010004,
+      "invalid_action_rate": 0.0,
+      "net_mean_mastery_change": 0.10600000619888306,
+      "net_total_mastery_change": 2.119999885559082,
+      "return": 11.119999825954432,
+      "selected_topic_mastery_gain_sum": 2.1199998259544373,
+      "synthetic": true,
+      "termination_reason": "max_episode_steps",
+      "valid_practice_count": 40
+    },
+    {
+      "domain": "se_simulation",
+      "episode_seed": 7010005,
+      "invalid_action_rate": 0.0,
+      "net_mean_mastery_change": 0.07727271318435669,
+      "net_total_mastery_change": 1.6999998092651367,
+      "return": 7.200000077486042,
+      "selected_topic_mastery_gain_sum": 1.7000000774860382,
+      "synthetic": true,
+      "termination_reason": "max_episode_steps",
+      "valid_practice_count": 40
+    },
+    {
+      "domain": "se_simulation",
+      "episode_seed": 7010006,
+      "invalid_action_rate": 0.0,
+      "net_mean_mastery_change": 0.09400004148483276,
+      "net_total_mastery_change": 1.8799991607666016,
+      "return": 8.88000011444092,
+      "selected_topic_mastery_gain_sum": 1.880000114440918,
+      "synthetic": true,
+      "termination_reason": "max_episode_steps",
+      "valid_practice_count": 40
+    },
+    {
+      "domain": "se_simulation",
+      "episode_seed": 7010007,
+      "invalid_action_rate": 0.0,
+      "net_mean_mastery_change": 0.08380946516990662,
+      "net_total_mastery_change": 1.7599983215332031,
+      "return": 7.760000169277196,
+      "selected_topic_mastery_gain_sum": 1.7600001692771912,
+      "synthetic": true,
+      "termination_reason": "max_episode_steps",
+      "valid_practice_count": 40
+    },
+    {
+      "domain": "se_simulation",
+      "episode_seed": 7010008,
+      "invalid_action_rate": 0.0,
+      "net_mean_mastery_change": 0.075999915599823,
+      "net_total_mastery_change": 1.5200004577636719,
+      "return": 5.519999980926516,
+      "selected_topic_mastery_gain_sum": 1.5199999809265137,
+      "synthetic": true,
+      "termination_reason": "max_episode_steps",
+      "valid_practice_count": 40
+    },
+    {
+      "domain": "se_simulation",
+      "episode_seed": 7010009,
+      "invalid_action_rate": 0.0,
+      "net_mean_mastery_change": 0.09636357426643372,
+      "net_total_mastery_change": 2.120001792907715,
+      "return": 11.120000004768366,
+      "selected_topic_mastery_gain_sum": 2.1200000047683716,
+      "synthetic": true,
+      "termination_reason": "max_episode_steps",
+      "valid_practice_count": 40
+    },
+    {
+      "domain": "se_simulation",
+      "episode_seed": 7010010,
+      "invalid_action_rate": 0.0,
+      "net_mean_mastery_change": 0.09217393398284912,
+      "net_total_mastery_change": 2.119999885559082,
+      "return": 11.119999885559077,
+      "selected_topic_mastery_gain_sum": 2.119999885559082,
+      "synthetic": true,
+      "termination_reason": "max_episode_steps",
+      "valid_practice_count": 40
+    },
+    {
+      "domain": "se_simulation",
+      "episode_seed": 7010011,
+      "invalid_action_rate": 0.0,
+      "net_mean_mastery_change": 0.08833327889442444,
+      "net_total_mastery_change": 2.120001792907715,
+      "return": 11.11999982595443,
+      "selected_topic_mastery_gain_sum": 2.1199998259544373,
+      "synthetic": true,
+      "termination_reason": "max_episode_steps",
+      "valid_practice_count": 40
+    },
+    {
+      "domain": "se_simulation",
+      "episode_seed": 7010012,
+      "invalid_action_rate": 0.0,
+      "net_mean_mastery_change": 0.10000008344650269,
+      "net_total_mastery_change": 2.000001907348633,
+      "return": 10.000000119209291,
+      "selected_topic_mastery_gain_sum": 2.0000001192092896,
+      "synthetic": true,
+      "termination_reason": "max_episode_steps",
+      "valid_practice_count": 40
+    },
+    {
+      "domain": "se_simulation",
+      "episode_seed": 7010013,
+      "invalid_action_rate": 0.0,
+      "net_mean_mastery_change": 0.09578940272331238,
+      "net_total_mastery_change": 1.8199996948242188,
+      "return": 8.319999963045124,
+      "selected_topic_mastery_gain_sum": 1.8199999630451202,
+      "synthetic": true,
+      "termination_reason": "max_episode_steps",
+      "valid_practice_count": 40
+    },
+    {
+      "domain": "se_simulation",
+      "episode_seed": 7010014,
+      "invalid_action_rate": 0.0,
+      "net_mean_mastery_change": 0.10999995470046997,
+      "net_total_mastery_change": 1.7600011825561523,
+      "return": 7.7599998712539735,
+      "selected_topic_mastery_gain_sum": 1.7599998712539673,
+      "synthetic": true,
+      "termination_reason": "max_episode_steps",
+      "valid_practice_count": 40
+    },
+    {
+      "domain": "se_simulation",
+      "episode_seed": 7010015,
+      "invalid_action_rate": 0.0,
+      "net_mean_mastery_change": 0.07583338022232056,
+      "net_total_mastery_change": 1.8200016021728516,
+      "return": 8.319999933242801,
+      "selected_topic_mastery_gain_sum": 1.8199999332427979,
+      "synthetic": true,
+      "termination_reason": "max_episode_steps",
+      "valid_practice_count": 40
+    },
+    {
+      "domain": "se_simulation",
+      "episode_seed": 7010016,
+      "invalid_action_rate": 0.0,
+      "net_mean_mastery_change": 0.10181823372840881,
+      "net_total_mastery_change": 2.239999771118164,
+      "return": 12.239999890327448,
+      "selected_topic_mastery_gain_sum": 2.2399998903274536,
+      "synthetic": true,
+      "termination_reason": "max_episode_steps",
+      "valid_practice_count": 40
+    },
+    {
+      "domain": "se_simulation",
+      "episode_seed": 7010017,
+      "invalid_action_rate": 0.0,
+      "net_mean_mastery_change": 0.08333331346511841,
+      "net_total_mastery_change": 2.0,
+      "return": 10.00000011920928,
+      "selected_topic_mastery_gain_sum": 2.0000001192092896,
+      "synthetic": true,
+      "termination_reason": "max_episode_steps",
+      "valid_practice_count": 40
+    },
+    {
+      "domain": "se_simulation",
+      "episode_seed": 7010018,
+      "invalid_action_rate": 0.0,
+      "net_mean_mastery_change": 0.09909090399742126,
+      "net_total_mastery_change": 2.1800003051757812,
+      "return": 11.68000009655952,
+      "selected_topic_mastery_gain_sum": 2.1800000965595245,
+      "synthetic": true,
+      "termination_reason": "max_episode_steps",
+      "valid_practice_count": 40
+    },
+    {
+      "domain": "se_simulation",
+      "episode_seed": 7010019,
+      "invalid_action_rate": 0.0,
+      "net_mean_mastery_change": 0.08434778451919556,
+      "net_total_mastery_change": 1.9400005340576172,
+      "return": 9.440000027418137,
+      "selected_topic_mastery_gain_sum": 1.9400000274181366,
+      "synthetic": true,
+      "termination_reason": "max_episode_steps",
+      "valid_practice_count": 40
+    }
+  ],
+  "generator": "se-sim-1.0.0",
+  "label": "Lowest rolling in-episode attempt accuracy; cold-start = lowest-index untried valid",
+  "method": "recent_performance",
+  "not_assistments": true,
+  "not_real_se_students": true,
+  "protocol": "se-path-sim-v1",
+  "scenario": "y3s1_sim_test",
+  "split": "final_test",
+  "summary": {
+    "invalid_action_rate": {
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "n_episodes": 20,
+    "net_mean_mastery_change": {
+      "mean": 0.0905225321650505,
+      "std": 0.011382337171356163
+    },
+    "net_total_mastery_change": {
+      "mean": 1.940000295639038,
+      "std": 0.22109784219165027
+    },
+    "return": {
+      "mean": 9.439999993145465,
+      "std": 2.0635788702065456
+    },
+    "selected_topic_mastery_gain_sum": {
+      "mean": 1.939999993145466,
+      "std": 0.22109770555243757
+    },
+    "valid_practice_count": {
+      "mean": 40.0,
+      "std": 0.0
+    }
+  },
+  "synthetic": true,
+  "train_seed": 1,
+  "uses_action_mask": true
+}

@@ -1,0 +1,8 @@
+{
+  "enabled": true,
+  "min_class_count": 8,
+  "n_neg": 779,
+  "n_pos": 621,
+  "pass_threshold": 0.55,
+  "reason": "both classes meet minimum count"
+}

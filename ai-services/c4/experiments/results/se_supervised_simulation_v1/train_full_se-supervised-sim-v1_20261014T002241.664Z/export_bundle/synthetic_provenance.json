@@ -1,0 +1,10 @@
+{
+  "domain": "se_simulation",
+  "generator_version": "se_supervised_gen_v1",
+  "note": "All data and labels are synthetic. real_exam_validation=false. Not validated on real SE students.",
+  "protocol": "se-supervised-sim-v1",
+  "real_exam_validation": false,
+  "scope_decision": "S1",
+  "simulation_only": true,
+  "synthetic": true
+}

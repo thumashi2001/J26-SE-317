@@ -1,0 +1,1 @@
+{"algorithm": "maskable_ppo", "masks_in_training": true, "timesteps": 128}

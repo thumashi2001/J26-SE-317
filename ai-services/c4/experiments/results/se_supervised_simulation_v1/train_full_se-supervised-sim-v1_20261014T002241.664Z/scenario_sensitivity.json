@@ -1,0 +1,254 @@
+{
+  "rule": "report_all_predeclared_scenarios",
+  "scenarios": {
+    "baseline": {
+      "exam_score_mean": 0.5199007936507937,
+      "exam_score_val": [
+        {
+          "name": "train_mean",
+          "val_metrics": {
+            "mae": 0.15067650541698163,
+            "n": 300,
+            "pred_mean": 0.5213066893424037,
+            "pred_std": 0.0,
+            "rmse": 0.1821180451621497,
+            "y_mean": 0.5214329805996473,
+            "y_std": 0.18242229231459675
+          }
+        },
+        {
+          "name": "ridge_regression",
+          "val_metrics": {
+            "mae": 0.06850262447014432,
+            "n": 300,
+            "pred_mean": 0.5060742982815725,
+            "pred_std": 0.16148343833291876,
+            "rmse": 0.083333534257756,
+            "y_mean": 0.5214329805996473,
+            "y_std": 0.18242229231459675
+          }
+        },
+        {
+          "name": "hist_gradient_boosting_regressor",
+          "val_metrics": {
+            "mae": 0.06997721398839246,
+            "n": 300,
+            "pred_mean": 0.5074367379464713,
+            "pred_std": 0.1608841943908993,
+            "rmse": 0.08601329052823925,
+            "y_mean": 0.5214329805996473,
+            "y_std": 0.18242229231459675
+          }
+        }
+      ],
+      "practice_correct_rate": 0.49703606952677587,
+      "response_val": [
+        {
+          "name": "constant_train_prevalence",
+          "val_metrics": {
+            "accuracy": 0.4820337503636893,
+            "brier": 0.25001485606236307,
+            "classification_prob_threshold": 0.5,
+            "log_loss": 0.6931768926913289,
+            "n": 13748,
+            "pred_mean": 0.5004087929039721,
+            "prevalence": 0.4820337503636893,
+            "roc_auc": 0.5
+          }
+        },
+        {
+          "name": "logistic_regression",
+          "val_metrics": {
+            "accuracy": 0.6634419551934827,
+            "brier": 0.21315862187238227,
+            "classification_prob_threshold": 0.5,
+            "log_loss": 0.6149419583557282,
+            "n": 13748,
+            "pred_mean": 0.4886214338145091,
+            "prevalence": 0.4820337503636893,
+            "roc_auc": 0.7201948207478366
+          }
+        },
+        {
+          "name": "hist_gradient_boosting_classifier",
+          "val_metrics": {
+            "accuracy": 0.6663514693046261,
+            "brier": 0.2112751580726346,
+            "classification_prob_threshold": 0.5,
+            "log_loss": 0.6103379736241487,
+            "n": 13748,
+            "pred_mean": 0.4871726873760817,
+            "prevalence": 0.4820337503636893,
+            "roc_auc": 0.7252752105613995
+          }
+        }
+      ]
+    },
+    "easy_bank": {
+      "exam_score_mean": 0.6591322751322751,
+      "exam_score_val": [
+        {
+          "name": "train_mean",
+          "val_metrics": {
+            "mae": 0.14493854875283446,
+            "n": 300,
+            "pred_mean": 0.6649357520786091,
+            "pred_std": 1.1120780351495294e-16,
+            "rmse": 0.1757591457130241,
+            "y_mean": 0.6329761904761906,
+            "y_std": 0.17311777185988833
+          }
+        },
+        {
+          "name": "ridge_regression",
+          "val_metrics": {
+            "mae": 0.06961853957017629,
+            "n": 300,
+            "pred_mean": 0.6493892188052466,
+            "pred_std": 0.1530198044917164,
+            "rmse": 0.0857932324207291,
+            "y_mean": 0.6329761904761906,
+            "y_std": 0.17311777185988833
+          }
+        },
+        {
+          "name": "hist_gradient_boosting_regressor",
+          "val_metrics": {
+            "mae": 0.06766068366881806,
+            "n": 300,
+            "pred_mean": 0.6475152687828056,
+            "pred_std": 0.15279908203897394,
+            "rmse": 0.08421961966007266,
+            "y_mean": 0.6329761904761906,
+            "y_std": 0.17311777185988833
+          }
+        }
+      ],
+      "practice_correct_rate": 0.6412321101371763,
+      "response_val": [
+        {
+          "name": "constant_train_prevalence",
+          "val_metrics": {
+            "accuracy": 0.6271210710961552,
+            "brier": 0.2340744287833812,
+            "classification_prob_threshold": 0.5,
+            "log_loss": 0.6609767779469461,
+            "n": 13967,
+            "pred_mean": 0.6424245184206933,
+            "prevalence": 0.6271210710961552,
+            "roc_auc": 0.5
+          }
+        },
+        {
+          "name": "logistic_regression",
+          "val_metrics": {
+            "accuracy": 0.6844705376959977,
+            "brier": 0.20591987616144286,
+            "classification_prob_threshold": 0.5,
+            "log_loss": 0.599785975369824,
+            "n": 13967,
+            "pred_mean": 0.6348596095517243,
+            "prevalence": 0.6271210710961552,
+            "roc_auc": 0.7022783258790739
+          }
+        },
+        {
+          "name": "hist_gradient_boosting_classifier",
+          "val_metrics": {
+            "accuracy": 0.6874776258323191,
+            "brier": 0.20386330792971716,
+            "classification_prob_threshold": 0.5,
+            "log_loss": 0.5945105813239047,
+            "n": 13967,
+            "pred_mean": 0.6343404526273065,
+            "prevalence": 0.6271210710961552,
+            "roc_auc": 0.7081085261611098
+          }
+        }
+      ]
+    },
+    "high_noise": {
+      "exam_score_mean": 0.5145773809523809,
+      "exam_score_val": [
+        {
+          "name": "train_mean",
+          "val_metrics": {
+            "mae": 0.12112658100277149,
+            "n": 300,
+            "pred_mean": 0.5142602040816325,
+            "pred_std": 1.1120780351495294e-16,
+            "rmse": 0.14850539112616465,
+            "y_mean": 0.5239858906525574,
+            "y_std": 0.14843417585853316
+          }
+        },
+        {
+          "name": "ridge_regression",
+          "val_metrics": {
+            "mae": 0.07256010952097919,
+            "n": 300,
+            "pred_mean": 0.522180917848597,
+            "pred_std": 0.13819719503712233,
+            "rmse": 0.09171137372713949,
+            "y_mean": 0.5239858906525574,
+            "y_std": 0.14843417585853316
+          }
+        },
+        {
+          "name": "hist_gradient_boosting_regressor",
+          "val_metrics": {
+            "mae": 0.07345190535726558,
+            "n": 300,
+            "pred_mean": 0.5205108121023175,
+            "pred_std": 0.13588694734055903,
+            "rmse": 0.09266021506816259,
+            "y_mean": 0.5239858906525574,
+            "y_std": 0.14843417585853316
+          }
+        }
+      ],
+      "practice_correct_rate": 0.49705999601355394,
+      "response_val": [
+        {
+          "name": "constant_train_prevalence",
+          "val_metrics": {
+            "accuracy": 0.4945384450631827,
+            "brier": 0.2500735668751087,
+            "classification_prob_threshold": 0.5,
+            "log_loss": 0.6932943193109675,
+            "n": 14007,
+            "pred_mean": 0.4952931992469118,
+            "prevalence": 0.5054615549368173,
+            "roc_auc": 0.5
+          }
+        },
+        {
+          "name": "logistic_regression",
+          "val_metrics": {
+            "accuracy": 0.6399657314200042,
+            "brier": 0.22187836246410433,
+            "classification_prob_threshold": 0.5,
+            "log_loss": 0.6342950676660636,
+            "n": 14007,
+            "pred_mean": 0.5047527354410692,
+            "prevalence": 0.5054615549368173,
+            "roc_auc": 0.6927803387873049
+          }
+        },
+        {
+          "name": "hist_gradient_boosting_classifier",
+          "val_metrics": {
+            "accuracy": 0.6428928392946384,
+            "brier": 0.22013693339520296,
+            "classification_prob_threshold": 0.5,
+            "log_loss": 0.6301653810870111,
+            "n": 14007,
+            "pred_mean": 0.5056908802850787,
+            "prevalence": 0.5054615549368173,
+            "roc_auc": 0.6983683657415224
+          }
+        }
+      ]
+    }
+  }
+}
