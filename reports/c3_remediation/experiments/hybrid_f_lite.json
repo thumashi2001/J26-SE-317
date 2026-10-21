@@ -1,0 +1,169 @@
+{
+ "definition": "F-lite = NNLS stack of E, A1, B1, C (no LLM). Differs from the proposal's Condition F.",
+ "weights": {
+  "E": 0.02551802508426899,
+  "A1": 0.05044105474901854,
+  "B1": 0.0,
+  "C": 0.9243219188078015
+ },
+ "weights_sum": 1.000280998641089,
+ "fit_data": "validation predictions only (n=66)",
+ "f_lite": {
+  "validation": {
+   "n": 66,
+   "n_questions": 11,
+   "nmae": 0.0353362736341517,
+   "nmae_ci95_question_bootstrap": [
+    0.021539037918776097,
+    0.057029755462314174
+   ],
+   "nrmse": 0.06123002088868091,
+   "mae_marks": 0.7809502307827931,
+   "pearson_r": 0.9819543903408788,
+   "qwk_11bins": 0.9831904856820145,
+   "within_0.10_of_max": 0.9242424242424242
+  },
+  "test": {
+   "n": 90,
+   "n_questions": 15,
+   "nmae": 0.03746214245752777,
+   "nmae_ci95_question_bootstrap": [
+    0.029941511029299813,
+    0.04565599579194061
+   ],
+   "nrmse": 0.05633873853749093,
+   "mae_marks": 0.6900106030384179,
+   "pearson_r": 0.984728261936824,
+   "qwk_11bins": 0.9812083174688955,
+   "within_0.10_of_max": 0.9222222222222223
+  }
+ },
+ "components": {
+  "E": {
+   "validation": {
+    "n": 66,
+    "n_questions": 11,
+    "nmae": 0.2953030303030303,
+    "nmae_ci95_question_bootstrap": [
+     0.22272727272727272,
+     0.40303030303030296
+    ],
+    "nrmse": 0.42237603524763945,
+    "mae_marks": 10.954545454545455,
+    "pearson_r": 0.5099156670869109,
+    "qwk_11bins": 0.47083827195814765,
+    "within_0.10_of_max": 0.3181818181818182
+   },
+   "test": {
+    "n": 90,
+    "n_questions": 15,
+    "nmae": 0.20937037037037035,
+    "nmae_ci95_question_bootstrap": [
+     0.1774037037037037,
+     0.24429814814814815
+    ],
+    "nrmse": 0.3051542819664655,
+    "mae_marks": 3.5444444444444443,
+    "pearson_r": 0.7334206094717934,
+    "qwk_11bins": 0.6822828291189007,
+    "within_0.10_of_max": 0.3333333333333333
+   }
+  },
+  "A1": {
+   "validation": {
+    "n": 66,
+    "n_questions": 11,
+    "nmae": 0.08394600357441531,
+    "nmae_ci95_question_bootstrap": [
+     0.07339575417851456,
+     0.09666677624790598
+    ],
+    "nrmse": 0.11678843433055969,
+    "mae_marks": 1.7977416063549647,
+    "pearson_r": 0.933402938863585,
+    "qwk_11bins": 0.9332627865961199,
+    "within_0.10_of_max": 0.6515151515151515
+   },
+   "test": {
+    "n": 90,
+    "n_questions": 15,
+    "nmae": 0.08124301756821145,
+    "nmae_ci95_question_bootstrap": [
+     0.07436772441832463,
+     0.0879781569330227
+    ],
+    "nrmse": 0.11287078871556196,
+    "mae_marks": 1.2959282632829328,
+    "pearson_r": 0.9380141263512914,
+    "qwk_11bins": 0.9342181860519269,
+    "within_0.10_of_max": 0.6888888888888889
+   }
+  },
+  "B1": {
+   "validation": {
+    "n": 66,
+    "n_questions": 11,
+    "nmae": 0.09270471739046501,
+    "nmae_ci95_question_bootstrap": [
+     0.07953208981589838,
+     0.10805241402622424
+    ],
+    "nrmse": 0.12223372263879988,
+    "mae_marks": 2.617785918893236,
+    "pearson_r": 0.92611430634176,
+    "qwk_11bins": 0.923680706426519,
+    "within_0.10_of_max": 0.6212121212121212
+   },
+   "test": {
+    "n": 90,
+    "n_questions": 15,
+    "nmae": 0.08402224386179889,
+    "nmae_ci95_question_bootstrap": [
+     0.0768938578267892,
+     0.09173416361124427
+    ],
+    "nrmse": 0.11384567831891083,
+    "mae_marks": 1.406277949280209,
+    "pearson_r": 0.9360836679594411,
+    "qwk_11bins": 0.9350980867656256,
+    "within_0.10_of_max": 0.6888888888888889
+   }
+  },
+  "C": {
+   "validation": {
+    "n": 66,
+    "n_questions": 11,
+    "nmae": 0.03770649259726545,
+    "nmae_ci95_question_bootstrap": [
+     0.0248927707975575,
+     0.05801086835956526
+    ],
+    "nrmse": 0.06282297760314878,
+    "mae_marks": 0.8255852541540551,
+    "pearson_r": 0.9810444021653848,
+    "qwk_11bins": 0.9797088082218856,
+    "within_0.10_of_max": 0.9242424242424242
+   },
+   "test": {
+    "n": 90,
+    "n_questions": 15,
+    "nmae": 0.03815195891506004,
+    "nmae_ci95_question_bootstrap": [
+     0.030342489522936982,
+     0.046592239372618485
+    ],
+    "nrmse": 0.05737498050431416,
+    "mae_marks": 0.7064791192688669,
+    "pearson_r": 0.9841379955256611,
+    "qwk_11bins": 0.9802696481420585,
+    "within_0.10_of_max": 0.9
+   }
+  }
+ },
+ "best_component_by_validation": "C",
+ "caveats": [
+  "validation set has only 66 answers from 11 questions",
+  "RoBERTa validation predictions are from the validation-selected epoch (optimistic)",
+  "single run, single seed, tier-derived synthetic labels, ratio-concentration check failed"
+ ]
+}

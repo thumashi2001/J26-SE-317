@@ -1,0 +1,9 @@
+{
+ "status": "BLOCKED",
+ "reason": "live LLM calls not enabled (--run-live not given). Free-tier quota (about 20 requests/day/model) cannot cover 2 x 90 calls; OpenAI credit was reported exhausted earlier in the project (not re-probed)",
+ "provider_requested": "gemini",
+ "test_answers": 90,
+ "calls_required": "2 x test answers (conditions A and B)",
+ "results": null,
+ "note": "No marks were generated; nothing here is an experimental result."
+}
