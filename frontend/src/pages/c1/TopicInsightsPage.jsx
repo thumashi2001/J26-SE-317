@@ -69,6 +69,8 @@ export default function TopicInsightsPage() {
         getInsights(user.student_id).catch(() => null),
         getBehaviour(user.student_id).catch(() => null),
       ]);
+          // Gets the trained model's prediction for this student, then keeps only this topic. It is shown in the
+    // "Chance you answer the next question correctly" box (heading near line 167).
       setTwin(t);
       setPracticable(pt.topics);
       setInsights(ins);
