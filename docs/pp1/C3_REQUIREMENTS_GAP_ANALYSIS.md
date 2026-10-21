@@ -1,3 +1,5 @@
+> **SUPERSEDED (2026-10-21):** this document predates the dataset repair. Its dataset counts, label statistics, "ALL PASS" claims and metrics (e.g. MAE 4.640, 1.289, 17.3% reduction) are not valid for the repaired dataset. See `docs/pp1/C3_DATASET_CARD.md`, `docs/pp1/C3_DATASET_QUALITY_AUDIT.md` and `docs/audit/`. Mock-provider results mentioned here are not real model results.
+
 # AdaptiveLearnSE Component 3 — Requirements Gap Analysis & Architectural Audit
 **Project ID:** J26-SE-317 | **Academic Module:** IT4010 Research Project  
 **Component:** Component 3 (C3) — AI-Powered Automated Marking & Answer Analysis System  

@@ -1,3 +1,5 @@
+> **SUPERSEDED (2026-10-21):** this document predates the dataset repair. Its dataset counts, label statistics, "ALL PASS" claims and metrics (e.g. MAE 4.640, 1.289, 17.3% reduction) are not valid for the repaired dataset. See `docs/pp1/C3_DATASET_CARD.md`, `docs/pp1/C3_DATASET_QUALITY_AUDIT.md` and `docs/audit/`. Mock-provider results mentioned here are not real model results.
+
 # AdaptiveLearnSE Component 3 — Authoritative Experiments A–F Traceability & Specification
 
 **Document Version:** 1.0.0 (Authoritative Research Experiment Specification)  
