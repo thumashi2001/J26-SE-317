@@ -1,6 +1,0 @@
-{
-  "pass_threshold_note": "Pass label = 1[y_exam_score >= 0.55] on the synthetic exam fraction-correct scale. This is a declared synthetic exam-score cutoff only \u2014 not an institutional rule.",
-  "y_correct": "binary correctness of the practice attempt being predicted",
-  "y_exam_score": "fraction correct on subsequent synthetic mock exam [0,1]",
-  "y_pass": "1 if y_exam_score >= 0.55"
-}
