@@ -1,0 +1,21 @@
+{
+  "comparison_notes": {
+    "legacy_alias": "Older smoke runs labelled rule_based and lowest_first used the same weakest-mastery heuristic (alias). New runs report weakest_mastery once.",
+    "mask_vs_penalty": "weakest_mastery, random_valid, and recent_performance use valid-action masks. Vanilla DQN/PPO learn unavailable actions only through penalties; invalid actions are not silently remapped.",
+    "maskable_ppo_separate": "maskable_ppo is opt-in and uses sb3_contrib.MaskablePPO with action_masks() during learn and predict. Do not describe inference-only remapping as masked training.",
+    "mastery_metrics": "selected_skill_mastery_gain_sum accumulates per-step gains on the chosen skill only. mean_mastery_delta_final_minus_initial and total_mastery_delta_final_minus_initial compare end vs start mastery across all skills (includes forgetting).",
+    "recent_performance_defined": "recent_performance uses a rolling window of previously observed correct/incorrect responses per skill within the episode only. Cold-start prefers untried valid skills (lowest action index). Ties break by lowest action index. This is distinct from weakest_mastery (current mastery) and random_valid."
+  },
+  "env_protocol_version": "c4-env-eval-v1.1",
+  "mean_val_return_by_algorithm": {
+    "dqn": 3.043666425794362,
+    "maskable_ppo": 11.86533285559465,
+    "ppo": -36.83900012065966,
+    "random_valid": 9.42933331771443,
+    "recent_performance": 7.9453334245209914,
+    "weakest_mastery": 7.488000568250816
+  },
+  "note": "Selection uses validation only; do not tune on final test.",
+  "selected": "maskable_ppo",
+  "selected_label": "MaskablePPO (sb3-contrib; masks used in training and evaluation \u2014 separate experiment)"
+}

@@ -1,0 +1,460 @@
+/* Local to C4 pages only — colours come from shared index.css tokens. */
+
+.c4-path {
+  color: var(--text);
+}
+
+.c4-path h1 {
+  color: var(--text);
+  margin-bottom: 0.35rem;
+}
+
+.c4-path h2 {
+  color: var(--text);
+  font-size: 1.05rem;
+  margin: 0 0 0.5rem;
+}
+
+.c4-path .error {
+  color: var(--weak);
+  margin: 0 0 0.75rem;
+}
+
+.c4-path .c4-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.c4-path .c4-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.c4-list {
+  list-style: decimal;
+  padding-left: 1.25rem;
+  margin: 0;
+}
+
+.c4-item {
+  margin: 12px 0;
+}
+
+.c4-item-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.c4-item-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.c4-unavailable {
+  margin: 0;
+  padding-left: 1.1rem;
+}
+
+.c4-unavailable li {
+  margin: 6px 0;
+  color: var(--text-2);
+  border-left: 3px solid var(--line);
+  padding-left: 10px;
+}
+
+.c4-item[data-status='self_reported_complete'] {
+  border-color: var(--line-strong);
+  background: color-mix(in srgb, var(--strong) 6%, var(--panel));
+}
+
+.c4-item[data-status='pending'] {
+  border-color: var(--line);
+}
+
+/* Tabs: learning path vs synthetic model simulation demo */
+.c4-tabs {
+  display: flex;
+  gap: 8px;
+  margin: 12px 0 16px;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 8px;
+}
+
+.c4-tab {
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  color: var(--muted);
+  cursor: pointer;
+  font: inherit;
+  padding: 8px 12px;
+}
+
+.c4-tab:hover {
+  color: var(--text);
+  border-color: var(--line);
+}
+
+.c4-tab.active {
+  color: var(--text);
+  border-color: var(--line-strong);
+  background: color-mix(in srgb, var(--strong) 8%, var(--panel));
+}
+
+/* Synthetic simulation demo */
+.c4-sim-demo h2 {
+  margin-top: 0;
+}
+
+.c4-sim-ready-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.c4-sim-ready .chip.ok {
+  border-color: color-mix(in srgb, var(--strong) 40%, var(--line));
+}
+
+.c4-sim-ready .chip.bad {
+  border-color: color-mix(in srgb, #c44 50%, var(--line));
+  color: #c44;
+}
+
+.c4-label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.9rem;
+  margin: 8px 0;
+}
+
+.c4-label select {
+  font: inherit;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.c4-sim-status {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 8px 0 12px;
+}
+
+.c4-sim-status .ok {
+  border-color: color-mix(in srgb, var(--strong) 40%, var(--line));
+}
+
+.c4-sim-status .bad {
+  border-color: color-mix(in srgb, #c44 50%, var(--line));
+  color: #c44;
+}
+
+.c4-sim-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 900px) {
+  .c4-sim-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.c4-sim-card h3 {
+  margin: 0 0 8px;
+  font-size: 1.05rem;
+}
+
+.c4-sim-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.c4-sim-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.9rem;
+}
+
+.c4-sim-form select,
+.c4-sim-form input[type='number'] {
+  font: inherit;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.c4-sim-result {
+  margin-top: 10px;
+  padding: 10px;
+  border-left: 3px solid var(--strong);
+  background: color-mix(in srgb, var(--strong) 6%, var(--panel));
+  border-radius: 0 8px 8px 0;
+}
+
+.c4-sim-result .big {
+  font-size: 1.25rem;
+  margin: 4px 0;
+}
+
+.c4-sim-note {
+  margin-top: 16px;
+}
+
+.c4-day-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.c4-day-list li {
+  padding: 8px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.c4-day-block {
+  margin-bottom: 12px;
+}
+
+.c4-day-block h3 {
+  margin: 0 0 4px;
+  font-size: 1rem;
+}
+
+.c4-exam-q {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin: 10px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+}
+
+.c4-exam-q legend {
+  padding: 0 4px;
+  text-align: left;
+}
+
+/* Override global `input { width: 100% }` so radios stay next to labels */
+.c4-exam-opt {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.c4-exam-opt:hover {
+  border-color: var(--line-strong, var(--line));
+}
+
+.c4-exam-opt input[type='radio'],
+.c4-exam-opt input[type='checkbox'] {
+  width: auto;
+  min-width: 1.1rem;
+  max-width: 1.1rem;
+  flex: none;
+  margin: 0.2rem 0 0;
+  padding: 0;
+  accent-color: var(--primary, var(--strong));
+}
+
+.c4-exam-opt-text {
+  flex: 1 1 auto;
+  min-width: 0;
+  line-height: 1.35;
+}
+
+.c4-sim-form textarea {
+  font: inherit;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  resize: vertical;
+}
+
+.c4-item[data-status='practice_verified'] {
+  border-color: color-mix(in srgb, var(--strong) 45%, var(--line));
+}
+
+.c4-item[data-status='practice_observed'] {
+  border-color: color-mix(in srgb, #c90 45%, var(--line));
+}
+
+.c4-item[data-status='overdue'] {
+  border-color: color-mix(in srgb, #c44 45%, var(--line));
+}
+
+.c4-overview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 10px 0;
+}
+
+.c4-reco {
+  margin: 12px 0;
+  border-color: color-mix(in srgb, var(--strong, var(--primary)) 35%, var(--line));
+}
+
+.c4-reco h3 {
+  margin: 0 0 6px;
+  font-size: 1.05rem;
+}
+
+.c4-subtabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 8px 0 12px;
+}
+
+.c4-day-toggles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.c4-day-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.9rem;
+}
+
+.c4-details {
+  margin: 8px 0;
+}
+
+.c4-details summary {
+  cursor: pointer;
+  color: var(--muted);
+}
+
+.c4-exam-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.c4-exam-settings {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+}
+
+.c4-q-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 10px 0;
+}
+
+.c4-q-dot {
+  min-width: 2rem;
+  min-height: 2rem;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  color: var(--text);
+  cursor: pointer;
+  font: inherit;
+}
+
+.c4-q-dot:focus-visible {
+  outline: 2px solid var(--strong);
+  outline-offset: 2px;
+}
+
+.c4-q-dot.answered {
+  border-color: color-mix(in srgb, var(--strong) 50%, var(--line));
+}
+
+.c4-q-dot.active {
+  background: color-mix(in srgb, var(--strong) 14%, var(--panel));
+  border-color: var(--line-strong);
+}
+
+.c4-attempt-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.c4-attempt-list .btn {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  text-align: left;
+  white-space: normal;
+  line-height: 1.35;
+}
+
+.c4-exam-settings .c4-label input,
+.c4-exam-settings input[type='number'] {
+  width: 100%;
+  max-width: 12rem;
+  box-sizing: border-box;
+}
+
+.c4-tab:focus-visible,
+.btn:focus-visible {
+  outline: 2px solid var(--strong);
+  outline-offset: 2px;
+}
+
+@media (max-width: 640px) {
+  .c4-path {
+    overflow-x: hidden;
+  }
+
+  .c4-actions {
+    flex-wrap: wrap;
+  }
+
+  .c4-exam-toolbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

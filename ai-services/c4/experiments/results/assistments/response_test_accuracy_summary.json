@@ -1,0 +1,12 @@
+{
+  "kind": "extracted_saved_metrics_json",
+  "note": "Copied fields from response_metrics.json test_held_out; not a new evaluation.",
+  "source": "experiments/results/assistments/response_metrics.json",
+  "metric_name": "classification_accuracy",
+  "accuracy": 0.6662353520074357,
+  "accuracy_percent": 66.62,
+  "n": 54871,
+  "positive_rate": 0.640720963714895,
+  "roc_auc": 0.7119660044977623,
+  "domain": "assistments_research"
+}

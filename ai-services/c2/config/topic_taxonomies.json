@@ -1,0 +1,55 @@
+
+{
+  "schema_version": "1.0",
+  "description": "Module topic taxonomies for C2 examination intelligence.",
+  "taxonomies": [
+    {
+      "module_key": "case_studies_in_software_engineering",
+      "verification_status": "unverified",
+      "source_reference": null,
+      "topics": []
+    },
+    {
+      "module_key": "database_systems",
+      "verification_status": "unverified",
+      "source_reference": null,
+      "topics": []
+    },
+    {
+      "module_key": "software_project_management",
+      "verification_status": "unverified",
+      "source_reference": null,
+      "topics": []
+    },
+    {
+      "module_key": "user_experience_engineering",
+      "verification_status": "unverified",
+      "source_reference": null,
+      "topics": []
+    },
+    {
+      "module_key": "application_frameworks",
+      "verification_status": "unverified",
+      "source_reference": null,
+      "topics": []
+    },
+    {
+      "module_key": "distributed_systems",
+      "verification_status": "unverified",
+      "source_reference": null,
+      "topics": []
+    },
+    {
+      "module_key": "software_architecture",
+      "verification_status": "unverified",
+      "source_reference": null,
+      "topics": []
+    },
+    {
+      "module_key": "software_engineering_process_and_quality_management",
+      "verification_status": "unverified",
+      "source_reference": null,
+      "topics": []
+    }
+  ]
+}
