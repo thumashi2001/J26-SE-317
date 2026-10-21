@@ -114,7 +114,7 @@ test('C3 Module Backend Integration', async (t) => {
     await fetchApi('/marking', studentToken, {});
     await fetchApi('/feedback', studentToken, {});
     await fetchApi('/mindmap', studentToken, {});
-    await fetchApi('/assess', studentToken, {});
+    await fetchApi('/assess', lecturerToken, { student_id: 'student123' });
     
     const paths = aiRequests.map(r => r.path);
     assert.deepStrictEqual(paths, [
@@ -691,8 +691,10 @@ test('C3 Module Backend Integration', async (t) => {
   });
 
   await t.test('MCQ: assessAnswer persists into c3_submissions & allows lecturer review & override', async () => {
-    const resAssess = await fetchApi('/assess', studentToken, {
+    // Lecturer-supplied configuration for a named student (students cannot supply an answer key).
+    const resAssess = await fetchApi('/assess', lecturerToken, {
       ...standardMcqPayload,
+      student_id: 'student123',
       selected_option_id: 'B'
     });
     assert.strictEqual(resAssess.status, 200);

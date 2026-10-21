@@ -6,6 +6,7 @@ process.env.AUTH_SECRET = 'test-secret-change-me';
 
 import app from '../../../app.js';
 import { signToken } from '../../../middleware/auth.js';
+import { setDb } from '../../../config/db.js';
 
 test('C3 Live Microservice Boundary Integration (Express <-> FastAPI)', async (t) => {
   const restoreEnv = (key, original) => {
@@ -28,6 +29,22 @@ test('C3 Live Microservice Boundary Integration (Express <-> FastAPI)', async (t
     isFastApiLive = false;
   }
 
+  // Persistence is mandatory (a failed save is a 503, not a silent success), so give the app a tiny in-memory db.
+  const tables = {};
+  let seq = 0;
+  setDb({
+    collection: (name) => {
+      tables[name] ||= [];
+      return {
+        async insertOne(doc) { const d = { ...doc, _id: `${name}-${++seq}` }; tables[name].push(d); return { insertedId: d._id }; },
+        async findOne(q = {}) { return tables[name].find((r) => Object.entries(q).every(([k, v]) => typeof v !== 'object' && String(r[k]) === String(v))) || null; },
+        async updateOne() { return { matchedCount: 1 }; },
+        async findOneAndUpdate() { return { value: null }; },
+        find() { return { sort() { return this; }, limit() { return this; }, async toArray() { return []; } }; },
+      };
+    },
+  });
+
   // 2. Setup Node Express App Server
   const server = http.createServer(app);
   await new Promise((resolve) => server.listen(0, resolve));
@@ -36,7 +53,8 @@ test('C3 Live Microservice Boundary Integration (Express <-> FastAPI)', async (t
   const baseUrl = `http://127.0.0.1:${port}/api/v1/c3`;
 
   // Auth tokens
-  const studentToken = signToken({ sub: 'IT21001001', role: 'student' });
+  // Students may not supply their own rubric, so these boundary tests act as a lecturer (trusted author) for a named student.
+  const lecturerToken = signToken({ sub: 'LEC-LIVE', role: 'lecturer' });
 
   const fetchApi = async (path, token, body = {}) => {
     const headers = { 'Content-Type': 'application/json' };
@@ -49,6 +67,7 @@ test('C3 Live Microservice Boundary Integration (Express <-> FastAPI)', async (t
     const data = await res.json().catch(() => null);
     return { status: res.status, data };
   };
+  const assessAsLecturer = (payload) => fetchApi('/assess', lecturerToken, { student_id: 'IT21001001', ...payload });
 
   await t.test('1. Python FastAPI service health check is reachable', { skip: !isFastApiLive && 'FastAPI service is not running on port 8003' }, async () => {
     const res = await fetch(`${fastapiUrl}/health`);
@@ -92,7 +111,7 @@ test('C3 Live Microservice Boundary Integration (Express <-> FastAPI)', async (t
       },
     };
 
-    const res = await fetchApi('/assess', studentToken, payload);
+    const res = await assessAsLecturer(payload);
     assert.strictEqual(res.status, 200);
     assert.ok(res.data, 'Response must contain data');
     assert.strictEqual(res.data.question_id, 'SE3010-ARCH-01');
@@ -134,7 +153,7 @@ test('C3 Live Microservice Boundary Integration (Express <-> FastAPI)', async (t
       },
     };
 
-    const res = await fetchApi('/assess', studentToken, invalidPayload);
+    const res = await assessAsLecturer(invalidPayload);
     assert.strictEqual(res.status, 400, 'Express must map FastAPI 422 to 400 Bad Request');
     assert.ok(res.data.error.includes('Validation error') || res.data.error.includes('criteria'), 'Error must describe validation problem');
   });
@@ -145,7 +164,7 @@ test('C3 Live Microservice Boundary Integration (Express <-> FastAPI)', async (t
     // Point to non-existent port
     process.env.C3_AI_URL = 'http://127.0.0.1:54321';
 
-    const res = await fetchApi('/assess', studentToken, {
+    const res = await assessAsLecturer({
       question_id: 'Q-TEST',
       question_text: 'Valid question',
       student_answer: 'Valid answer',
@@ -184,7 +203,7 @@ test('C3 Live Microservice Boundary Integration (Express <-> FastAPI)', async (t
     process.env.C3_AI_URL = `http://127.0.0.1:${slowPort}`;
     process.env.C3_AI_TIMEOUT_MS = '50'; // 50ms timeout
 
-    const res = await fetchApi('/assess', studentToken, {
+    const res = await assessAsLecturer({
       question_id: 'Q-TIMEOUT',
       question_text: 'Timeout test',
       student_answer: 'Answer text',

@@ -3,8 +3,8 @@ import assert from 'node:assert';
 import http from 'node:http';
 
 // Audit regression suite for the C3 backend.
-// Tests tagged `todo: 'AUDIT-Bn ...'` assert the CORRECT behaviour and currently fail
-// (node:test reports them as todo and they do not fail the run). Remove `todo` once fixed.
+// Tests named AUDIT-* assert the correct behaviour of defects found in the PP1 audit. They are now fixed (no `todo` flags left);
+// AUDIT-B9 (404/error middleware) is outside the C3 security scope and remains a known todo where marked.
 
 process.env.AUTH_SECRET = 'test-secret-change-me';
 
@@ -158,12 +158,6 @@ const mcqPayload = (extra = {}) => ({
   ...extra,
 });
 
-async function assessAs(token, extra) {
-  const res = await api('POST', '/assess', token, mcqPayload(extra));
-  assert.strictEqual(res.status, 200, JSON.stringify(res.data));
-  return res.data;
-}
-
 let seedCounter = 0;
 function seedSubmission({ status = 'pending_review', studentId = 'student123', mark = 3, total = 4, finalMark = null, decision = null } = {}) {
   const id = `seed-sub-${++seedCounter}`;
@@ -307,14 +301,15 @@ test('C1 sync: missing submissionId is refused without writing', async () => {
 // ---------------------------------------------------------------------------
 test(
   'AUDIT-B2: re-posting /assess for a finalized batch submission must not reopen it',
-  { todo: 'AUDIT-B2 submissionService.js:89-111 updates existing batch submission/result and resets status to pending_review even when finalized' },
   async () => {
-    const first = await assessAs(student, { batch_id: 'BATCH-B2' });
+    const setup = await createMcqSetup(lecturer1);
+    const first = (await api('POST', '/assess', student, { batch_id: setup.batch_id, selected_option_id: 'B' })).data;
+    assert.ok(first.submission_id, 'student submission against a lecturer batch must be saved');
     await api('POST', `/submissions/${first.submission_id}/review`, lecturer1, { decision: 'accepted' });
     assert.strictEqual((await api('POST', `/submissions/${first.submission_id}/finalize`, lecturer1, {})).status, 200);
     assert.strictEqual(resultOf(first.submission_id).status, 'finalized');
 
-    const again = await api('POST', '/assess', student, mcqPayload({ batch_id: 'BATCH-B2', selected_option_id: 'A' }));
+    const again = await api('POST', '/assess', student, { batch_id: setup.batch_id, selected_option_id: 'A' });
 
     const stored = resultOf(first.submission_id);
     assert.ok(again.status === 409 || stored.status === 'finalized',
@@ -327,7 +322,6 @@ test(
 
 test(
   'AUDIT-B3: override with new_mark above total_possible_marks -> 400',
-  { todo: 'AUDIT-B3 submissionService.js:366-373 only rejects negative marks; no upper bound against total_possible_marks' },
   async () => {
     const id = seedSubmission({ mark: 3, total: 4 });
     const res = await api('POST', `/submissions/${id}/review`, lecturer1, {
@@ -339,7 +333,6 @@ test(
 
 test(
   'AUDIT-X1: override with new_mark "Infinity" -> 400',
-  { todo: 'AUDIT-X1 submissionService.js:366-373 isNaN(Number("Infinity")) is false so a non-finite mark is accepted' },
   async () => {
     const id = seedSubmission({ mark: 3, total: 4 });
     const res = await api('POST', `/submissions/${id}/review`, lecturer1, {
@@ -351,7 +344,6 @@ test(
 
 test(
   'AUDIT-B4a: another lecturer cannot read a batch setup they do not own',
-  { todo: 'AUDIT-B4 batchMarkingService.js:250-258 getBatchSetup ignores created_by (controller passes only role)' },
   async () => {
     const setup = await createMcqSetup(lecturer1);
     const res = await api('GET', `/batch/setup/${setup.batch_id}`, lecturer2);
@@ -361,7 +353,6 @@ test(
 
 test(
   'AUDIT-B4b: another lecturer cannot mark a batch they do not own',
-  { todo: 'AUDIT-B4 batchMarkingService.js:460-468 processBatchMarking ignores setup.created_by' },
   async () => {
     const setup = await createMcqSetup(lecturer1);
     const res = await api('POST', '/batch/mark', lecturer2, {
@@ -373,7 +364,6 @@ test(
 
 test(
   'AUDIT-B4c: another lecturer cannot finalize a batch they do not own',
-  { todo: 'AUDIT-B4 batchMarkingService.js:553-557 finalizeBatchSubmissions ignores setup.created_by' },
   async () => {
     const setup = await createMcqSetup(lecturer1);
     await api('POST', '/batch/mark', lecturer1, {
@@ -387,7 +377,6 @@ test(
 
 test(
   'AUDIT-B5: two concurrent finalize calls -> exactly one 200 and one 409',
-  { todo: 'AUDIT-B5 submissionService.js:426-449 read-check-then-updateOne({_id}) with no status guard; not atomic' },
   async () => {
     // Faithful to the app code: the fake DB yields on every operation, so both requests read
     // status='reviewed' before either writes. Real Mongo has the same gap because updateOne
@@ -403,10 +392,9 @@ test(
 
 test(
   'AUDIT-B6: when persistence fails, /assess must not report the result as saved',
-  { todo: 'AUDIT-B6 c3Controller.js:93-98 swallows every persistence error and returns the AI result with status pending_review and no persisted flag' },
   async () => {
     failures.insertSubmissions = true;
-    const res = await api('POST', '/assess', student, mcqPayload());
+    const res = await api('POST', '/assess', student, { demo_id: 'mcq-correct', selected_option_id: 'B' });
     assert.ok(res.status >= 500 || (res.data && res.data.persisted === false),
       `got http ${res.status} body ${JSON.stringify(res.data).slice(0, 120)}`);
     assert.strictEqual(rowsOf('c3_submissions').length, 0);
@@ -415,7 +403,6 @@ test(
 
 test(
   'AUDIT-B7a: GET /submissions?status[$ne]=x (operator injection) -> 400',
-  { todo: 'AUDIT-B7 c3Controller.js:103 / submissionService.js:193-195 pass req.query.status straight into the Mongo filter' },
   async () => {
     seedSubmission({ status: 'pending_review' });
     seedSubmission({ status: 'finalized' });
@@ -426,7 +413,6 @@ test(
 
 test(
   'AUDIT-B7b: POST /batch/mark with setup_id {"$ne":null} -> 400',
-  { todo: 'AUDIT-B7 batchMarkingService.js:461-464 setup_id is used unvalidated inside $or lookup; operator object matches any setup' },
   async () => {
     const setup = await createMcqSetup(lecturer1);
     const res = await api('POST', '/batch/mark', lecturer2, {
@@ -438,7 +424,6 @@ test(
 
 test(
   'AUDIT-B7c: POST /batch/validate with setup_id {"$ne":null} -> 400',
-  { todo: 'AUDIT-B7 batchMarkingService.js:343-347 same unvalidated setup_id lookup in validateBatchAnswers' },
   async () => {
     await createMcqSetup(lecturer1);
     const res = await api('POST', '/batch/validate', lecturer1, {
@@ -448,29 +433,52 @@ test(
   }
 );
 
-test(
-  'AUDIT-B8: a student must not be able to self-grade an MCQ by supplying their own answer key',
-  // DESIGN ISSUE for the owner to decide: /assess and /marking trust client-supplied
-  // correct_answer/options/rubric (c3Controller.js:9-12, 59-99). Either the key must come from a
-  // server-side question bank / batch setup, or student calls must be rejected when they carry a key.
-  { todo: 'AUDIT-B8 c3Controller.js:72-74 evaluateMcqAnswer uses the key from the request body; student gets full marks with own key' },
-  async () => {
-    const res = await api('POST', '/assess', student, mcqPayload({ correct_answer: 'C', selected_option_id: 'C' }));
-    const trusted = res.status === 200 && res.data.is_correct === true && res.data.total_awarded_marks === 2;
-    assert.ok(!trusted, 'student-supplied answer key was trusted and awarded full marks (2/2)');
-  }
-);
-
-test('AUDIT-B8 (documented current behaviour): student-supplied key is currently trusted for /assess', async () => {
+test('AUDIT-B8: a student cannot self-grade an MCQ by supplying their own answer key', async () => {
   const res = await api('POST', '/assess', student, mcqPayload({ correct_answer: 'C', selected_option_id: 'C' }));
-  assert.strictEqual(res.status, 200);
-  assert.strictEqual(res.data.total_awarded_marks, 2);
+  assert.strictEqual(res.status, 400);
+  assert.match(res.data.error, /cannot supply assessment configuration/);
+  assert.strictEqual(rowsOf('c3_submissions').length, 0);
+});
+
+test('AUDIT-B8: a student cannot swap in their own rubric or max marks either', async () => {
+  const res = await api('POST', '/assess', student, {
+    demo_id: 'arch-full', student_answer: 'x', max_marks: 999, rubric: { criteria: [] },
+  });
+  assert.strictEqual(res.status, 400);
+});
+
+test('AUDIT-B8: a student must choose a server-held assessment (demo_id or batch_id)', async () => {
+  const res = await api('POST', '/assess', student, { student_answer: 'anything' });
+  assert.strictEqual(res.status, 400);
+  const unknown = await api('POST', '/assess', student, { demo_id: 'does-not-exist', student_answer: 'x' });
+  assert.strictEqual(unknown.status, 404);
+  const badType = await api('POST', '/assess', student, { batch_id: { $ne: null }, selected_option_id: 'B' });
+  assert.strictEqual(badType.status, 400);
+});
+
+test('AUDIT-B8: student answers an MCQ against the server-held key (wrong and right option)', async () => {
+  const wrong = await api('POST', '/assess', student, { demo_id: 'mcq-incorrect', selected_option_id: 'A' });
+  assert.strictEqual(wrong.status, 200, JSON.stringify(wrong.data));
+  assert.strictEqual(wrong.data.total_awarded_marks, 0);
+  // A student cannot upgrade the answer by sending a different key: the key is not read from the request.
+  const right = await api('POST', '/assess', student, { demo_id: 'mcq-correct', selected_option_id: 'B' });
+  assert.strictEqual(right.data.total_awarded_marks, 2);
+  assert.strictEqual(right.data.persisted, true);
+  assert.strictEqual(rowsOf('c3_submissions').length, 2);
+});
+
+test('AUDIT-B8: lecturer batch setup drives a student submission (key hidden from the request)', async () => {
+  const setup = await createMcqSetup(lecturer1);
+  const res = await api('POST', '/assess', student, { batch_id: setup.batch_id, selected_option_id: 'B' });
+  assert.strictEqual(res.status, 200, JSON.stringify(res.data));
   assert.strictEqual(res.data.is_correct, true);
+  const ghost = await api('POST', '/assess', student, { batch_id: 'BATCH-NOPE', selected_option_id: 'B' });
+  assert.strictEqual(ghost.status, 404);
 });
 
 test(
   'AUDIT-B9a: unknown route returns JSON {error} with 404',
-  { todo: 'AUDIT-B9 app.js has no 404 handler; Express default replies with HTML' },
+  { todo: 'AUDIT-B9 app.js has no 404 handler; Express default replies with HTML (shared app, outside C3 security scope)' },
   async () => {
     const res = await fetch(`${baseUrl}/api/v1/does-not-exist`);
     assert.strictEqual(res.status, 404);
@@ -482,7 +490,7 @@ test(
 
 test(
   'AUDIT-B9b: malformed JSON body returns JSON {error} with 400',
-  { todo: 'AUDIT-B9 app.js has no error middleware; express.json() parse errors return an HTML stack page' },
+  { todo: 'AUDIT-B9 app.js has no error middleware; express.json() parse errors return an HTML stack page (shared app, outside C3 security scope)' },
   async () => {
     const res = await fetch(`${baseUrl}/api/v1/c3/assess`, {
       method: 'POST',

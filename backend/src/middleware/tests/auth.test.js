@@ -165,7 +165,6 @@ test('production with no AUTH_SECRET refuses to sign tokens', () => {
 
 test(
   'AUTH_SECRET unset outside production must NOT silently fall back to a public default secret',
-  { todo: 'AUDIT-B1 auth.js:12-21 falls back to hard-coded "dev-only-secret-change-me" when NODE_ENV != production; tokens are forgeable by anyone who reads the source' },
   () => {
     const r = childSign({});
     // Correct behaviour: refuse (throw) rather than issue a token signed with a well-known secret.
