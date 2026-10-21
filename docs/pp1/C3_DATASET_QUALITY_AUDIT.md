@@ -1,137 +1,43 @@
-# AdaptiveLearnSE Component 3 — Synthetic Dataset Quality & Leakage Audit
+# C3 dataset quality audit and repair report (2026-10-21)
 
-**Project:** AdaptiveLearnSE — IT4010 Research Project  
-**Component:** Component 3 (AI-Powered Automated Marking & Answer Analysis System)  
-**Authoritative Dataset:** `C3-Phase3-v5-FINAL`  
-**Date of Audit:** October 20, 2026  
-**Auditor:** Senior Research & QA Audit Engineer  
-**Status:** AUDITED & VALIDATED (Quarantine Documented)
+Supersedes the earlier audit. Evidence labels: **[executed]** computed by a script in this repository on 2026-10-21; **[doc]** reported by older documentation and not recomputed.
+Detail: `docs/audit/C3_DATASET_REPAIR_PHASE1_BASELINE.md` (findings), `docs/audit/C3_DATASET_REPAIR_PLAN.md` (plan and decisions), `docs/audit/C3_DATASET_REPAIR_SAMPLE_DIFF.md` (six-question sample), `ai-services/c3/datasets/c3_phase3_v5_repaired/` (repair_manifest.csv, quarantine.csv, review_queue.csv, validation_report.json, metrics_report.json).
 
----
+## 1. What was done
+The **existing** dataset `C3-Phase3-v5-FINAL` (167 questions / 1,002 answers, original preserved byte-exact in `ai-services/c3/datasets/archive/`) was repaired in a new versioned directory (`C3-Phase3-v5-REPAIRED-r2`). Nothing was generated or reworded; question/answer ids, labels and split assignments were preserved. A value was repaired only when the data, the rubric or a documented policy proves it; everything else was quarantined or flagged.
 
-## 1. Executive Summary
+## 2. Counts [executed]
+| | original | repaired |
+|---|---|---|
+| questions | 167 | 96 eligible + 71 ineligible |
+| answers | 1,002 | 576 eligible + 355 quarantined + 71 repaired ineligible controls (= 1,002; asserted by code and test) |
+| eligible per split (answers) | train 702 / val 150 / test 150 | train 420 / val 66 / test 90 |
+| rubric rows | 230 | 230 (8 re-keyed) |
 
-This report presents an independent, evidence-based quality, leakage, and integrity audit of the canonical synthetic benchmark dataset utilized for evaluating AdaptiveLearnSE Component 3.
+Quarantined 355: 252 `unrecoverable_nan` (the answer text was literally `nan` or contained `nan` in place of a concept name; no source holds the lost text) + 103 `unsupported_flat_mark` (flat 10.0 marks with no rubric/answer evidence for any specific mark). Repaired 71: replacement-question IRRELEVANT answers 10.0 → 0.0 (documented policy `datasets/README.md` "IRRELEVANT … 0 marks"; canonical precedent 96/96 already 0.0); kept outside the primary set because the dataset's own rule is 6 variants per question and keeping one-row questions would inflate the IRRELEVANT share (16.7% → 25–31%) and make a trivial cue rule (precision 0.994, recall 1.0).
 
-### Key Audit Findings
+## 3. Exclusion report
+All 71 replacement questions are ineligible (question-level reason `question_has_only_one_valid_variant`); 96 canonical questions (47 past-paper + 49 native synthetic) remain eligible. Ledger: 1,023 rows (`repair_manifest.csv`): flagged 411, repaired 253, quarantined 355, needs_review 4. The held-out **test split falls from 150 to 90 answers (25 → 15 questions)**; all test records were retained or documented (none silently dropped).
 
-1. **Total Volume & Partitioning:**
-   - **Total Records:** Exactly **1,002** controlled answers across **167** university examination questions (6 controlled variants per question).
-   - **Training Set (`controlled_answers_train.csv`):** 702 answers across 117 disjoint questions (70.1%).
-   - **Validation Set (`controlled_answers_validation.csv`):** 150 answers across 25 disjoint questions (15.0%).
-   - **Held-Out Test Set (`controlled_answers_test.csv`):** 150 answers across 25 disjoint questions (15.0%).
-   - **Question-Level Disjointness:** **100% DISJOINT**. Overlap between Train, Validation, and Test question IDs is **0** (verified across all 167 IDs).
+## 4. Validation [executed] (`validation_report.json`; no check was weakened)
+Hard checks passing: files/schema, counts reconcile, id uniqueness, split files consistent, score range, label values, IRRELEVANT marks zero, rubric association and sums (eligible), no literal `nan`/`None` in eligible data, no duplicate rows or question text, question-disjoint splits, 96/96 eligible questions have exactly 6 variants, criterion marks sum to expected mark, quarantine fidelity.
+**Hard check FAILING: ratio-concentration = 0.758 (threshold 0.45)** — unchanged from the original (0.758). It is inherited from the canonical labels (marks cluster on 0.8/0.6/0.85/…); the threshold and labels were not changed. A decision is needed (see §6).
+Warnings (report-only): 4 unflagged duplicate strings shared across questions/splits (9 answers); one question pair across splits with TF-IDF cosine 0.903 (> 0.8: PP-SE3080-099 / PP-SE3080-107); criterion-id map 96 resolved / 391 unresolved; 63 literal `nan` cells remain inside the ineligible controls file; answer-length vs mark Pearson **0.81** on the eligible set (spec limit 0.4; the original's 0.089 was an artefact of the flat-mark block — canonical-only original is also 0.81).
 
-2. **Root Cause of Literal `nan` Strings (189 Total Records):**
-   - In 63 replacement questions (`SYN-REPL-...` documented in `04_ORIGINAL_63_REPLACEMENT_AUDIT.csv`), answers were generated from a template script where concept substitution failed (`NaN` in pandas merge).
-   - String concatenation produced literal strings:
-     - Variant 2: `"nan The response gives less supporting detail for one part of the explanation."` (63 total: 42 Train, 13 Val, 8 Test).
-     - Variant 3: `"The response correctly explains one part of nan but gives incomplete coverage of the remaining concepts."` (63 total: 42 Train, 13 Val, 8 Test).
-     - Variant 1: Literal `"nan"` (63 total: 42 Train, 13 Val, 8 Test).
-   - **Total literal `nan` occurrences:** 189 records across the dataset.
+## 5. Recomputed metrics [executed, offline, nothing tuned] — not comparable to older figures
+| set | method | n | MAE | RMSE | r | within ±2 marks | MAE 95% CI |
+|---|---|---|---|---|---|---|---|
+| repaired test | lexical baseline | 90 | 1.939 | 2.616 | 0.974 | 62.2% | [1.58, 2.31] |
+| repaired test | Condition E | 90 | 3.544 | 5.885 | 0.801 | 57.8% | [2.63, 4.58] |
+| original test (like-for-like, failures excluded) | lexical baseline | 150 | 4.637 | 6.050 | 0.759 | 40.0% | [4.03, 5.29] |
+| original test (like-for-like) | Condition E | 150 | 5.993 | 7.710 | 0.685 | 36.0% | [5.22, 6.76] |
 
-3. **Ground-Truth Mislabelling in Replacement Questions:**
-   - For all 63 replacement questions (71 total in question bank), every answer variant was assigned a flat ground-truth score of **10.0 out of 10.0**, even for `IRRELEVANT` (negative control) and `MISCONCEPTION` answers.
-   - In the held-out test set (150 answers), 10 questions (60 answers, 40%) belong to this replacement category.
-   - **Evaluation Impact:** When models correctly awarded 0.0 marks to irrelevant answers, they were penalized with an artificial error of $|0.0 - 10.0| = 10.0$. Evaluating on the **clean canonical 90 test set** drops Rubric Engine MAE from **4.640** to **1.289** and raises tolerance ($\le 2$ marks) from **56.0%** to **91.1%**.
+Documentation vs recomputation: Condition E MAE 4.640 / RMSE 7.220 / r 0.7243 **reproduce exactly** with the legacy settings (which scored 15 of 150 failed calls as 0.0 — equal to their IRRELEVANT label — flattering Condition E; like-for-like MAE is 5.993). The documented lexical MAE 5.609 **did not reproduce** (5.369). On the repaired test split the lexical baseline beats Condition E on MAE, RMSE and r; Condition E scores MISCONCEPTION and MISSING_CONCEPT identically (their canonical marks are identical per question) and is poor on PARTIAL/MOSTLY_CORRECT. LLM conditions A–D/F were **not run** (free-tier quota; OpenAI has no credits).
 
-4. **Cross-Split Duplicate Strings (14 Unique Strings):**
-   - 5 strings are **standardized negative control distractors** (e.g., `"The response discusses unrelated material and does not answer the assessed question."`), deliberately planted across questions to test irrelevant rejection.
-   - 9 strings are templated replacement artifacts sharing identical boilerplate text across questions.
-
----
-
-## 2. Dataset Inventory & Checksums
-
-| Filename | File Size | SHA-256 Checksum (First 16 chars) | Role in System |
-| :--- | :--- | :--- | :--- |
-| `01_FINAL_question_bank.csv` | 361,317 bytes | `5327ea1e3458fa05` | 167 Authoritative Questions & Reference Models |
-| `02_FINAL_controlled_answers.csv` | 1,998,321 bytes | `b2146cbbf0e930cb` | Master 1,002 Controlled Student Answers |
-| `03_FINAL_rubric_criteria.csv` | 114,228 bytes | `25bc6cf9aa2c82dc` | 230 Criterion-Level Rubric Breakdowns |
-| `04_ORIGINAL_63_REPLACEMENT_AUDIT.csv` | 22,157 bytes | `b3df24d7d3d2db7b` | Audit Trail of 63 Replaced Visual/Code Questions |
-| `controlled_answers_train.csv` | 1,432,665 bytes | `8ca752f9b2d8ebdf` | 702 Training Answers (117 Questions) |
-| `controlled_answers_validation.csv` | 276,323 bytes | `5f89be9eeea3d6f1` | 150 Validation Answers (25 Questions) |
-| `controlled_answers_test.csv` | 290,303 bytes | `ea4aa1035955fe4f` | 150 Held-Out Test Answers (25 Questions) |
-
----
-
-## 3. Split Partitioning & Leakage Analysis
-
-### 3.1 Question-ID Disjointness
-
-Splitting is strictly enforced at the **question cluster level**, ensuring all 6 variants of any question reside solely within one split:
-
-| Comparison | Overlapping Question IDs | Status | Leakage Verdict |
-| :--- | :--- | :--- | :--- |
-| **Train vs Validation** | 0 / 117 vs 25 | DISJOINT | **ZERO LEAKAGE** |
-| **Train vs Test** | 0 / 117 vs 25 | DISJOINT | **ZERO LEAKAGE** |
-| **Validation vs Test** | 0 / 25 vs 25 | DISJOINT | **ZERO LEAKAGE** |
-
-### 3.2 Cross-Split Duplicate Text Strings
-
-While question IDs are 100% disjoint, string-level analysis identified **14 duplicate strings** spanning multiple splits:
-
-1. **Standardized Negative Controls (Deliberate Distractors):**
-   - `"The response discusses unrelated material and does not answer the assessed question."`:
-     - Train: 70 occurrences (Ground truth: 0.0)
-     - Validation: 11 occurrences (Ground truth: 0.0)
-     - Test: 15 occurrences (Ground truth: 0.0)
-     - *Justification:* Necessary standardized benchmark probe to measure whether marking models reject completely off-topic answers across different questions.
-2. **Templated Replacement Artifacts (`SYN-REPL-...`):**
-   - `"nan The response gives less supporting detail for one part of the explanation."`:
-     - Train: 42 occurrences (Ground truth: 10.0)
-     - Validation: 13 occurrences (Ground truth: 10.0)
-     - Test: 8 occurrences (Ground truth: 10.0)
-     - *Root Cause:* Failed variable substitution during synthetic generator script export.
-
----
-
-## 4. Root-Cause Analysis: Mislabeled Replacement Questions
-
-### 4.1 How the Mislabelling Occurred
-
-In the original question bank, 63 questions required drawing UML class diagrams, ER diagrams, or control flow graphs. Because automated handwritten diagram grading is out of scope for C3, a replacement generator script (`04_ORIGINAL_63_REPLACEMENT_AUDIT.csv`) converted them into written conceptual questions.
-
-However, during answer synthesis for these replacement questions:
-1. The generator mapped `marks = 10.0` as the question maximum.
-2. In the answer creation loop, the generator failed to resolve `concept_1`, inserting `np.nan`.
-3. The generator assigned `expected_mark = 10.0` to **all six answer tiers** (Full, Mostly Correct, Partial, Missing Concept, Misconception, and Irrelevant).
-4. The CSV was flagged in `04_ORIGINAL_63_REPLACEMENT_AUDIT.csv` as `REPLACED — manual content QA pending`.
-
-### 4.2 Impact on Primary Research Metrics
-
-The table below contrasts evaluation on the **unfiltered 150 test records** versus the **canonical 90 test records** (excluding the quarantined 60 replacement records):
-
-| Model / Condition | ALL 150 Test Answers (With Defective Replacements) | Canonical 90 Test Answers (Clean Ground Truth) | Delta / Scientific Insight |
-| :--- | :--- | :--- | :--- |
-| **Lexical Token Baseline** | MAE: 5.609 \| RMSE: 6.530 \| Tol: 20.7% | MAE: 3.558 \| RMSE: 4.113 \| Tol: 30.0% | MAE improved by 2.05 marks |
-| **Condition E (Rubric Engine)** | MAE: 4.640 \| RMSE: 7.220 \| Tol: 56.0% | **MAE: 1.289 \| RMSE: 4.738 \| Tol: 91.1%** | **MAE improved by 3.35 marks; 91.1% within 2 marks** |
-| **Condition F (Trainable GBR v2)**| MAE: 5.994 \| RMSE: 9.547 \| Tol: 53.3% | MAE: 5.544 \| RMSE: 10.367 \| Tol: 66.7%| Tol improved by 13.4% |
-| **Mock LLM (Zero-Shot)** | MAE: 4.859 \| RMSE: 6.354 \| Tol: 38.7% | MAE: 2.050 \| RMSE: 2.885 \| Tol: 60.0% | MAE improved by 2.81 marks |
-| **Mock LLM (Rubric-Aligned)** | MAE: 4.589 \| RMSE: 6.235 \| Tol: 43.3% | MAE: 1.614 \| RMSE: 2.469 \| Tol: 67.8% | MAE improved by 2.97 marks |
-| **Mock LLM (Vector RAG)** | MAE: 4.513 \| RMSE: 6.210 \| Tol: 47.3% | **MAE: 1.488 \| RMSE: 2.363 \| Tol: 74.4%** | **MAE improved by 3.02 marks; 74.4% within 2 marks** |
-| **Mock LLM (GraphRAG)** | MAE: 4.581 \| RMSE: 6.230 \| Tol: 43.3% | MAE: 1.602 \| RMSE: 2.448 \| Tol: 67.8% | MAE improved by 2.98 marks |
-
-**Defensible Scientific Conclusion:**
-The reported MAE plateau of ~4.5–5.0 in previous audits was not a failure of rubric marking or semantic analysis, but an artifact of evaluating against 60 mislabeled replacement records where ground truth was flat 10.0 for every response. On the clean, defensible ground truth (n=90), the Rubric Engine achieves a remarkable **1.289 MAE** and **91.1% accuracy within $\pm 2$ marks**.
-
----
-
-## 5. Quarantining and Data Hygiene Procedure
-
-To maintain strict scientific auditability without silently overwriting raw historical files:
-1. The original files (`controlled_answers_train.csv`, `validation.csv`, `test.csv`) are preserved exactly as committed.
-2. The 63 replacement questions and their 189 `nan` answers are formally quarantined with documented rationale.
-3. Automated evaluation scripts (`run_evaluation.py`, `run_all_experiments.py`) are updated to report metrics both **overall (N=150)** and on the **canonical verified subset (N=90)**.
-
----
-
-## 6. Reproducible Verification Command
-
-To re-run the full automated dataset audit and regenerate machine-readable checksums and leakage reports:
-
-```powershell
-& "c:\Users\M S I\Desktop\Reserach\DEVELOPMENT\.venv\Scripts\python.exe" "c:\Users\M S I\Desktop\Reserach\DEVELOPMENT\ADAPTIVE_LEARN_SE\ai-services\c3\datasets\audit_synthetic_dataset.py"
-```
-
-Output: `ai-services/c3/datasets/synthetic/dataset_quality_audit_results.json`
+## 6. Remaining limitations / decisions needed
+- Ratio-concentration fails (inherited). Options: accept as a documented limitation of researcher-constructed labels, redefine the metric (needs approval), or re-label (not done: no evidence supports new marks).
+- Rubrics: criterion descriptions for the 487 answer criterion ids are unrecoverable (391 unresolved); canonical reference answers are empty/generic; question-bank concept lists have comma-split artefacts.
+- All 96 canonical IRRELEVANT answers are one constant sentence (learnable cue); canonical MOSTLY/MISSING/MISCONCEPTION marks coincide within a question.
+- Scope: PP-SE3040-001/002 flagged `scope_review` (need code); other past-paper items unverified.
+- Ground truth is researcher-constructed; **no expert validation**.
+- The experiment framework (`experiments/`, `datasets/loader.py`) targets the removed v6 schema and needs an adapter before LLM conditions can run on the repaired set.
