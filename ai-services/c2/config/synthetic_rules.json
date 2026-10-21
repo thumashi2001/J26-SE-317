@@ -1,0 +1,27 @@
+
+{
+  "schema_version": "1.0",
+  "generation_policy": {
+    "source_type": "synthetic",
+    "require_module_configuration": true,
+    "require_verified_exam_structure": true,
+    "require_verified_topic_coverage": true,
+    "require_generation_provenance": true,
+    "require_validation": true,
+    "allow_unverified_exam_structures": false
+  },
+  "quality_rules": {
+    "minimum_question_text_length": 20,
+    "require_unique_question_ids": true,
+    "require_positive_marks": true,
+    "require_module_alignment": true,
+    "require_topic_alignment": true,
+    "require_human_review_before_release": true
+  },
+  "generation_defaults": {
+    "target_papers_per_module": null,
+    "difficulty_distribution": null,
+    "blooms_taxonomy_distribution": null,
+    "question_type_distribution": null
+  }
+}

@@ -1,0 +1,76 @@
+{
+  "protocol": "se-path-multi-v2",
+  "algorithm": "maskable_ppo",
+  "library": "sb3_contrib.MaskablePPO",
+  "training_mode": "full",
+  "activation_allowed": true,
+  "criterion_met": true,
+  "serves_students": false,
+  "masks_in_training": true,
+  "masks_in_evaluation": true,
+  "obs_dim": 101,
+  "n_actions": 184,
+  "catalogue_hash": "95aaba520a28a494e9d6fed0c30de5999b6d47f376368424fb211acb434a1622",
+  "policy_file": "maskable_ppo_final.zip",
+  "selected_seed": 1,
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "schema_sha256": "6cde1f98beac8491843166e7f020f63c80b3e3a7c2cfe82fc512b305fa55bff4",
+  "selection_split": "validation",
+  "selection_metric": "mean_mastery_change",
+  "test_used_for_selection": false,
+  "linear_policy_npz": false,
+  "acceptance_rule": "On validation only, the selected seed must have invalid_action_rate mean 0 in both semesters, and mean_mastery_change at least the lowest of weakest_practice, recent_performance and weakest_multi on that same split. Passing is not real-student validation and does not by itself switch the live app. Failing leaves activation_allowed false.",
+  "training_revision": "se-path-multi-v2-coverage-r2",
+  "semester_coverage": {
+    "0": {
+      "Y3S1": {
+        "episodes": 1002,
+        "steps": 40080
+      },
+      "Y3S2": {
+        "episodes": 1002,
+        "steps": 40048
+      }
+    },
+    "1": {
+      "Y3S1": {
+        "episodes": 1002,
+        "steps": 40080
+      },
+      "Y3S2": {
+        "episodes": 1002,
+        "steps": 40048
+      }
+    },
+    "2": {
+      "Y3S1": {
+        "episodes": 1002,
+        "steps": 40080
+      },
+      "Y3S2": {
+        "episodes": 1002,
+        "steps": 40048
+      }
+    }
+  },
+  "versions": {
+    "numpy": "2.1.3",
+    "gymnasium": "1.4.0",
+    "stable_baselines3": "2.9.0",
+    "sb3_contrib": "2.9.0",
+    "torch": "2.11.0+cpu"
+  },
+  "file_sha256": {
+    "maskable_ppo_final.zip": "71f66525cd161d65805469f9effb55527f2fa848a26df401dc21d1bf60526c07",
+    "observation_schema.json": "841e854c8ad6b26af44e7e889b25cc8b837f03d58c41cb20e8f1455556e12de2",
+    "selection_val.json": "c92459d62989d783b2d5381726bbbb1b3c077610f82d43ebfd81bb3c767bcfdb",
+    "final_test.json": "72fac87c5a322c7d95b19d5488c421106ab3dc97176bbcf179c356b38cdd5261",
+    "train_config.json": "b3fc78a069e7a9c1ecd51e00ee3f64d150291ccfc5d3988bf0925928770059e3",
+    "dependency_versions.json": "185d35c92d4549b21c16d52df700a7fdab6255386ecc086047e5a3fdf7f709bb",
+    "semester_coverage.json": "5013557223eb60c130dab3582eeef2027a8d15a5694b3b0ceed85b5b7d96be99"
+  }
+}

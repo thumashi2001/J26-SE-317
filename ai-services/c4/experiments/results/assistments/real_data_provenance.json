@@ -1,0 +1,14 @@
+{
+  "bytes": 64412812,
+  "captured_at_utc": "2026-10-12T02:12:42.033692+00:00",
+  "corrected_drive_view_url": "https://drive.google.com/file/d/1NNXHFRxcArrU0ZJSb9BIL56vmUt5FhlE/view?usp=sharing",
+  "data_kind": "real_assistments_observations",
+  "domain": "K-12 mathematics tutoring (ASSISTments Skill Builder 2009-2010)",
+  "filename": "skill_builder_data_corrected.csv",
+  "local_path": "/content/drive/MyDrive/AdaptiveLearnSE/c4_data/raw/skill_builder_data_corrected.csv",
+  "not_sliit_se_observations": true,
+  "not_synthetic": true,
+  "notes": "Corrected Skill Builder 2009-2010. Multi-skill tags may appear collapsed as skill1_skill2 in a single student-problem row. Mathematics tutoring domain only; not SLIIT SE observations.",
+  "official_page": "https://sites.google.com/site/assistmentsdata/home/2009-2010-assistment-data/skill-builder-data-2009-2010",
+  "sha256": "162ef8d2d28bcbfea6591a282994062bd8d5eaa00636544292a0d268dca6e5da"
+}

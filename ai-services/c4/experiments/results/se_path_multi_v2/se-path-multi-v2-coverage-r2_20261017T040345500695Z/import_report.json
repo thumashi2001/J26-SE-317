@@ -1,0 +1,28 @@
+{
+  "zip": "C:\\Users\\Deshan\\Documents\\GitHub\\Softedge\\Suwani_Research\\C4_v2_exports\\C4_multi_v2_coverage_r2_complete_20261017T042614Z.zip",
+  "run": "se-path-multi-v2-coverage-r2_20261017T040345500695Z",
+  "revision": "se-path-multi-v2-coverage-r2",
+  "policy_sha256": "71f66525cd161d65805469f9effb55527f2fa848a26df401dc21d1bf60526c07",
+  "catalogue_hash": "95aaba520a28a494e9d6fed0c30de5999b6d47f376368424fb211acb434a1622",
+  "selected_seed": 1,
+  "validation_mean_mastery_change": {
+    "Y3S1": 0.08295701444149017,
+    "Y3S2": 0.1304062359035015
+  },
+  "validation_return": {
+    "Y3S1": 1.9231079831719398,
+    "Y3S2": 2.046293634176254
+  },
+  "validation_no_progress_rate": {
+    "Y3S1": 0.05875,
+    "Y3S2": 0.02
+  },
+  "validation_invalid_action_rate": {
+    "Y3S1": 0.0,
+    "Y3S2": 0.0
+  },
+  "synthetic": true,
+  "serves_students": false,
+  "activated_directory": "C:\\Users\\Deshan\\Documents\\GitHub\\Softedge\\Suwani_Research\\J26-SE-317\\ai-services\\c4\\runtime-artifacts\\se_path_multi_v2\\active",
+  "final_test_used_for_selection": false
+}

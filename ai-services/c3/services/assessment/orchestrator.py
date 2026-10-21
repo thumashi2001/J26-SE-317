@@ -1,0 +1,143 @@
+from app.schemas.analysis import AnswerAnalysisRequest
+from app.schemas.assessment import AssessmentRequest, AssessmentResponse
+from app.schemas.marking import (
+    CriterionMarkingResult,
+    MarkingResponse,
+)
+from services.feedback.generator import build_feedback_from_results
+from services.marking.criterion_evaluator import evaluate_criterion
+from services.marking.rubric_validator import validate_rubric
+from services.mindmap.generator import build_mindmap_from_analysis
+from services.semantic.analyzer import analyze_answer
+
+PIPELINE_VERSION = "integrated-v1"
+MARKING_VERSION = "baseline-v1"
+
+
+def _analysis_request(request: AssessmentRequest) -> AnswerAnalysisRequest:
+    """Collect all expected and rubric-required concepts for unified analysis."""
+    concepts: list[str] = list(request.expected_concepts or [])
+    seen: set[str] = {c.casefold() for c in concepts}
+    for criterion in request.rubric.criteria:
+        for concept in (criterion.required_concepts or []):
+            if concept.casefold() not in seen:
+                concepts.append(concept)
+                seen.add(concept.casefold())
+        for level in criterion.scoring_levels:
+            for concept in (level.required_concepts or []):
+                if concept.casefold() not in seen:
+                    concepts.append(concept)
+                    seen.add(concept.casefold())
+
+    dump = request.model_dump(exclude={"rubric", "expected_concepts"})
+    dump["expected_concepts"] = concepts if concepts else None
+    return AnswerAnalysisRequest.model_validate(dump)
+
+
+def _overall_explanation(results: list[CriterionMarkingResult]) -> str:
+    details = "; ".join(
+        f"{result.criterion_id}={result.awarded_mark:g}/{result.max_marks:g}"
+        for result in results
+    )
+    return (
+        "The overall proposed mark is derived by summing the rubric-defined "
+        f"criterion marks: {details}. It is a deterministic baseline proposal, "
+        "not a claim of factual correctness or final lecturer judgment."
+    )
+
+
+def assess_answer(request: AssessmentRequest) -> AssessmentResponse:
+    """Execute the end-to-end C3 assessment pipeline:
+
+    Student Answer
+        ↓
+    F1 Answer Processing / Semantic Analysis
+        ↓
+    F2 Rubric-Aware Marking Engine
+        ↓
+    F3 Explainable Feedback Generation
+        ↓
+    F4 Concept-Based Mind Map Generator
+        ↓
+    Integrated Assessment Result
+    """
+    # Step 0: Validate rubric structure
+    validate_rubric(request.rubric)
+
+    # Step 1: Function 1 — Answer Processing & Semantic Analysis
+    analysis_req = _analysis_request(request)
+    analysis = analyze_answer(analysis_req)
+
+    # Step 2: Function 2 — Rubric-Aware Marking Engine
+    criteria_results = [
+        evaluate_criterion(criterion, analysis)
+        for criterion in request.rubric.criteria
+    ]
+    total_awarded_marks = sum(result.awarded_mark for result in criteria_results)
+    total_possible_marks = sum(result.max_marks for result in criteria_results)
+    percentage = round(total_awarded_marks / total_possible_marks * 100, 2)
+
+    marking_warnings = list(analysis.warnings)
+    marking_warnings.extend(
+        warning
+        for result in criteria_results
+        for warning in result.warnings
+    )
+
+    marking = MarkingResponse(
+        question_id=request.question_id,
+        criteria_results=criteria_results,
+        total_awarded_marks=total_awarded_marks,
+        total_possible_marks=total_possible_marks,
+        percentage=percentage,
+        overall_explanation=_overall_explanation(criteria_results),
+        warnings=marking_warnings,
+        marking_version=MARKING_VERSION,
+    )
+
+    # Step 3: Strict Mark Authority Check
+    # Function 2 is the authoritative source of truth for marks
+    if marking.total_awarded_marks != total_awarded_marks:
+        raise ValueError(
+            f"Mark authority violation: F2 total ({marking.total_awarded_marks}) "
+            f"!= calculated total ({total_awarded_marks})"
+        )
+    if marking.percentage != percentage:
+        raise ValueError(
+            f"Mark authority violation: F2 percentage ({marking.percentage}) "
+            f"!= calculated percentage ({percentage})"
+        )
+
+    # Step 4: Function 3 — Explainable Feedback Generation
+    feedback = build_feedback_from_results(
+        marking=marking,
+        analysis=analysis,
+        rubric=request.rubric,
+    )
+
+    # Step 5: Function 4 — Concept-Based Mind Map Generator
+    expected_concepts = analysis_req.expected_concepts or []
+    mindmap = build_mindmap_from_analysis(
+        question_id=request.question_id,
+        question_text=request.question_text,
+        analysis=analysis,
+        expected_concepts=expected_concepts,
+    )
+
+    # Step 6: Aggregate warnings
+    all_warnings = list(dict.fromkeys(
+        marking.warnings + feedback.warnings + mindmap.warnings
+    ))
+
+    return AssessmentResponse(
+        question_id=request.question_id,
+        total_awarded_marks=marking.total_awarded_marks,
+        total_possible_marks=marking.total_possible_marks,
+        percentage=marking.percentage,
+        marking=marking,
+        analysis=analysis,
+        feedback=feedback,
+        mindmap=mindmap,
+        warnings=all_warnings,
+        pipeline_version=PIPELINE_VERSION,
+    )

@@ -1,0 +1,21 @@
+{
+  "domain": "se_simulation",
+  "generator": "se-sim-1.0.0",
+  "n_episodes": 20,
+  "not_assistments": true,
+  "not_real_se_students": true,
+  "note": "Final simulator test reporting only; not real SE students.",
+  "protocol": "se-path-sim-v1",
+  "selected_on_validation": "maskable_ppo",
+  "selection_frozen_from": "/content/drive/MyDrive/AdaptiveLearnSE/c4_runs/se_path_sim_v1/train_full_se-path-sim-v1_20261013T181643.681Z/selection_val.json",
+  "synthetic": true,
+  "test_scenarios": [
+    "y3s1_sim_test",
+    "y3s2_sim_test"
+  ],
+  "train_seeds": [
+    0,
+    1,
+    2
+  ]
+}
