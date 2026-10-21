@@ -8,9 +8,12 @@
 | Dataset | v2 derived (3 train questions quarantined); **ratio-concentration still FAILS (0.766 > 0.45)**, threshold untouched | 02, `dataset_v2_hash_manifest.json` |
 | Security (C3) | B1, B2, B3/X1, B4, B5, B6, B7, B8 fixed with tests; B9 and shared-app items open | 04, 05 |
 | Models | TF-IDF, SBERT, RoBERTa trained/evaluated on v2 with validation-only selection; Condition E and baseline re-scored | 03 |
-| LLM / RAG conditions | **Not run** (no credits/quota); not simulated | 03 |
+| LLM / RAG-vs-no-RAG marking | **Not run** (no credits/quota, COM-07); not simulated | 03, 12 |
 | Integration | Python pipeline code unchanged (324 pass); Node suite 91 pass; Express↔FastAPI live tests pass; frontend builds; no browser walkthrough | 05 |
-| Commit/push of remediation | **None** (as instructed) | `git status` |
+| Vector RAG | Retrieval + guarded marking implemented, 10 offline tests pass, retrieval evaluated with local SBERT; **LLM marking evaluation BLOCKED (no usable LLM access)** | 11, 12 |
+| Proposal crosswalk | 17 conditions mapped, six-label status matrix; LLM A/B, multi-LLM, proposal-F deferred to PP2, GraphRAG blocked (CCKG), benchmarks not implemented | 09, 10, `experiment_status_matrix.csv` |
+| Condition F-lite (non-LLM) | executed; no gain over RoBERTa | 12 |
+| Commit/push of remediation | see final git log (local commits; push only if safe) | `git log` |
 
 ## Headline results
 - RoBERTa-base (validation-selected): test nMAE 0.038, QWK 0.98; TF-IDF 0.081; SBERT-ridge 0.084; lexical baseline 0.112; Condition E 0.209 (binary rubric). A length-only diagnostic scores 0.067, so TF-IDF/SBERT gains are not proof of semantic skill. Labels are tier-based, so all numbers measure recovery of synthetic tiers, not human agreement.
