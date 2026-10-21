@@ -1,3 +1,0 @@
-SOFTWARE TEST FIXTURE ONLY.
-Not ASSISTments research data.
-Not for model training claims or evaluation claims.

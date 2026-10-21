@@ -1,3 +1,0 @@
-label,numerator,denominator,accuracy_percent,probability_threshold,dataset_provenance
-response_correctness,9425,14194,66.4,0.5,synthetic
-mock_exam_pass,248,300,82.67,0.5,synthetic
