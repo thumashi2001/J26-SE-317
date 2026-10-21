@@ -19,3 +19,5 @@ export async function callAi(aiUrl, path, body) {
   if (!res.ok) throw httpError(502, `AI service returned ${res.status} for ${path}`);
   return res.json();
 }
+// SOLID (Single Responsibility): this file has one job, talking to the Python AI service and turning
+// network failures into clear errors. Other services call it and never use fetch directly.
