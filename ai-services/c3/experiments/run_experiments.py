@@ -93,7 +93,7 @@ def required_models(conds: list[str], providers: list[str], f_provider: str | No
 
 
 def run_model_preflight(reqs: list[ModelRequirement], out_dir: Path) -> bool:
-    ok, summary = preflight_or_report(reqs, out_dir / "preflight.json")
+    ok, summary = preflight_or_report(reqs, out_dir / "preflight.json", probe=True)
     print("Model preflight:\n" + summary)
     if not ok:
         print(f"ERROR: model preflight failed; no experiment call was made (see {out_dir / 'preflight.json'}).")

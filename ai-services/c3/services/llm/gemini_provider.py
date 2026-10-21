@@ -15,7 +15,7 @@ from .base import BaseLLMProvider, LLMRequest, LLMResponse, LLMUsage
 from .http_utils import get_json, get_rate_limiter, post_json_with_retry
 
 GEMINI_BASE_URL = "https://generativelanguage.googleapis.com/v1beta"
-DEFAULT_GEMINI_MODEL = "gemini-2.5-flash"
+DEFAULT_GEMINI_MODEL = "gemini-3.6-flash"  # gemini-2.5-* returns 404 "no longer available to new users"
 # Thinking models spend part of maxOutputTokens on reasoning; never starve the visible answer.
 MIN_OUTPUT_TOKENS = 2048
 OK_FINISH = ("STOP", "FINISH_REASON_UNSPECIFIED")
@@ -129,7 +129,7 @@ class GeminiProvider(BaseLLMProvider):
                 headers=self._headers(),
                 payload=payload,
                 timeout=request.timeout_seconds,
-                limiter=get_rate_limiter("gemini"),
+                limiter=get_rate_limiter(f"gemini:{model}"),
             )
         except (httpx.HTTPError, ValueError) as exc:
             return self._failure(model, start, f"Gemini API call failed: {type(exc).__name__}: {exc}")

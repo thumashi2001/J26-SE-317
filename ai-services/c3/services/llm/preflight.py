@@ -19,6 +19,7 @@ from pathlib import Path
 
 import httpx
 
+from .base import LLMRequest
 from .gemini_provider import GeminiProvider
 from .openai_provider import OpenAIProvider
 
@@ -113,22 +114,50 @@ def _check_openai(req: ModelRequirement, api_key: str | None, http_client: httpx
     return _result(req, False, _http_reason(res.status_code))
 
 
+def _probe(req: ModelRequirement, check: ModelCheck, api_key: str | None) -> ModelCheck:
+    """Make one tiny REAL call. A model can be listed yet not callable (e.g. retired for new users -> HTTP 404,
+    or zero free-tier quota -> HTTP 429), so listing alone is not proof."""
+    if not check.ok or req.kind != "llm":
+        return check
+    provider = (
+        GeminiProvider(model=req.model, api_key=api_key)
+        if req.provider == "gemini"
+        else OpenAIProvider(model=req.model, api_key=api_key)
+    )
+    res = provider.generate(
+        LLMRequest(prompt='Reply with exactly this JSON: {"ok": true}', model=req.model, temperature=0.0,
+                   max_tokens=64, response_format="json", timeout_seconds=60.0)
+    )
+    if res.is_success and res.is_real_execution:
+        served = f"; served as {res.model_identifier}" if res.model_identifier != req.model else ""
+        return _result(req, True, f"{check.detail}; live call ok{served}")
+    detail = (res.error_message or "live call failed")[:300]
+    return _result(req, False, f"listed but NOT callable: {detail}")
+
+
 def run_preflight(
     requirements: list[ModelRequirement],
     *,
     gemini_api_key: str | None = None,
     openai_api_key: str | None = None,
     http_client: httpx.Client | None = None,
+    probe: bool = False,
 ) -> list[ModelCheck]:
-    """Check every requirement (keys default to the environment). Never raises for an unreachable model."""
+    """Check every requirement (keys default to the environment). Never raises for an unreachable model.
+
+    probe=True additionally makes one tiny real generation call per LLM model (costs a few tokens)."""
     checks = []
     for req in requirements:
         if req.provider == "gemini":
-            checks.append(_check_gemini(req, gemini_api_key, http_client))
+            check = _check_gemini(req, gemini_api_key, http_client)
+            key = gemini_api_key
         elif req.provider == "openai":
-            checks.append(_check_openai(req, openai_api_key, http_client))
+            check = _check_openai(req, openai_api_key, http_client)
+            key = openai_api_key
         else:
             checks.append(_result(req, False, f"unsupported provider '{req.provider}' (use gemini or openai)"))
+            continue
+        checks.append(_probe(req, check, key) if probe else check)
     return checks
 
 
@@ -148,6 +177,7 @@ def format_checks(checks: list[ModelCheck]) -> str:
 
 def preflight_or_report(requirements: list[ModelRequirement], out_path: Path, **kwargs) -> tuple[bool, str]:
     """Run, write preflight.json, and return (all_ok, printable summary)."""
+    kwargs.setdefault("probe", False)
     checks = run_preflight(requirements, **kwargs)
     write_preflight(out_path, checks)
     return all_ok(checks), format_checks(checks)

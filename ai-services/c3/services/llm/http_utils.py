@@ -11,11 +11,12 @@ overlap. Every attempt counts, including each retry after a 429/5xx. 0 or unset 
 Optional per-provider overrides C3_LLM_RPM_GEMINI / C3_LLM_RPM_OPENAI take precedence for that provider
 (and its embedding key) so one provider's quota does not throttle the other; unset or empty they fall back
 to C3_LLM_RPM, and an explicit 0 disables limiting for that provider only. Keys are "gemini",
-"gemini-embedding", "openai", "openai-embedding"; each key has its own limiter, so the chat and embedding
+"gemini-embedding", "openai", "openai-embedding", and "<provider>:<model>" (Gemini chat calls use one limiter per model because free-tier quotas are per model); each key has its own limiter, so the chat and embedding
 endpoints of one provider are limited independently.
 """
 
 import os
+import re
 import threading
 import time
 from typing import Any
@@ -50,7 +51,7 @@ _limiters_lock = threading.Lock()
 
 def rpm_for(key: str) -> float:
     """Requests-per-minute for a limiter key: C3_LLM_RPM_<PROVIDER> if set, else C3_LLM_RPM, else 0 (unlimited)."""
-    provider = key.split("-")[0].upper()
+    provider = re.split(r"[-:]", key)[0].upper()  # "gemini:model-x" and "gemini-embedding" -> GEMINI
     specific = os.getenv(f"C3_LLM_RPM_{provider}", "").strip()
     return float(specific or os.getenv("C3_LLM_RPM", "0") or 0)
 

@@ -206,7 +206,7 @@ def test_provider_failure_makes_cli_exit_nonzero_and_writes_no_exclusion_csv(mon
 
     monkeypatch.setattr(Role, "build", lambda self: AlwaysFails())
     monkeypatch.setattr(gen_cli, "load_source", lambda limit=None: make_questions(3))
-    monkeypatch.setattr(gen_cli, "preflight_or_report", lambda reqs, path: (True, "ok"))
+    monkeypatch.setattr(gen_cli, "preflight_or_report", lambda reqs, path, **kw: (True, "ok"))
     monkeypatch.setattr(LLMTasks, "__init__", _fast_init(LLMTasks.__init__))
     out = tmp_path / "o"
     assert gen_cli.main(["--out", str(out)]) == 1

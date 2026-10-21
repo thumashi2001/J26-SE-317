@@ -89,10 +89,10 @@ def test_cli_entry_points_call_load_env(clean_env, monkeypatch):
 # -- roles ------------------------------------------------------------------------------------------------------
 def test_default_roles_generator_gemini_verifier_openai(clean_env):
     generator, verifier = resolve_roles()
-    assert (generator.provider, generator.model) == ("gemini", "gemini-2.5-pro")
+    assert (generator.provider, generator.model) == ("gemini", "gemini-3.8-flash")
     assert (verifier.provider, verifier.model) == ("openai", "gpt-4o-mini")
     assert isinstance(generator.build(), GeminiProvider) and isinstance(verifier.build(), OpenAIProvider)
-    assert generator.build().model == "gemini-2.5-pro" and verifier.build().model == "gpt-4o-mini"
+    assert generator.build().model == "gemini-3.8-flash" and verifier.build().model == "gpt-4o-mini"
     meta = role_meta(generator, verifier)
     assert meta["verifier_same_model_family_as_generator"] is False
     assert verifier_cache_name(verifier) == "verifier_openai.jsonl"
@@ -134,7 +134,7 @@ def test_dry_run_prints_roles_models_and_required_env_names(clean_env, capsys):
     clean_env.setenv("GEMINI_API_KEY", FAKE_GEMINI)
     assert gen_cli.main(["--dry-run", "--limit", "5"]) == 0
     out = capsys.readouterr().out
-    assert "generator" in out and "gemini / gemini-2.5-pro" in out and "GEMINI_API_KEY (set)" in out
+    assert "generator" in out and "gemini / gemini-3.8-flash" in out and "GEMINI_API_KEY (set)" in out
     assert "verifier" in out and "openai / gpt-4o-mini" in out and "OPENAI_API_KEY (NOT SET)" in out
     assert "C3_VERIFIER_PROVIDER" in out and "verifier_openai.jsonl" in out
     assert FAKE_GEMINI not in out
@@ -185,7 +185,7 @@ def cli_env(clean_env, monkeypatch):
     fakes = {"generator": RealFlagFake(), "verifier": RealFlagFake()}
     monkeypatch.setattr(Role, "build", lambda self: fakes[self.name])
     monkeypatch.setattr(gen_cli, "load_source", lambda limit=None: make_questions(12))
-    monkeypatch.setattr(gen_cli, "preflight_or_report", lambda reqs, path: (True, "  [ok] stubbed preflight"))
+    monkeypatch.setattr(gen_cli, "preflight_or_report", lambda reqs, path, **kw: (True, "  [ok] stubbed preflight"))
     return fakes
 
 
@@ -193,7 +193,7 @@ def test_cli_run_records_roles_in_manifest_and_uses_separate_verifier_cache(cli_
     out = tmp_path / "rel"
     assert gen_cli.main(["--out", str(out), "--seed", "5"]) == 0
     manifest = json.loads((out / "manifest.json").read_text(encoding="utf-8"))
-    assert manifest["generator_provider"] == "gemini" and manifest["generator_model"] == "gemini-2.5-pro"
+    assert manifest["generator_provider"] == "gemini" and manifest["generator_model"] == "gemini-3.8-flash"
     assert manifest["verifier_provider"] == "openai" and manifest["verifier_model"] == "gpt-4o-mini"
     assert manifest["verifier_same_model_family_as_generator"] is False
     cache = out / "_llm_cache"
@@ -209,7 +209,7 @@ def test_cli_run_records_roles_in_manifest_and_uses_separate_verifier_cache(cli_
 def test_cli_aborts_with_exit_2_when_preflight_fails_and_makes_no_provider_call(cli_env, monkeypatch, tmp_path, capsys):
     monkeypatch.setattr(
         gen_cli, "preflight_or_report",
-        lambda reqs, path: (False, "  [FAIL] verifier: openai/gpt-x - model 'gpt-x' not found (HTTP 404)"),
+        lambda reqs, path, **kw: (False, "  [FAIL] verifier: openai/gpt-x - model 'gpt-x' not found (HTTP 404)"),
     )  # fmt: skip
     assert gen_cli.main(["--out", str(tmp_path / "o")]) == 2
     captured = capsys.readouterr()
@@ -380,7 +380,7 @@ def test_required_models_cover_llm_and_embedding_without_duplicates(exp, monkeyp
 
 def test_run_experiments_preflight_flag_exits_2_on_failure_before_loading_the_release(exp, monkeypatch, tmp_path):
     monkeypatch.setattr(exp.fw, "RESULTS_ROOT", tmp_path)
-    monkeypatch.setattr(exp, "preflight_or_report", lambda reqs, path: (False, "  [FAIL] llm:gemini - HTTP 403"))
+    monkeypatch.setattr(exp, "preflight_or_report", lambda reqs, path, **kw: (False, "  [FAIL] llm:gemini - HTTP 403"))
     monkeypatch.setattr(exp, "load_release", lambda *a, **k: pytest.fail("release must not load"))
     monkeypatch.setattr(sys, "argv", ["run_experiments", "--preflight", "--conditions", "A", "--providers", "gemini"])
     assert exp.main() == 2
@@ -388,7 +388,7 @@ def test_run_experiments_preflight_flag_exits_2_on_failure_before_loading_the_re
 
 def test_run_experiments_aborts_before_any_condition_when_preflight_fails(exp, monkeypatch, tmp_path):
     monkeypatch.setattr(exp.fw, "RESULTS_ROOT", tmp_path)
-    monkeypatch.setattr(exp, "preflight_or_report", lambda reqs, path: (False, "  [FAIL] llm:openai - 404"))
+    monkeypatch.setattr(exp, "preflight_or_report", lambda reqs, path, **kw: (False, "  [FAIL] llm:openai - 404"))
     monkeypatch.setattr(exp, "load_release", lambda *a, **k: pytest.fail("release must not load"))
     monkeypatch.setattr(exp.cond, "run_llm_condition", lambda *a, **k: pytest.fail("no LLM call allowed"))
     monkeypatch.setattr(sys, "argv", ["run_experiments", "--conditions", "A", "--providers", "openai"])
@@ -397,7 +397,7 @@ def test_run_experiments_aborts_before_any_condition_when_preflight_fails(exp, m
 
 def test_run_experiments_preflight_flag_ok_returns_0(exp, monkeypatch, tmp_path):
     monkeypatch.setattr(exp.fw, "RESULTS_ROOT", tmp_path)
-    monkeypatch.setattr(exp, "preflight_or_report", lambda reqs, path: (True, "  [ok] llm:gemini"))
+    monkeypatch.setattr(exp, "preflight_or_report", lambda reqs, path, **kw: (True, "  [ok] llm:gemini"))
     monkeypatch.setattr(sys, "argv", ["run_experiments", "--preflight", "--conditions", "A", "--providers", "gemini"])
     assert exp.main() == 0
 
@@ -408,3 +408,63 @@ def test_llm_request_cache_key_distinguishes_model_so_roles_never_share_answers(
     req = LLMRequest(prompt="same")
     assert request_cache_key("openai", "gpt-a", req) != request_cache_key("openai", "gpt-b", req)
     assert request_cache_key("openai", "m", req) != request_cache_key("gemini", "m", req)
+
+
+class TestLiveProbe:
+    """A model that is listed but retired/quota-less must fail preflight when probing (real incident: 2.5 models)."""
+
+    def _listed_ok(self, monkeypatch):
+        from services.llm import preflight as pf
+
+        monkeypatch.setattr(
+            pf, "_check_gemini", lambda req, key, client: pf._result(req, True, "ok")
+        )
+        return pf
+
+    def test_listed_but_not_callable_fails(self, monkeypatch):
+        from services.llm import preflight as pf
+        from services.llm.base import LLMResponse
+
+        self._listed_ok(monkeypatch)
+
+        class Dead:
+            def __init__(self, **kw):
+                pass
+
+            def generate(self, request):
+                return LLMResponse(raw_content="", model_identifier="m", provider_name="gemini", is_success=False,
+                                   error_message="HTTPStatusError: 404 no longer available to new users")
+
+        monkeypatch.setattr(pf, "GeminiProvider", Dead)
+        req = pf.ModelRequirement("generator", "gemini", "gemini-x")
+        (check,) = pf.run_preflight([req], gemini_api_key="k", probe=True)
+        assert check.ok is False
+        assert "NOT callable" in check.detail and "no longer available" in check.detail
+
+    def test_callable_model_passes_and_reports_served_version(self, monkeypatch):
+        from services.llm import preflight as pf
+        from services.llm.base import LLMResponse
+
+        self._listed_ok(monkeypatch)
+
+        class Live:
+            def __init__(self, **kw):
+                pass
+
+            def generate(self, request):
+                return LLMResponse(raw_content="{}", parsed_json={"ok": True}, model_identifier="gemini-served-2",
+                                   provider_name="gemini", is_success=True, is_real_execution=True)
+
+        monkeypatch.setattr(pf, "GeminiProvider", Live)
+        req = pf.ModelRequirement("generator", "gemini", "gemini-alias")
+        (check,) = pf.run_preflight([req], gemini_api_key="k", probe=True)
+        assert check.ok is True
+        assert "served as gemini-served-2" in check.detail
+
+    def test_probe_off_makes_no_generation_call(self, monkeypatch):
+        from services.llm import preflight as pf
+
+        self._listed_ok(monkeypatch)
+        monkeypatch.setattr(pf, "GeminiProvider", lambda **kw: (_ for _ in ()).throw(AssertionError("probe ran")))
+        (check,) = pf.run_preflight([pf.ModelRequirement("g", "gemini", "m")], gemini_api_key="k", probe=False)
+        assert check.ok is True

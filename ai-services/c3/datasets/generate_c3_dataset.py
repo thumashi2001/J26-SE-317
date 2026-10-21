@@ -6,7 +6,7 @@ python datasets/generate_c3_dataset.py --limit 3          # first 3 source quest
 python datasets/generate_c3_dataset.py                    # full run; add --resume to continue from the cache
 
 Roles (set in ai-services/c3/.env or the environment; real environment variables win over .env):
-  generator  Gemini  model C3_GENERATOR_MODEL (default gemini-2.5-pro)       key GEMINI_API_KEY
+  generator  Gemini  model C3_GENERATOR_MODEL (default gemini-3.8-flash)       key GEMINI_API_KEY
   verifier   C3_VERIFIER_PROVIDER = openai (default) | gemini, model C3_VERIFIER_MODEL
              keys OPENAI_API_KEY or GEMINI_API_KEY respectively
 A real run first verifies every required model (preflight.json) and aborts with exit 2 if one is unavailable.
@@ -133,7 +133,9 @@ def main(argv: list[str] | None = None) -> int:
     if not args.preflight and cdir.exists() and any(cdir.iterdir()) and not args.resume:
         print(f"ERROR: {cdir} already has cached responses; pass --resume to reuse them.", file=sys.stderr)
         return 2
-    ok, summary = preflight_or_report([gen_role.requirement, ver_role.requirement], args.out / "preflight.json")
+    ok, summary = preflight_or_report(
+        [gen_role.requirement, ver_role.requirement], args.out / "preflight.json", probe=True
+    )
     print("Model preflight:\n" + summary)
     if not ok:
         print(f"ERROR: model preflight failed; nothing generated (see {args.out / 'preflight.json'}).", file=sys.stderr)
