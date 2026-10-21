@@ -1,0 +1,58 @@
+check,expected,actual,result,evidence
+orig questions,167,167,PASS,01_FINAL_question_bank.csv rows; unique ids=167
+orig answers,1002,1002,PASS,unique answer_id=1002
+orig rubric rows,230,230,PASS,
+sizes elig/quar/ctrl,576/355/71,576/355/71,PASS,row counts; uniq ids 576/355/71
+pairwise disjoint,"0,0,0","0,0,0",PASS,answer_id set intersections
+union==original,equal,missing=0 extra=0,PASS,answer_id sets
+manifest record types,-,"{'answer': 916, 'file': 6, 'question': 88, 'rubric_row': 13}",PASS,repair_manifest.csv
+each original answer has >=1 manifest row (record_type=answer),0,456,FAIL,"answers without a row by bucket={'eligible': np.int64(456)}; examples=['SA-PP-SE3010-083-FULL', 'SA-PP-SE3010-083-MISCONCEPTION', 'SA-PP-SE3010-083-MISSING_CONCEPT']"
+manifest answer ids not in original,0,0,PASS,
+manifest answer rows by bucket,-,"{'control': np.int64(429), 'quarantine': np.int64(355), 'eligible': np.int64(132)}",PASS,
+ledger quarantined == quarantine.csv,equal,355 vs 355; symdiff=0,PASS,
+eligible questions variants,"{'q': 96, 'variants': {6}}","{'q': 96, 'variants': {6}}",PASS,
+control questions variants,"{'q': 71, 'variants': {1}}","{'q': 71, 'variants': {1}}",PASS,
+quarantine questions,-,"{'q': 71, 'variants': {5: np.int64(71)}}",PASS,per-question answers in quarantine
+question buckets disjoint & cover,167,elig_q&ctrl_q=0; union=167,PASS,
+orig answers per question,{6},{6},PASS,
+quarantine questions subset of control questions,True,True,PASS,71 qs; ctrl qs with 0 quarantine=0
+question bank eligibility_status,"{'eligible': 96, 'ineligible': 71}","{'eligible': np.int64(96), 'ineligible': np.int64(71)}",PASS,01_question_bank.csv
+splits eligible,"{'train': 420, 'validation': 66, 'test': 90}","{'train': np.int64(420), 'test': np.int64(90), 'validation': np.int64(66)}",PASS,
+splits quarantine,-,"{'train': np.int64(235), 'validation': np.int64(70), 'test': np.int64(50)}",PASS,
+splits controls,-,"{'train': np.int64(47), 'validation': np.int64(14), 'test': np.int64(10)}",PASS,
+splits original,"{'train': 702, 'validation': 150, 'test': 150}","{'train': np.int64(702), 'validation': np.int64(150), 'test': np.int64(150)}",PASS,
+controlled_answers_train.csv == master subset,equal,"n=420, idsets equal=True, content equal=True",PASS,
+question_bank_train.csv vs eligible master,equal,n=70 equal=True,PASS,extra=[] missing=[]
+controlled_answers_validation.csv == master subset,equal,"n=66, idsets equal=True, content equal=True",PASS,
+question_bank_validation.csv vs eligible master,equal,n=11 equal=True,PASS,extra=[] missing=[]
+controlled_answers_test.csv == master subset,equal,"n=90, idsets equal=True, content equal=True",PASS,
+question_bank_test.csv vs eligible master,equal,n=15 equal=True,PASS,extra=[] missing=[]
+splits disjoint (answers files),0,0,PASS,
+question split unchanged vs original,0,0,PASS,
+answer split == question split (eligible),0,0,PASS,
+question ids shared train&validation,0,0,PASS,
+question ids shared train&test,0,0,PASS,
+question ids shared validation&test,0,0,PASS,
+eligible 0<=expected_mark<=max_marks,0,0,PASS,
+eligible max_marks==question marks,0,0,PASS,
+ctrl 0<=mark<=max,0,0,PASS,
+quar 0<=mark<=max,0,0,PASS,
+orig 0<=mark<=marks,0,0,PASS,
+labels eligible,6 core,True,PASS,"{'FULL': np.int64(96), 'MOSTLY_CORRECT': np.int64(96), 'PARTIAL': np.int64(96), 'MISSING_CONCEPT': np.int64(96), 'MISCONCEPTION': np.int64(96), 'IRRELEVANT': np.int64(96)}"
+labels quar,6 core,True,PASS,"{'FULL': np.int64(71), 'MOSTLY_CORRECT': np.int64(71), 'PARTIAL': np.int64(71), 'MISSING_CONCEPT': np.int64(71), 'MISCONCEPTION': np.int64(71)}"
+labels ctrl,6 core,True,PASS,{'IRRELEVANT': np.int64(71)}
+labels orig,6 core,True,PASS,"{'FULL': np.int64(167), 'MOSTLY_CORRECT': np.int64(167), 'PARTIAL': np.int64(167), 'MISSING_CONCEPT': np.int64(167), 'MISCONCEPTION': np.int64(167), 'IRRELEVANT': np.int64(167)}"
+FULL ratio==1 (eligible),True,[1.0],PASS,
+IRRELEVANT ratio==0 (eligible),True,[0.0],PASS,
+mark non-increasing along FULL>=MOSTLY>=PARTIAL>=MISSING>=MISCONC>=IRREL,0,93,FAIL,"violating q: ['PP-SE3010-083', 'PP-SE3010-085', 'PP-SE3010-086', 'PP-SE3010-087', 'PP-SE3010-088']"
+every question has rubric rows,167,167,PASS,rubric rows=230
+eligible answer rubric_id == rubric file rubric_id,0,0,PASS,
+rubric marks sum == question marks (all 167),0,7,FAIL,"['SYN-REPL-PP-SE3020-035', 'SYN-REPL-PP-SE3020-040', 'SYN-REPL-PP-SE3040-007', 'SYN-REPL-PP-SE3050-109', 'SYN-REPL-PP-SE3070-012', 'SYN-REPL-PP-SE3070-022', 'SYN-REPL-PP-SE3070-025']"
+  ...of which eligible questions,0,0,PASS,
+eligible exact-dup answer strings (groups/answers),-,7/109,PASS,
+eligible normalised-dup answer strings (groups/answers),-,7/109,PASS,
+accidental dup groups (not template-flagged),-,6 groups/13 answers,PASS,"[('remote object is justified using the relevant trad', ['SA-PP-SE3020-030-PARTIAL', 'SA-PP-SE3020-039-PARTIAL']), ('stakeholder management is explained accurately and', ['SA-PP-SE3080-102-FULL', 'SA-PP-SE3080-102-PARTIAL']), ('the answer correctly addresses dynamic testing and', ['SA-PP-SE3010-089-MOSTLY_CORRECT', 'SA-PP-SE3010-089-PARTIAL']), ('the answer correctly addresses mongodb and applies', ['SA-PP-SE3060-015-PARTIAL', 'SA-PP-SE3060-045-PARTIAL']), ('the answer correctly addresses rest and applies it', ['SA-PP-SE3040-005-FULL', 'SA-PP-SE3040-006-PARTIAL', 'SA-PP-SE3010-086-PARTIAL']), ('the answer correctly addresses soap and applies it', ['SA-PP-SE3040-005-MOSTLY_CORRECT', 'SA-PP-SE3020-037-PARTIAL'])]"
+question exact dup texts,0,0,PASS,
+question normalised dup texts,0,0,PASS,
+"max cross-split q cosine (all167, TF-IDF 1-2gram fit on this set)",<=0.8,0.836 PP-SE3080-099(train)-PP-SE3080-107(test),FAIL,cross-split pairs>=0.6: 1; all pairs>=0.6: 2
+"max cross-split q cosine (elig96, TF-IDF 1-2gram fit on this set)",<=0.8,0.834 PP-SE3080-099(train)-PP-SE3080-107(test),FAIL,cross-split pairs>=0.6: 1; all pairs>=0.6: 1

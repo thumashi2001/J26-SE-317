@@ -1,0 +1,61 @@
+id,source,requirement,status,implementation_evidence,test_evidence,label,note
+FR-C3-01,proposal pp.40-45,Accept questions,IMPLEMENTED,c3Controller.assessAnswer; AssessmentSchema,test_assessment_api; c3.test.js,VERIFIED,
+FR-C3-02,proposal pp.40-45,Accept student responses,IMPLEMENTED,c3Controller; app/schemas/analysis.py,test_analysis_api; c3.test.js,VERIFIED,
+FR-C3-03,proposal pp.40-45,Accept model/reference answers,IMPLEMENTED,schemas reference_answer,test_semantic_baseline,VERIFIED,
+FR-C3-04,proposal pp.40-45,Process objective + NL responses (short answer primary),IMPLEMENTED,mcqMarkingService (Node); Python pipeline,MCQ subtests; test_assessment_api,VERIFIED,
+FR-C3-05,proposal pp.40-45,Preprocess response,IMPLEMENTED,services/preprocessing/text_normalizer.py,test_preprocessing,VERIFIED,
+FR-C3-06,proposal pp.40-45,Identify relevant concepts,PARTIAL (lexical),services/semantic/analyzer.py,test_semantic_baseline,VERIFIED,
+FR-C3-07,proposal pp.40-45,Associate response with question/assessment/student,IMPLEMENTED,submissionService.createSubmissionWithResult,c3.test.js,VERIFIED,
+FR-C3-08,proposal pp.40-45,Evaluate vs reference,PARTIAL (reference_similarity unused in marking),semantic/baseline.py,test_semantic_baseline,VERIFIED,
+FR-C3-09,proposal pp.40-45,Semantic comparison not only keywords,NOT MET (token overlap only),semantic/analyzer.py,probes: paraphrase 0/4,VERIFIED,main semantic gap
+FR-C3-10,proposal pp.40-45,Degree of addressing expected content,IMPLEMENTED (concept status),semantic/analyzer.py,test_semantic_baseline,VERIFIED,
+FR-C3-11,proposal pp.40-45,Apply rubrics,IMPLEMENTED,marking/criterion_evaluator.py,test_criterion_evaluator,VERIFIED,
+FR-C3-12,proposal pp.40-45,Generate proposed mark,IMPLEMENTED,marking/marking_engine.py,test_marking_engine,VERIFIED,
+FR-C3-13,proposal pp.40-45,Partial credit,IMPLEMENTED with bugs (M4),criterion_evaluator.py:155-184,test_criterion_evaluator_audit (xfail),VERIFIED,M4 bug
+FR-C3-14,proposal pp.40-45,Marking evidence,IMPLEMENTED,criterion_evaluator.py,test_criterion_evaluator,VERIFIED,
+FR-C3-15,proposal pp.40-45,Record method/configuration,PARTIAL,MARKING_VERSION; ai_evaluation stored,c3.test.js,VERIFIED,
+FR-C3-16,proposal pp.40-45,LLM configuration,PARTIAL (not on live path),services/llm/*,test_llm_providers,VERIFIED,
+FR-C3-17,proposal pp.40-45,RAG configuration,PARTIAL (not on live path),services/rag/*,test_cckg_and_rag,VERIFIED,
+FR-C3-18,proposal pp.40-45,Record retrieved context,PLANNED,experiments/conditions.py ContextBuilder,none,VERIFIED,
+FR-C3-19,proposal pp.40-45,RAG vs non-RAG comparison,NOT DEMONSTRATED,experiments/conditions.py,none,VERIFIED,deferred COM-07/DEC-07
+FR-C3-20,proposal pp.40-45,Compare selected LLM configurations,NOT DEMONSTRATED (BLOCKED quota),experiments/,none,VERIFIED,quota blocked
+FR-C3-21,proposal pp.40-45,Demonstrated concepts,IMPLEMENTED,semantic/analyzer.py,test_semantic_baseline,VERIFIED,
+FR-C3-22,proposal pp.40-45,Partially demonstrated concepts,IMPLEMENTED (stop-word artefacts),semantic/baseline.py:29-39,test_text_and_semantic_edge_cases,VERIFIED,
+FR-C3-23,proposal pp.40-45,Missing concepts,IMPLEMENTED,semantic/analyzer.py,test_semantic_baseline,VERIFIED,
+FR-C3-24,proposal pp.40-45,Associate concepts with criteria,IMPLEMENTED,criterion_evaluator.py,test_criterion_evaluator,VERIFIED,
+FR-C3-25,proposal pp.40-45,Explanation of evidence,IMPLEMENTED (templated),criterion_evaluator.py:132-152,test_criterion_evaluator,VERIFIED,
+FR-C3-26,proposal pp.40-45,Present explanation with mark,IMPLEMENTED,orchestrator; LecturerReviewPage,test_assessment_api,VERIFIED,
+FR-C3-27,proposal pp.40-45,Feedback from response,IMPLEMENTED (templated),services/feedback/generator.py,test_feedback_generator,VERIFIED,
+FR-C3-28,proposal pp.40-45,Strengths,IMPLEMENTED,feedback/evidence_formatter.py,test_feedback_helpers,VERIFIED,
+FR-C3-29,proposal pp.40-45,Missing concepts feedback,IMPLEMENTED,feedback/generator.py,test_feedback_generator,VERIFIED,
+FR-C3-30,proposal pp.40-45,Improvement suggestions,IMPLEMENTED (templated),feedback/explanation_builder.py,test_feedback_generator,VERIFIED,
+FR-C3-31,proposal pp.40-45,Feedback linked to result,IMPLEMENTED,generator.build_feedback_from_results,test_feedback_api,VERIFIED,
+FR-C3-32,proposal pp.40-45,Extract concepts for map,IMPLEMENTED,mindmap/node_builder.py,test_mindmap_builders,VERIFIED,
+FR-C3-33,proposal pp.40-45,Relationships where evidence exists,NOT IMPLEMENTED (star graph),mindmap/relationship_builder.py,test_relationship_builder,VERIFIED,needs CCKG/relations
+FR-C3-34,proposal pp.40-45,Structured/hierarchical map,PARTIAL,mindmap/generator.py,test_mindmap_generator,VERIFIED,
+FR-C3-35,proposal pp.40-45,Visual presentation,IMPLEMENTED (Python shape); MCQ shape likely crashes,MindMapGraph.jsx,none (UI untested),VERIFIED,
+FR-C3-36,proposal pp.40-45,Lecturer review interface,IMPLEMENTED,LecturerQueuePage/ReviewPage,c3.test.js,VERIFIED,
+FR-C3-37,proposal pp.40-45,"Show response, mark, evidence",IMPLEMENTED,LecturerReviewPage,c3.test.js,VERIFIED,
+FR-C3-38,proposal pp.40-45,Show concept classes,IMPLEMENTED,ConceptDiagnosis.jsx,none (UI untested),VERIFIED,
+FR-C3-39,proposal pp.40-45,Show feedback and mind map,IMPLEMENTED,LecturerReviewPage,none (UI untested),VERIFIED,
+FR-C3-40,proposal pp.40-45,Accept or override,IMPLEMENTED with defects (B3),submissionService.reviewSubmission,c3.test.js; c3_audit todo,VERIFIED,
+FR-C3-41,proposal pp.40-45,Record verification/override/status,PARTIAL (no history),submissionService.js:382-390,c3.test.js,VERIFIED,
+FR-C3-42,proposal pp.40-45,Receive from C2,NOT IMPLEMENTED,integration/c2-c3/README.md,none,VERIFIED,contract only
+FR-C3-43,proposal pp.40-45,Outputs to C1,IMPLEMENTED (direct DB write),integration/c3-c1/index.js,bridge tests,VERIFIED,
+FR-C3-44,proposal pp.40-45,Weak-concept info to C4,NOT IMPLEMENTED,modules/c4 empty,none,VERIFIED,contract only
+FR-C3-45,proposal pp.40-45,Maintain assessment records,IMPLEMENTED (no indexes),"c3_submissions, c3_results",c3.test.js,VERIFIED,
+FR-C3-46,proposal pp.40-45,Retrieve results/evidence,IMPLEMENTED,submissionService.getSubmissionDetail,c3.test.js,VERIFIED,
+NFR-C3-01..04,proposal pp.45-49,Quality and consistency,PARTIAL,deterministic repeatable pipeline; agreement measured only for baseline/E,metrics_report.json,VERIFIED/INFERRED,no numeric targets exist
+NFR-C3-05..07,proposal pp.45-49,Explainability; proposed vs verified mark separate,IMPLEMENTED,automated_mark vs final_mark,c3.test.js,VERIFIED/INFERRED,no numeric targets exist
+NFR-C3-08..10,proposal pp.45-49,Performance record/threshold,PARTIAL,no per-response timing store; threshold deliberately undefined,none,VERIFIED/INFERRED,no numeric targets exist
+NFR-C3-11..15,proposal pp.45-49,Security/privacy/ethics,PARTIAL,"roles, scrypt; B1,B4,B8 open; no anonymisation pipeline",auth.test.js; c3_audit todo,VERIFIED/INFERRED,no numeric targets exist
+NFR-C3-16..19,proposal pp.45-49,Reliability,PARTIAL,502/504/400 mapping; A1 500; B6 masked failure,live microservice tests,VERIFIED/INFERRED,no numeric targets exist
+NFR-C3-20..23,proposal pp.45-49,Auditability,PARTIAL,no history array; no finalized_by,c3.test.js,VERIFIED/INFERRED,no numeric targets exist
+NFR-C3-24..26,proposal pp.45-49,Scalability/maintainability,PARTIAL,provider ABC; duplication,test_llm_providers,VERIFIED/INFERRED,no numeric targets exist
+NFR-C3-27..30,proposal pp.45-49,Usability,PARTIAL,UI exists; no usability evaluation,none,VERIFIED/INFERRED,no numeric targets exist
+SO1,proposal p.27,semantic answer analysis,PARTIAL (lexical only),semantic/analyzer.py,see 03/06,VERIFIED,
+SO2,proposal p.27,rubric-aware marking with criterion evidence,IMPLEMENTED,marking/*,see 03/06,VERIFIED,
+SO3,proposal p.27,concept-level analysis (demonstrated/partial/missing),IMPLEMENTED (lexical),semantic/analyzer.py,see 03/06,VERIFIED,
+SO4,proposal p.27,explainable feedback,IMPLEMENTED (templated),feedback/*,see 03/06,VERIFIED,
+SO5,proposal p.27,mind-map generation,PARTIAL (star graph),mindmap/*,see 03/06,VERIFIED,
+SO6,proposal p.27,experimental evaluation vs baselines,PARTIAL (baseline vs E only; planned candidates not run),evaluate_repaired.py,see 03/06,VERIFIED,

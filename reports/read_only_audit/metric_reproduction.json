@@ -1,0 +1,740 @@
+{
+ "generated": "2026-10-21",
+ "note": "All values recomputed with the auditor's own numpy code from repository CSV files; see 04_metric_reproduction.md",
+ "independent_part1": {
+  "reconciliation": {
+   "original_answers": 1002,
+   "original_unique_ids": 1002,
+   "eligible": 576,
+   "quarantine": 355,
+   "controls": 71,
+   "sum": 1002,
+   "unique_ids_in_each_bucket": {
+    "eligible": 576,
+    "quarantine": 355,
+    "controls": 71
+   },
+   "pairwise_overlap": {
+    "el&qu": 0,
+    "el&ct": 0,
+    "qu&ct": 0
+   },
+   "union_equals_original": true,
+   "missing_from_union": 0,
+   "extra_in_union": 0,
+   "eligible_per_split": {
+    "train": 420,
+    "test": 90,
+    "validation": 66
+   },
+   "original_per_split": {
+    "train": 702,
+    "validation": 150,
+    "test": 150
+   },
+   "answers_with_a_manifest_row": 546,
+   "answers_without_manifest_row": [
+    "SA-PP-SE3010-083-FULL",
+    "SA-PP-SE3010-083-MISCONCEPTION",
+    "SA-PP-SE3010-083-MISSING_CONCEPT",
+    "SA-PP-SE3010-083-MOSTLY_CORRECT",
+    "SA-PP-SE3010-083-PARTIAL"
+   ],
+   "n_answers_without_manifest_row": 456,
+   "eligible_variants_per_question": {
+    "6": 96
+   },
+   "eligible_questions": 96,
+   "question_split_disjoint": true,
+   "nan_cells_in_eligible": 0,
+   "empty_student_answers_eligible": 0
+  },
+  "ratio_concentration": {
+   "formula": "share of inner labels (0<r<1, r=expected_mark/max_marks rounded 3dp) on the 7 most frequent values",
+   "n_all": 576,
+   "n_inner": 380,
+   "n_at_0": 99,
+   "n_at_1": 97,
+   "distinct_inner": 37,
+   "top7": [
+    [
+     0.8,
+     163
+    ],
+    [
+     0.6,
+     52
+    ],
+    [
+     0.85,
+     24
+    ],
+    [
+     0.84,
+     18
+    ],
+    [
+     0.667,
+     12
+    ],
+    [
+     0.55,
+     10
+    ],
+    [
+     0.9,
+     9
+    ]
+   ],
+   "value": 0.7579,
+   "value_train": 0.7283,
+   "value_validation": 1.0,
+   "value_test": 0.9167,
+   "original_all_value": 0.7579,
+   "original_all_n_inner": 380
+  },
+  "length_correlation": {
+   "definition": "words = len(student_answer.split()); y = expected_mark/max_marks (also raw)",
+   "pearson_norm": 0.8107,
+   "spearman_norm": 0.793,
+   "pearson_raw": 0.6153,
+   "n": 576,
+   "mean_words_by_tier": {
+    "FULL": 75.5,
+    "MOSTLY_CORRECT": 60.8,
+    "PARTIAL": 43.1,
+    "MISSING_CONCEPT": 73.4,
+    "MISCONCEPTION": 77.3,
+    "IRRELEVANT": 12.0
+   },
+   "mean_norm_mark_by_tier": {
+    "FULL": 1.0,
+    "MOSTLY_CORRECT": 0.787,
+    "PARTIAL": 0.623,
+    "MISSING_CONCEPT": 0.787,
+    "MISCONCEPTION": 0.787,
+    "IRRELEVANT": 0.0
+   },
+   "pearson_norm_without_two_100mark_questions": 0.826,
+   "pearson_norm_without_IRRELEVANT": 0.5756,
+   "mean_within_question_pearson": 0.9184
+  },
+  "repaired_test": {
+   "ids_unique": 90,
+   "n": 90,
+   "baseline": {
+    "n": 90,
+    "failed": 0,
+    "mae": 1.9387,
+    "rmse": 2.6159,
+    "pearson": 0.974,
+    "within2": 0.6222,
+    "within10pct": 0.5111
+   },
+   "condition_e": {
+    "n": 90,
+    "failed": 0,
+    "mae": 3.5444,
+    "rmse": 5.885,
+    "pearson": 0.801,
+    "within2": 0.5778,
+    "within10pct": 0.3333
+   },
+   "same_ids_for_both": true,
+   "condition_e_distinct_predictions": [
+    0.0,
+    10.0,
+    12.0,
+    25.0,
+    30.0
+   ],
+   "condition_e_share_predicted_0_or_max": 1.0,
+   "rubric_source_counts": {
+    "rubric_file": 90
+   },
+   "by_tier_mae": {
+    "FULL": {
+     "baseline": 4.152,
+     "condition_e": 0.0
+    },
+    "IRRELEVANT": {
+     "baseline": 2.395,
+     "condition_e": 0.0
+    },
+    "MISCONCEPTION": {
+     "baseline": 0.855,
+     "condition_e": 3.167
+    },
+    "MISSING_CONCEPT": {
+     "baseline": 1.0,
+     "condition_e": 3.167
+    },
+    "MOSTLY_CORRECT": {
+     "baseline": 1.949,
+     "condition_e": 7.7
+    },
+    "PARTIAL": {
+     "baseline": 1.281,
+     "condition_e": 7.233
+    }
+   },
+   "mae_excluding_two_100mark_questions": null
+  }
+ },
+ "independent_part2_validation_items": {
+  "T3C": {
+   "validator_method_tokens_[A-Za-z0-9']+_unigram_fit_on_96_eligible": [
+    [
+     0.9033627645161304,
+     "PP-SE3080-099",
+     "PP-SE3080-107",
+     "train",
+     "test"
+    ],
+    [
+     0.6441983262859344,
+     "PP-SE3060-015",
+     "PP-SE3060-045",
+     "train",
+     "validation"
+    ],
+    [
+     0.6016643738288017,
+     "PP-SE3020-030",
+     "PP-SE3020-039",
+     "test",
+     "train"
+    ],
+    [
+     0.6008637950597739,
+     "PP-SE3040-005",
+     "PP-SE3040-006",
+     "train",
+     "test"
+    ]
+   ],
+   "unigram_english_stopwords": [
+    [
+     0.9036530058131099,
+     "PP-SE3080-099",
+     "PP-SE3080-107",
+     "train",
+     "test"
+    ],
+    [
+     0.5927523364421915,
+     "PP-SE3060-015",
+     "PP-SE3060-045",
+     "train",
+     "validation"
+    ],
+    [
+     0.5716603348137821,
+     "PP-SE3030-061",
+     "PP-SE3030-079",
+     "train",
+     "test"
+    ],
+    [
+     0.5532749942461883,
+     "PP-SE3040-005",
+     "PP-SE3040-006",
+     "train",
+     "test"
+    ]
+   ],
+   "unigram_bigram": [
+    [
+     0.8335518112574581,
+     "PP-SE3080-099",
+     "PP-SE3080-107",
+     "train",
+     "test"
+    ],
+    [
+     0.5221806285748389,
+     "PP-SE3060-015",
+     "PP-SE3060-045",
+     "train",
+     "validation"
+    ],
+    [
+     0.4876421523276119,
+     "PP-SE3040-001",
+     "PP-SE3040-002",
+     "validation",
+     "train"
+    ],
+    [
+     0.45686730291798233,
+     "PP-SE3020-031",
+     "PP-SE3020-036",
+     "test",
+     "train"
+    ]
+   ],
+   "pair": {
+    "ids": [
+     "PP-SE3080-099",
+     "PP-SE3080-107"
+    ],
+    "splits": [
+     "train",
+     "test"
+    ],
+    "marks": [
+     "25",
+     "25"
+    ],
+    "jaccard_tokens": 0.742,
+    "len_chars": [
+     1511,
+     1637
+    ],
+    "text_a": "(Total Marks 25) Company XYZ owns an ERP system with 10 products with couple of hundred clients using them. All the products are integrated with each other. They could function standalone as well as combination of few to execute a task. Company has two major teams in working on in terms of releasing issue fixes and new features in to live environment for each products. \u2022 Application Management team - Focuses on weekly patches I hotfixes for issues to live environments. Consists of five developers and two QAs. \u2022 Product Development Team - Focuses on monthly feature releases to live environment quarterly. Consists of five developers and two QA. Each product team releases the features they deve",
+    "text_b": "(Total Marks 25) Company XYZ owns an ERP system with 10 products with couple of hundred clients using them. All the products are integrated with each other. They could function standalone as well as combination of few to execute a task. Company has two major teams in working on in terms of releasing issue fixes and new features in to live environment for each products. \u2022 Application Management team- Focuses on weekly patches I hotfixes to live environments. Consists of five developers and two QAs. \u2022 Product Development Team - Focuses on monthly feature releases to live environment quarterly. Consists of five developers and two QA. Each product team releases the product they develop after tes",
+    "expected_concepts_a": "[\"Java RMI\", \"remote object\", \"RMI registry\"]",
+    "expected_concepts_b": "[\"Java RMI\", \"remote object\", \"RMI registry\"]"
+   },
+   "FULL_answers": [
+    {
+     "question_id": "PP-SE3080-099",
+     "split": "train",
+     "student_answer": "The answer correctly addresses Java RMI and applies it to the requirement in the question. The answer correctly addresses remote object and applies it to the requirement in the question. RMI registry is explained accurately and connected to the requirement described in the question. The answer correctly addresses Java RMI and applies it to the requirement in the question."
+    },
+    {
+     "question_id": "PP-SE3080-107",
+     "split": "test",
+     "student_answer": "The answer correctly addresses Java RMI and applies it to the requirement in the question. remote object is explained accurately and connected to the requirement described in the question. The answer correctly addresses RMI registry and applies it to the requirement in the question. Java RMI is explained accurately and connected to the requirement described in the question. The answer correctly addresses Java RMI and applies it to the requirement in the question."
+    }
+   ]
+  },
+  "T3D": {
+   "columns": [
+    "answer_criterion_id",
+    "question_id",
+    "rubric_criterion_id",
+    "mapping_status",
+    "rule",
+    "answer_criterion_full_mark",
+    "rubric_criterion_marks",
+    "marks_agree",
+    "question_marks"
+   ],
+   "n": 487,
+   "status_counts": {
+    "RESOLVED": 96,
+    "UNRESOLVED": 391
+   },
+   "distinct_answer_criterion_ids": 487,
+   "resolved_independent": 96,
+   "unresolved_independent": 391,
+   "unresolved_suffix_distribution": {
+    "04": 86,
+    "05": 80,
+    "06": 29,
+    "03": 94,
+    "02": 95,
+    "07": 5,
+    "09": 1,
+    "08": 1
+   },
+   "unresolved_by_source_type": {
+    "synthetic": 205,
+    "past_paper": 186
+   },
+   "resolved_all_are_C01": true,
+   "eligible_questions_with_gt1_criterion": 95,
+   "rubric_file_rows_per_eligible_question": {
+    "1": 96
+   },
+   "criteria_per_answer_distribution": {
+    "7": 24,
+    "4": 36,
+    "6": 144,
+    "3": 48,
+    "5": 306,
+    "9": 6,
+    "2": 6,
+    "1": 6
+   },
+   "FULL_answers_whose_criterion_sum_equals_rubric_total": "96/96",
+   "re_keyed_rows": [
+    {
+     "record_id": "R-PP-SE3040-007-v2-C01",
+     "original_value": "PP-SE3040-007",
+     "repaired_value": "SYN-REPL-PP-SE3040-007"
+    },
+    {
+     "record_id": "R-PP-SE3070-012-C01",
+     "original_value": "PP-SE3070-012",
+     "repaired_value": "SYN-REPL-PP-SE3070-012"
+    },
+    {
+     "record_id": "R-PP-SE3070-022-C01",
+     "original_value": "PP-SE3070-022",
+     "repaired_value": "SYN-REPL-PP-SE3070-022"
+    },
+    {
+     "record_id": "R-PP-SE3070-025-C01",
+     "original_value": "PP-SE3070-025",
+     "repaired_value": "SYN-REPL-PP-SE3070-025"
+    },
+    {
+     "record_id": "R-PP-SE3020-035-C01",
+     "original_value": "PP-SE3020-035",
+     "repaired_value": "SYN-REPL-PP-SE3020-035"
+    },
+    {
+     "record_id": "R-PP-SE3020-040-C01",
+     "original_value": "PP-SE3020-040",
+     "repaired_value": "SYN-REPL-PP-SE3020-040"
+    },
+    {
+     "record_id": "R-PP-SE3050-109-C01",
+     "original_value": "PP-SE3050-109",
+     "repaired_value": "SYN-REPL-PP-SE3050-109"
+    },
+    {
+     "record_id": "R-SYN-SE3040-019-C01",
+     "original_value": "SYN-SE3040-019",
+     "repaired_value": "SYN-REPL-SYN-SE3040-019"
+    }
+   ]
+  },
+  "T3E": {
+   "columns": [
+    "answer_id",
+    "question_id",
+    "split",
+    "answer_quality",
+    "expected_mark",
+    "identical_to",
+    "review_status",
+    "reason",
+    "action"
+   ],
+   "rows": [
+    {
+     "answer_id": "SA-PP-SE3010-089-MOSTLY_CORRECT",
+     "question_id": "PP-SE3010-089",
+     "split": "train",
+     "answer_quality": "MOSTLY_CORRECT",
+     "expected_mark": "20.0"
+    },
+    {
+     "answer_id": "SA-PP-SE3010-089-PARTIAL",
+     "question_id": "PP-SE3010-089",
+     "split": "train",
+     "answer_quality": "PARTIAL",
+     "expected_mark": "20.0"
+    },
+    {
+     "answer_id": "SA-PP-SE3080-102-FULL",
+     "question_id": "PP-SE3080-102",
+     "split": "train",
+     "answer_quality": "FULL",
+     "expected_mark": "20.0"
+    },
+    {
+     "answer_id": "SA-PP-SE3080-102-PARTIAL",
+     "question_id": "PP-SE3080-102",
+     "split": "train",
+     "answer_quality": "PARTIAL",
+     "expected_mark": "20.0"
+    }
+   ],
+   "PP-SE3010-089": [
+    {
+     "answer_id": "SA-PP-SE3010-089-FULL",
+     "answer_quality": "FULL",
+     "expected_mark": "25.0"
+    },
+    {
+     "answer_id": "SA-PP-SE3010-089-MOSTLY_CORRECT",
+     "answer_quality": "MOSTLY_CORRECT",
+     "expected_mark": "20.0"
+    },
+    {
+     "answer_id": "SA-PP-SE3010-089-PARTIAL",
+     "answer_quality": "PARTIAL",
+     "expected_mark": "20.0"
+    },
+    {
+     "answer_id": "SA-PP-SE3010-089-MISSING_CONCEPT",
+     "answer_quality": "MISSING_CONCEPT",
+     "expected_mark": "20.0"
+    },
+    {
+     "answer_id": "SA-PP-SE3010-089-MISCONCEPTION",
+     "answer_quality": "MISCONCEPTION",
+     "expected_mark": "20.0"
+    },
+    {
+     "answer_id": "SA-PP-SE3010-089-IRRELEVANT",
+     "answer_quality": "IRRELEVANT",
+     "expected_mark": "0.0"
+    }
+   ],
+   "PP-SE3080-102": [
+    {
+     "answer_id": "SA-PP-SE3080-102-FULL",
+     "answer_quality": "FULL",
+     "expected_mark": "20.0"
+    },
+    {
+     "answer_id": "SA-PP-SE3080-102-MOSTLY_CORRECT",
+     "answer_quality": "MOSTLY_CORRECT",
+     "expected_mark": "0.0"
+    },
+    {
+     "answer_id": "SA-PP-SE3080-102-PARTIAL",
+     "answer_quality": "PARTIAL",
+     "expected_mark": "20.0"
+    },
+    {
+     "answer_id": "SA-PP-SE3080-102-MISSING_CONCEPT",
+     "answer_quality": "MISSING_CONCEPT",
+     "expected_mark": "0.0"
+    },
+    {
+     "answer_id": "SA-PP-SE3080-102-MISCONCEPTION",
+     "answer_quality": "MISCONCEPTION",
+     "expected_mark": "0.0"
+    },
+    {
+     "answer_id": "SA-PP-SE3080-102-IRRELEVANT",
+     "answer_quality": "IRRELEVANT",
+     "expected_mark": "0.0"
+    }
+   ],
+   "non_template_duplicate_strings": {
+    "strings": 6,
+    "answers": 13,
+    "cross_split_strings": 4,
+    "flagged_needs_review": 4
+   }
+  },
+  "T3F": {
+   "PP-SE3040-001": {
+    "marks": "100",
+    "split": "validation",
+    "scope_review": "True",
+    "keywords": [
+     "implement",
+     "web application",
+     "unit test",
+     "UI",
+     "REST",
+     "React",
+     "Spring",
+     "code"
+    ],
+    "marking_scheme_snippet": ""
+   },
+   "PP-SE3040-002": {
+    "marks": "100",
+    "split": "train",
+    "scope_review": "True",
+    "keywords": [
+     "implement",
+     "web application",
+     "unit test",
+     "UI",
+     "REST",
+     "React",
+     "Spring",
+     "code"
+    ],
+    "marking_scheme_snippet": "Allocation of marks is as follows; 1. Implementation ofUI for view categories and rooms belongs to a category. (Marks 24) 2. Implementation of get categories, get rooms, add rooms and get rooms belongs to a category service endpoints. (Marks 30) 3. Implementat"
+   },
+   "other_eligible_questions_with_code_or_diagram_keywords_INFERRED": [
+    [
+     "PP-SE3040-001",
+     "100",
+     "True",
+     [
+      "implementation of",
+      "unit test"
+     ]
+    ],
+    [
+     "PP-SE3040-002",
+     "100",
+     "True",
+     [
+      "implementation of",
+      "unit test"
+     ]
+    ],
+    [
+     "PP-SE3040-003",
+     "20",
+     "False",
+     [
+      "given code"
+     ]
+    ],
+    [
+     "PP-SE3040-009",
+     "100",
+     "False",
+     [
+      "implementation of",
+      "unit test"
+     ]
+    ],
+    [
+     "PP-SE3060-013",
+     "25",
+     "False",
+     [
+      "xquery"
+     ]
+    ],
+    [
+     "PP-SE3070-028",
+     "20",
+     "False",
+     [
+      "unit test"
+     ]
+    ],
+    [
+     "PP-SE3060-050",
+     "13",
+     "False",
+     [
+      "xquery"
+     ]
+    ],
+    [
+     "PP-SE3010-085",
+     "74",
+     "False",
+     [
+      "code snippet",
+      "following code"
+     ]
+    ],
+    [
+     "PP-SE3010-087",
+     "25",
+     "False",
+     [
+      "unit test"
+     ]
+    ],
+    [
+     "PP-SE3010-088",
+     "25",
+     "False",
+     [
+      "code snippet"
+     ]
+    ],
+    [
+     "PP-SE3010-095",
+     "50",
+     "False",
+     [
+      "unit test"
+     ]
+    ]
+   ]
+  }
+ },
+ "independent_part3_legacy_metrics": {
+  "legacy_settings": {
+   "n_rows": 150,
+   "not_evaluable": 0,
+   "failed_marking_calls": 15,
+   "failed_by_tier": {
+    "IRRELEVANT": 15
+   },
+   "failed_error_types": {
+    "RubricValidationError": 15
+   },
+   "failed_gold_marks": [
+    0.0
+   ],
+   "failed_max_marks": [
+    0.0
+   ],
+   "condition_e_failures_scored_0 (legacy)": {
+    "n": 150,
+    "mae": 4.64,
+    "rmse": 7.2203,
+    "r": 0.7243,
+    "within2": "84/150"
+   },
+   "baseline (token-overlap recall x answers.marks)": {
+    "n": 150,
+    "mae": 5.3694,
+    "rmse": 6.4778,
+    "r": 0.8194,
+    "within2": "37/150"
+   },
+   "condition_e_failures_EXCLUDED": {
+    "n": 135,
+    "mae": 5.1556,
+    "rmse": 7.6109,
+    "r": 0.7321,
+    "within2": "69/135"
+   },
+   "failure_rows_gold_equals_scored_zero": true
+  },
+  "like_for_like": {
+   "n_rows": 150,
+   "failed": 0,
+   "not_evaluable": 0,
+   "condition_e": {
+    "n": 150,
+    "mae": 5.9933,
+    "rmse": 7.7102,
+    "r": 0.6847,
+    "within2": "54/150"
+   },
+   "baseline": {
+    "n": 150,
+    "mae": 4.6374,
+    "rmse": 6.0498,
+    "r": 0.7587,
+    "within2": "60/150"
+   },
+   "fallback_rubric_answers": 12
+  },
+  "baseline_hunt_documented_5.609": {
+   "cosine x answers.marks": 4.6283,
+   "cosine x question marks": 4.805,
+   "cosine x answers.marks rounded2": 4.6285,
+   "token-recall x question marks": 4.6374
+  },
+  "raw_predictions_test_split.csv": {
+   "exists": true,
+   "columns": [
+    "index",
+    "answer_id",
+    "question_id",
+    "quality",
+    "max_marks",
+    "ground_truth_mark",
+    "predicted_mark",
+    "baseline_mark",
+    "pred_abs_error",
+    "base_abs_error",
+    "pred_pct",
+    "gt_pct",
+    "concept_precision",
+    "concept_recall",
+    "structural_feedback",
+    "structural_mindmap",
+    "latency_ms"
+   ],
+   "rows": 150,
+   "predicted_mark": 2.5467,
+   "pred_abs_error": 6.78,
+   "pred_pct": 61.06
+  }
+ }
+}

@@ -1,0 +1,20 @@
+# 08 Prioritised remediation plan (nothing below has been implemented; every item needs your approval)
+
+| # | Issue | Evidence | Impact | Proposed action | Approval |
+|---|---|---|---|---|---|
+| 1 | Hard check ratio-concentration 0.758 > 0.45 (val 1.0, test 0.917) | `03` §A; inherited from original labels | PP1 claims "validated" would be false; test/validation distributions are degenerate | (a) accept and disclose as a limitation of researcher-constructed labels (recommended), or (b) redefine/relax the metric with a written justification, or (c) re-label with new evidence (none exists) | Yes (research design) |
+| 2 | Condition E evaluated as a binary 0/full predictor; baseline definition differs from docs | `04` §1 | Misleading "E vs baseline" comparison | Re-run with agreed definitions; report both; disclose; adopt normalised MAE as primary | Yes |
+| 3 | No scoring levels; 391/487 criterion ids undescribed | `03` §D, `06` | Rubric-aware evaluation and B–F impossible | Choose O1 (mechanical, disclosed) now and O4 (author levels for 96 questions) for B–F; implement adapter | Yes |
+| 4 | A–F decision not recorded; docs still say deferred | `07` | Contradictory scope in viva | Record the decision/supervisor sign-off in `CLAIM_EVIDENCE_DECISION_LOG.md` | Yes |
+| 5 | Near-duplicate train/test pair PP-SE3080-099/107 (cosine 0.903, identical concepts/scenario) | `03` §C | Leakage risk in test results | Keep records; either report results with/without the pair, or move/quarantine one question (changes splits) | Yes |
+| 6 | PP-SE3080-102 inconsistent labels (PARTIAL = FULL, MOSTLY = 0); 4 same-text answers | `02`, `03` §E | Label noise in train | Quarantine the affected answers with reason or leave and flag; do not relabel | Yes |
+| 7 | Scope flags incomplete (PP-SE3040-009 and ≥ 8 other code/diagram items) | `03` §F | Unanswerable-as-text questions in the primary set | Extend `scope_review` flags; human decides exclusions | Yes |
+| 8 | 9 unflagged cross-question duplicate answers; 96 constant IRRELEVANT sentence | `02` | Learnable cue; inflated IRRELEVANT detection | Flag as template controls; report IRRELEVANT results separately | Yes |
+| 9 | ~29 stale docs/evidence pages/READMEs still show pre-repair figures or mock provider | agent C list (e.g. `C3_EXPERIMENT_METHODOLOGY.md`, `C3_MODEL_PROVIDER_SETUP.md`, `datasets/README.md`, `frontend/public/evidence_*.html`) | Contradictory evidence at PP1 | Add banners/rewrite; correct `.env.example:18`, `loader.py:22`; remove the unreproducible GBR claims for F | Yes (docs) |
+| 10 | Lint: ruff 111 findings under configured rules; ESLint 13 errors | `05` | Hygiene, no functional proof | Fix E501/W293 or relax E501 in config deliberately; fix unused vars | Yes |
+| 11 | Backend security/functional defects AUDIT-B1…B9, X1 (client-supplied rubric/answer key, no batch ownership, NoSQL operator injection, persistence failure masked, reopen finalized, override unbounded, forgeable token without `AUTH_SECRET`) | `backend/src/modules/c3/tests/c3_audit.test.js` todos | Security risk (separate from dataset) | Fix with the existing todo tests as acceptance | Yes |
+| 12 | `backend/seed_users.js` hard-codes demo credentials (untracked) | agent C | Credential risk if ever committed | Keep untracked or read from env | Your call |
+| 13 | Co-Authored-By trailer on 29 commits | `01` | Contributor display on GitHub | See decision row below | **Yes** |
+
+## Co-Authored-By trailer – separate decision (nothing done)
+29 commits (`f21dba4`…`8fdbdbd`) end with `Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>`. Removing it requires rewriting those commits and `git push --force-with-lease`, which changes their hashes for anyone who pulled the shared group branch. Safe procedure if you approve: (1) create a backup branch at the current tip, (2) confirm no teammate is working on this branch, (3) rewrite messages only (`git rebase`/`filter-branch --msg-filter`, author unchanged), (4) compare the tree hash before/after (must be identical), (5) force-with-lease push. Future commits will omit the trailer.
