@@ -113,8 +113,13 @@ class GeminiProvider(BaseLLMProvider):
         if request.response_format == "json":
             generation_config["responseMimeType"] = "application/json"
         budget = os.getenv("C3_GEMINI_THINKING_BUDGET")
+        level = os.getenv("C3_GEMINI_THINKING_LEVEL", "low").strip()
         if budget:
             generation_config["thinkingConfig"] = {"thinkingBudget": int(budget)}
+        elif model.startswith("gemini-3") and level:
+            # Gemini 3 models otherwise spend the whole output budget on hidden reasoning and return
+            # truncated JSON (finishReason=MAX_TOKENS) - verified live on the 3.x Flash models.
+            generation_config["thinkingConfig"] = {"thinkingLevel": level}
 
         payload = {
             "systemInstruction": {"parts": [{"text": request.system_prompt}]},
@@ -155,6 +160,14 @@ class GeminiProvider(BaseLLMProvider):
         if not raw_text:
             reason = data.get("promptFeedback", {}).get("blockReason") or finish
             return self._failure(model, start, f"Gemini returned no text (reason: {reason})", **common)
+
+        if finish == "MAX_TOKENS":
+            return self._failure(
+                model, start,
+                f"Gemini output truncated (finishReason=MAX_TOKENS, thoughts={meta.get('thoughtsTokenCount')}); "
+                "lower C3_GEMINI_THINKING_LEVEL or raise max_tokens",
+                raw_content=raw_text, **common,
+            )
 
         parsed = None
         if request.response_format == "json":

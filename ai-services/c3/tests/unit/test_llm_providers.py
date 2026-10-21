@@ -295,3 +295,33 @@ class TestFactory:
     def test_list_available_providers_has_no_mock(self):
         names = [p["provider"] for p in list_available_providers()]
         assert names == ["gemini", "openai", "local-ollama"]
+
+
+class TestGeminiThinkingControl:
+    """Regression: Gemini 3 models burned the whole output budget on hidden thinking -> truncated JSON."""
+
+    def test_gemini3_defaults_to_low_thinking_level(self, monkeypatch):
+        monkeypatch.delenv("C3_GEMINI_THINKING_LEVEL", raising=False)
+        monkeypatch.delenv("C3_GEMINI_THINKING_BUDGET", raising=False)
+        provider = GeminiProvider(api_key="k", model="gemini-3-flash-preview")
+        with patch("services.llm.gemini_provider.post_json_with_retry",
+                   return_value=(gemini_body('{"a": 1}'), 0)) as post:
+            provider.generate(LLMRequest(prompt="x"))
+        assert post.call_args.kwargs["payload"]["generationConfig"]["thinkingConfig"] == {"thinkingLevel": "low"}
+
+    def test_level_is_configurable_and_not_sent_to_gemini2(self, monkeypatch):
+        monkeypatch.setenv("C3_GEMINI_THINKING_LEVEL", "medium")
+        with patch("services.llm.gemini_provider.post_json_with_retry",
+                   return_value=(gemini_body('{"a": 1}'), 0)) as post:
+            GeminiProvider(api_key="k", model="gemini-3.6-flash").generate(LLMRequest(prompt="x"))
+            assert post.call_args.kwargs["payload"]["generationConfig"]["thinkingConfig"]["thinkingLevel"] == "medium"
+            GeminiProvider(api_key="k", model="gemini-2.5-flash").generate(LLMRequest(prompt="x"))
+            assert "thinkingConfig" not in post.call_args.kwargs["payload"]["generationConfig"]
+
+    def test_max_tokens_truncation_reports_cause_not_json_error(self):
+        body = gemini_body('{"x": "unterminated', finish="MAX_TOKENS")
+        body["usageMetadata"]["thoughtsTokenCount"] = 1963
+        with patch("services.llm.gemini_provider.post_json_with_retry", return_value=(body, 0)):
+            res = GeminiProvider(api_key="k", model="gemini-3-flash-preview").generate(LLMRequest(prompt="x"))
+        assert res.is_success is False
+        assert "truncated" in res.error_message and "thoughts=1963" in res.error_message
