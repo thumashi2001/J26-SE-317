@@ -124,7 +124,15 @@ export default function AssessmentPage() {
     };
 
     try {
-      const data = await assessAnswer(payload);
+      // Students only send their own answer: the question, rubric and answer key are held by the server.
+      const body = user?.role === 'student'
+        ? {
+            demo_id: selectedPresetId !== 'custom' ? selectedPresetId : undefined,
+            student_answer: studentAnswer.trim(),
+            selected_option_id: selectedOptionId || undefined,
+          }
+        : payload;
+      const data = await assessAnswer(body);
       setResult(data);
       setViewingHistoricalSubmission(null);
       // Refresh history silently
