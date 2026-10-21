@@ -1,5 +1,5 @@
 """
-AdaptiveLearnSE Component 3 — Real dense embedding providers (Gemini, OpenAI).
+AdaptiveLearnSE Component 3 — Real dense embedding providers (Gemini, OpenAI, local SBERT).
 
 Embeddings are produced by genuine remote embedding models; nothing is simulated. Vectors are
 validated (finite, consistent dimension) and L2-normalised so a dot product equals cosine
@@ -168,6 +168,46 @@ class OpenAIEmbedding(EmbeddingProvider):
         return [d["embedding"] for d in ordered]
 
 
+DEFAULT_LOCAL_EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
+
+
+class LocalSentenceTransformerEmbedding(EmbeddingProvider):
+    """Local SBERT-family embeddings (no API key, no network once the weights are cached).
+
+    Model comes from `C3_LOCAL_EMBEDDING_MODEL`. The weights are public pretrained SBERT weights, so this is a
+    real embedding model, not a simulation. Requires the optional `sentence-transformers` package.
+    """
+
+    provider_name = "local"
+
+    def __init__(self, model: str | None = None, cache_file: str | Path | None = None, device: str = "cpu"):
+        super().__init__(cache_file)
+        self.model = model or os.getenv("C3_LOCAL_EMBEDDING_MODEL", DEFAULT_LOCAL_EMBEDDING_MODEL)
+        self.device = device
+        self._encoder: Any = None
+
+    def is_available(self) -> bool:
+        try:
+            import sentence_transformers  # noqa: F401
+        except ImportError:
+            return False
+        return True
+
+    def _embed_batch(self, texts: list[str], task: str) -> list[list[float]]:
+        if self._encoder is None:
+            from sentence_transformers import SentenceTransformer
+
+            self._encoder = SentenceTransformer(self.model, device=self.device)
+        self.api_calls += 1
+        return self._encoder.encode(texts, batch_size=32, normalize_embeddings=True, show_progress_bar=False).tolist()
+
+    def diagnostics(self) -> dict[str, Any]:
+        info = super().diagnostics()
+        info["status"] = "ready" if self.is_available() else "missing_dependency: sentence-transformers"
+        info["runs_locally"] = True
+        return info
+
+
 def get_embedding_provider(name: str | None = None, cache_file: str | Path | None = None) -> EmbeddingProvider:
     """Build the configured dense embedding provider (C3_EMBEDDING_PROVIDER, default gemini)."""
     provider = (name or os.getenv("C3_EMBEDDING_PROVIDER", "gemini")).lower().strip()
@@ -175,4 +215,6 @@ def get_embedding_provider(name: str | None = None, cache_file: str | Path | Non
         return GeminiEmbedding(cache_file=cache_file)
     if provider == "openai":
         return OpenAIEmbedding(cache_file=cache_file)
-    raise EmbeddingError(f"Unsupported embedding provider '{provider}'. Supported: gemini, openai.")
+    if provider == "local":
+        return LocalSentenceTransformerEmbedding(cache_file=cache_file)
+    raise EmbeddingError(f"Unsupported embedding provider '{provider}'. Supported: gemini, openai, local.")
