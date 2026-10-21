@@ -1,0 +1,11 @@
+"""CLI: python datasets/validate_repaired.py <dir> [--json [path]]  (exit 1 when a hard check fails)."""
+
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+from datasets.repair.validate_repaired import main  # noqa: E402
+
+if __name__ == "__main__":
+    sys.exit(main())
