@@ -84,3 +84,11 @@ backend/responses.csv
 
 htmlcov/
 .coverage
+
+# Screenshots and evidence artifacts
+ss/
+docs/pp1/evidence/
+docs/pp1/screenshots/
+evidence/
+**/evidence/
+**/screenshots/
