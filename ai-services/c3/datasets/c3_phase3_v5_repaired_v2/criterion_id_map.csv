@@ -1,0 +1,488 @@
+answer_criterion_id,question_id,rubric_criterion_id,mapping_status,rule,answer_criterion_full_mark,rubric_criterion_marks,marks_agree,question_marks
+PP-SE3010-083-C01,PP-SE3010-083,R-PP-SE3010-083-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,8.0,25.0,False,25.0
+PP-SE3010-083-C02,PP-SE3010-083,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",6.0,,,25.0
+PP-SE3010-083-C03,PP-SE3010-083,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",8.0,,,25.0
+PP-SE3010-083-C04,PP-SE3010-083,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",3.0,,,25.0
+PP-SE3010-085-C01,PP-SE3010-085,R-PP-SE3010-085-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,12.5,74.0,False,74.0
+PP-SE3010-085-C02,PP-SE3010-085,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",12.5,,,74.0
+PP-SE3010-085-C03,PP-SE3010-085,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",12.5,,,74.0
+PP-SE3010-085-C04,PP-SE3010-085,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",12.5,,,74.0
+PP-SE3010-085-C05,PP-SE3010-085,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",12.0,,,74.0
+PP-SE3010-085-C06,PP-SE3010-085,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",12.0,,,74.0
+PP-SE3010-086-C01,PP-SE3010-086,R-PP-SE3010-086-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,4.5,25.0,False,25.0
+PP-SE3010-086-C02,PP-SE3010-086,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",4.5,,,25.0
+PP-SE3010-086-C03,PP-SE3010-086,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",4.0,,,25.0
+PP-SE3010-086-C04,PP-SE3010-086,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",4.0,,,25.0
+PP-SE3010-086-C05,PP-SE3010-086,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",4.0,,,25.0
+PP-SE3010-086-C06,PP-SE3010-086,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",4.0,,,25.0
+PP-SE3010-087-C01,PP-SE3010-087,R-PP-SE3010-087-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,6.0,25.0,False,25.0
+PP-SE3010-087-C02,PP-SE3010-087,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",6.0,,,25.0
+PP-SE3010-087-C03,PP-SE3010-087,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",6.0,,,25.0
+PP-SE3010-087-C04,PP-SE3010-087,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",7.0,,,25.0
+PP-SE3010-088-C01,PP-SE3010-088,R-PP-SE3010-088-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,4.5,25.0,False,25.0
+PP-SE3010-088-C02,PP-SE3010-088,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",4.5,,,25.0
+PP-SE3010-088-C03,PP-SE3010-088,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",4.0,,,25.0
+PP-SE3010-088-C04,PP-SE3010-088,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",4.0,,,25.0
+PP-SE3010-088-C05,PP-SE3010-088,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",4.0,,,25.0
+PP-SE3010-088-C06,PP-SE3010-088,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",4.0,,,25.0
+PP-SE3010-089-C01,PP-SE3010-089,R-PP-SE3010-089-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,5.0,25.0,False,25.0
+PP-SE3010-089-C02,PP-SE3010-089,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",20.0,,,25.0
+PP-SE3010-092-C01,PP-SE3010-092,R-PP-SE3010-092-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,8.0,25.0,False,25.0
+PP-SE3010-092-C02,PP-SE3010-092,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",6.0,,,25.0
+PP-SE3010-092-C03,PP-SE3010-092,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",6.0,,,25.0
+PP-SE3010-092-C04,PP-SE3010-092,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",5.0,,,25.0
+PP-SE3010-095-C01,PP-SE3010-095,R-PP-SE3010-095-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,8.5,50.0,False,50.0
+PP-SE3010-095-C02,PP-SE3010-095,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",8.5,,,50.0
+PP-SE3010-095-C03,PP-SE3010-095,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",8.5,,,50.0
+PP-SE3010-095-C04,PP-SE3010-095,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",8.5,,,50.0
+PP-SE3010-095-C05,PP-SE3010-095,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",8.0,,,50.0
+PP-SE3010-095-C06,PP-SE3010-095,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",8.0,,,50.0
+PP-SE3010-096-C01,PP-SE3010-096,R-PP-SE3010-096-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,4.0,20.0,False,20.0
+PP-SE3010-096-C02,PP-SE3010-096,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",4.0,,,20.0
+PP-SE3010-096-C03,PP-SE3010-096,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",4.0,,,20.0
+PP-SE3010-096-C04,PP-SE3010-096,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",4.0,,,20.0
+PP-SE3010-096-C05,PP-SE3010-096,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",4.0,,,20.0
+PP-SE3020-030-C01,PP-SE3020-030,R-PP-SE3020-030-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,3.0,12.0,False,12.0
+PP-SE3020-030-C02,PP-SE3020-030,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",4.0,,,12.0
+PP-SE3020-030-C03,PP-SE3020-030,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",5.0,,,12.0
+PP-SE3020-031-C01,PP-SE3020-031,R-PP-SE3020-031-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,2.0,12.0,False,12.0
+PP-SE3020-031-C02,PP-SE3020-031,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,12.0
+PP-SE3020-031-C03,PP-SE3020-031,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",4.0,,,12.0
+PP-SE3020-031-C04,PP-SE3020-031,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,12.0
+PP-SE3020-031-C05,PP-SE3020-031,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,12.0
+PP-SE3020-032-C01,PP-SE3020-032,R-PP-SE3020-032-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,5.0,12.0,False,12.0
+PP-SE3020-032-C02,PP-SE3020-032,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,12.0
+PP-SE3020-032-C03,PP-SE3020-032,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",1.0,,,12.0
+PP-SE3020-032-C04,PP-SE3020-032,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",4.0,,,12.0
+PP-SE3020-036-C01,PP-SE3020-036,R-PP-SE3020-036-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,2.0,25.0,False,25.0
+PP-SE3020-036-C02,PP-SE3020-036,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",8.0,,,25.0
+PP-SE3020-036-C03,PP-SE3020-036,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",8.0,,,25.0
+PP-SE3020-036-C04,PP-SE3020-036,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",4.0,,,25.0
+PP-SE3020-036-C05,PP-SE3020-036,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",3.0,,,25.0
+PP-SE3020-037-C01,PP-SE3020-037,R-PP-SE3020-037-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,3.0,15.0,False,15.0
+PP-SE3020-037-C02,PP-SE3020-037,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",6.0,,,15.0
+PP-SE3020-037-C03,PP-SE3020-037,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",6.0,,,15.0
+PP-SE3020-039-C01,PP-SE3020-039,R-PP-SE3020-039-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,3.0,11.0,False,11.0
+PP-SE3020-039-C02,PP-SE3020-039,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",4.0,,,11.0
+PP-SE3020-039-C03,PP-SE3020-039,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",4.0,,,11.0
+PP-SE3030-061-C01,PP-SE3030-061,R-PP-SE3030-061-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,3.0,35.0,False,35.0
+PP-SE3030-061-C02,PP-SE3030-061,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",4.0,,,35.0
+PP-SE3030-061-C03,PP-SE3030-061,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",3.0,,,35.0
+PP-SE3030-061-C04,PP-SE3030-061,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",4.0,,,35.0
+PP-SE3030-061-C05,PP-SE3030-061,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",5.0,,,35.0
+PP-SE3030-061-C06,PP-SE3030-061,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",3.0,,,35.0
+PP-SE3030-061-C07,PP-SE3030-061,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",5.0,,,35.0
+PP-SE3030-061-C08,PP-SE3030-061,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",5.0,,,35.0
+PP-SE3030-061-C09,PP-SE3030-061,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",3.0,,,35.0
+PP-SE3030-065-C01,PP-SE3030-065,R-PP-SE3030-065-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,4.5,25.0,False,25.0
+PP-SE3030-065-C02,PP-SE3030-065,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",4.5,,,25.0
+PP-SE3030-065-C03,PP-SE3030-065,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",4.0,,,25.0
+PP-SE3030-065-C04,PP-SE3030-065,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",4.0,,,25.0
+PP-SE3030-065-C05,PP-SE3030-065,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",4.0,,,25.0
+PP-SE3030-065-C06,PP-SE3030-065,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",4.0,,,25.0
+PP-SE3030-068-C01,PP-SE3030-068,R-PP-SE3030-068-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,4.0,30.0,False,30.0
+PP-SE3030-068-C02,PP-SE3030-068,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",5.0,,,30.0
+PP-SE3030-068-C03,PP-SE3030-068,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",4.0,,,30.0
+PP-SE3030-068-C04,PP-SE3030-068,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",6.0,,,30.0
+PP-SE3030-068-C05,PP-SE3030-068,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",3.0,,,30.0
+PP-SE3030-068-C06,PP-SE3030-068,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",4.0,,,30.0
+PP-SE3030-068-C07,PP-SE3030-068,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",4.0,,,30.0
+PP-SE3030-073-C01,PP-SE3030-073,R-PP-SE3030-073-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,3.0,20.0,False,20.0
+PP-SE3030-073-C02,PP-SE3030-073,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",4.0,,,20.0
+PP-SE3030-073-C03,PP-SE3030-073,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",4.0,,,20.0
+PP-SE3030-073-C04,PP-SE3030-073,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",5.0,,,20.0
+PP-SE3030-073-C05,PP-SE3030-073,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",4.0,,,20.0
+PP-SE3030-075-C01,PP-SE3030-075,R-PP-SE3030-075-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,4.0,25.0,False,25.0
+PP-SE3030-075-C02,PP-SE3030-075,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",5.0,,,25.0
+PP-SE3030-075-C03,PP-SE3030-075,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",6.0,,,25.0
+PP-SE3030-075-C04,PP-SE3030-075,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",6.0,,,25.0
+PP-SE3030-075-C05,PP-SE3030-075,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",4.0,,,25.0
+PP-SE3030-078-C01,PP-SE3030-078,R-PP-SE3030-078-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,10.0,22.0,False,22.0
+PP-SE3030-078-C02,PP-SE3030-078,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",6.0,,,22.0
+PP-SE3030-078-C03,PP-SE3030-078,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",6.0,,,22.0
+PP-SE3030-079-C01,PP-SE3030-079,R-PP-SE3030-079-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,4.0,25.0,False,25.0
+PP-SE3030-079-C02,PP-SE3030-079,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",4.0,,,25.0
+PP-SE3030-079-C03,PP-SE3030-079,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",5.0,,,25.0
+PP-SE3030-079-C04,PP-SE3030-079,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",4.0,,,25.0
+PP-SE3030-079-C05,PP-SE3030-079,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",4.0,,,25.0
+PP-SE3030-079-C06,PP-SE3030-079,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",4.0,,,25.0
+PP-SE3040-001-C01,PP-SE3040-001,R-PP-SE3040-001-v2-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,24.0,100.0,False,100.0
+PP-SE3040-001-C02,PP-SE3040-001,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",30.0,,,100.0
+PP-SE3040-001-C03,PP-SE3040-001,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",24.0,,,100.0
+PP-SE3040-001-C04,PP-SE3040-001,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",10.0,,,100.0
+PP-SE3040-001-C05,PP-SE3040-001,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",5.0,,,100.0
+PP-SE3040-001-C06,PP-SE3040-001,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,100.0
+PP-SE3040-001-C07,PP-SE3040-001,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",5.0,,,100.0
+PP-SE3040-002-C01,PP-SE3040-002,R-PP-SE3040-002-v2-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,24.0,100.0,False,100.0
+PP-SE3040-002-C02,PP-SE3040-002,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",30.0,,,100.0
+PP-SE3040-002-C03,PP-SE3040-002,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",24.0,,,100.0
+PP-SE3040-002-C04,PP-SE3040-002,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",10.0,,,100.0
+PP-SE3040-002-C05,PP-SE3040-002,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",5.0,,,100.0
+PP-SE3040-002-C06,PP-SE3040-002,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,100.0
+PP-SE3040-002-C07,PP-SE3040-002,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",5.0,,,100.0
+PP-SE3040-003-C01,PP-SE3040-003,R-PP-SE3040-003-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,5.0,20.0,False,20.0
+PP-SE3040-003-C02,PP-SE3040-003,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",8.0,,,20.0
+PP-SE3040-003-C03,PP-SE3040-003,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",3.0,,,20.0
+PP-SE3040-003-C04,PP-SE3040-003,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",4.0,,,20.0
+PP-SE3040-004-C01,PP-SE3040-004,R-PP-SE3040-004-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,3.0,20.0,False,20.0
+PP-SE3040-004-C02,PP-SE3040-004,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",3.0,,,20.0
+PP-SE3040-004-C03,PP-SE3040-004,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",4.0,,,20.0
+PP-SE3040-004-C04,PP-SE3040-004,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",3.0,,,20.0
+PP-SE3040-004-C05,PP-SE3040-004,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",4.0,,,20.0
+PP-SE3040-004-C06,PP-SE3040-004,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",3.0,,,20.0
+PP-SE3040-005-C01,PP-SE3040-005,R-PP-SE3040-005-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,10.0,25.0,False,25.0
+PP-SE3040-005-C02,PP-SE3040-005,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",10.0,,,25.0
+PP-SE3040-005-C03,PP-SE3040-005,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",5.0,,,25.0
+PP-SE3040-006-C01,PP-SE3040-006,R-PP-SE3040-006-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,5.0,25.0,False,25.0
+PP-SE3040-006-C02,PP-SE3040-006,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",5.0,,,25.0
+PP-SE3040-006-C03,PP-SE3040-006,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",5.0,,,25.0
+PP-SE3040-006-C04,PP-SE3040-006,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",5.0,,,25.0
+PP-SE3040-006-C05,PP-SE3040-006,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",5.0,,,25.0
+PP-SE3040-008-C01,PP-SE3040-008,R-PP-SE3040-008-v2-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,6.0,40.0,False,40.0
+PP-SE3040-008-C02,PP-SE3040-008,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",4.0,,,40.0
+PP-SE3040-008-C03,PP-SE3040-008,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",5.0,,,40.0
+PP-SE3040-008-C04,PP-SE3040-008,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",14.0,,,40.0
+PP-SE3040-008-C05,PP-SE3040-008,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",6.0,,,40.0
+PP-SE3040-008-C06,PP-SE3040-008,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",5.0,,,40.0
+PP-SE3040-009-C01,PP-SE3040-009,R-PP-SE3040-009-v2-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,24.0,100.0,False,100.0
+PP-SE3040-009-C02,PP-SE3040-009,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",30.0,,,100.0
+PP-SE3040-009-C03,PP-SE3040-009,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",24.0,,,100.0
+PP-SE3040-009-C04,PP-SE3040-009,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",10.0,,,100.0
+PP-SE3040-009-C05,PP-SE3040-009,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",5.0,,,100.0
+PP-SE3040-009-C06,PP-SE3040-009,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,100.0
+PP-SE3040-009-C07,PP-SE3040-009,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",5.0,,,100.0
+PP-SE3050-108-C01,PP-SE3050-108,R-PP-SE3050-108-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,10.0,30.0,False,30.0
+PP-SE3050-108-C02,PP-SE3050-108,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",10.0,,,30.0
+PP-SE3050-108-C03,PP-SE3050-108,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",10.0,,,30.0
+PP-SE3050-110-C01,PP-SE3050-110,R-PP-SE3050-110-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,10.0,30.0,False,30.0
+PP-SE3050-110-C02,PP-SE3050-110,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",6.0,,,30.0
+PP-SE3050-110-C03,PP-SE3050-110,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",4.0,,,30.0
+PP-SE3050-110-C04,PP-SE3050-110,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",4.0,,,30.0
+PP-SE3050-110-C05,PP-SE3050-110,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",6.0,,,30.0
+PP-SE3050-111-C01,PP-SE3050-111,R-PP-SE3050-111-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,3.0,30.0,False,30.0
+PP-SE3050-111-C02,PP-SE3050-111,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",3.0,,,30.0
+PP-SE3050-111-C03,PP-SE3050-111,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",10.0,,,30.0
+PP-SE3050-111-C04,PP-SE3050-111,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",6.0,,,30.0
+PP-SE3050-111-C05,PP-SE3050-111,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",4.0,,,30.0
+PP-SE3050-111-C06,PP-SE3050-111,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",4.0,,,30.0
+PP-SE3050-112-C01,PP-SE3050-112,R-PP-SE3050-112-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,4.0,30.0,False,30.0
+PP-SE3050-112-C02,PP-SE3050-112,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",9.0,,,30.0
+PP-SE3050-112-C03,PP-SE3050-112,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",6.0,,,30.0
+PP-SE3050-112-C04,PP-SE3050-112,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",6.0,,,30.0
+PP-SE3050-112-C05,PP-SE3050-112,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",5.0,,,30.0
+PP-SE3060-013-C01,PP-SE3060-013,R-PP-SE3060-013-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,3.0,25.0,False,25.0
+PP-SE3060-013-C02,PP-SE3060-013,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",4.0,,,25.0
+PP-SE3060-013-C03,PP-SE3060-013,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",4.0,,,25.0
+PP-SE3060-013-C04,PP-SE3060-013,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",6.0,,,25.0
+PP-SE3060-013-C05,PP-SE3060-013,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",8.0,,,25.0
+PP-SE3060-015-C01,PP-SE3060-015,R-PP-SE3060-015-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,6.0,35.0,False,35.0
+PP-SE3060-015-C02,PP-SE3060-015,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",6.0,,,35.0
+PP-SE3060-015-C03,PP-SE3060-015,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",6.0,,,35.0
+PP-SE3060-015-C04,PP-SE3060-015,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",6.0,,,35.0
+PP-SE3060-015-C05,PP-SE3060-015,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",5.5,,,35.0
+PP-SE3060-015-C06,PP-SE3060-015,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",5.5,,,35.0
+PP-SE3060-045-C01,PP-SE3060-045,R-PP-SE3060-045-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,4.5,25.0,False,25.0
+PP-SE3060-045-C02,PP-SE3060-045,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",4.5,,,25.0
+PP-SE3060-045-C03,PP-SE3060-045,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",4.0,,,25.0
+PP-SE3060-045-C04,PP-SE3060-045,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",4.0,,,25.0
+PP-SE3060-045-C05,PP-SE3060-045,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",4.0,,,25.0
+PP-SE3060-045-C06,PP-SE3060-045,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",4.0,,,25.0
+PP-SE3060-050-C01,PP-SE3060-050,R-PP-SE3060-050-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,3.0,13.0,False,13.0
+PP-SE3060-050-C02,PP-SE3060-050,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",4.0,,,13.0
+PP-SE3060-050-C03,PP-SE3060-050,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",6.0,,,13.0
+PP-SE3060-051-C01,PP-SE3060-051,R-PP-SE3060-051-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,4.0,15.0,False,15.0
+PP-SE3060-051-C02,PP-SE3060-051,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",5.0,,,15.0
+PP-SE3060-051-C03,PP-SE3060-051,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",6.0,,,15.0
+PP-SE3060-055-C01,PP-SE3060-055,R-PP-SE3060-055-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,12.0,60.0,False,60.0
+PP-SE3060-055-C02,PP-SE3060-055,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",12.0,,,60.0
+PP-SE3060-055-C03,PP-SE3060-055,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",12.0,,,60.0
+PP-SE3060-055-C04,PP-SE3060-055,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",12.0,,,60.0
+PP-SE3060-055-C05,PP-SE3060-055,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",12.0,,,60.0
+PP-SE3070-028-C01,PP-SE3070-028,R-PP-SE3070-028-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,3.5,20.0,False,20.0
+PP-SE3070-028-C02,PP-SE3070-028,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",3.5,,,20.0
+PP-SE3070-028-C03,PP-SE3070-028,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",3.5,,,20.0
+PP-SE3070-028-C04,PP-SE3070-028,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",3.5,,,20.0
+PP-SE3070-028-C05,PP-SE3070-028,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",3.0,,,20.0
+PP-SE3070-028-C06,PP-SE3070-028,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",3.0,,,20.0
+PP-SE3080-097-C01,PP-SE3080-097,R-PP-SE3080-097-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,4.5,25.0,False,25.0
+PP-SE3080-097-C02,PP-SE3080-097,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",4.5,,,25.0
+PP-SE3080-097-C03,PP-SE3080-097,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",4.0,,,25.0
+PP-SE3080-097-C04,PP-SE3080-097,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",4.0,,,25.0
+PP-SE3080-097-C05,PP-SE3080-097,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",4.0,,,25.0
+PP-SE3080-097-C06,PP-SE3080-097,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",4.0,,,25.0
+PP-SE3080-099-C01,PP-SE3080-099,R-PP-SE3080-099-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,5.0,25.0,False,25.0
+PP-SE3080-099-C02,PP-SE3080-099,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",6.0,,,25.0
+PP-SE3080-099-C03,PP-SE3080-099,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",6.0,,,25.0
+PP-SE3080-099-C04,PP-SE3080-099,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",8.0,,,25.0
+PP-SE3080-100-C01,PP-SE3080-100,R-PP-SE3080-100-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,5.0,30.0,False,30.0
+PP-SE3080-100-C02,PP-SE3080-100,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",5.0,,,30.0
+PP-SE3080-100-C03,PP-SE3080-100,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",5.0,,,30.0
+PP-SE3080-100-C04,PP-SE3080-100,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",5.0,,,30.0
+PP-SE3080-100-C05,PP-SE3080-100,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",5.0,,,30.0
+PP-SE3080-100-C06,PP-SE3080-100,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",5.0,,,30.0
+PP-SE3080-102-C01,PP-SE3080-102,R-PP-SE3080-102-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,20.0,20.0,True,20.0
+PP-SE3080-104-C01,PP-SE3080-104,R-PP-SE3080-104-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,2.5,13.0,False,13.0
+PP-SE3080-104-C02,PP-SE3080-104,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.5,,,13.0
+PP-SE3080-104-C03,PP-SE3080-104,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,13.0
+PP-SE3080-104-C04,PP-SE3080-104,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,13.0
+PP-SE3080-104-C05,PP-SE3080-104,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,13.0
+PP-SE3080-104-C06,PP-SE3080-104,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,13.0
+PP-SE3080-107-C01,PP-SE3080-107,R-PP-SE3080-107-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,3.0,25.0,False,25.0
+PP-SE3080-107-C02,PP-SE3080-107,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",5.0,,,25.0
+PP-SE3080-107-C03,PP-SE3080-107,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",5.0,,,25.0
+PP-SE3080-107-C04,PP-SE3080-107,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",7.0,,,25.0
+PP-SE3080-107-C05,PP-SE3080-107,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",5.0,,,25.0
+SYN-SE3010-001-C01,SYN-SE3010-001,R-SYN-SE3010-001-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,2.0,10.0,False,10.0
+SYN-SE3010-001-C02,SYN-SE3010-001,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3010-001-C03,SYN-SE3010-001,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3010-001-C04,SYN-SE3010-001,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3010-001-C05,SYN-SE3010-001,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3010-002-C01,SYN-SE3010-002,R-SYN-SE3010-002-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,2.0,10.0,False,10.0
+SYN-SE3010-002-C02,SYN-SE3010-002,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3010-002-C03,SYN-SE3010-002,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3010-002-C04,SYN-SE3010-002,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3010-002-C05,SYN-SE3010-002,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3010-003-C01,SYN-SE3010-003,R-SYN-SE3010-003-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,2.0,10.0,False,10.0
+SYN-SE3010-003-C02,SYN-SE3010-003,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3010-003-C03,SYN-SE3010-003,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3010-003-C04,SYN-SE3010-003,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3010-003-C05,SYN-SE3010-003,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3010-004-C01,SYN-SE3010-004,R-SYN-SE3010-004-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,2.0,10.0,False,10.0
+SYN-SE3010-004-C02,SYN-SE3010-004,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3010-004-C03,SYN-SE3010-004,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3010-004-C04,SYN-SE3010-004,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3010-004-C05,SYN-SE3010-004,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3010-005-C01,SYN-SE3010-005,R-SYN-SE3010-005-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,2.0,10.0,False,10.0
+SYN-SE3010-005-C02,SYN-SE3010-005,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3010-005-C03,SYN-SE3010-005,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3010-005-C04,SYN-SE3010-005,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3010-005-C05,SYN-SE3010-005,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3010-006-C01,SYN-SE3010-006,R-SYN-SE3010-006-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,2.0,10.0,False,10.0
+SYN-SE3010-006-C02,SYN-SE3010-006,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3010-006-C03,SYN-SE3010-006,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3010-006-C04,SYN-SE3010-006,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3010-006-C05,SYN-SE3010-006,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3020-007-C01,SYN-SE3020-007,R-SYN-SE3020-007-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,2.0,10.0,False,10.0
+SYN-SE3020-007-C02,SYN-SE3020-007,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3020-007-C03,SYN-SE3020-007,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3020-007-C04,SYN-SE3020-007,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3020-007-C05,SYN-SE3020-007,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3020-008-C01,SYN-SE3020-008,R-SYN-SE3020-008-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,2.0,10.0,False,10.0
+SYN-SE3020-008-C02,SYN-SE3020-008,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3020-008-C03,SYN-SE3020-008,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3020-008-C04,SYN-SE3020-008,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3020-008-C05,SYN-SE3020-008,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3020-009-C01,SYN-SE3020-009,R-SYN-SE3020-009-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,2.0,10.0,False,10.0
+SYN-SE3020-009-C02,SYN-SE3020-009,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3020-009-C03,SYN-SE3020-009,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3020-009-C04,SYN-SE3020-009,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3020-009-C05,SYN-SE3020-009,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3020-010-C01,SYN-SE3020-010,R-SYN-SE3020-010-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,2.0,10.0,False,10.0
+SYN-SE3020-010-C02,SYN-SE3020-010,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3020-010-C03,SYN-SE3020-010,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3020-010-C04,SYN-SE3020-010,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3020-010-C05,SYN-SE3020-010,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3020-011-C01,SYN-SE3020-011,R-SYN-SE3020-011-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,2.0,10.0,False,10.0
+SYN-SE3020-011-C02,SYN-SE3020-011,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3020-011-C03,SYN-SE3020-011,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",1.5,,,10.0
+SYN-SE3020-011-C04,SYN-SE3020-011,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",1.5,,,10.0
+SYN-SE3020-011-C05,SYN-SE3020-011,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",1.5,,,10.0
+SYN-SE3020-011-C06,SYN-SE3020-011,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",1.5,,,10.0
+SYN-SE3020-012-C01,SYN-SE3020-012,R-SYN-SE3020-012-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,2.0,10.0,False,10.0
+SYN-SE3020-012-C02,SYN-SE3020-012,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3020-012-C03,SYN-SE3020-012,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3020-012-C04,SYN-SE3020-012,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3020-012-C05,SYN-SE3020-012,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3030-013-C01,SYN-SE3030-013,R-SYN-SE3030-013-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,2.0,10.0,False,10.0
+SYN-SE3030-013-C02,SYN-SE3030-013,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3030-013-C03,SYN-SE3030-013,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3030-013-C04,SYN-SE3030-013,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3030-013-C05,SYN-SE3030-013,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3030-014-C01,SYN-SE3030-014,R-SYN-SE3030-014-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,2.0,10.0,False,10.0
+SYN-SE3030-014-C02,SYN-SE3030-014,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3030-014-C03,SYN-SE3030-014,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3030-014-C04,SYN-SE3030-014,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3030-014-C05,SYN-SE3030-014,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3030-015-C01,SYN-SE3030-015,R-SYN-SE3030-015-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,2.0,10.0,False,10.0
+SYN-SE3030-015-C02,SYN-SE3030-015,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3030-015-C03,SYN-SE3030-015,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3030-015-C04,SYN-SE3030-015,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3030-015-C05,SYN-SE3030-015,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3030-016-C01,SYN-SE3030-016,R-SYN-SE3030-016-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,2.0,10.0,False,10.0
+SYN-SE3030-016-C02,SYN-SE3030-016,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3030-016-C03,SYN-SE3030-016,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3030-016-C04,SYN-SE3030-016,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3030-016-C05,SYN-SE3030-016,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3030-017-C01,SYN-SE3030-017,R-SYN-SE3030-017-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,2.0,10.0,False,10.0
+SYN-SE3030-017-C02,SYN-SE3030-017,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3030-017-C03,SYN-SE3030-017,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",1.5,,,10.0
+SYN-SE3030-017-C04,SYN-SE3030-017,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",1.5,,,10.0
+SYN-SE3030-017-C05,SYN-SE3030-017,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",1.5,,,10.0
+SYN-SE3030-017-C06,SYN-SE3030-017,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",1.5,,,10.0
+SYN-SE3030-018-C01,SYN-SE3030-018,R-SYN-SE3030-018-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,2.0,10.0,False,10.0
+SYN-SE3030-018-C02,SYN-SE3030-018,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3030-018-C03,SYN-SE3030-018,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3030-018-C04,SYN-SE3030-018,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3030-018-C05,SYN-SE3030-018,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3040-020-C01,SYN-SE3040-020,R-SYN-SE3040-020-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,2.0,10.0,False,10.0
+SYN-SE3040-020-C02,SYN-SE3040-020,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3040-020-C03,SYN-SE3040-020,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3040-020-C04,SYN-SE3040-020,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3040-020-C05,SYN-SE3040-020,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3040-021-C01,SYN-SE3040-021,R-SYN-SE3040-021-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,2.0,10.0,False,10.0
+SYN-SE3040-021-C02,SYN-SE3040-021,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3040-021-C03,SYN-SE3040-021,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3040-021-C04,SYN-SE3040-021,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3040-021-C05,SYN-SE3040-021,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3040-022-C01,SYN-SE3040-022,R-SYN-SE3040-022-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,2.0,10.0,False,10.0
+SYN-SE3040-022-C02,SYN-SE3040-022,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3040-022-C03,SYN-SE3040-022,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3040-022-C04,SYN-SE3040-022,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3040-022-C05,SYN-SE3040-022,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3040-023-C01,SYN-SE3040-023,R-SYN-SE3040-023-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,2.0,10.0,False,10.0
+SYN-SE3040-023-C02,SYN-SE3040-023,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3040-023-C03,SYN-SE3040-023,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3040-023-C04,SYN-SE3040-023,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3040-023-C05,SYN-SE3040-023,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3040-024-C01,SYN-SE3040-024,R-SYN-SE3040-024-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,2.0,10.0,False,10.0
+SYN-SE3040-024-C02,SYN-SE3040-024,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3040-024-C03,SYN-SE3040-024,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3040-024-C04,SYN-SE3040-024,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3040-024-C05,SYN-SE3040-024,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3050-025-C01,SYN-SE3050-025,R-SYN-SE3050-025-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,2.0,10.0,False,10.0
+SYN-SE3050-025-C02,SYN-SE3050-025,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3050-025-C03,SYN-SE3050-025,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",1.5,,,10.0
+SYN-SE3050-025-C04,SYN-SE3050-025,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",1.5,,,10.0
+SYN-SE3050-025-C05,SYN-SE3050-025,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",1.5,,,10.0
+SYN-SE3050-025-C06,SYN-SE3050-025,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",1.5,,,10.0
+SYN-SE3050-026-C01,SYN-SE3050-026,R-SYN-SE3050-026-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,2.0,10.0,False,10.0
+SYN-SE3050-026-C02,SYN-SE3050-026,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3050-026-C03,SYN-SE3050-026,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",1.5,,,10.0
+SYN-SE3050-026-C04,SYN-SE3050-026,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",1.5,,,10.0
+SYN-SE3050-026-C05,SYN-SE3050-026,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",1.5,,,10.0
+SYN-SE3050-026-C06,SYN-SE3050-026,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",1.5,,,10.0
+SYN-SE3050-027-C01,SYN-SE3050-027,R-SYN-SE3050-027-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,2.0,10.0,False,10.0
+SYN-SE3050-027-C02,SYN-SE3050-027,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3050-027-C03,SYN-SE3050-027,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3050-027-C04,SYN-SE3050-027,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3050-027-C05,SYN-SE3050-027,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3050-028-C01,SYN-SE3050-028,R-SYN-SE3050-028-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,2.0,10.0,False,10.0
+SYN-SE3050-028-C02,SYN-SE3050-028,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3050-028-C03,SYN-SE3050-028,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3050-028-C04,SYN-SE3050-028,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3050-028-C05,SYN-SE3050-028,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3050-029-C01,SYN-SE3050-029,R-SYN-SE3050-029-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,2.0,10.0,False,10.0
+SYN-SE3050-029-C02,SYN-SE3050-029,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3050-029-C03,SYN-SE3050-029,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3050-029-C04,SYN-SE3050-029,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3050-029-C05,SYN-SE3050-029,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3050-030-C01,SYN-SE3050-030,R-SYN-SE3050-030-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,2.0,10.0,False,10.0
+SYN-SE3050-030-C02,SYN-SE3050-030,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3050-030-C03,SYN-SE3050-030,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3050-030-C04,SYN-SE3050-030,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3050-030-C05,SYN-SE3050-030,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3050-031-C01,SYN-SE3050-031,R-SYN-SE3050-031-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,2.0,10.0,False,10.0
+SYN-SE3050-031-C02,SYN-SE3050-031,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3050-031-C03,SYN-SE3050-031,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3050-031-C04,SYN-SE3050-031,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3050-031-C05,SYN-SE3050-031,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3060-032-C01,SYN-SE3060-032,R-SYN-SE3060-032-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,2.0,10.0,False,10.0
+SYN-SE3060-032-C02,SYN-SE3060-032,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3060-032-C03,SYN-SE3060-032,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3060-032-C04,SYN-SE3060-032,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3060-032-C05,SYN-SE3060-032,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3060-034-C01,SYN-SE3060-034,R-SYN-SE3060-034-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,2.0,10.0,False,10.0
+SYN-SE3060-034-C02,SYN-SE3060-034,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3060-034-C03,SYN-SE3060-034,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3060-034-C04,SYN-SE3060-034,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3060-034-C05,SYN-SE3060-034,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3060-035-C01,SYN-SE3060-035,R-SYN-SE3060-035-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,2.0,10.0,False,10.0
+SYN-SE3060-035-C02,SYN-SE3060-035,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3060-035-C03,SYN-SE3060-035,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3060-035-C04,SYN-SE3060-035,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3060-035-C05,SYN-SE3060-035,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3060-036-C01,SYN-SE3060-036,R-SYN-SE3060-036-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,2.0,10.0,False,10.0
+SYN-SE3060-036-C02,SYN-SE3060-036,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3060-036-C03,SYN-SE3060-036,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",1.5,,,10.0
+SYN-SE3060-036-C04,SYN-SE3060-036,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",1.5,,,10.0
+SYN-SE3060-036-C05,SYN-SE3060-036,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",1.5,,,10.0
+SYN-SE3060-036-C06,SYN-SE3060-036,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",1.5,,,10.0
+SYN-SE3060-037-C01,SYN-SE3060-037,R-SYN-SE3060-037-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,2.0,10.0,False,10.0
+SYN-SE3060-037-C02,SYN-SE3060-037,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3060-037-C03,SYN-SE3060-037,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",1.5,,,10.0
+SYN-SE3060-037-C04,SYN-SE3060-037,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",1.5,,,10.0
+SYN-SE3060-037-C05,SYN-SE3060-037,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",1.5,,,10.0
+SYN-SE3060-037-C06,SYN-SE3060-037,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",1.5,,,10.0
+SYN-SE3070-038-C01,SYN-SE3070-038,R-SYN-SE3070-038-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,2.0,10.0,False,10.0
+SYN-SE3070-038-C02,SYN-SE3070-038,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3070-038-C03,SYN-SE3070-038,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3070-038-C04,SYN-SE3070-038,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3070-038-C05,SYN-SE3070-038,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3070-039-C01,SYN-SE3070-039,R-SYN-SE3070-039-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,2.0,10.0,False,10.0
+SYN-SE3070-039-C02,SYN-SE3070-039,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3070-039-C03,SYN-SE3070-039,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3070-039-C04,SYN-SE3070-039,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3070-039-C05,SYN-SE3070-039,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3070-040-C01,SYN-SE3070-040,R-SYN-SE3070-040-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,2.0,10.0,False,10.0
+SYN-SE3070-040-C02,SYN-SE3070-040,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3070-040-C03,SYN-SE3070-040,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3070-040-C04,SYN-SE3070-040,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3070-040-C05,SYN-SE3070-040,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3070-041-C01,SYN-SE3070-041,R-SYN-SE3070-041-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,2.0,10.0,False,10.0
+SYN-SE3070-041-C02,SYN-SE3070-041,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3070-041-C03,SYN-SE3070-041,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3070-041-C04,SYN-SE3070-041,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3070-041-C05,SYN-SE3070-041,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3070-042-C01,SYN-SE3070-042,R-SYN-SE3070-042-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,2.0,10.0,False,10.0
+SYN-SE3070-042-C02,SYN-SE3070-042,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3070-042-C03,SYN-SE3070-042,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3070-042-C04,SYN-SE3070-042,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3070-042-C05,SYN-SE3070-042,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3070-043-C01,SYN-SE3070-043,R-SYN-SE3070-043-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,2.0,10.0,False,10.0
+SYN-SE3070-043-C02,SYN-SE3070-043,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3070-043-C03,SYN-SE3070-043,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3070-043-C04,SYN-SE3070-043,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3070-043-C05,SYN-SE3070-043,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3070-044-C01,SYN-SE3070-044,R-SYN-SE3070-044-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,2.0,10.0,False,10.0
+SYN-SE3070-044-C02,SYN-SE3070-044,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3070-044-C03,SYN-SE3070-044,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",1.5,,,10.0
+SYN-SE3070-044-C04,SYN-SE3070-044,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",1.5,,,10.0
+SYN-SE3070-044-C05,SYN-SE3070-044,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",1.5,,,10.0
+SYN-SE3070-044-C06,SYN-SE3070-044,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",1.5,,,10.0
+SYN-SE3080-045-C01,SYN-SE3080-045,R-SYN-SE3080-045-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,2.0,10.0,False,10.0
+SYN-SE3080-045-C02,SYN-SE3080-045,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3080-045-C03,SYN-SE3080-045,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",1.5,,,10.0
+SYN-SE3080-045-C04,SYN-SE3080-045,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",1.5,,,10.0
+SYN-SE3080-045-C05,SYN-SE3080-045,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",1.5,,,10.0
+SYN-SE3080-045-C06,SYN-SE3080-045,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",1.5,,,10.0
+SYN-SE3080-046-C01,SYN-SE3080-046,R-SYN-SE3080-046-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,2.0,10.0,False,10.0
+SYN-SE3080-046-C02,SYN-SE3080-046,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3080-046-C03,SYN-SE3080-046,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3080-046-C04,SYN-SE3080-046,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3080-046-C05,SYN-SE3080-046,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3080-047-C01,SYN-SE3080-047,R-SYN-SE3080-047-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,2.0,10.0,False,10.0
+SYN-SE3080-047-C02,SYN-SE3080-047,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3080-047-C03,SYN-SE3080-047,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3080-047-C04,SYN-SE3080-047,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3080-047-C05,SYN-SE3080-047,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3080-048-C01,SYN-SE3080-048,R-SYN-SE3080-048-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,2.0,10.0,False,10.0
+SYN-SE3080-048-C02,SYN-SE3080-048,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3080-048-C03,SYN-SE3080-048,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3080-048-C04,SYN-SE3080-048,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3080-048-C05,SYN-SE3080-048,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3080-049-C01,SYN-SE3080-049,R-SYN-SE3080-049-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,2.0,10.0,False,10.0
+SYN-SE3080-049-C02,SYN-SE3080-049,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3080-049-C03,SYN-SE3080-049,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3080-049-C04,SYN-SE3080-049,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3080-049-C05,SYN-SE3080-049,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3080-050-C01,SYN-SE3080-050,R-SYN-SE3080-050-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,2.0,10.0,False,10.0
+SYN-SE3080-050-C02,SYN-SE3080-050,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3080-050-C03,SYN-SE3080-050,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3080-050-C04,SYN-SE3080-050,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3080-050-C05,SYN-SE3080-050,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3080-051-C01,SYN-SE3080-051,R-SYN-SE3080-051-C01,RESOLVED,normalised id: strip 'R-' prefix and '-vN' infix; same question and Cnn,2.0,10.0,False,10.0
+SYN-SE3080-051-C02,SYN-SE3080-051,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",2.0,,,10.0
+SYN-SE3080-051-C03,SYN-SE3080-051,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",1.5,,,10.0
+SYN-SE3080-051-C04,SYN-SE3080-051,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",1.5,,,10.0
+SYN-SE3080-051-C05,SYN-SE3080-051,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",1.5,,,10.0
+SYN-SE3080-051-C06,SYN-SE3080-051,,UNRESOLVED,"no rubric row with the same normalised (question, Cnn) key",1.5,,,10.0

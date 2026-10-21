@@ -1,0 +1,19 @@
+answer_id,question_id,split,reason
+SA-PP-SE3040-009-FULL,PP-SE3040-009,train,code/diagram-dependent question cannot be assessed from text alone (scope review)
+SA-PP-SE3040-009-MOSTLY_CORRECT,PP-SE3040-009,train,code/diagram-dependent question cannot be assessed from text alone (scope review)
+SA-PP-SE3040-009-PARTIAL,PP-SE3040-009,train,code/diagram-dependent question cannot be assessed from text alone (scope review)
+SA-PP-SE3040-009-MISSING_CONCEPT,PP-SE3040-009,train,code/diagram-dependent question cannot be assessed from text alone (scope review)
+SA-PP-SE3040-009-MISCONCEPTION,PP-SE3040-009,train,code/diagram-dependent question cannot be assessed from text alone (scope review)
+SA-PP-SE3040-009-IRRELEVANT,PP-SE3040-009,train,code/diagram-dependent question cannot be assessed from text alone (scope review)
+SA-PP-SE3080-099-FULL,PP-SE3080-099,train,cross-split near-duplicate of test question PP-SE3080-107 (cosine 0.903 > 0.8); train copy removed so the test split is unchanged
+SA-PP-SE3080-099-MOSTLY_CORRECT,PP-SE3080-099,train,cross-split near-duplicate of test question PP-SE3080-107 (cosine 0.903 > 0.8); train copy removed so the test split is unchanged
+SA-PP-SE3080-099-PARTIAL,PP-SE3080-099,train,cross-split near-duplicate of test question PP-SE3080-107 (cosine 0.903 > 0.8); train copy removed so the test split is unchanged
+SA-PP-SE3080-099-MISSING_CONCEPT,PP-SE3080-099,train,cross-split near-duplicate of test question PP-SE3080-107 (cosine 0.903 > 0.8); train copy removed so the test split is unchanged
+SA-PP-SE3080-099-MISCONCEPTION,PP-SE3080-099,train,cross-split near-duplicate of test question PP-SE3080-107 (cosine 0.903 > 0.8); train copy removed so the test split is unchanged
+SA-PP-SE3080-099-IRRELEVANT,PP-SE3080-099,train,cross-split near-duplicate of test question PP-SE3080-107 (cosine 0.903 > 0.8); train copy removed so the test split is unchanged
+SA-PP-SE3080-102-FULL,PP-SE3080-102,train,anomalous labels: PARTIAL scored equal to FULL and MOSTLY_CORRECT scored 0 with identical answer strings (see review_queue.csv)
+SA-PP-SE3080-102-MOSTLY_CORRECT,PP-SE3080-102,train,anomalous labels: PARTIAL scored equal to FULL and MOSTLY_CORRECT scored 0 with identical answer strings (see review_queue.csv)
+SA-PP-SE3080-102-PARTIAL,PP-SE3080-102,train,anomalous labels: PARTIAL scored equal to FULL and MOSTLY_CORRECT scored 0 with identical answer strings (see review_queue.csv)
+SA-PP-SE3080-102-MISSING_CONCEPT,PP-SE3080-102,train,anomalous labels: PARTIAL scored equal to FULL and MOSTLY_CORRECT scored 0 with identical answer strings (see review_queue.csv)
+SA-PP-SE3080-102-MISCONCEPTION,PP-SE3080-102,train,anomalous labels: PARTIAL scored equal to FULL and MOSTLY_CORRECT scored 0 with identical answer strings (see review_queue.csv)
+SA-PP-SE3080-102-IRRELEVANT,PP-SE3080-102,train,anomalous labels: PARTIAL scored equal to FULL and MOSTLY_CORRECT scored 0 with identical answer strings (see review_queue.csv)
