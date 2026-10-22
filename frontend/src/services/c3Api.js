@@ -1,8 +1,19 @@
 import { api } from './apiClient.js';
 
 /**
- * Execute C3 End-to-End Automated Assessment Pipeline
- * (F1 Answer Processing -> F2 Rubric Marking -> F3 Feedback -> F4 Mind Map)
+ * Assessments a student can answer: the question and options only (never answer keys, rubrics or reference answers).
+ * @returns {Promise<{ assessments: Array }>}
+ */
+export const listAssessments = () => api('/c3/assessments');
+
+/**
+ * Example setups with keys and rubrics (lecturer/admin only).
+ * @returns {Promise<{ examples: Array }>}
+ */
+export const listExamples = () => api('/c3/examples');
+
+/**
+ * Mark one answer and save it for lecturer review.
  *
  * @param {Object} payload - AssessmentRequest matching backend schema
  * @returns {Promise<Object>} AssessmentResponse
@@ -117,7 +128,7 @@ export const processBatchMarking = (payload) =>
  * Finalize all reviewed/eligible submissions in a batch in one confirmed operation.
  *
  * @param {string} batchId
- * @returns {Promise<{ batch_id: string, finalized_count: number }>}
+ * @returns {Promise<{ batch_id: string, finalized_count: number, skipped_unreviewed_count?: number, already_finalized_count?: number }>}
  */
 export const finalizeBatchSubmissions = (batchId) =>
   api(`/c3/batch/${batchId}/finalize-all`, {

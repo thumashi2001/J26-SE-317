@@ -4,6 +4,7 @@ import * as mcqSvc from './mcqMarkingService.js';
 import * as aiClient from './aiClient.js';
 import * as submissionSvc from './submissionService.js';
 import { syncC3AssessmentToC1 } from '../../../integration/c3-c1/index.js';
+import { LIMITS, assertMaxChars, assertMaxItems } from './limits.js';
 
 function httpError(status, message) {
   const err = new Error(message);
@@ -51,6 +52,12 @@ export function validateSetupData(setupData) {
   if (!setupData || typeof setupData !== 'object') {
     throw httpError(400, 'Assessment setup data is required');
   }
+
+  assertMaxChars(setupData.title, LIMITS.TITLE_CHARS, 'Assessment title');
+  assertMaxChars(setupData.question_text, LIMITS.QUESTION_CHARS, 'Question text');
+  assertMaxItems(setupData.options, LIMITS.OPTIONS, 'Options');
+  assertMaxItems(setupData.expected_concepts, LIMITS.EXPECTED_CONCEPTS, 'Expected concepts');
+  assertMaxItems(setupData.rubric?.criteria, LIMITS.CRITERIA, 'Rubric criteria');
 
   const title = String(setupData.title || '').trim();
   if (!title || title.length < 3) {
@@ -368,6 +375,7 @@ export async function validateBatchAnswers({ setupId, items, lecturerId, role })
   if (!Array.isArray(items) || items.length === 0) {
     throw httpError(400, 'A non-empty list of student answers is required');
   }
+  assertMaxItems(items, LIMITS.BATCH_ITEMS, 'Student answer list');
 
   const isMcq = setup.answer_type === 'mcq' || setup.answer_type === 'multiple-choice';
   const validItems = [];
@@ -439,6 +447,14 @@ export async function validateBatchAnswers({ setupId, items, lecturerId, role })
     } else {
       // Subjective
       const answerText = String(item.student_answer || item.answer || '').trim();
+      if (answerText.length > LIMITS.ANSWER_CHARS) {
+        invalidItems.push({
+          row: rowNum,
+          student_id: studentId,
+          reason: `Student answer is too long (maximum ${LIMITS.ANSWER_CHARS} characters)`,
+        });
+        return;
+      }
       if (!answerText) {
         invalidItems.push({
           row: rowNum,
@@ -496,6 +512,7 @@ export async function processBatchMarking({ lecturerId, role, setupId, items, ai
 
   for (const item of validation.valid_items) {
     try {
+      const startedAt = Date.now();
       let aiResult;
       const payload = {
         question_id: setup.question_id,
@@ -522,6 +539,9 @@ export async function processBatchMarking({ lecturerId, role, setupId, items, ai
 
         aiResult = await aiClient.assessAnswer(aiUrl, payload);
       }
+
+      // NFR-C3-08: record how long the response took to evaluate
+      if (aiResult && typeof aiResult === 'object') aiResult.processing_time_ms = Date.now() - startedAt;
 
       // Persist submission and result idempotently
       const { submissionId, resultId } = await submissionSvc.createSubmissionWithResult({
@@ -586,12 +606,20 @@ export async function finalizeBatchSubmissions({ lecturerId, role, batchId }) {
     .find({ submission_id: { $in: subIds } })
     .toArray();
 
+  // Policy (FR-C3-40/41, human-in-the-loop): only results a lecturer has already reviewed are finalized here.
+  // Unreviewed results are never finalized silently; they stay pending and are reported back.
   let finalizedCount = 0;
+  let alreadyFinalized = 0;
+  let skippedUnreviewed = 0;
   const now = new Date();
 
   for (const r of results) {
     if (r.status === 'finalized') {
-      finalizedCount += 1;
+      alreadyFinalized += 1;
+      continue;
+    }
+    if (r.status !== 'reviewed') {
+      skippedUnreviewed += 1;
       continue;
     }
 
@@ -601,19 +629,26 @@ export async function finalizeBatchSubmissions({ lecturerId, role, batchId }) {
       : (r.automated_mark ?? r.ai_evaluation?.total_awarded_marks ?? 0);
     const decision = r.lecturer_decision || 'accepted';
 
-    await resultsCol().updateOne(
-      { _id: r._id },
+    // Conditional update: a concurrent finalize of the same result is counted once.
+    const claim = await resultsCol().updateOne(
+      { _id: r._id, status: 'reviewed' },
       {
         $set: {
           status: 'finalized',
           lecturer_decision: decision,
           final_mark: effectiveMark,
           reviewed_by: r.reviewed_by || lecturerId,
+          finalized_by: lecturerId,
           finalized_at: now,
           updated_at: now,
         },
+        $push: { review_history: { action: 'finalized', by: lecturerId, at: now, decision, final_mark: effectiveMark, via: 'finalize-all' } },
       }
     );
+    if (!claim.matchedCount) {
+      alreadyFinalized += 1;
+      continue;
+    }
 
     await submissionsCol().updateOne(
       { _id: r.submission_id ? parseId(r.submission_id) : parseId(sub?._id) },
@@ -645,10 +680,16 @@ export async function finalizeBatchSubmissions({ lecturerId, role, batchId }) {
     finalizedCount += 1;
   }
 
+  if (finalizedCount === 0 && skippedUnreviewed > 0) {
+    throw httpError(409, `No reviewed results to finalize: ${skippedUnreviewed} result${skippedUnreviewed === 1 ? ' is' : 's are'} still waiting for review`);
+  }
+
   return {
     batch_id: setup.batch_id,
     finalized_count: finalizedCount,
+    already_finalized_count: alreadyFinalized,
+    skipped_unreviewed_count: skippedUnreviewed,
     total_submissions: submissions.length,
-    status: 'finalized',
+    status: skippedUnreviewed > 0 ? 'partially_finalized' : 'finalized',
   };
 }

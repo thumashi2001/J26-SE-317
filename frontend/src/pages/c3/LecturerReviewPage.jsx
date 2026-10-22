@@ -1,612 +1,244 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
-import { getSubmission, reviewSubmission, finalizeSubmission } from '../../services/c3Api.js';
-import MindMapGraph from './components/MindMapGraph.jsx';
-import CriterionCard from './components/CriterionCard.jsx';
-import ConceptDiagnosis from './components/ConceptDiagnosis.jsx';
+import React, { useEffect, useState } from 'react';
+import { Link, useParams } from 'react-router-dom';
+import { finalizeSubmission, getSubmission, reviewSubmission } from '../../services/c3Api.js';
+import AssessmentResult from './components/AssessmentResult.jsx';
+import { ConfirmDialog, Dialog, Notice, PageHeader, SourceBadge, Spinner, StatusPill, friendlyError } from './components/c3ui.jsx';
 import './c3.css';
+
+const fmt = (d) => (d ? new Date(d).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' }) : '-');
 
 export default function LecturerReviewPage() {
   const { submissionId } = useParams();
-  const navigate = useNavigate();
-
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [actionLoading, setActionLoading] = useState(false);
+  const [loadError, setLoadError] = useState(null);
+  const [busy, setBusy] = useState(false);
   const [error, setError] = useState(null);
-  const [successMsg, setSuccessMsg] = useState(null);
+  const [success, setSuccess] = useState(null);
 
-  // Override Modal state
-  const [showOverrideModal, setShowOverrideModal] = useState(false);
+  const [overrideOpen, setOverrideOpen] = useState(false);
   const [newMark, setNewMark] = useState('');
-  const [overrideReason, setOverrideReason] = useState('');
-  const [overrideError, setOverrideError] = useState(null);
+  const [reason, setReason] = useState('');
+  const [markError, setMarkError] = useState(null);
+  const [reasonError, setReasonError] = useState(null);
+  const [finalizeOpen, setFinalizeOpen] = useState(false);
 
-  const fetchDetail = async () => {
+  const load = async () => {
     setLoading(true);
-    setError(null);
+    setLoadError(null);
     try {
       const resp = await getSubmission(submissionId);
       setData(resp);
-      if (resp.result?.final_mark !== null && resp.result?.final_mark !== undefined) {
-        setNewMark(String(resp.result.final_mark));
-      } else if (resp.result?.automated_mark !== null && resp.result?.automated_mark !== undefined) {
-        setNewMark(String(resp.result.automated_mark));
-      }
-      if (resp.result?.override_reason) {
-        setOverrideReason(resp.result.override_reason);
-      }
+      const r = resp.result || {};
+      const start = r.final_mark ?? r.automated_mark;
+      setNewMark(start != null ? String(start) : '');
+      setReason(r.override_reason || '');
     } catch (err) {
-      console.error('Failed to load submission detail:', err);
-      setError(err.message || 'Failed to retrieve submission details.');
+      setLoadError(friendlyError(err, 'This submission could not be loaded.'));
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchDetail();
-  }, [submissionId]);
+    load();
+  }, [submissionId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (loading) {
     return (
       <div className="c3-page">
-        <div className="panel" style={{ textAlign: 'center', padding: '60px' }}>
-          <div className="c3-spinner" style={{ width: '28px', height: '28px', borderColor: 'var(--primary)' }} />
-          <p className="muted" style={{ marginTop: '16px' }}>
-            Loading submission and evaluation evidence...
-          </p>
-        </div>
+        <Spinner label="Loading submission..." />
       </div>
     );
   }
-
-  if (error || !data) {
+  if (loadError || !data) {
     return (
       <div className="c3-page">
-        <div className="c3-alert-box c3-alert-error">
-          <span>⚠️</span>
-          <div>
-            <strong>Error:</strong> {error || 'Submission not found'}
-          </div>
-        </div>
-        <Link to="/lecturer/c3" className="btn secondary" style={{ width: 'auto' }}>
-          ← Back to Submissions Queue
-        </Link>
+        <Notice tone="error" title="Submission unavailable" onRetry={load}>{loadError || 'Submission not found.'}</Notice>
+        <div><Link to="/lecturer/c3" className="btn secondary">Back to the queue</Link></div>
       </div>
     );
   }
 
   const { submission, result } = data;
-  const aiEvaluation = result?.ai_evaluation || {};
-  const analysis = aiEvaluation.analysis || {};
-  const marking = aiEvaluation.marking || {};
-  const feedback = aiEvaluation.feedback || {};
-  const mindmap = aiEvaluation.mindmap || {};
-
-  const totalPossible = result?.total_possible_marks ?? marking.total_possible_marks ?? 0;
-  const automatedMark = result?.automated_mark ?? marking.total_awarded_marks ?? 0;
-  const percentage =
-    result?.percentage ??
-    aiEvaluation.percentage ??
-    (totalPossible > 0 ? Math.round((automatedMark / totalPossible) * 1000) / 10 : 0);
-
+  const evaluation = result?.ai_evaluation || {};
+  const total = result?.total_possible_marks ?? evaluation.marking?.total_possible_marks ?? 0;
+  const automatic = result?.automated_mark ?? evaluation.marking?.total_awarded_marks ?? 0;
   const status = result?.status || submission?.status || 'pending_review';
   const decision = result?.lecturer_decision;
-  const isFinalized = status === 'finalized';
+  const finalized = status === 'finalized';
 
-  // Build sentence text map for evidence linking
-  const sentenceMap = new Map();
-  if (analysis?.sentences) {
-    analysis.sentences.forEach((s) => sentenceMap.set(s.sentence_id, s.text));
-  }
+  const apply = (patch) => setData((prev) => ({ ...prev, submission: { ...prev.submission, status: patch.status }, result: { ...prev.result, ...patch } }));
 
-  // Feedback by criterion id
-  const feedbackByCriterionId = new Map();
-  if (feedback?.criteria_feedback) {
-    feedback.criteria_feedback.forEach((fb) => feedbackByCriterionId.set(fb.criterion_id, fb));
-  }
-
-  // Action: Accept AI Mark
-  const handleAcceptAiMark = async () => {
-    setActionLoading(true);
+  const accept = async () => {
+    setBusy(true);
     setError(null);
-    setSuccessMsg(null);
+    setSuccess(null);
     try {
       const resp = await reviewSubmission(submission._id, { decision: 'accepted' });
-      setData((prev) => ({
-        ...prev,
-        submission: { ...prev.submission, status: 'reviewed' },
-        result: {
-          ...prev.result,
-          ...resp.result,
-          status: 'reviewed',
-          lecturer_decision: 'accepted',
-          final_mark: automatedMark,
-        },
-      }));
-      setSuccessMsg('✓ AI proposed mark accepted by lecturer. Ready for finalization.');
+      apply({ ...resp.result, status: 'reviewed', lecturer_decision: 'accepted', final_mark: automatic, override_reason: null });
+      setSuccess('Automatic mark accepted. You can now finalize the result.');
     } catch (err) {
-      setError(err.message || 'Failed to accept AI mark.');
+      setError(friendlyError(err, 'The mark could not be accepted.'));
     } finally {
-      setActionLoading(false);
+      setBusy(false);
     }
   };
 
-  // Action: Open Override Modal
-  const handleOpenOverride = () => {
-    setOverrideError(null);
-    setShowOverrideModal(true);
+  const openOverride = () => {
+    setMarkError(null);
+    setReasonError(null);
+    setOverrideOpen(true);
   };
 
-  // Action: Submit Override
-  const handleSubmitOverride = async (e) => {
+  const saveOverride = async (e) => {
     e.preventDefault();
-    if (newMark === '' || isNaN(Number(newMark))) {
-      setOverrideError('Please enter a valid numeric mark.');
-      return;
-    }
     const num = Number(newMark);
-    if (num < 0 || num > totalPossible) {
-      setOverrideError(`Mark must be between 0 and maximum possible marks (${totalPossible}).`);
-      return;
-    }
-    if (!overrideReason.trim()) {
-      setOverrideError('An override reason is required. Please provide academic justification.');
-      return;
-    }
-
-    setActionLoading(true);
-    setOverrideError(null);
-    setError(null);
-    setSuccessMsg(null);
+    let ok = true;
+    if (newMark.trim() === '' || !Number.isFinite(num)) {
+      setMarkError('Enter a number.');
+      ok = false;
+    } else if (num < 0 || num > total) {
+      setMarkError(`The mark must be between 0 and ${total}.`);
+      ok = false;
+    } else setMarkError(null);
+    if (!reason.trim()) {
+      setReasonError('Give a reason. It is saved with the result.');
+      ok = false;
+    } else setReasonError(null);
+    if (!ok) return;
+    setBusy(true);
     try {
-      const resp = await reviewSubmission(submission._id, {
-        decision: 'overridden',
-        new_mark: num,
-        override_reason: overrideReason.trim(),
-      });
-      setData((prev) => ({
-        ...prev,
-        submission: { ...prev.submission, status: 'reviewed' },
-        result: {
-          ...prev.result,
-          ...resp.result,
-          status: 'reviewed',
-          lecturer_decision: 'overridden',
-          final_mark: num,
-          override_reason: overrideReason.trim(),
-        },
-      }));
-      setShowOverrideModal(false);
-      setSuccessMsg(`✓ Mark successfully overridden to ${num} / ${totalPossible} with recorded reason.`);
+      const resp = await reviewSubmission(submission._id, { decision: 'overridden', new_mark: num, override_reason: reason.trim() });
+      apply({ ...resp.result, status: 'reviewed', lecturer_decision: 'overridden', final_mark: num, override_reason: reason.trim() });
+      setOverrideOpen(false);
+      setSuccess(`Mark changed to ${num} / ${total}. The reason has been saved.`);
     } catch (err) {
-      setOverrideError(err.message || 'Failed to save mark override.');
+      setMarkError(friendlyError(err, 'The mark could not be saved.'));
     } finally {
-      setActionLoading(false);
+      setBusy(false);
     }
   };
 
-  // Action: Finalize Assessment
-  const handleFinalize = async () => {
-    setActionLoading(true);
+  const finalize = async () => {
+    setBusy(true);
     setError(null);
-    setSuccessMsg(null);
     try {
       const resp = await finalizeSubmission(submission._id);
-      setData((prev) => ({
-        ...prev,
-        submission: { ...prev.submission, status: 'finalized' },
-        result: {
-          ...prev.result,
-          ...resp.result,
-          status: 'finalized',
-        },
-      }));
-      setSuccessMsg('✓ Assessment successfully finalized! Official result is now archived.');
+      apply({ ...resp.result, status: 'finalized' });
+      setFinalizeOpen(false);
+      setSuccess('Result finalized. It is now official and can no longer be changed.');
     } catch (err) {
-      setError(err.message || 'Failed to finalize assessment.');
+      setFinalizeOpen(false);
+      setError(friendlyError(err, 'The result could not be finalized.'));
     } finally {
-      setActionLoading(false);
+      setBusy(false);
     }
   };
+
+  const canFinalize = !finalized && (decision || status === 'reviewed');
 
   return (
     <div className="c3-page">
-      {/* Navigation Breadcrumb */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Link to="/lecturer/c3" className="btn-ghost" style={{ width: 'auto', padding: '4px 10px' }}>
-          ← Back to Submissions Queue
-        </Link>
-        {(submission.is_demo || submission.provenance === 'pp1_demo') && (
-          <span className="c3-badge-provenance pp1_demo" style={{ fontSize: '0.85rem', padding: '4px 12px' }}>
-            🎯 Controlled PP1 Benchmark Scenario
-          </span>
-        )}
-      </div>
+      <PageHeader
+        title="Review submission"
+        subtitle={`${submission.student_id} · ${submission.question_id} · submitted ${fmt(submission.submitted_at)}`}
+        actions={<><SourceBadge submission={submission} /><StatusPill status={status} /><Link to="/lecturer/c3" className="btn secondary">Back to the queue</Link></>}
+      />
 
-      {/* Top Header Lead */}
-      <div className="c3-header-lead">
-        <div>
-          <h1>Assessment Review & Human-In-The-Loop Verification</h1>
-          <p className="muted" style={{ margin: '4px 0 0' }}>
-            Reference: #{submission._id?.slice(-6)} • Student: <strong>{submission.student_id}</strong> • Task: {submission.question_id}
-          </p>
-        </div>
-        <div>
-          <span className={`c3-badge-status ${status}`} style={{ fontSize: '0.9rem', padding: '6px 16px' }}>
-            {status === 'pending_review'
-              ? '⏳ Status: AI Proposed (Pending Lecturer Review)'
-              : status === 'reviewed'
-              ? `🔍 Status: Lecturer Reviewed (${decision === 'accepted' ? 'Accepted' : 'Overridden'})`
-              : '✓ Status: Finalized Assessment Result'}
-          </span>
-        </div>
-      </div>
+      {success && <Notice tone="success" onDismiss={() => setSuccess(null)}>{success}</Notice>}
+      {error && <Notice tone="error" title="Action failed" onDismiss={() => setError(null)}>{error}</Notice>}
 
-      {/* Status Messages */}
-      {successMsg && (
-        <div className="c3-alert-box" style={{ background: '#e6f7f2', border: '1px solid #82dec5', color: '#065543' }}>
-          <span>✓</span>
-          <div>{successMsg}</div>
-        </div>
-      )}
-      {error && (
-        <div className="c3-alert-box c3-alert-error">
-          <span>⚠️</span>
+      <section className="panel c3-review-panel" aria-label="Decision" style={{ margin: 0 }}>
+        <div className="c3-dual">
           <div>
-            <strong>Error:</strong> {error}
+            <div className="c3-dual-label">Automatic mark</div>
+            <div className="c3-mark-big">{automatic}<span className="c3-mark-of"> / {total}</span></div>
+            <div className="small muted">Proposed by the automated marking. Not official until you decide.</div>
+          </div>
+          <div>
+            <div className="c3-dual-label">{finalized ? 'Final mark' : 'Your mark'}</div>
+            {result?.final_mark != null ? (
+              <div className="c3-mark-big">{result.final_mark}<span className="c3-mark-of"> / {total}</span></div>
+            ) : (
+              <div className="muted" style={{ fontSize: '1.1rem', padding: '10px 0' }}>Not decided yet</div>
+            )}
+            <div className="small muted">
+              {decision ? `${decision === 'accepted' ? 'Automatic mark accepted' : 'Mark adjusted'}${result?.reviewed_by ? ` by ${result.reviewed_by}` : ''}${result?.reviewed_at ? ` on ${fmt(result.reviewed_at)}` : ''}.` : 'Accept the automatic mark or change it with a reason.'}
+              {finalized && result?.finalized_at ? ` Finalized ${fmt(result.finalized_at)}.` : ''}
+            </div>
           </div>
         </div>
-      )}
 
-      {/* Lecturer Action Bar (Accept, Override, Finalize) */}
-      <div className="c3-review-actions-bar">
-        <div>
-          <h4 style={{ margin: '0 0 4px' }}>Lecturer Assessment Controls</h4>
-          <span className="small muted">
-            {isFinalized
-              ? 'This assessment has been finalized and archived.'
-              : status === 'reviewed'
-              ? 'Review decision recorded. You can finalize the official assessment result or adjust the override.'
-              : 'Review the AI proposed mark and grounded evidence below, then Accept or Override.'}
-          </span>
-        </div>
+        {decision === 'overridden' && (
+          <div className="c3-reason"><strong>Reason for the change</strong><p>{result?.override_reason || 'No reason recorded.'}</p></div>
+        )}
 
-        <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
-          {!isFinalized ? (
+        <div className="c3-form-actions" style={{ marginTop: 14 }}>
+          {finalized ? (
+            <span className="muted">This result is finalized and cannot be changed.</span>
+          ) : (
             <>
-              <button
-                type="button"
-                className="c3-btn-accept"
-                onClick={handleAcceptAiMark}
-                disabled={actionLoading}
-              >
-                ✓ Accept AI Mark
-              </button>
-              <button
-                type="button"
-                className="c3-btn-override"
-                onClick={handleOpenOverride}
-                disabled={actionLoading}
-              >
-                ✏️ Override Mark
-              </button>
-              <button
-                type="button"
-                className="c3-btn-finalize"
-                onClick={handleFinalize}
-                disabled={actionLoading || (!decision && status !== 'reviewed')}
-                title={!decision && status !== 'reviewed' ? 'Please Accept or Override before finalization' : ''}
-              >
-                🎓 Finalize Assessment Result
+              <button type="button" className="btn" onClick={accept} disabled={busy}>Accept automatic mark</button>
+              <button type="button" className="btn secondary" onClick={openOverride} disabled={busy}>Change mark</button>
+              <button type="button" className="btn secondary" onClick={() => setFinalizeOpen(true)} disabled={busy || !canFinalize} title={canFinalize ? '' : 'Accept or change the mark first'}>
+                Finalize result
               </button>
             </>
-          ) : (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span className="c3-badge-status finalized">✓ Official Result Finalized</span>
-              <span className="small muted">
-                (By {result?.reviewed_by || 'Lecturer'} on{' '}
-                {result?.finalized_at ? new Date(result.finalized_at).toLocaleDateString() : '—'})
-              </span>
-            </div>
           )}
         </div>
-      </div>
+      </section>
 
-      {/* Dual Marks Display: AI Proposed Mark vs Lecturer Final Mark */}
-      <div className="c3-dual-marks-banner">
-        {/* Tile 1: AI Proposed Mark */}
-        <div className="c3-mark-tile ai-proposed">
-          <div className="c3-mark-tile-title">AI Proposed Mark (Function 2)</div>
-          <div className="c3-mark-tile-score" style={{ color: '#2b6cb0' }}>
-            {automatedMark} <span style={{ fontSize: '1.2rem', color: 'var(--muted)' }}>/ {totalPossible}</span>
-          </div>
-          <div className="small muted">
-            Calculated score: {percentage}% • Proposed from automated rubric evaluation
-          </div>
-        </div>
-
-        {/* Tile 2: Lecturer Final Mark */}
-        <div className="c3-mark-tile lecturer-final">
-          <div className="c3-mark-tile-title">
-            {isFinalized ? 'Final Assessment Result' : 'Lecturer Review Mark'}
-          </div>
-          <div className="c3-mark-tile-score" style={{ color: '#087a63' }}>
-            {result?.final_mark !== null && result?.final_mark !== undefined ? (
-              <>
-                {result.final_mark}{' '}
-                <span style={{ fontSize: '1.2rem', color: 'var(--muted)' }}>/ {totalPossible}</span>
-              </>
-            ) : (
-              <span style={{ fontSize: '1.5rem', color: 'var(--muted)', fontWeight: 400 }}>
-                Awaiting Lecturer Decision
-              </span>
-            )}
-          </div>
-          <div className="small muted">
-            {decision ? (
-              <span>
-                Decision:{' '}
-                <strong>{decision === 'accepted' ? 'Accepted AI Proposed Mark' : 'Overridden by Lecturer'}</strong>
-                {result?.reviewed_by && ` by ${result.reviewed_by}`}
-              </span>
-            ) : (
-              'Action required: Accept proposed mark or enter override with academic reason'
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Recorded Override Reason Notice if Overridden */}
-      {decision === 'overridden' && (
-        <div className="panel" style={{ borderLeft: '5px solid #c05621', background: '#fdfaf8' }}>
-          <h4 style={{ margin: '0 0 6px', color: '#9c4215' }}>Recorded Override Reason (Mandatory Audit Trail)</h4>
-          <p style={{ margin: 0, fontStyle: 'italic', fontSize: '0.95rem' }}>
-            "{result?.override_reason || 'No reason specified'}"
-          </p>
-          <div className="small muted" style={{ marginTop: '8px' }}>
-            Reviewed by: {result?.reviewed_by || 'Lecturer'} • Timestamp:{' '}
-            {result?.reviewed_at ? new Date(result.reviewed_at).toLocaleString() : '—'}
-          </div>
-        </div>
-      )}
-
-      {/* =========================================================================
-          SECTION 1: ASSESSMENT & QUESTION CONTEXT
-         ========================================================================= */}
-      <div className="panel">
-        <h3>Assessment & Question Context</h3>
-        <div className="c3-form-grid" style={{ marginTop: '12px' }}>
-          <div>
-            <strong>Question ID:</strong> {submission.question_id || 'SE-DB-001'}
-          </div>
-          <div>
-            <strong>Answer Type:</strong> {submission.answer_type || 'Essay / Descriptive'}
-          </div>
-        </div>
-        <div style={{ marginTop: '10px' }}>
-          <strong>Question Text:</strong>
-          <p style={{ margin: '4px 0 0', fontSize: '0.95rem', color: 'var(--text)' }}>
-            {submission.question_text || 'Explain database normalization and describe 1NF, 2NF, and 3NF.'}
-          </p>
-        </div>
+      <section className="panel" aria-label="Question and answer" style={{ margin: 0 }}>
+        <h3 style={{ margin: '0 0 8px' }}>Question and answer</h3>
+        <p className="small" style={{ marginTop: 0 }}><strong>Question:</strong> {submission.question_text || submission.question_id}</p>
+        <div className="c3-answer-box">{submission.student_answer || 'No answer text was recorded.'}</div>
         {submission.reference_answer && (
-          <div style={{ marginTop: '10px' }}>
-            <strong>Model / Reference Answer:</strong>
-            <p className="small muted" style={{ margin: '4px 0 0' }}>
-              {submission.reference_answer}
-            </p>
-          </div>
+          <details style={{ marginTop: 12 }}>
+            <summary style={{ cursor: 'pointer', color: 'var(--primary-dark)' }}>Reference answer</summary>
+            <p className="small muted" style={{ margin: '8px 0 0' }}>{submission.reference_answer}</p>
+          </details>
         )}
-      </div>
+      </section>
 
-      {/* =========================================================================
-          SECTION 2: ACTUAL STUDENT SUBMITTED ANSWER
-         ========================================================================= */}
-      <div className="panel" style={{ borderLeft: '5px solid var(--ink)' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h3 style={{ margin: 0 }}>Actual Student Submitted Answer</h3>
-          <span className="small muted">
-            Submitted:{' '}
-            {submission.submitted_at ? new Date(submission.submitted_at).toLocaleString() : '—'}
-          </span>
-        </div>
-        <div
-          style={{
-            background: '#f9fbfd',
-            border: '1px solid var(--line)',
-            borderRadius: '8px',
-            padding: '16px',
-            marginTop: '12px',
-            whiteSpace: 'pre-wrap',
-            fontFamily: 'inherit',
-            lineHeight: 1.6,
-            fontSize: '0.95rem',
-          }}
+      <AssessmentResult evaluation={result?.ai_evaluation} historicalResult={result} showMarkCard={false} showContext={false} />
+
+      {overrideOpen && (
+        <Dialog
+          title="Change the mark"
+          onClose={() => !busy && setOverrideOpen(false)}
+          footer={
+            <>
+              <button type="button" className="btn secondary" onClick={() => setOverrideOpen(false)} disabled={busy}>Cancel</button>
+              <button type="submit" form="override-form" className="btn" disabled={busy}>{busy ? 'Saving...' : 'Save mark'}</button>
+            </>
+          }
         >
-          {submission.student_answer || 'No answer text recorded.'}
-        </div>
-        <div className="small muted" style={{ marginTop: '8px' }}>
-          Total sentences parsed by F1: {analysis?.sentences?.length || 0} • Word count:{' '}
-          {submission.student_answer?.trim() ? submission.student_answer.trim().split(/\s+/).length : 0}
-        </div>
-      </div>
-
-      {/* =========================================================================
-          SECTION 3: CRITERION BREAKDOWN & GROUNDED EVIDENCE
-         ========================================================================= */}
-      <div>
-        <h2>Criterion Breakdown & Grounded Sentence Evidence</h2>
-        <p className="muted" style={{ margin: '0 0 16px' }}>
-          Inspect the deterministic evidence and scoring descriptors assigned to each rubric criterion.
-        </p>
-        {marking?.criteria_results?.map((cr) => (
-          <CriterionCard
-            key={cr.criterion_id}
-            criterionMarking={cr}
-            criterionFeedback={feedbackByCriterionId.get(cr.criterion_id)}
-            sentenceMap={sentenceMap}
-          />
-        ))}
-      </div>
-
-      {/* =========================================================================
-          SECTION 4: CONCEPT ANALYSIS
-         ========================================================================= */}
-      <div>
-        <h2>Concept Analysis & Knowledge Diagnosis</h2>
-        <ConceptDiagnosis analysis={analysis} sentenceMap={sentenceMap} />
-      </div>
-
-      {/* =========================================================================
-          SECTION 5: OVERALL FEEDBACK SYNTHESIS
-         ========================================================================= */}
-      {feedback?.overall_feedback && (
-        <div className="panel c3-summary-card">
-          <h3>Evidence-Grounded Feedback Synthesis</h3>
-          <p className="c3-summary-text">{feedback.overall_feedback.overall_summary}</p>
-
-          <div className="c3-summary-columns">
-            {feedback.overall_feedback.overall_strengths?.length > 0 && (
-              <div className="c3-summary-col">
-                <h5 style={{ color: '#065543' }}>✓ Strengths Identified</h5>
-                <ul>
-                  {feedback.overall_feedback.overall_strengths.map((s, i) => (
-                    <li key={i}>{s}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            {feedback.overall_feedback.overall_missing_concepts?.length > 0 && (
-              <div className="c3-summary-col">
-                <h5 style={{ color: '#8a1f17' }}>○ Missing Concepts</h5>
-                <ul>
-                  {feedback.overall_feedback.overall_missing_concepts.map((m, i) => (
-                    <li key={i}>{m}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            {feedback.overall_feedback.overall_improvement_suggestions?.length > 0 && (
-              <div className="c3-summary-col">
-                <h5 style={{ color: '#1b4d75' }}>💡 Recommended Improvements</h5>
-                <ul>
-                  {feedback.overall_feedback.overall_improvement_suggestions.map((s, i) => (
-                    <li key={i}>{s}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            {feedback.overall_feedback.overall_next_level_improvements?.length > 0 && (
-              <div className="c3-summary-col">
-                <h5 style={{ color: '#5c2069' }}>🚀 Next-Level Goals</h5>
-                <ul>
-                  {feedback.overall_feedback.overall_next_level_improvements.map((nl, i) => (
-                    <li key={i}>{nl}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
-          </div>
-        </div>
+          <form id="override-form" onSubmit={saveOverride} noValidate>
+            <p className="small muted" style={{ marginTop: 0 }}>Automatic mark: {automatic} / {total}. The original automatic mark is always kept.</p>
+            <div className="c3-field">
+              <label htmlFor="ov-mark">New mark (0 to {total})</label>
+              <input id="ov-mark" data-autofocus type="number" inputMode="decimal" step="0.5" min="0" max={total} value={newMark} onChange={(e) => setNewMark(e.target.value)} aria-invalid={!!markError} aria-describedby={markError ? 'ov-mark-err' : undefined} />
+              {markError && <p id="ov-mark-err" className="c3-error" role="alert">{markError}</p>}
+            </div>
+            <div className="c3-field">
+              <label htmlFor="ov-reason">Reason</label>
+              <textarea id="ov-reason" maxLength={2000} value={reason} onChange={(e) => setReason(e.target.value)} aria-invalid={!!reasonError} aria-describedby={reasonError ? 'ov-reason-err' : undefined} style={{ minHeight: 110 }} />
+              {reasonError && <p id="ov-reason-err" className="c3-error" role="alert">{reasonError}</p>}
+            </div>
+          </form>
+        </Dialog>
       )}
 
-      {/* =========================================================================
-          SECTION 6: CONCEPT-BASED MIND MAP
-         ========================================================================= */}
-      <div>
-        <h2>Concept-Based Mind Map Representation (Function 4)</h2>
-        <p className="muted" style={{ margin: '0 0 12px' }}>
-          Inspect the structural relationships extracted by the automated pipeline before approving the mark.
-        </p>
-        <MindMapGraph mindmap={mindmap} sentences={analysis?.sentences || []} />
-      </div>
-
-      {/* =========================================================================
-          OVERRIDE MODAL DIALOG
-         ========================================================================= */}
-      {showOverrideModal && (
-        <div className="c3-modal-overlay">
-          <div className="c3-modal-content">
-            <div className="c3-modal-header">
-              <h3>Override AI Proposed Mark</h3>
-              <button
-                type="button"
-                className="btn-ghost"
-                style={{ width: 'auto', padding: '4px 8px', fontSize: '1.2rem' }}
-                onClick={() => setShowOverrideModal(false)}
-              >
-                ✕
-              </button>
-            </div>
-            <form onSubmit={handleSubmitOverride}>
-              <div className="c3-modal-body">
-                <div style={{ background: '#f7fafc', padding: '12px 16px', borderRadius: '8px' }}>
-                  <strong>Original AI Proposed Mark:</strong> {automatedMark} / {totalPossible} ({percentage}%)
-                </div>
-
-                <div>
-                  <label htmlFor="newM">
-                    New Lecturer Mark <span style={{ color: '#d6453d' }}>*</span> (0 to {totalPossible})
-                  </label>
-                  <input
-                    id="newM"
-                    type="number"
-                    step="0.5"
-                    min="0"
-                    max={totalPossible}
-                    value={newMark}
-                    onChange={(e) => setNewMark(e.target.value)}
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="ovReason">
-                    Academic Override Reason <span style={{ color: '#d6453d' }}>*</span> (Required)
-                  </label>
-                  <textarea
-                    id="ovReason"
-                    className="c3-textarea"
-                    rows="4"
-                    value={overrideReason}
-                    onChange={(e) => setOverrideReason(e.target.value)}
-                    placeholder="Provide clear pedagogical reasoning (e.g. 'The answer demonstrates understanding of 2NF full functional dependency, but phrasing differed from the lexical pattern.')..."
-                    required
-                  />
-                  <span className="hint">
-                    A non-empty reason is strictly required to preserve grading auditability.
-                  </span>
-                </div>
-
-                {overrideError && (
-                  <div className="c3-alert-box c3-alert-error" style={{ margin: 0 }}>
-                    <span>⚠️</span>
-                    <div>{overrideError}</div>
-                  </div>
-                )}
-              </div>
-
-              <div className="c3-modal-footer">
-                <button
-                  type="button"
-                  className="btn secondary"
-                  style={{ width: 'auto' }}
-                  onClick={() => setShowOverrideModal(false)}
-                >
-                  Cancel
-                </button>
-                <button type="submit" className="c3-btn-override" disabled={actionLoading}>
-                  {actionLoading ? 'Saving...' : 'Save Override'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
+      {finalizeOpen && (
+        <ConfirmDialog
+          title="Finalize this result?"
+          message={`The final mark will be ${result?.final_mark ?? automatic} / ${total}. Once finalized it is official and cannot be changed.`}
+          confirmLabel="Finalize"
+          busy={busy}
+          onConfirm={finalize}
+          onCancel={() => setFinalizeOpen(false)}
+        />
       )}
     </div>
   );

@@ -1,919 +1,334 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext.jsx';
-import { assessAnswer, listSubmissions, getSubmission } from '../../services/c3Api.js';
-import { C3_PRESETS } from './presets.js';
-import MindMapGraph from './components/MindMapGraph.jsx';
-import CriterionCard from './components/CriterionCard.jsx';
-import ConceptDiagnosis from './components/ConceptDiagnosis.jsx';
+import React, { useEffect, useRef, useState } from 'react';
+import { assessAnswer, getSubmission, listAssessments, listSubmissions } from '../../services/c3Api.js';
+import { SAMPLE_ANSWERS } from './samples.js';
+import AssessmentResult from './components/AssessmentResult.jsx';
+import { EmptyState, Notice, PageHeader, Spinner, StatusPill, friendlyError } from './components/c3ui.jsx';
 import './c3.css';
 
+// Student page: choose an assessment, write an answer, see the proposed mark with evidence and feedback.
+// The question, rubric and answer key stay on the server; this page only ever sends the answer.
 export default function AssessmentPage() {
-  const { user } = useAuth();
+  const [tab, setTab] = useState('answer'); // 'answer' | 'history'
+  const [assessments, setAssessments] = useState(null);
+  const [loadError, setLoadError] = useState(null);
+  const [selectedId, setSelectedId] = useState(null);
+  const [answer, setAnswer] = useState('');
+  const [optionId, setOptionId] = useState(null);
+  const [fieldError, setFieldError] = useState(null);
 
-  // Mode: 'new_assessment' | 'history'
-  const [activeTab, setActiveTab] = useState('new_assessment');
+  const [busy, setBusy] = useState(false);
+  const [submitError, setSubmitError] = useState(null);
+  const [result, setResult] = useState(null); // { evaluation, submissionId, question, answer }
 
-  // Active preset (default to full credit architecture preset)
-  const [selectedPresetId, setSelectedPresetId] = useState('arch-full');
-
-  // Form State
-  const initialPreset = C3_PRESETS[0];
-  const [questionId, setQuestionId] = useState(initialPreset.payload.question_id);
-  const [questionText, setQuestionText] = useState(initialPreset.payload.question_text);
-  const [studentAnswer, setStudentAnswer] = useState(initialPreset.payload.student_answer);
-  const [referenceAnswer, setReferenceAnswer] = useState(initialPreset.payload.reference_answer || '');
-  const [expectedConceptsStr, setExpectedConceptsStr] = useState(
-    initialPreset.payload.expected_concepts.join(', ')
-  );
-  const [answerType, setAnswerType] = useState(initialPreset.payload.answer_type || 'short');
-  const [rubric, setRubric] = useState(initialPreset.payload.rubric);
-  const [options, setOptions] = useState(initialPreset.payload.options || null);
-  const [selectedOptionId, setSelectedOptionId] = useState(initialPreset.payload.selected_option_id || null);
-  const [correctAnswer, setCorrectAnswer] = useState(initialPreset.payload.correct_answer || null);
-  const [maxMarks, setMaxMarks] = useState(initialPreset.payload.max_marks || null);
-
-  // Rubric view toggles
-  const [showRubricDetails, setShowRubricDetails] = useState(false);
-
-  // Pipeline Execution State
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [result, setResult] = useState(null);
-
-  // Submissions History State
-  const [historySubmissions, setHistorySubmissions] = useState([]);
-  const [loadingHistory, setLoadingHistory] = useState(false);
+  const [history, setHistory] = useState([]);
+  const [historyLoading, setHistoryLoading] = useState(false);
   const [historyError, setHistoryError] = useState(null);
-  const [viewingHistoricalSubmission, setViewingHistoricalSubmission] = useState(null);
-  const [loadingHistoricalDetail, setLoadingHistoricalDetail] = useState(false);
+  const [detail, setDetail] = useState(null);
+  const [detailBusy, setDetailBusy] = useState(false);
+  const resultRef = useRef(null);
+  // Only an explicit {available: true} from the server would ever hide the notice; nothing here is C2-originated today.
+  const [c2Available, setC2Available] = useState(false);
 
-  // Fetch student's own submissions
-  const fetchStudentHistory = async () => {
-    setLoadingHistory(true);
+  const loadAssessments = async () => {
+    setLoadError(null);
+    setAssessments(null); // shows the loading state again, so "Try again" visibly re-requests
+    try {
+      const data = await listAssessments();
+      const list = data.assessments || [];
+      setC2Available(data.integrations?.c2?.available === true);
+      setAssessments(list);
+      // Nothing is preselected: a student only answers an assessment they explicitly chose.
+      setSelectedId((cur) => (cur && list.some((a) => a.id === cur) ? cur : null));
+    } catch (err) {
+      setAssessments([]);
+      setLoadError(
+        err.status === 404
+          ? 'The assessments list was not found on the server. The backend is probably running an older version: restart it (npm run dev in the backend folder) and try again.'
+          : friendlyError(err, 'The assessments could not be loaded.')
+      );
+    }
+  };
+
+  const loadHistory = async () => {
+    setHistoryLoading(true);
     setHistoryError(null);
     try {
       const data = await listSubmissions();
-      setHistorySubmissions(data.submissions || []);
+      setHistory(data.submissions || []);
     } catch (err) {
-      console.error('Failed to load submissions history:', err);
-      setHistoryError(err.message || 'Could not load your submissions history.');
+      setHistoryError(friendlyError(err, 'Your submissions could not be loaded.'));
     } finally {
-      setLoadingHistory(false);
+      setHistoryLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchStudentHistory();
+    loadAssessments();
+    loadHistory();
   }, []);
 
-  // Switch preset
-  const handleSelectPreset = (preset) => {
-    setSelectedPresetId(preset.id);
-    setQuestionId(preset.payload.question_id);
-    setQuestionText(preset.payload.question_text);
-    setStudentAnswer(preset.payload.student_answer);
-    setReferenceAnswer(preset.payload.reference_answer || '');
-    setExpectedConceptsStr((preset.payload.expected_concepts || []).join(', '));
-    setAnswerType(preset.payload.answer_type || 'short');
-    setRubric(preset.payload.rubric || null);
-    setOptions(preset.payload.options || null);
-    setSelectedOptionId(preset.payload.selected_option_id || null);
-    setCorrectAnswer(preset.payload.correct_answer || null);
-    setMaxMarks(preset.payload.max_marks || null);
-    setError(null);
+  const selected = (assessments || []).find((a) => a.id === selectedId) || null;
+  const isMcq = selected && (selected.answer_type === 'mcq' || selected.answer_type === 'multiple-choice');
+  const sample = selected && !isMcq ? SAMPLE_ANSWERS[selected.id] : null;
+
+  const choose = (a) => {
+    setSelectedId(a.id);
+    setAnswer('');
+    setOptionId(null);
+    setFieldError(null);
+    setSubmitError(null);
+    setResult(null);
   };
 
-  // Submit assessment request to backend
-  const handleSubmit = async (e) => {
-    e?.preventDefault();
-    if (!studentAnswer.trim() && !selectedOptionId) {
-      setError('Please provide a student answer or select an option to assess.');
+  const submit = async (e) => {
+    e.preventDefault();
+    if (!selected) return;
+    if (isMcq ? !optionId : !answer.trim()) {
+      setFieldError(isMcq ? 'Choose one option before submitting.' : 'Write your answer before submitting.');
       return;
     }
-    if (!questionId.trim()) {
-      setError('Please specify a Question ID.');
-      return;
-    }
-    if (!questionText.trim()) {
-      setError('Please specify Question Text.');
-      return;
-    }
-
-    setLoading(true);
-    setError(null);
-
-    const conceptsList = expectedConceptsStr
-      .split(',')
-      .map((c) => c.trim())
-      .filter(Boolean);
-
-    const payload = {
-      question_id: questionId.trim(),
-      question_text: questionText.trim(),
-      student_answer: studentAnswer.trim(),
-      reference_answer: referenceAnswer.trim() || null,
-      expected_concepts: conceptsList.length > 0 ? conceptsList : null,
-      answer_type: answerType,
-      options: options || null,
-      selected_option_id: selectedOptionId || null,
-      correct_answer: correctAnswer || null,
-      max_marks: maxMarks || undefined,
-      rubric: rubric || null,
-      is_demo: selectedPresetId !== 'custom',
-    };
-
+    setFieldError(null);
+    setSubmitError(null);
+    setBusy(true);
     try {
-      // Students only send their own answer: the question, rubric and answer key are held by the server.
-      const body = user?.role === 'student'
-        ? {
-            demo_id: selectedPresetId !== 'custom' ? selectedPresetId : undefined,
-            student_answer: studentAnswer.trim(),
-            selected_option_id: selectedOptionId || undefined,
-          }
-        : payload;
+      const body = { demo_id: selected.id };
+      if (isMcq) body.selected_option_id = optionId;
+      else body.student_answer = answer.trim();
       const data = await assessAnswer(body);
-      setResult(data);
-      setViewingHistoricalSubmission(null);
-      // Refresh history silently
-      fetchStudentHistory();
+      setResult({
+        evaluation: data,
+        submissionId: data.submission_id,
+        question: selected.question_text,
+        answer: isMcq ? selected.options?.find((o) => o.option_id === optionId)?.text || optionId : answer.trim(),
+      });
+      loadHistory();
+      setTimeout(() => resultRef.current?.focus(), 50);
     } catch (err) {
-      console.error('Assessment pipeline error:', err);
-      let errMsg = err.message || 'Assessment pipeline failed';
-      if (err.status === 422) {
-        errMsg = `Input validation error (422): ${err.message}. Please check all required rubric and question fields.`;
-      } else if (err.status === 502) {
-        errMsg = `Backend error (502): ${err.message}. Ensure the C3 Python AI service is running on port 8003.`;
-      } else if (err.status === 401) {
-        errMsg = 'Session expired or unauthorized. Please log in again.';
+      if (err.status === 404) {
+        // The server does not know this demo assessment: usually a backend still running an older version.
+        setSubmitError('This demo assessment was not found on the server. The server may be running an older version: restart the backend (npm run dev in the backend folder), then refresh this page and choose an assessment again.');
+        loadAssessments();
+      } else {
+        setSubmitError(friendlyError(err, 'Your answer could not be marked. Please try again.'));
       }
-      setError(errMsg);
     } finally {
-      setLoading(false);
+      setBusy(false);
     }
   };
 
-  // View a past submission from history
-  const handleOpenHistoricalSubmission = async (subId) => {
-    setLoadingHistoricalDetail(true);
-    setError(null);
+  const openSubmission = async (id) => {
+    setDetailBusy(true);
+    setHistoryError(null);
     try {
-      const detail = await getSubmission(subId);
-      setViewingHistoricalSubmission(detail);
-      setResult(null);
+      setDetail(await getSubmission(id));
     } catch (err) {
-      console.error('Failed to load past submission detail:', err);
-      setError(err.message || 'Failed to open submission detail.');
+      setHistoryError(friendlyError(err, 'This submission could not be opened.'));
     } finally {
-      setLoadingHistoricalDetail(false);
+      setDetailBusy(false);
     }
   };
-
-  // Determine active evaluation to render
-  const activeEvaluation = viewingHistoricalSubmission
-    ? viewingHistoricalSubmission.result?.ai_evaluation || viewingHistoricalSubmission.result
-    : result;
-
-  const activeSubmissionContext = viewingHistoricalSubmission
-    ? viewingHistoricalSubmission.submission
-    : result
-    ? {
-        question_id: result.question_id,
-        question_text: questionText,
-        student_answer: studentAnswer,
-        reference_answer: referenceAnswer,
-        status: result.status || 'pending_review',
-        submission_id: result.submission_id,
-      }
-    : null;
-
-  const historicalResult = viewingHistoricalSubmission?.result;
-  const isFinalized = historicalResult?.status === 'finalized';
-
-  // Build sentence text map from active evaluation
-  const sentenceMap = new Map();
-  if (activeEvaluation?.analysis?.sentences) {
-    activeEvaluation.analysis.sentences.forEach((s) => sentenceMap.set(s.sentence_id, s.text));
-  }
-
-  // Quick feedback by criterion id
-  const feedbackByCriterionId = new Map();
-  if (activeEvaluation?.feedback?.criteria_feedback) {
-    activeEvaluation.feedback.criteria_feedback.forEach((fb) => feedbackByCriterionId.set(fb.criterion_id, fb));
-  }
-
-  const totalPossible =
-    historicalResult?.total_possible_marks ??
-    activeEvaluation?.total_possible_marks ??
-    activeEvaluation?.marking?.total_possible_marks ??
-    0;
-
-  const automatedMark =
-    historicalResult?.automated_mark ??
-    activeEvaluation?.total_awarded_marks ??
-    activeEvaluation?.marking?.total_awarded_marks ??
-    0;
-
-  const scorePercentage =
-    historicalResult?.percentage ??
-    activeEvaluation?.percentage ??
-    (totalPossible > 0 ? Math.round((automatedMark / totalPossible) * 1000) / 10 : 0);
 
   return (
     <div className="c3-page">
-      {/* Top Header */}
-      <div className="c3-header-lead">
-        <div>
-          <h1>Automated Marking & Answer Analysis</h1>
-          <p className="muted" style={{ margin: '4px 0 0' }}>
-            AdaptiveLearnSE Component 3 • Rubric-Aware Semantic Evaluation & Concept Diagnosis
-          </p>
-        </div>
-        <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-          {user?.role === 'lecturer' && (
-            <Link to="/lecturer/c3" className="btn secondary" style={{ width: 'auto', padding: '6px 14px' }}>
-              📋 Review Submissions Queue →
-            </Link>
-          )}
-          <span className="c3-badge-research">AdaptiveLearnSE • Component 3</span>
-        </div>
-      </div>
+      <PageHeader title="Automated Marking & Answer Analysis" subtitle="Answer a question and get a proposed mark with the evidence, feedback and concept map behind it." />
 
-      {/* Mode Switcher Tabs */}
-      <div className="c3-mode-tabs">
-        <button
-          type="button"
-          className={`c3-mode-tab ${activeTab === 'new_assessment' ? 'active' : ''}`}
-          onClick={() => {
-            setActiveTab('new_assessment');
-            setViewingHistoricalSubmission(null);
-          }}
-        >
-          ✍️ New Assessment & Benchmarks
+      <div className="tabs" role="tablist" aria-label="Marking sections" style={{ margin: 0 }}>
+        <button type="button" role="tab" aria-selected={tab === 'answer'} className={tab === 'answer' ? 'on' : ''} onClick={() => setTab('answer')}>
+          Answer a question
         </button>
-        <button
-          type="button"
-          className={`c3-mode-tab ${activeTab === 'history' ? 'active' : ''}`}
-          onClick={() => {
-            setActiveTab('history');
-            fetchStudentHistory();
-          }}
-        >
-          📋 My Submissions History ({historySubmissions.length})
+        <button type="button" role="tab" aria-selected={tab === 'history'} className={tab === 'history' ? 'on' : ''} onClick={() => { setTab('history'); setDetail(null); }}>
+          My submissions <span className="tab-count">{history.length}</span>
         </button>
       </div>
 
-      {/* =========================================================================
-          MODE 1: SUBMISSIONS HISTORY TAB
-         ========================================================================= */}
-      {activeTab === 'history' && !viewingHistoricalSubmission && (
-        <div className="panel" style={{ padding: '20px 24px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-            <div>
-              <h3 style={{ margin: 0 }}>Your Assessment History</h3>
-              <p className="small muted" style={{ margin: '4px 0 0' }}>
-                Track your submitted answers, AI proposed evaluations, and lecturer-finalized marks.
-              </p>
-            </div>
-            <button
-              type="button"
-              className="btn-ghost"
-              style={{ width: 'auto', padding: '6px 12px' }}
-              onClick={fetchStudentHistory}
-              disabled={loadingHistory}
-            >
-              🔄 Refresh History
-            </button>
-          </div>
-
-          {loadingHistory ? (
-            <div style={{ textAlign: 'center', padding: '40px' }}>
-              <div className="c3-spinner" style={{ width: '24px', height: '24px', borderColor: 'var(--primary)' }} />
-              <p className="muted" style={{ marginTop: '12px' }}>Loading past submissions...</p>
-            </div>
-          ) : historyError ? (
-            <div className="c3-alert-box c3-alert-error">
-              <span>⚠️</span>
-              <div>{historyError}</div>
-            </div>
-          ) : historySubmissions.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '40px 16px' }}>
-              <h4>No Submissions Yet</h4>
-              <p className="muted" style={{ margin: '6px 0 16px' }}>
-                You have not submitted any answers for automated marking yet.
-              </p>
-              <button
-                type="button"
-                className="btn"
-                style={{ width: 'auto', margin: '0 auto' }}
-                onClick={() => setActiveTab('new_assessment')}
-              >
-                Start an Assessment Now →
-              </button>
-            </div>
-          ) : (
-            <div className="c3-table-responsive">
-              <table className="c3-queue-table">
-                <thead>
-                  <tr>
-                    <th>Question / Task</th>
-                    <th>Submitted At</th>
-                    <th>AI Proposed Mark</th>
-                    <th>Status</th>
-                    <th>Final Approved Mark</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {historySubmissions.map((s) => {
-                    const subDate = s.submitted_at
-                      ? new Date(s.submitted_at).toLocaleString(undefined, {
-                          dateStyle: 'short',
-                          timeStyle: 'short',
-                        })
-                      : '—';
-                    const status = s.status || 'pending_review';
-
-                    return (
-                      <tr key={s._id}>
-                        <td>
-                          <div>
-                            <strong>{s.question_id || 'SE-DB-001'}</strong>
-                          </div>
-                          {s.question_text && (
-                            <div
-                              className="small muted"
-                              style={{
-                                maxWidth: '280px',
-                                whiteSpace: 'nowrap',
-                                overflow: 'hidden',
-                                textOverflow: 'ellipsis',
-                              }}
-                              title={s.question_text}
-                            >
-                              {s.question_text}
-                            </div>
-                          )}
-                        </td>
-                        <td className="small muted">{subDate}</td>
-                        <td>
-                          {s.automated_mark !== null && s.automated_mark !== undefined ? (
-                            <div>
-                              <strong>
-                                {s.automated_mark} / {s.total_possible_marks}
-                              </strong>
-                              {s.percentage !== null && (
-                                <span className="small muted" style={{ marginLeft: '6px' }}>
-                                  ({s.percentage}%)
-                                </span>
-                              )}
-                            </div>
-                          ) : (
-                            <span className="muted">—</span>
-                          )}
-                        </td>
-                        <td>
-                          <span className={`c3-badge-status ${status}`}>
-                            {status === 'pending_review'
-                              ? '⏳ AI Proposed (Pending)'
-                              : status === 'reviewed'
-                              ? '🔍 Under Review'
-                              : status === 'finalized'
-                              ? '✓ Finalized'
-                              : status}
-                          </span>
-                        </td>
-                        <td>
-                          {s.final_mark !== null && s.final_mark !== undefined ? (
-                            <strong style={{ color: '#087a63', fontSize: '1rem' }}>
-                              {s.final_mark} / {s.total_possible_marks}
-                            </strong>
-                          ) : (
-                            <span className="small muted">Awaiting finalization</span>
-                          )}
-                        </td>
-                        <td>
-                          <button
-                            type="button"
-                            className="btn secondary"
-                            style={{ padding: '6px 12px', fontSize: '0.85rem', width: 'auto', whiteSpace: 'nowrap' }}
-                            onClick={() => handleOpenHistoricalSubmission(s._id)}
-                          >
-                            View Evaluation & Mind Map →
-                          </button>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* =========================================================================
-          MODE 2: NEW ASSESSMENT INPUT FORM
-         ========================================================================= */}
-      {activeTab === 'new_assessment' && !activeEvaluation && (
+      {tab === 'answer' && (
         <>
-          {/* Preset Benchmarks Selector */}
-          <div className="c3-presets-bar">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <strong>🎯 Curriculum Assessment Scenarios:</strong>
-              <span className="small muted">Select an assessment scenario from the curriculum question bank</span>
-            </div>
-            <div className="c3-presets-list">
-              {C3_PRESETS.map((p) => (
-                <button
-                  key={p.id}
-                  type="button"
-                  className={`c3-preset-btn ${selectedPresetId === p.id ? 'active' : ''}`}
-                  onClick={() => handleSelectPreset(p)}
-                >
-                  {p.title}
-                </button>
-              ))}
-            </div>
-          </div>
+          {loadError && <Notice tone="error" title="Assessments unavailable" onRetry={loadAssessments}>{loadError}</Notice>}
 
-          {/* Assessment Form */}
-          <form className="panel form-block" onSubmit={handleSubmit}>
-            <h3>Assessment Configuration & Input</h3>
+          {assessments === null && !loadError && <Spinner label="Loading assessments..." />}
 
-            <div className="c3-form-grid">
-              <div>
-                <label htmlFor="qId">Question ID</label>
-                <input
-                  id="qId"
-                  type="text"
-                  value={questionId}
-                  onChange={(e) => {
-                    setQuestionId(e.target.value);
-                    setSelectedPresetId('custom');
-                  }}
-                  placeholder="e.g. SE3010-Q01"
-                  required
-                />
-              </div>
-              <div>
-                <label htmlFor="ansType">Answer Type</label>
-                <select
-                  id="ansType"
-                  value={answerType}
-                  onChange={(e) => setAnswerType(e.target.value)}
-                >
-                  <option value="short">Short Answer</option>
-                  <option value="structured">Structured Short Answer</option>
-                  <option value="essay">Descriptive / Essay</option>
-                  <option value="mcq">Multiple-Choice Question (MCQ)</option>
-                </select>
-              </div>
-            </div>
+          {assessments && assessments.length === 0 && !loadError && (
+            <EmptyState title="No assessments available yet">No demo assessments are available right now. Check back later.</EmptyState>
+          )}
 
-            <div>
-              <label htmlFor="qText">Question Text</label>
-              <input
-                id="qText"
-                type="text"
-                value={questionText}
-                onChange={(e) => setQuestionText(e.target.value)}
-                placeholder="Enter the examination question text..."
-                required
-              />
-            </div>
-
-            {/* Interactive MCQ Options when answerType is mcq or options provided */}
-            {options && options.length > 0 ? (
-              <div style={{ marginBottom: '16px' }}>
-                <label style={{ display: 'block', fontWeight: 600, marginBottom: '8px' }}>
-                  Multiple-Choice Options (Select your answer):
-                </label>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  {options.map((opt) => {
-                    const isSelected = selectedOptionId === opt.option_id || selectedOptionId === opt.label;
-                    return (
-                      <label
-                        key={opt.option_id}
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '12px',
-                          padding: '10px 14px',
-                          border: isSelected ? '2px solid var(--primary)' : '1px solid var(--line)',
-                          borderRadius: '8px',
-                          background: isSelected ? 'rgba(8, 122, 99, 0.05)' : '#fff',
-                          cursor: 'pointer',
-                        }}
-                      >
-                        <input
-                          type="radio"
-                          name="c3-mcq-choice"
-                          checked={isSelected}
-                          onChange={() => {
-                            setSelectedOptionId(opt.option_id);
-                            setStudentAnswer(`Option ${opt.label}: ${opt.text}`);
-                          }}
-                        />
-                        <span style={{ fontWeight: 700, minWidth: '24px' }}>[{opt.label}]</span>
-                        <span>{opt.text}</span>
-                      </label>
-                    );
-                  })}
+          {assessments && assessments.length > 0 && (
+            <>
+              <section aria-labelledby="pick-h">
+                <h2 id="pick-h" style={{ margin: '0 0 10px' }}>Choose an assessment</h2>
+                {!c2Available && (
+                  <Notice tone="info">C2 assessments are not available yet. The assessments currently shown are demo assessments.</Notice>
+                )}
+                <div role="group" aria-label="Demo assessments (practice examples)" style={{ marginTop: 12 }}>
+                  <h3 className="small muted" style={{ margin: '0 0 8px' }}>Demo assessments (practice examples)</h3>
+                  <div className="c3-picker">
+                    {assessments.map((a) => (
+                      <button key={a.id} type="button" className="c3-pick" data-source="demo" aria-pressed={a.id === selectedId} onClick={() => choose(a)}>
+                        <strong>{a.title}</strong>
+                        <span>
+                          <span className="c3-source-badge demo">Demo</span>{' '}
+                          {a.answer_type === 'mcq' ? 'Multiple choice' : 'Written answer'}
+                          {a.max_marks != null ? ` · ${a.max_marks} marks` : ''}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            ) : (
-              <div>
-                <label htmlFor="studentAns">
-                  Student Answer <span style={{ color: '#d6453d' }}>*</span>
-                </label>
-                <textarea
-                  id="studentAns"
-                  className="c3-textarea"
-                  rows="4"
-                  value={studentAnswer}
-                  onChange={(e) => {
-                    setStudentAnswer(e.target.value);
-                    setSelectedPresetId('custom');
-                  }}
-                  placeholder="Type or paste natural-language student response here..."
-                  required
-                />
-                <span className="hint">
-                  Words: {studentAnswer.trim() ? studentAnswer.trim().split(/\s+/).length : 0} • Characters:{' '}
-                  {studentAnswer.length}
-                </span>
-              </div>
-            )}
+              </section>
 
-            <div>
-              <label htmlFor="refAns">Reference / Model Answer (Optional)</label>
-              <textarea
-                id="refAns"
-                className="c3-textarea"
-                rows="2"
-                value={referenceAnswer}
-                onChange={(e) => setReferenceAnswer(e.target.value)}
-                placeholder="Lecturer model answer for semantic alignment comparison..."
-              />
-            </div>
+              {!selected && !result && (
+                <p className="c3-choose-hint muted" role="status" style={{ margin: '4px 0 0' }}>Choose an assessment to start.</p>
+              )}
 
-            <div>
-              <label htmlFor="expConcepts">Expected Domain Concepts (comma-separated)</label>
-              <input
-                id="expConcepts"
-                type="text"
-                value={expectedConceptsStr}
-                onChange={(e) => setExpectedConceptsStr(e.target.value)}
-                placeholder="e.g. high-level structure, components, relationships"
-              />
-            </div>
+              {selected && !result && (
+                <form className="panel" onSubmit={submit} noValidate aria-label="Your answer">
+                  <h2 style={{ margin: '0 0 12px' }}>Your answer</h2>
+                  <div className="c3-question">
+                    <strong>Question</strong>
+                    <p style={{ margin: '4px 0 0' }}>{selected.question_text}</p>
+                  </div>
 
-            {/* Rubric Overview Bar */}
-            <div style={{ marginTop: '10px' }}>
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  background: '#f7fafc',
-                  border: '1px solid var(--line)',
-                  padding: '10px 14px',
-                  borderRadius: '8px',
-                }}
-              >
-                <div>
-                  <strong>Active Rubric:</strong> {rubric?.title} (ID: {rubric?.rubric_id}) •{' '}
-                  {rubric?.criteria?.length || 0} Criterion/Criteria
-                </div>
-                <button
-                  type="button"
-                  className="btn-ghost"
-                  style={{ width: 'auto', padding: '4px 10px' }}
-                  onClick={() => setShowRubricDetails(!showRubricDetails)}
-                >
-                  {showRubricDetails ? 'Hide Rubric Structure' : 'Inspect Rubric Structure'}
-                </button>
-              </div>
-
-              {showRubricDetails && (
-                <div style={{ background: '#f3f6f8', padding: '12px', borderRadius: '8px', marginTop: '6px' }}>
-                  {rubric?.criteria?.map((c, i) => (
-                    <div key={i} style={{ marginBottom: '10px', fontSize: '0.88rem' }}>
-                      <strong>
-                        Criterion {c.criterion_id}: {c.description} (Max: {c.max_marks} marks)
-                      </strong>
-                      <div style={{ marginLeft: '12px', marginTop: '4px' }}>
-                        {c.scoring_levels?.map((lvl, j) => (
-                          <div key={j} className="small muted">
-                            • Level {lvl.level_id} ({lvl.mark} marks): {lvl.descriptor}
-                            {lvl.required_concepts?.length > 0 &&
-                              ` [Requires: ${lvl.required_concepts.join(', ')}]`}
-                          </div>
+                  {isMcq ? (
+                    <fieldset className="c3-field" style={{ border: 0, padding: 0, margin: '0 0 14px' }} aria-describedby={fieldError ? 'ans-err' : undefined}>
+                      <legend className="c3-label">Choose one option</legend>
+                      <div className="c3-options">
+                        {(selected.options || []).map((o) => (
+                          <label key={o.option_id} className="c3-option">
+                            <input type="radio" name="option" value={o.option_id} checked={optionId === o.option_id} onChange={() => { setOptionId(o.option_id); setFieldError(null); }} />
+                            <span>
+                              <strong>{o.label}.</strong> {o.text}
+                            </span>
+                          </label>
                         ))}
                       </div>
+                    </fieldset>
+                  ) : (
+                    <div className="c3-field">
+                      <label htmlFor="ans">Write your answer</label>
+                      <textarea id="ans" value={answer} onChange={(e) => { setAnswer(e.target.value); setFieldError(null); }} aria-invalid={!!fieldError} aria-describedby={fieldError ? 'ans-err' : 'ans-hint'} />
+                      <span id="ans-hint" className="hint" style={{ margin: 0 }}>
+                        {answer.trim() ? answer.trim().split(/\s+/).length : 0} words
+                        {sample && (
+                          <>
+                            {' · '}
+                            <button type="button" className="btn-link-dark" onClick={() => { setAnswer(sample); setFieldError(null); }}>
+                              Insert an example answer
+                            </button>
+                          </>
+                        )}
+                      </span>
                     </div>
-                  ))}
-                </div>
-              )}
-            </div>
+                  )}
+                  {fieldError && <p id="ans-err" className="c3-error" role="alert" style={{ margin: '0 0 12px', color: 'var(--red-ink)' }}>{fieldError}</p>}
+                  {submitError && <Notice tone="error" title="Could not mark your answer" onRetry={() => submit({ preventDefault() {} })} onDismiss={() => setSubmitError(null)}>{submitError}</Notice>}
 
-            {/* Action Buttons */}
-            <div className="c3-form-actions">
-              <button type="submit" className="btn" disabled={loading}>
-                {loading && <span className="c3-spinner" />}
-                {loading ? 'Evaluating via C3 Pipeline (F1 → F2 → F3 → F4)...' : 'Assess Student Answer'}
-              </button>
-              <button
-                type="button"
-                className="btn secondary"
-                onClick={() => {
-                  setStudentAnswer('');
-                  setResult(null);
-                  setError(null);
-                }}
-              >
-                Clear
-              </button>
+                  <div className="c3-form-actions" style={{ marginTop: 12 }}>
+                    <button className="btn" type="submit" disabled={busy}>
+                      {busy ? 'Marking your answer...' : 'Submit answer'}
+                    </button>
+                    {busy && <Spinner />}
+                    {!busy && (answer || optionId) && (
+                      <button type="button" className="btn secondary" onClick={() => { setAnswer(''); setOptionId(null); setFieldError(null); }}>
+                        Clear
+                      </button>
+                    )}
+                  </div>
+                </form>
+              )}
+            </>
+          )}
+
+          {result && (
+            <div ref={resultRef} tabIndex={-1} style={{ outline: 'none' }}>
+              <AssessmentResult evaluation={result.evaluation} historicalResult={{ status: 'pending_review' }} submissionId={result.submissionId} question={result.question} answer={result.answer} />
+              <div className="c3-form-actions" style={{ marginTop: 16 }}>
+                <button type="button" className="btn" onClick={() => { setResult(null); setAnswer(''); setOptionId(null); }}>
+                  Answer another question
+                </button>
+                <button type="button" className="btn secondary" onClick={() => setTab('history')}>
+                  View my submissions
+                </button>
+              </div>
             </div>
-          </form>
+          )}
         </>
       )}
 
-      {/* Loading state for Historical Detail */}
-      {loadingHistoricalDetail && (
-        <div className="panel" style={{ textAlign: 'center', padding: '50px' }}>
-          <div className="c3-spinner" style={{ width: '28px', height: '28px', borderColor: 'var(--primary)' }} />
-          <p className="muted" style={{ marginTop: '12px' }}>Loading complete assessment evaluation...</p>
-        </div>
-      )}
-
-      {/* Error Message Box */}
-      {error && (
-        <div className="c3-alert-box c3-alert-error">
-          <span style={{ fontSize: '1.2rem' }}>⚠️</span>
-          <div>
-            <strong>Evaluation Error:</strong>
-            <p style={{ margin: '2px 0 0', fontSize: '0.9rem' }}>{error}</p>
-          </div>
-        </div>
-      )}
-
-      {/* =========================================================================
-          ASSESSMENT RESULT SECTION (Active Submission OR Historical View)
-         ========================================================================= */}
-      {activeEvaluation && !loadingHistoricalDetail && (
-        <div className="c3-result-container">
-          {/* Top Back Navigation if viewing past submission */}
-          {viewingHistoricalSubmission && (
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-              <button
-                type="button"
-                className="btn-ghost"
-                style={{ width: 'auto', padding: '6px 14px' }}
-                onClick={() => setViewingHistoricalSubmission(null)}
-              >
-                ← Back to Submissions History
-              </button>
-              <button
-                type="button"
-                className="btn secondary"
-                style={{ width: 'auto', padding: '6px 14px' }}
-                onClick={() => {
-                  setActiveTab('new_assessment');
-                  setViewingHistoricalSubmission(null);
-                  setResult(null);
-                }}
-              >
-                ✍️ Start New Assessment
-              </button>
-            </div>
-          )}
-
-          {/* Top Score Banner */}
-          <div className="c3-result-banner">
-            <div>
-              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
-                <span className="c3-badge-research" style={{ background: 'rgba(255,255,255,0.2)' }}>
-                  {activeEvaluation.pipeline_version || 'f2-rubric-v1'} • Component 3
-                </span>
-                {isFinalized ? (
-                  <span className="c3-badge-status finalized" style={{ background: '#e6f7f2', color: '#065543' }}>
-                    ✓ Official Result Finalized by Lecturer
-                  </span>
-                ) : (
-                  <span className="c3-badge-status pending_review" style={{ background: 'rgba(254,245,231,0.95)' }}>
-                    ⏳ AI Proposed Mark • Pending Final Lecturer Review
-                  </span>
-                )}
-              </div>
-              <h2 className="c3-banner-title">
-                {isFinalized ? 'Finalized Assessment Result' : 'AI Proposed Evaluation'}
-              </h2>
-              <p className="c3-banner-sub">
-                Question: {activeSubmissionContext?.question_id} • Evaluated via F1–F4 sequential pipeline
-              </p>
-              {activeSubmissionContext?.submission_id && (
-                <p className="small" style={{ color: '#bcd0e2', margin: '4px 0 0' }}>
-                  Submission Reference: <code>#{String(activeSubmissionContext.submission_id).slice(-6)}</code>
-                </p>
-              )}
-            </div>
-
-            <div className="c3-score-display">
-              <div className="c3-score-ring-wrap">
-                <svg viewBox="0 0 100 100" style={{ transform: 'rotate(-90deg)' }}>
-                  <circle cx="50" cy="50" r="40" className="ring-track" stroke="rgba(255,255,255,0.2)" />
-                  <circle
-                    cx="50"
-                    cy="50"
-                    r="40"
-                    className="ring-fill"
-                    stroke={isFinalized ? '#3ddbb0' : '#ffd166'}
-                    strokeDasharray="251.2"
-                    strokeDashoffset={
-                      scorePercentage !== null && scorePercentage !== undefined
-                        ? 251.2 - (251.2 * scorePercentage) / 100
-                        : 251.2
-                    }
-                  />
-                </svg>
-                <div className="c3-score-circle-text">
-                  <div className="c3-score-percent">{scorePercentage}%</div>
-                  <div className="c3-score-denom-label">{isFinalized ? 'Final' : 'AI Mark'}</div>
+      {tab === 'history' && !detail && (
+        <section aria-label="My submissions">
+          {historyError && <Notice tone="error" title="Submissions unavailable" onRetry={loadHistory}>{historyError}</Notice>}
+          {historyLoading && history.length === 0 ? (
+            <Spinner label="Loading your submissions..." />
+          ) : history.length === 0 && !historyError ? (
+            <EmptyState title="No submissions yet" action={<button type="button" className="btn" onClick={() => setTab('answer')}>Answer a question</button>}>
+              Your marked answers will appear here.
+            </EmptyState>
+          ) : (
+            history.length > 0 && (
+              <div className="panel flush">
+                <div className="table-wrap">
+                  <table className="data-table c3-table" style={{ margin: 0 }}>
+                    <thead>
+                      <tr>
+                        <th>Question</th>
+                        <th>Submitted</th>
+                        <th>Mark</th>
+                        <th>Status</th>
+                        <th>
+                          <span className="c3-sr">Open</span>
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {history.map((s) => {
+                        const finalized = s.status === 'finalized' && s.final_mark != null;
+                        const mark = finalized ? s.final_mark : s.automated_mark;
+                        return (
+                          <tr key={s._id}>
+                            <td>
+                              <div className="c3-trunc" title={s.question_text}>{s.question_text || s.question_id}</div>
+                            </td>
+                            <td className="small muted">{s.submitted_at ? new Date(s.submitted_at).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' }) : '-'}</td>
+                            <td>
+                              {mark != null ? (
+                                <>
+                                  <strong>{mark} / {s.total_possible_marks}</strong>
+                                  {!finalized && <span className="small muted"> proposed</span>}
+                                </>
+                              ) : (
+                                <span className="muted">-</span>
+                              )}
+                            </td>
+                            <td><StatusPill status={s.status} /></td>
+                            <td>
+                              <button type="button" className="btn secondary c3-sm" disabled={detailBusy} onClick={() => openSubmission(s._id)}>
+                                Open
+                              </button>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
                 </div>
               </div>
-
-              <div className="c3-score-numbers">
-                <div>
-                  <span className="c3-score-big">
-                    {isFinalized ? historicalResult?.final_mark : automatedMark}
-                  </span>
-                  <span className="c3-score-total"> / {totalPossible}</span>
-                </div>
-                <span className="c3-score-legend">
-                  {isFinalized
-                    ? `Authoritative Score (Verified by ${historicalResult?.reviewed_by || 'Lecturer'})`
-                    : 'AI Proposed Mark (Pending Final Lecturer Verification)'}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Finalized Lecturer Decision Notice */}
-          {isFinalized && historicalResult?.lecturer_decision === 'overridden' && (
-            <div className="panel" style={{ borderLeft: '5px solid #c05621', background: '#fdfaf8' }}>
-              <h4 style={{ margin: '0 0 6px', color: '#9c4215' }}>Lecturer Review Notes & Override Reason</h4>
-              <p style={{ margin: 0, fontStyle: 'italic', fontSize: '0.95rem' }}>
-                "{historicalResult?.override_reason || 'Verified and updated by lecturer.'}"
-              </p>
-              <div className="small muted" style={{ marginTop: '8px' }}>
-                Original AI Proposed Mark: {automatedMark} / {totalPossible} • Final Score: {historicalResult?.final_mark} / {totalPossible}
-              </div>
-            </div>
+            )
           )}
+        </section>
+      )}
 
-          {/* Warnings Alert Box */}
-          {activeEvaluation.warnings && activeEvaluation.warnings.length > 0 && (
-            <div className="c3-alert-box c3-alert-warning">
-              <span style={{ fontSize: '1.2rem' }}>ℹ️</span>
-              <div>
-                <strong>Pipeline Warnings:</strong>
-                <ul style={{ margin: '4px 0 0', paddingLeft: '18px', fontSize: '0.88rem' }}>
-                  {activeEvaluation.warnings.map((w, i) => (
-                    <li key={i}>{w}</li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          )}
-
-          {/* Question and Student Answer Context */}
-          <div className="panel">
-            <h4 style={{ margin: '0 0 8px' }}>Assessment Context & Evaluated Answer</h4>
-            <div className="small muted" style={{ marginBottom: '8px' }}>
-              <strong>Question:</strong> {activeSubmissionContext?.question_text}
-            </div>
-            <div
-              style={{
-                background: '#f8fafc',
-                border: '1px solid var(--line)',
-                borderRadius: '8px',
-                padding: '12px 16px',
-                whiteSpace: 'pre-wrap',
-                fontSize: '0.92rem',
-                lineHeight: 1.5,
-              }}
-            >
-              {activeSubmissionContext?.student_answer}
-            </div>
-          </div>
-
-          {/* Overall Feedback Summary Card */}
-          {activeEvaluation.feedback?.overall_feedback && (
-            <div className="panel c3-summary-card">
-              <h3>Overall Feedback Synthesis</h3>
-              <p className="c3-summary-text">
-                {activeEvaluation.feedback.overall_feedback.overall_summary}
-              </p>
-
-              <div className="c3-summary-columns">
-                {activeEvaluation.feedback.overall_feedback.overall_strengths?.length > 0 && (
-                  <div className="c3-summary-col">
-                    <h5 style={{ color: '#065543' }}>✓ Strengths Identified</h5>
-                    <ul>
-                      {activeEvaluation.feedback.overall_feedback.overall_strengths.map((s, i) => (
-                        <li key={i}>{s}</li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                {activeEvaluation.feedback.overall_feedback.overall_missing_concepts?.length > 0 && (
-                  <div className="c3-summary-col">
-                    <h5 style={{ color: '#8a1f17' }}>○ Missing Concepts</h5>
-                    <ul>
-                      {activeEvaluation.feedback.overall_feedback.overall_missing_concepts.map((m, i) => (
-                        <li key={i}>{m}</li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                {activeEvaluation.feedback.overall_feedback.overall_improvement_suggestions?.length > 0 && (
-                  <div className="c3-summary-col">
-                    <h5 style={{ color: '#1b4d75' }}>💡 Recommended Improvements</h5>
-                    <ul>
-                      {activeEvaluation.feedback.overall_feedback.overall_improvement_suggestions.map((s, i) => (
-                        <li key={i}>{s}</li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                {activeEvaluation.feedback.overall_feedback.overall_next_level_improvements?.length > 0 && (
-                  <div className="c3-summary-col">
-                    <h5 style={{ color: '#5c2069' }}>🚀 Target Next Level</h5>
-                    <ul>
-                      {activeEvaluation.feedback.overall_feedback.overall_next_level_improvements.map((nl, i) => (
-                        <li key={i}>{nl}</li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* Criteria Evaluation Results Section */}
-          <div style={{ marginTop: '24px' }}>
-            <h2>Criterion-Level Evaluation & Grounded Evidence</h2>
-            {activeEvaluation.marking?.criteria_results?.map((cr) => (
-              <CriterionCard
-                key={cr.criterion_id}
-                criterionMarking={cr}
-                criterionFeedback={feedbackByCriterionId.get(cr.criterion_id)}
-                sentenceMap={sentenceMap}
-              />
-            ))}
-          </div>
-
-          {/* Concept Diagnosis Table Section */}
-          <ConceptDiagnosis analysis={activeEvaluation.analysis} sentenceMap={sentenceMap} />
-
-          {/* Interactive Concept Mind Map Section */}
-          <h2>Concept-Based Mind Map Visualization</h2>
-          <MindMapGraph mindmap={activeEvaluation.mindmap} sentences={activeEvaluation.analysis?.sentences || []} />
-
-          {/* Bottom Actions */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '20px' }}>
-            <button
-              type="button"
-              className="btn secondary"
-              style={{ width: 'auto' }}
-              onClick={() => {
-                setResult(null);
-                setViewingHistoricalSubmission(null);
-                setActiveTab('history');
-                fetchStudentHistory();
-              }}
-            >
-              📋 View in Submissions History
-            </button>
-            <button
-              type="button"
-              className="btn"
-              style={{ width: 'auto' }}
-              onClick={() => {
-                setResult(null);
-                setViewingHistoricalSubmission(null);
-                setActiveTab('new_assessment');
-              }}
-            >
-              ✍️ Assess Another Answer
-            </button>
-          </div>
-        </div>
+      {tab === 'history' && detail && (
+        <section aria-label="Submission detail">
+          <button type="button" className="btn secondary back" onClick={() => setDetail(null)} style={{ marginBottom: 12 }}>
+            Back to my submissions
+          </button>
+          <AssessmentResult
+            evaluation={detail.result?.ai_evaluation || detail.result}
+            historicalResult={detail.result}
+            submissionId={detail.submission?._id}
+            question={detail.submission?.question_text}
+            answer={detail.submission?.student_answer}
+          />
+        </section>
       )}
     </div>
   );

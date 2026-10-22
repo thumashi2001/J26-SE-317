@@ -1,280 +1,127 @@
 import React, { useState } from 'react';
 
-/**
- * Interactive SVG Concept Mind Map Visualizer
- * Renders the authoritative Function 4 graph structure directly from the API response.
- */
-export default function MindMapGraph({ mindmap, sentences = [] }) {
-  const [selectedNodeId, setSelectedNodeId] = useState(null);
-  const [filterStatus, setFilterStatus] = useState('all');
+const STATUS = {
+  demonstrated: { label: 'Demonstrated', cls: 'demonstrated', pill: 'status-approved' },
+  partial: { label: 'Partial', cls: 'partial', pill: 'status-pending' },
+  not_demonstrated: { label: 'Missing', cls: 'missing', pill: 'status-rejected' },
+  missing: { label: 'Missing', cls: 'missing', pill: 'status-rejected' },
+};
 
-  if (!mindmap || !mindmap.nodes || mindmap.nodes.length === 0) {
+// Accepts both response shapes: the Python service (node_id, relationships, root_node_id)
+// and the in-app MCQ marker (id, edges). Only edges present in the response are drawn.
+function normalise(mindmap) {
+  const nodes = (mindmap.nodes || []).map((n) => ({
+    ...n,
+    node_id: n.node_id ?? n.id,
+    concept: n.concept ?? n.label,
+    label: n.label ?? n.concept ?? '',
+  }));
+  const edges = (mindmap.relationships || mindmap.edges || []).map((r, i) => ({
+    id: r.relationship_id ?? r.id ?? `e${i}`,
+    source: r.source_node_id ?? r.source ?? r.from,
+    target: r.target_node_id ?? r.target ?? r.to,
+    type: r.relationship_type ?? r.type,
+  }));
+  const rootId = mindmap.root_node_id ?? nodes.find((n) => n.type === 'root')?.node_id ?? nodes[0]?.node_id;
+  return { nodes, edges, rootId };
+}
+
+export default function MindMapGraph({ mindmap, sentences = [] }) {
+  const [selectedId, setSelectedId] = useState(null);
+  const [filter, setFilter] = useState('all');
+
+  if (!mindmap || !Array.isArray(mindmap.nodes) || mindmap.nodes.length === 0) {
     return (
-      <div className="c3-empty-card">
-        <p className="muted">No mind map generated for this assessment.</p>
+      <div className="panel c3-empty">
+        <p className="muted" style={{ margin: 0 }}>
+          No concept map was produced for this answer.
+        </p>
       </div>
     );
   }
 
-  const { nodes, relationships, summary, title, root_node_id } = mindmap;
-
-  // Map sentence IDs to sentence text
-  const sentenceMap = new Map();
-  sentences.forEach((s) => sentenceMap.set(s.sentence_id, s.text));
-
-  // Partition root and concept nodes
-  const rootNode = nodes.find((n) => n.node_id === root_node_id) || nodes[0];
-  const conceptNodes = nodes.filter((n) => n.node_id !== rootNode.node_id);
-
-  // Filter concept nodes if filter is active
-  const visibleConceptNodes = conceptNodes.filter((n) => {
-    if (filterStatus === 'all') return true;
-    return n.status === filterStatus;
+  const { nodes, edges, rootId } = normalise(mindmap);
+  const sentenceMap = new Map(sentences.map((s) => [s.sentence_id, s.text]));
+  const root = nodes.find((n) => n.node_id === rootId) || nodes[0];
+  const concepts = nodes.filter((n) => n.node_id !== root.node_id);
+  const counts = { demonstrated: 0, partial: 0, not_demonstrated: 0 };
+  concepts.forEach((n) => {
+    const k = n.status === 'missing' ? 'not_demonstrated' : n.status;
+    if (k in counts) counts[k] += 1;
   });
+  const matches = (n) => filter === 'all' || (n.status === 'missing' ? 'not_demonstrated' : n.status) === filter;
 
-  // Calculate layout coordinates
-  // Root at top center; concept nodes in a row or arc below
-  const width = 840;
-  const height = Math.max(340, 160 + Math.ceil(conceptNodes.length / 4) * 110);
-  const rootX = width / 2;
-  const rootY = 60;
-
-  // Position concept nodes in a clean grid below the root
-  const cols = Math.min(4, Math.max(2, conceptNodes.length));
-  const conceptPositions = new Map();
-
-  conceptNodes.forEach((node, index) => {
-    const row = Math.floor(index / cols);
-    const col = index % cols;
-    const totalInRow = Math.min(cols, conceptNodes.length - row * cols);
-    const spacingX = width / (totalInRow + 1);
-    const x = spacingX * (col + 1);
-    const y = 190 + row * 110;
-    conceptPositions.set(node.node_id, { x, y });
+  const W = 840;
+  const cols = Math.min(4, Math.max(2, concepts.length));
+  const H = Math.max(300, 170 + Math.ceil(concepts.length / cols) * 100);
+  const rootPos = { x: W / 2, y: 50 };
+  const pos = new Map();
+  concepts.forEach((n, i) => {
+    const row = Math.floor(i / cols);
+    const inRow = Math.min(cols, concepts.length - row * cols);
+    pos.set(n.node_id, { x: (W / (inRow + 1)) * ((i % cols) + 1), y: 170 + row * 100 });
   });
-
-  const selectedNode = nodes.find((n) => n.node_id === selectedNodeId);
-
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'demonstrated':
-        return {
-          bg: '#e6f7f2',
-          border: '#0f9a78',
-          text: '#065543',
-          badge: '✓ Demonstrated',
-          chipClass: 'c3-status-demonstrated',
-        };
-      case 'partial':
-        return {
-          bg: '#fef5e7',
-          border: '#d9901a',
-          text: '#7a5200',
-          badge: '△ Partial',
-          chipClass: 'c3-status-partial',
-        };
-      case 'not_demonstrated':
-        return {
-          bg: '#fdf0ef',
-          border: '#d6453d',
-          text: '#8a1f17',
-          badge: '○ Missing',
-          chipClass: 'c3-status-missing',
-        };
-      default:
-        return {
-          bg: '#f3f6f8',
-          border: '#0e2238',
-          text: '#0e2238',
-          badge: 'Root Topic',
-          chipClass: 'c3-status-root',
-        };
-    }
-  };
+  pos.set(root.node_id, rootPos);
+  const selected = nodes.find((n) => n.node_id === selectedId);
+  const trim = (t, n) => (t.length > n ? `${t.slice(0, n - 2)}...` : t);
 
   return (
-    <div className="c3-mindmap-container">
-      {/* Mind Map Header & Summary Statistics */}
+    <section className="c3-mindmap-container" aria-label="Concept map">
       <div className="c3-mindmap-header">
         <div>
-          <h3 style={{ margin: 0 }}>{title || 'Concept Mind Map'}</h3>
-          <span className="small muted">
-            Generated via Function 4 deterministic hierarchy & lexical evidence
-          </span>
+          <h3 style={{ margin: 0 }}>{mindmap.title || 'Concept map'}</h3>
+          <span className="small muted">Built from the concepts found in the answer. Select a concept for its evidence.</span>
         </div>
-        <div className="c3-mindmap-filters">
-          <button
-            type="button"
-            className={`c3-filter-pill ${filterStatus === 'all' ? 'active' : ''}`}
-            onClick={() => setFilterStatus('all')}
-          >
-            All ({summary?.total_nodes || nodes.length})
-          </button>
-          <button
-            type="button"
-            className={`c3-filter-pill demonstrated ${filterStatus === 'demonstrated' ? 'active' : ''}`}
-            onClick={() => setFilterStatus('demonstrated')}
-          >
-            ✓ Demonstrated ({summary?.demonstrated_count || 0})
-          </button>
-          <button
-            type="button"
-            className={`c3-filter-pill partial ${filterStatus === 'partial' ? 'active' : ''}`}
-            onClick={() => setFilterStatus('partial')}
-          >
-            △ Partial ({summary?.partial_count || 0})
-          </button>
-          <button
-            type="button"
-            className={`c3-filter-pill missing ${filterStatus === 'not_demonstrated' ? 'active' : ''}`}
-            onClick={() => setFilterStatus('not_demonstrated')}
-          >
-            ○ Missing ({summary?.missing_count || 0})
-          </button>
+        <div className="tabs" role="group" aria-label="Filter concept map" style={{ margin: 0 }}>
+          {[
+            ['all', 'All', concepts.length],
+            ['demonstrated', 'Demonstrated', counts.demonstrated],
+            ['partial', 'Partial', counts.partial],
+            ['not_demonstrated', 'Missing', counts.not_demonstrated],
+          ].map(([key, label, n]) => (
+            <button key={key} type="button" className={filter === key ? 'on' : ''} aria-pressed={filter === key} onClick={() => setFilter(key)}>
+              {label} <span className="tab-count">{n}</span>
+            </button>
+          ))}
         </div>
       </div>
 
-      {/* SVG Canvas */}
       <div className="c3-svg-scroll">
-        <svg
-          viewBox={`0 0 ${width} ${height}`}
-          className="c3-mindmap-svg"
-          style={{ width: '100%', minWidth: '600px', height: `${height}px` }}
-        >
-          <defs>
-            <marker
-              id="arrow-default"
-              viewBox="0 0 10 10"
-              refX="18"
-              refY="5"
-              markerWidth="6"
-              markerHeight="6"
-              orient="auto-start-reverse"
-            >
-              <path d="M 0 1 L 10 5 L 0 9 z" fill="#8aa3ba" />
-            </marker>
-            <marker
-              id="arrow-active"
-              viewBox="0 0 10 10"
-              refX="18"
-              refY="5"
-              markerWidth="6"
-              markerHeight="6"
-              orient="auto-start-reverse"
-            >
-              <path d="M 0 1 L 10 5 L 0 9 z" fill="#087a63" />
-            </marker>
-          </defs>
-
-          {/* Relationship Edges */}
-          {relationships.map((rel) => {
-            const isSourceRoot = rel.source_node_id === rootNode.node_id;
-            const sourcePos = isSourceRoot
-              ? { x: rootX, y: rootY + 20 }
-              : conceptPositions.get(rel.source_node_id);
-            const targetPos = conceptPositions.get(rel.target_node_id);
-
-            if (!sourcePos || !targetPos) return null;
-
-            const isConnectedToSelected =
-              selectedNodeId &&
-              (rel.source_node_id === selectedNodeId || rel.target_node_id === selectedNodeId);
-
-            // Curved cubic bezier path
-            const midY = (sourcePos.y + targetPos.y) / 2;
-            const pathData = `M ${sourcePos.x} ${sourcePos.y} C ${sourcePos.x} ${midY}, ${targetPos.x} ${midY}, ${targetPos.x} ${targetPos.y}`;
-
-            return (
-              <g key={rel.relationship_id}>
-                <path
-                  d={pathData}
-                  fill="none"
-                  stroke={isConnectedToSelected ? '#087a63' : '#bccad7'}
-                  strokeWidth={isConnectedToSelected ? 2.5 : 1.5}
-                  strokeDasharray={rel.relationship_type === 'UNLINKED_FALLBACK' ? '4 4' : 'none'}
-                  markerEnd={isConnectedToSelected ? 'url(#arrow-active)' : 'url(#arrow-default)'}
-                />
-              </g>
-            );
+        <svg viewBox={`0 0 ${W} ${H}`} className="c3-mindmap-svg" style={{ width: '100%', minWidth: 600, height: H }} role="group" aria-label="Concept map diagram; the same information is listed below">
+          {edges.map((e) => {
+            const a = pos.get(e.source);
+            const b = pos.get(e.target);
+            if (!a || !b) return null;
+            const active = selectedId && (e.source === selectedId || e.target === selectedId);
+            const midY = (a.y + b.y) / 2;
+            return <path key={e.id} d={`M ${a.x} ${a.y + 22} C ${a.x} ${midY}, ${b.x} ${midY}, ${b.x} ${b.y - 22}`} className={`c3-mm-edge${active ? ' active' : ''}`} />;
           })}
 
-          {/* Root Node */}
-          <g
-            className="c3-node-group"
-            transform={`translate(${rootX}, ${rootY})`}
-            onClick={() => setSelectedNodeId(rootNode.node_id)}
-            style={{ cursor: 'pointer' }}
-          >
-            <rect
-              x="-110"
-              y="-24"
-              width="220"
-              height="48"
-              rx="12"
-              fill="#0e2238"
-              stroke={selectedNodeId === rootNode.node_id ? '#4aa3ff' : '#1b3a59'}
-              strokeWidth={selectedNodeId === rootNode.node_id ? 3 : 1.5}
-            />
-            <text
-              textAnchor="middle"
-              y="5"
-              fill="#ffffff"
-              fontFamily="var(--font-head)"
-              fontWeight="700"
-              fontSize="13"
-            >
-              {rootNode.label.length > 28 ? rootNode.label.slice(0, 25) + '...' : rootNode.label}
-            </text>
+          <g transform={`translate(${rootPos.x}, ${rootPos.y})`} className="c3-mm-node root" tabIndex={0} role="button" aria-label={`Question: ${root.label}`} onClick={() => setSelectedId(root.node_id)} onKeyDown={(ev) => (ev.key === 'Enter' || ev.key === ' ') && setSelectedId(root.node_id)}>
+            <rect x="-120" y="-24" width="240" height="48" rx="12" className={selectedId === root.node_id ? 'sel' : ''} />
+            <text textAnchor="middle" y="5">{trim(root.label, 32)}</text>
           </g>
 
-          {/* Concept Nodes */}
-          {conceptNodes.map((node) => {
-            const pos = conceptPositions.get(node.node_id);
-            if (!pos) return null;
-
-            const colors = getStatusColor(node.status);
-            const isSelected = selectedNodeId === node.node_id;
-            const isDimmed = filterStatus !== 'all' && node.status !== filterStatus;
-
+          {concepts.map((n) => {
+            const p = pos.get(n.node_id);
+            const st = STATUS[n.status] || STATUS.not_demonstrated;
+            const label = n.concept || n.label;
             return (
               <g
-                key={node.node_id}
-                className={`c3-node-group ${isDimmed ? 'dimmed' : ''}`}
-                transform={`translate(${pos.x}, ${pos.y})`}
-                onClick={() => setSelectedNodeId(node.node_id)}
-                style={{ cursor: 'pointer', opacity: isDimmed ? 0.3 : 1 }}
+                key={n.node_id}
+                transform={`translate(${p.x}, ${p.y})`}
+                className={`c3-mm-node ${st.cls}${matches(n) ? '' : ' dim'}`}
+                tabIndex={0}
+                role="button"
+                aria-label={`${label}: ${st.label}`}
+                onClick={() => setSelectedId(n.node_id)}
+                onKeyDown={(ev) => (ev.key === 'Enter' || ev.key === ' ') && setSelectedId(n.node_id)}
               >
-                <rect
-                  x="-90"
-                  y="-22"
-                  width="180"
-                  height="44"
-                  rx="10"
-                  fill={colors.bg}
-                  stroke={isSelected ? '#0e2238' : colors.border}
-                  strokeWidth={isSelected ? 3 : 1.5}
-                />
-                <text
-                  textAnchor="middle"
-                  y="-3"
-                  fill={colors.text}
-                  fontFamily="var(--font-body)"
-                  fontWeight="600"
-                  fontSize="12"
-                >
-                  {node.concept.length > 22 ? node.concept.slice(0, 20) + '...' : node.concept}
-                </text>
-                <text
-                  textAnchor="middle"
-                  y="13"
-                  fill={colors.border}
-                  fontFamily="var(--font-body)"
-                  fontWeight="500"
-                  fontSize="10"
-                >
-                  {colors.badge}
-                  {node.evidence_sentence_ids?.length > 0 &&
-                    ` • S[${node.evidence_sentence_ids.join(',')}]`}
+                <rect x="-90" y="-22" width="180" height="44" rx="10" className={selectedId === n.node_id ? 'sel' : ''} />
+                <text textAnchor="middle" y="-3" className="t1">{trim(label, 22)}</text>
+                <text textAnchor="middle" y="13" className="t2">
+                  {st.label}
+                  {n.evidence_sentence_ids?.length > 0 && ` · S${n.evidence_sentence_ids.join(',')}`}
                 </text>
               </g>
             );
@@ -282,64 +129,47 @@ export default function MindMapGraph({ mindmap, sentences = [] }) {
         </svg>
       </div>
 
-      {/* Inspector Panel for Selected Node */}
-      {selectedNode && (
-        <div className="c3-node-inspector panel">
+      <details className="c3-mm-list">
+        <summary>View concepts as a list</summary>
+        <ul>
+          {concepts.map((n) => (
+            <li key={n.node_id}>
+              <strong>{n.concept || n.label}</strong> <span className={`pill ${(STATUS[n.status] || STATUS.not_demonstrated).pill}`}>{(STATUS[n.status] || STATUS.not_demonstrated).label}</span>
+            </li>
+          ))}
+        </ul>
+      </details>
+
+      {selected && (
+        <div className="c3-node-inspector panel" aria-live="polite">
           <div className="c3-inspector-head">
             <div>
-              <span className="small muted">Node Details</span>
-              <h4 style={{ margin: '2px 0 0' }}>{selectedNode.concept || selectedNode.label}</h4>
+              <span className="small muted">Selected concept</span>
+              <h4 style={{ margin: '2px 0 0' }}>{selected.concept || selected.label}</h4>
             </div>
-            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-              <span className={`chip ${getStatusColor(selectedNode.status).chipClass}`}>
-                {getStatusColor(selectedNode.status).badge}
-              </span>
-              <button
-                type="button"
-                className="btn-ghost"
-                style={{ padding: '3px 8px', width: 'auto' }}
-                onClick={() => setSelectedNodeId(null)}
-              >
-                ✕ Close
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+              {selected.node_id !== root.node_id && <span className={`pill ${(STATUS[selected.status] || STATUS.not_demonstrated).pill}`}>{(STATUS[selected.status] || STATUS.not_demonstrated).label}</span>}
+              <button type="button" className="btn-ghost c3-close" onClick={() => setSelectedId(null)}>
+                Close
               </button>
             </div>
           </div>
-
-          <div className="c3-inspector-grid">
-            <div>
-              <strong>Node ID:</strong> <span className="small muted">{selectedNode.node_id}</span>
-            </div>
-            <div>
-              <strong>Type / Source:</strong>{' '}
-              <span className="small muted">
-                {selectedNode.type} ({selectedNode.source})
-              </span>
-            </div>
-            <div>
-              <strong>Evidence Sentences:</strong>{' '}
-              <span className="small">
-                {selectedNode.evidence_sentence_ids?.length > 0
-                  ? selectedNode.evidence_sentence_ids.map((id) => `Sentence ${id}`).join(', ')
-                  : 'None detected'}
-              </span>
-            </div>
-          </div>
-
-          {selectedNode.evidence_sentence_ids?.length > 0 && (
+          {selected.evidence_sentence_ids?.length > 0 ? (
             <div className="c3-inspector-evidence">
-              <strong>Grounding Evidence in Student Answer:</strong>
-              {selectedNode.evidence_sentence_ids.map((id) => {
-                const text = sentenceMap.get(id);
-                return (
-                  <div key={id} className="c3-evidence-quote">
-                    <span className="c3-sentence-tag">Sentence {id}:</span> &ldquo;{text}&rdquo;
-                  </div>
-                );
-              })}
+              <strong>Evidence in the answer</strong>
+              {selected.evidence_sentence_ids.map((id) => (
+                <div key={id} className="c3-evidence-quote">
+                  <span className="c3-sentence-tag">Sentence {id}</span> &ldquo;{sentenceMap.get(id) || ''}&rdquo;
+                </div>
+              ))}
             </div>
+          ) : (
+            <p className="small muted" style={{ margin: '8px 0 0' }}>
+              No sentence in the answer supports this item.
+            </p>
           )}
         </div>
       )}
-    </div>
+    </section>
   );
 }

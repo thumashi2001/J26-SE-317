@@ -1,0 +1,128 @@
+{
+ "submission": {
+  "_id": "6ad8f6f7dcb2b3c2722db95d",
+  "student_id": "IT10000001",
+  "question_id": "SE3010-MCQ-01",
+  "question_text": "Which architectural style structures an application as a collection of loosely coupled, independently deployable services?",
+  "student_answer": "Selected Option: A",
+  "options": [
+   {
+    "option_id": "A",
+    "label": "A",
+    "text": "Monolithic Architecture"
+   },
+   {
+    "option_id": "B",
+    "label": "B",
+    "text": "Microservices Architecture"
+   },
+   {
+    "option_id": "C",
+    "label": "C",
+    "text": "Pipe and Filter Architecture"
+   },
+   {
+    "option_id": "D",
+    "label": "D",
+    "text": "Model-View-Controller (MVC)"
+   }
+  ],
+  "selected_options": [
+   "A"
+  ],
+  "answer_type": "mcq",
+  "status": "pending_review",
+  "submitted_at": "2026-10-21T17:31:35.515Z",
+  "updated_at": "2026-10-21T17:31:35.515Z",
+  "is_demo": true,
+  "provenance": "pp1_demo"
+ },
+ "result": {
+  "_id": "6ad8f6f7dcb2b3c2722db95e",
+  "submission_id": "6ad8f6f7dcb2b3c2722db95d",
+  "automated_mark": 0,
+  "total_possible_marks": 2,
+  "percentage": 0,
+  "ai_evaluation": {
+   "question_id": "SE3010-MCQ-01",
+   "answer_type": "mcq",
+   "is_correct": false,
+   "is_unanswered": false,
+   "total_awarded_marks": 0,
+   "total_possible_marks": 2,
+   "percentage": 0,
+   "selected_option_ids": [
+    "A"
+   ],
+   "selected_labels": [
+    "A"
+   ],
+   "options": [
+    {
+     "option_id": "A",
+     "label": "A",
+     "text": "Monolithic Architecture"
+    },
+    {
+     "option_id": "B",
+     "label": "B",
+     "text": "Microservices Architecture"
+    },
+    {
+     "option_id": "C",
+     "label": "C",
+     "text": "Pipe and Filter Architecture"
+    },
+    {
+     "option_id": "D",
+     "label": "D",
+     "text": "Model-View-Controller (MVC)"
+    }
+   ],
+   "marking": {
+    "question_id": "SE3010-MCQ-01",
+    "total_awarded_marks": 0,
+    "total_possible_marks": 2,
+    "percentage": 0,
+    "marking_version": "mcq-deterministic-v1",
+    "overall_explanation": "Your selected option is not correct. Mark: 0 / 2.",
+    "warnings": [],
+    "criteria_results": [
+     {
+      "criterion_id": "MCQ",
+      "criterion_description": "Multiple-choice answer",
+      "selected_level_id": "MCQ-INCORRECT",
+      "selected_level_label": "Incorrect",
+      "rubric_descriptor": "Your selected option is not correct.",
+      "awarded_mark": 0,
+      "max_marks": 2,
+      "evidence_sentence_ids": [],
+      "supporting_concepts": [],
+      "explanation": "Your selected option is not correct. Mark: 0 / 2.",
+      "warnings": []
+     }
+    ]
+   },
+   "analysis": null,
+   "feedback": {
+    "question_id": "SE3010-MCQ-01",
+    "summary": "Your selected option is not correct.",
+    "strengths": [],
+    "missing_concepts": [],
+    "misconceptions": [],
+    "actionable_guidance": "Review the lecture notes on this topic before trying again.",
+    "rubric_alignment": "Mark: 0 / 2 (0%).",
+    "warnings": []
+   },
+   "mindmap": null,
+   "redacted": true
+  },
+  "lecturer_decision": null,
+  "final_mark": null,
+  "override_reason": null,
+  "reviewed_by": null,
+  "reviewed_at": null,
+  "finalized_at": null,
+  "status": "pending_review"
+ }
+}

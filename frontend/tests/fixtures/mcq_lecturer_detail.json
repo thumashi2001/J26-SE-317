@@ -1,0 +1,188 @@
+{
+ "submission": {
+  "_id": "6ad8c84c5cb1228ff22b60cc",
+  "student_id": "IT10000001",
+  "question_id": "SE3010-MCQ-01",
+  "question_text": "Which architectural style structures an application as a collection of loosely coupled, independently deployable services?",
+  "student_answer": "Selected Option: A",
+  "reference_answer": "Correct Option: B",
+  "expected_concepts": [
+   "microservices",
+   "loosely coupled"
+  ],
+  "options": [
+   {
+    "option_id": "A",
+    "label": "A",
+    "text": "Monolithic Architecture"
+   },
+   {
+    "option_id": "B",
+    "label": "B",
+    "text": "Microservices Architecture"
+   },
+   {
+    "option_id": "C",
+    "label": "C",
+    "text": "Pipe and Filter Architecture"
+   },
+   {
+    "option_id": "D",
+    "label": "D",
+    "text": "Model-View-Controller (MVC)"
+   }
+  ],
+  "selected_options": [
+   "A"
+  ],
+  "correct_options": [
+   "B"
+  ],
+  "answer_type": "mcq",
+  "rubric": null,
+  "status": "pending_review",
+  "submitted_at": "2026-10-21T14:12:28.321Z",
+  "updated_at": "2026-10-21T14:12:28.321Z",
+  "is_demo": true,
+  "provenance": "pp1_demo"
+ },
+ "result": {
+  "_id": "6ad8c84c5cb1228ff22b60cd",
+  "submission_id": "6ad8c84c5cb1228ff22b60cc",
+  "automated_mark": 0,
+  "total_possible_marks": 2,
+  "percentage": 0,
+  "ai_evaluation": {
+   "question_id": "SE3010-MCQ-01",
+   "answer_type": "mcq",
+   "is_correct": false,
+   "is_unanswered": false,
+   "total_awarded_marks": 0,
+   "total_possible_marks": 2,
+   "percentage": 0,
+   "selected_option_ids": [
+    "A"
+   ],
+   "selected_labels": [
+    "A"
+   ],
+   "correct_option_ids": [
+    "B"
+   ],
+   "correct_labels": [
+    "B"
+   ],
+   "options": [
+    {
+     "option_id": "A",
+     "label": "A",
+     "text": "Monolithic Architecture"
+    },
+    {
+     "option_id": "B",
+     "label": "B",
+     "text": "Microservices Architecture"
+    },
+    {
+     "option_id": "C",
+     "label": "C",
+     "text": "Pipe and Filter Architecture"
+    },
+    {
+     "option_id": "D",
+     "label": "D",
+     "text": "Model-View-Controller (MVC)"
+    }
+   ],
+   "marking": {
+    "question_id": "SE3010-MCQ-01",
+    "total_awarded_marks": 0,
+    "total_possible_marks": 2,
+    "percentage": 0,
+    "marking_version": "mcq-deterministic-v1",
+    "overall_explanation": "Awarded 0/2 marks because selected option (A) does not match the authoritative answer key (B).",
+    "warnings": [],
+    "criteria_results": [
+     {
+      "criterion_id": "C1-MCQ",
+      "criterion_description": "Authoritative Multiple-Choice Option Key Match",
+      "selected_level_id": "MCQ-INCORRECT",
+      "selected_level_label": "Incorrect",
+      "rubric_descriptor": "Incorrect selection. Selected: Option A; Correct: Option B.",
+      "awarded_mark": 0,
+      "max_marks": 2,
+      "evidence_sentence_ids": [],
+      "supporting_concepts": [],
+      "explanation": "Awarded 0/2 marks because selected option (A) does not match the authoritative answer key (B).",
+      "warnings": []
+     }
+    ]
+   },
+   "analysis": {
+    "question_id": "SE3010-MCQ-01",
+    "answer_type": "mcq",
+    "sentences": [
+     {
+      "sentence_id": 1,
+      "text": "Selected Option: A"
+     }
+    ],
+    "concept_matches": [
+     {
+      "concept": "B",
+      "status": "missing",
+      "overlap_score": 0
+     }
+    ],
+    "demonstrated_concepts": [],
+    "missing_concepts": [
+     "B"
+    ],
+    "preprocessed_answer": "A",
+    "warnings": []
+   },
+   "feedback": {
+    "question_id": "SE3010-MCQ-01",
+    "summary": "Your selected option was incorrect. Review the core concept and explanation.",
+    "strengths": [],
+    "missing_concepts": [
+     "Authoritative key: Option B"
+    ],
+    "misconceptions": [
+     "Selected option A instead of B."
+    ],
+    "actionable_guidance": "Review the lecture notes on this topic before re-attempting.",
+    "rubric_alignment": "Mark: 0/2 (0%) based on authoritative answer key.",
+    "warnings": []
+   },
+   "mindmap": {
+    "nodes": [
+     {
+      "id": "SE3010-MCQ-01",
+      "label": "Which architectural style stru...",
+      "type": "root"
+     },
+     {
+      "id": "opt-B",
+      "label": "Key: B",
+      "type": "missing"
+     }
+    ],
+    "edges": [
+     {
+      "source": "SE3010-MCQ-01",
+      "target": "opt-B",
+      "relationship": "requires_key"
+     }
+    ]
+   }
+  },
+  "lecturer_decision": null,
+  "final_mark": null,
+  "override_reason": null,
+  "reviewed_by": null,
+  "reviewed_at": null,
+  "finalized_at": null,
+  "status": "pending_review"
+ }
+}

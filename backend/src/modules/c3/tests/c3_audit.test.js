@@ -10,6 +10,7 @@ process.env.AUTH_SECRET = 'test-secret-change-me';
 
 import app from '../../../app.js';
 import { signToken } from '../../../middleware/auth.js';
+import { resetRateLimits } from '../middleware/rateLimit.js';
 import { setDb } from '../../../config/db.js';
 import { syncC3AssessmentToC1 } from '../../../integration/c3-c1/index.js';
 
@@ -68,6 +69,7 @@ function col(name) {
       await tick();
       const item = rows.find((r) => matchDoc(r, q));
       if (item && u.$set) Object.assign(item, u.$set);
+      if (item && u.$push) for (const [k, v] of Object.entries(u.$push)) (item[k] ||= []).push(v);
       return { matchedCount: item ? 1 : 0 };
     },
     async findOneAndUpdate(q, u, opts = {}) {
@@ -300,16 +302,15 @@ test('C1 sync: missing submissionId is refused without writing', async () => {
 // AUDIT known bugs: tests assert the CORRECT behaviour
 // ---------------------------------------------------------------------------
 test(
-  'AUDIT-B2: re-posting /assess for a finalized batch submission must not reopen it',
+  'AUDIT-B2: re-posting /assess for a finalized demo submission must not reopen it',
   async () => {
-    const setup = await createMcqSetup(lecturer1);
-    const first = (await api('POST', '/assess', student, { batch_id: setup.batch_id, selected_option_id: 'B' })).data;
-    assert.ok(first.submission_id, 'student submission against a lecturer batch must be saved');
+    const first = (await api('POST', '/assess', student, { demo_id: 'mcq-correct', selected_option_id: 'B' })).data;
+    assert.ok(first.submission_id, 'student demo submission must be saved');
     await api('POST', `/submissions/${first.submission_id}/review`, lecturer1, { decision: 'accepted' });
     assert.strictEqual((await api('POST', `/submissions/${first.submission_id}/finalize`, lecturer1, {})).status, 200);
     assert.strictEqual(resultOf(first.submission_id).status, 'finalized');
 
-    const again = await api('POST', '/assess', student, { batch_id: setup.batch_id, selected_option_id: 'A' });
+    const again = await api('POST', '/assess', student, { demo_id: 'mcq-correct', selected_option_id: 'A' });
 
     const stored = resultOf(first.submission_id);
     assert.ok(again.status === 409 || stored.status === 'finalized',
@@ -374,6 +375,70 @@ test(
     assert.ok(rowsOf('c3_results').every((r) => r.status !== 'finalized'), 'results were finalized by a non-owner');
   }
 );
+
+// --- finalize-all policy: only lecturer-reviewed results are finalized -----------------------------
+async function markedBatch(items) {
+  const setup = await createMcqSetup(lecturer1);
+  await api('POST', '/batch/mark', lecturer1, { setup_id: setup.batch_id, items });
+  const results = rowsOf('c3_results');
+  return { setup, results };
+}
+
+test('finalize-all: nothing reviewed -> 409 and no result is finalized', async () => {
+  const { setup } = await markedBatch([{ student_id: 'IT1', selected_option_id: 'B' }, { student_id: 'IT2', selected_option_id: 'A' }]);
+  const res = await api('POST', `/batch/${setup.batch_id}/finalize-all`, lecturer1, {});
+  assert.strictEqual(res.status, 409);
+  assert.ok(rowsOf('c3_results').every((r) => r.status !== 'finalized'));
+});
+
+test('finalize-all: mixed batch finalizes only reviewed results and reports the rest', async () => {
+  const { setup, results } = await markedBatch([{ student_id: 'IT1', selected_option_id: 'B' }, { student_id: 'IT2', selected_option_id: 'A' }]);
+  const first = results[0];
+  const rev = await api('POST', `/submissions/${first.submission_id}/review`, lecturer1, { decision: 'accepted' });
+  assert.strictEqual(rev.status, 200);
+  const res = await api('POST', `/batch/${setup.batch_id}/finalize-all`, lecturer1, {});
+  assert.strictEqual(res.status, 200);
+  assert.strictEqual(res.data.finalized_count, 1);
+  assert.strictEqual(res.data.skipped_unreviewed_count, 1);
+  assert.strictEqual(res.data.status, 'partially_finalized');
+  const byId = Object.fromEntries(rowsOf('c3_results').map((r) => [String(r.submission_id), r]));
+  assert.strictEqual(byId[String(first.submission_id)].status, 'finalized');
+  assert.strictEqual(byId[String(first.submission_id)].finalized_by, 'lecturer1');
+  const other = results.find((r) => r !== first);
+  assert.notStrictEqual(byId[String(other.submission_id)].status, 'finalized');
+});
+
+test('finalize-all: repeated call is idempotent (no double finalize) and counts already finalized', async () => {
+  const { setup, results } = await markedBatch([{ student_id: 'IT1', selected_option_id: 'B' }]);
+  await api('POST', `/submissions/${results[0].submission_id}/review`, lecturer1, { decision: 'accepted' });
+  const a = await api('POST', `/batch/${setup.batch_id}/finalize-all`, lecturer1, {});
+  const b = await api('POST', `/batch/${setup.batch_id}/finalize-all`, lecturer1, {});
+  assert.strictEqual(a.status, 200);
+  assert.strictEqual(a.data.finalized_count, 1);
+  assert.strictEqual(b.status, 200);
+  assert.strictEqual(b.data.finalized_count, 0);
+  assert.strictEqual(b.data.already_finalized_count, 1);
+});
+
+test('finalize-all: concurrent calls finalize each result exactly once', async () => {
+  const { setup, results } = await markedBatch([{ student_id: 'IT1', selected_option_id: 'B' }, { student_id: 'IT2', selected_option_id: 'B' }]);
+  for (const r of results) await api('POST', `/submissions/${r.submission_id}/review`, lecturer1, { decision: 'accepted' });
+  const [a, b] = await Promise.all([
+    api('POST', `/batch/${setup.batch_id}/finalize-all`, lecturer1, {}),
+    api('POST', `/batch/${setup.batch_id}/finalize-all`, lecturer1, {}),
+  ]);
+  assert.strictEqual(a.data.finalized_count + b.data.finalized_count, 2, JSON.stringify([a.data, b.data]));
+});
+
+test('finalize-all: admin may finalize reviewed results, student is denied', async () => {
+  const { setup, results } = await markedBatch([{ student_id: 'IT1', selected_option_id: 'B' }]);
+  await api('POST', `/submissions/${results[0].submission_id}/review`, lecturer1, { decision: 'accepted' });
+  const adminTok = signToken({ sub: 'admin1', role: 'admin' });
+  assert.strictEqual((await api('POST', `/batch/${setup.batch_id}/finalize-all`, student, {})).status, 403);
+  const res = await api('POST', `/batch/${setup.batch_id}/finalize-all`, adminTok, {});
+  assert.strictEqual(res.status, 200);
+  assert.strictEqual(res.data.finalized_count, 1);
+});
 
 test(
   'AUDIT-B5: two concurrent finalize calls -> exactly one 200 and one 409',
@@ -447,7 +512,7 @@ test('AUDIT-B8: a student cannot swap in their own rubric or max marks either', 
   assert.strictEqual(res.status, 400);
 });
 
-test('AUDIT-B8: a student must choose a server-held assessment (demo_id or batch_id)', async () => {
+test('AUDIT-B8: a student must choose a server-held demo assessment (demo_id)', async () => {
   const res = await api('POST', '/assess', student, { student_answer: 'anything' });
   assert.strictEqual(res.status, 400);
   const unknown = await api('POST', '/assess', student, { demo_id: 'does-not-exist', student_answer: 'x' });
@@ -467,13 +532,87 @@ test('AUDIT-B8: student answers an MCQ against the server-held key (wrong and ri
   assert.strictEqual(rowsOf('c3_submissions').length, 2);
 });
 
-test('AUDIT-B8: lecturer batch setup drives a student submission (key hidden from the request)', async () => {
+test('GET /assessments exposes questions and options but never keys, rubrics or reference answers', async () => {
+  await createMcqSetup(lecturer1);
+  const res = await api('GET', '/assessments', student);
+  assert.strictEqual(res.status, 200);
+  const list = res.data.assessments;
+  assert.ok(list.length > 0 && list.every((a) => a.kind === 'demo'), 'only demo assessments are listed');
+  const text = JSON.stringify(list);
+  assert.ok(!/correct_answer|reference_answer|expected_concepts|scoring_levels|required_concepts|"rubric"/.test(text), 'protected field leaked');
+  const mcq = list.find((a) => a.id === 'mcq-correct');
+  assert.deepStrictEqual(Object.keys(mcq.options[0]).sort(), ['label', 'option_id', 'text']);
+});
+
+test('a student reading their own submission never receives reference answer, rubric, expected concepts or answer key', async () => {
+  const sub = await api('POST', '/assess', student, { demo_id: 'mcq-correct', selected_option_id: 'B' });
+  assert.strictEqual(sub.status, 200);
+  const staff = await api('GET', `/submissions/${sub.data.submission_id}`, lecturer1);
+  assert.ok(staff.data.submission.correct_options, 'staff must still see the key');
+  const own = await api('GET', `/submissions/${sub.data.submission_id}`, student);
+  assert.strictEqual(own.status, 200);
+  for (const k of ['reference_answer', 'expected_concepts', 'correct_options', 'rubric']) assert.ok(!(k in own.data.submission), `${k} must be absent for students`);
+});
+
+const KEY_LEAK = /correct_option_ids|correct_labels|authoritative|answer key|Correct: Option|Key: |requires_key/i;
+
+test('MCQ answer key is not disclosed to the student in the live response or in submission history', async () => {
+  for (const option of ['A', 'B']) {
+    const live = await api('POST', '/assess', student, { demo_id: 'mcq-correct', selected_option_id: option });
+    assert.strictEqual(live.status, 200, JSON.stringify(live.data));
+    assert.ok(!KEY_LEAK.test(JSON.stringify(live.data)), `key leaked in live response (option ${option}): ${JSON.stringify(live.data).match(KEY_LEAK)?.[0]}`);
+    assert.strictEqual(live.data.analysis, null);
+    assert.strictEqual(live.data.mindmap, null);
+    assert.strictEqual(typeof live.data.is_correct, 'boolean');
+    const own = await api('GET', `/submissions/${live.data.submission_id}`, student);
+    assert.ok(!KEY_LEAK.test(JSON.stringify(own.data)), `key leaked in student history detail: ${JSON.stringify(own.data).match(KEY_LEAK)?.[0]}`);
+    assert.strictEqual(own.data.result.ai_evaluation.redacted, true);
+    assert.ok(!('correct_options' in own.data.submission));
+    // The stored evaluation is complete: staff still see the key and the full analysis.
+    const staff = await api('GET', `/submissions/${live.data.submission_id}`, lecturer1);
+    assert.ok(staff.data.result.ai_evaluation.correct_labels.length > 0, 'lecturer lost the answer key');
+    assert.ok(/Key|Correct/.test(JSON.stringify(staff.data.result.ai_evaluation)));
+    assert.ok(staff.data.result.ai_evaluation.mindmap?.nodes?.length > 0, 'lecturer lost the stored map');
+  }
+});
+
+test('Subjective results are returned to students unchanged (no key exists to redact)', async () => {
+  const { redactEvaluationForStudent } = await import('../services/redaction.js');
+  const subjective = { answer_type: 'short', marking: { marking_version: 'f2-rubric-v1' }, analysis: { concept_matches: [{ concept: 'x', status: 'demonstrated' }] }, mindmap: { nodes: [{ node_id: 'a' }] } };
+  assert.strictEqual(redactEvaluationForStudent(subjective), subjective);
+  assert.strictEqual(redactEvaluationForStudent(null), null);
+});
+
+test('GET /examples (answer keys and rubrics) is staff-only', async () => {
+  assert.strictEqual((await api('GET', '/examples', student)).status, 403);
+  assert.strictEqual((await api('GET', '/examples', null)).status, 401);
+  const res = await api('GET', '/examples', lecturer1);
+  assert.strictEqual(res.status, 200);
+  assert.ok(res.data.examples.some((e) => e.id === 'mcq-correct' && e.config.correct_answer));
+});
+
+test('GET /assessments requires login', async () => {
+  const res = await api('GET', '/assessments', null);
+  assert.strictEqual(res.status, 401);
+});
+
+test('student workflow is demo-only: a lecturer batch_id cannot be used to submit, and nothing is stored or marked', async () => {
   const setup = await createMcqSetup(lecturer1);
-  const res = await api('POST', '/assess', student, { batch_id: setup.batch_id, selected_option_id: 'B' });
-  assert.strictEqual(res.status, 200, JSON.stringify(res.data));
-  assert.strictEqual(res.data.is_correct, true);
-  const ghost = await api('POST', '/assess', student, { batch_id: 'BATCH-NOPE', selected_option_id: 'B' });
-  assert.strictEqual(ghost.status, 404);
+  const before = rowsOf('c3_submissions').length;
+  for (const body of [
+    { batch_id: setup.batch_id, selected_option_id: 'B' },
+    { batch_id: 'BATCH-NOPE', selected_option_id: 'B' },
+    { batch_id: setup.batch_id, demo_id: 'mcq-correct', selected_option_id: 'B' }, // cannot smuggle a batch next to a valid demo id
+  ]) {
+    const res = await api('POST', '/assess', student, body);
+    assert.strictEqual(res.status, 400, JSON.stringify(body) + ' -> ' + res.status);
+    assert.deepStrictEqual(Object.keys(res.data), ['error']);
+  }
+  assert.strictEqual(rowsOf('c3_submissions').length, before, 'nothing may be stored');
+  assert.ok(rowsOf('c3_batch_setups').some((r) => r.batch_id === setup.batch_id), 'the lecturer batch itself is untouched');
+  // lecturers keep their own batch workflow
+  const marked = await api('POST', '/batch/mark', lecturer1, { setup_id: setup.batch_id, items: [{ student_id: 'IT1', selected_option_id: 'B' }] });
+  assert.strictEqual(marked.status, 200);
 });
 
 test(
@@ -511,4 +650,199 @@ test('malformed JSON is at least rejected with a 400 status', async () => {
     body: '{"question_id": ',
   });
   assert.strictEqual(res.status, 400);
+});
+
+// ---------------------------------------------------------------------------
+// Student response contracts (exact field sets), cross-student access, limits, rate limiting
+// ---------------------------------------------------------------------------
+const sorted = (o) => Object.keys(o).sort();
+
+test('contract: student MCQ live response, history list and detail expose exactly the allowed fields', async () => {
+  const live = await api('POST', '/assess', student, { demo_id: 'mcq-correct', selected_option_id: 'A' });
+  assert.strictEqual(live.status, 200, JSON.stringify(live.data));
+  assert.deepStrictEqual(sorted(live.data), [
+    'analysis', 'answer_type', 'feedback', 'is_correct', 'is_unanswered', 'marking', 'mindmap', 'options', 'percentage',
+    'persisted', 'question_id', 'redacted', 'result_id', 'selected_labels', 'selected_option_ids', 'status', 'submission_id',
+    'total_awarded_marks', 'total_possible_marks',
+  ]);
+  assert.deepStrictEqual(sorted(live.data.options[0]), ['label', 'option_id', 'text']);
+  assert.deepStrictEqual(sorted(live.data.marking.criteria_results[0]), [
+    'awarded_mark', 'criterion_description', 'criterion_id', 'evidence_sentence_ids', 'explanation', 'max_marks',
+    'rubric_descriptor', 'selected_level_id', 'selected_level_label', 'supporting_concepts', 'warnings',
+  ]);
+  const list = await api('GET', '/submissions', student);
+  assert.deepStrictEqual(sorted(list.data.submissions[0]), [
+    '_id', 'automated_mark', 'final_mark', 'finalized_at', 'is_demo', 'lecturer_decision', 'override_reason', 'percentage',
+    'provenance', 'question_id', 'question_text', 'reviewed_at', 'reviewed_by', 'status', 'student_id', 'submitted_at',
+    'total_possible_marks',
+  ]);
+  const detail = await api('GET', `/submissions/${live.data.submission_id}`, student);
+  assert.deepStrictEqual(sorted(detail.data.submission), [
+    '_id', 'answer_type', 'is_demo', 'options', 'provenance', 'question_id', 'question_text', 'selected_options',
+    'status', 'student_answer', 'student_id', 'submitted_at', 'updated_at',
+  ]);
+  for (const o of detail.data.submission.options) assert.deepStrictEqual(sorted(o).filter((k) => !['label', 'option_id', 'text'].includes(k)), []);
+});
+
+test('contract: error responses carry only an error message, never a key, stack or internal address', async () => {
+  const responses = [
+    await api('POST', '/assess', student, { demo_id: 'nope', selected_option_id: 'A' }),
+    await api('POST', '/assess', student, { demo_id: 'mcq-correct', correct_answer: 'A', selected_option_id: 'A' }),
+    await api('GET', '/submissions/not-an-id', student),
+  ];
+  for (const r of responses) {
+    assert.ok(r.status >= 400 && r.status < 500, `status ${r.status}`);
+    assert.deepStrictEqual(sorted(r.data), ['error']);
+    assert.ok(!/at .*\.js|127\.0\.0\.1|localhost|stack/i.test(r.data.error), r.data.error);
+  }
+});
+
+test('cross-student: another student cannot read a submission; staff can; foreign and malformed ids are 4xx never 500', async () => {
+  const mine = await api('POST', '/assess', student, { demo_id: 'mcq-correct', selected_option_id: 'B' });
+  const other = signToken({ sub: 'student999', role: 'student' });
+  const denied = await api('GET', `/submissions/${mine.data.submission_id}`, other);
+  assert.ok([403, 404].includes(denied.status), `got ${denied.status}`);
+  assert.ok(!JSON.stringify(denied.data).includes('student123'));
+  assert.strictEqual((await api('GET', `/submissions/${mine.data.submission_id}`, lecturer1)).status, 200);
+  const otherList = await api('GET', '/submissions', other);
+  assert.strictEqual(otherList.data.submissions.length, 0, 'another student must not see my history');
+  for (const id of ['xyz', '000000000000000000000000', '..%2F..%2Fetc%2Fpasswd', '%7B%22%24ne%22%3Anull%7D']) {
+    const r = await api('GET', `/submissions/${id}`, student);
+    assert.ok(r.status === 404 || r.status === 400, `${id} -> ${r.status}`);
+  }
+});
+
+test('limits: oversize answer, batch list and setup are refused with 413', async () => {
+  const long = 'x'.repeat(20001);
+  const a = await api('POST', '/assess', student, { demo_id: 'arch-full', student_answer: long });
+  assert.strictEqual(a.status, 413);
+  assert.strictEqual(rowsOf('c3_submissions').length, 0, 'nothing may be stored for a refused answer');
+  const setup = await createMcqSetup(lecturer1);
+  const many = Array.from({ length: 501 }, (_, i) => ({ student_id: `S${i}`, selected_option_id: 'A' }));
+  assert.strictEqual((await api('POST', '/batch/validate', lecturer1, { setup_id: setup.batch_id, items: many })).status, 413);
+  const big = await api('POST', '/batch/setup', lecturer1, {
+    title: 'Too many options', question_id: 'Q', question_text: 'Which one?', answer_type: 'mcq', max_marks: 1, correct_answer: 'A',
+    options: Array.from({ length: 21 }, (_, i) => ({ option_id: `O${i}`, label: `O${i}`, text: 't' })),
+  });
+  assert.strictEqual(big.status, 413);
+});
+
+test('rate limit: per-user budget returns 429 with Retry-After; other users and the disabled setting are unaffected', async () => {
+  const saved = process.env.C3_RATE_LIMIT_PER_MIN;
+  try {
+    process.env.C3_RATE_LIMIT_PER_MIN = '3';
+    resetRateLimits();
+    const statuses = [];
+    for (let i = 0; i < 5; i++) statuses.push((await api('POST', '/assess', student, { demo_id: 'mcq-correct', selected_option_id: 'A' })).status);
+    assert.deepStrictEqual(statuses, [200, 200, 200, 429, 429]);
+    const res = await fetch(`${baseUrl}/api/v1/c3/assess`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${student}` },
+      body: JSON.stringify({ demo_id: 'mcq-correct', selected_option_id: 'A' }),
+    });
+    assert.strictEqual(res.status, 429);
+    assert.ok(Number(res.headers.get('retry-after')) >= 1);
+    const other = signToken({ sub: 'student777', role: 'student' });
+    assert.strictEqual((await api('POST', '/assess', other, { demo_id: 'mcq-correct', selected_option_id: 'A' })).status, 200);
+    process.env.C3_RATE_LIMIT_PER_MIN = '0';
+    assert.strictEqual((await api('POST', '/assess', student, { demo_id: 'mcq-correct', selected_option_id: 'A' })).status, 200);
+  } finally {
+    if (saved === undefined) delete process.env.C3_RATE_LIMIT_PER_MIN; else process.env.C3_RATE_LIMIT_PER_MIN = saved;
+    resetRateLimits();
+  }
+});
+
+test('review history: every review and finalize action is appended, earlier decisions remain visible to staff only', async () => {
+  const id = seedSubmission({ mark: 2, total: 4 });
+  await api('POST', `/submissions/${id}/review`, lecturer1, { decision: 'accepted' });
+  await api('POST', `/submissions/${id}/review`, lecturer1, { decision: 'overridden', new_mark: 3, override_reason: 'Rechecked against the rubric' });
+  await api('POST', `/submissions/${id}/finalize`, lecturer1, {});
+  const staff = await api('GET', `/submissions/${id}`, lecturer1);
+  const h = staff.data.result.review_history;
+  assert.deepStrictEqual(h.map((e) => e.action + ':' + (e.decision || '')), ['reviewed:accepted', 'reviewed:overridden', 'finalized:overridden']);
+  assert.strictEqual(h[1].override_reason, 'Rechecked against the rubric');
+  assert.strictEqual(h[1].automated_mark, 2);
+  assert.strictEqual(h[1].by, 'lecturer1');
+  const own = await api('GET', `/submissions/${id}`, student);
+  assert.ok(!('review_history' in own.data.result), 'students must not receive the reviewer audit trail');
+});
+
+test('processing time is recorded with each evaluated response (NFR-C3-08)', async () => {
+  const r = await api('POST', '/assess', lecturer1, { student_id: 'student123', question_id: 'T1', question_text: 'q?', answer_type: 'short', student_answer: 'a' });
+  assert.strictEqual(r.status, 200);
+  assert.strictEqual(typeof r.data.processing_time_ms, 'number');
+  const stored = rowsOf('c3_results')[0];
+  assert.strictEqual(typeof stored.ai_evaluation.processing_time_ms, 'number');
+});
+
+// --- Assessment list: source labelling and honest C2 status ---------------------------------------------------------
+test('GET /assessments lists only the built-in demo assessments and reports C2 as unavailable', async () => {
+  const setup = await createMcqSetup(lecturer1); // an active lecturer batch exists in the database
+  const res = await api('GET', '/assessments', student);
+  assert.strictEqual(res.status, 200);
+  assert.deepStrictEqual(res.data.integrations, { c2: { available: false, reason: 'No C2 assessment export is available yet' } });
+  assert.strictEqual(res.data.assessments.length, 7, 'the built-in demo bank');
+  assert.ok(res.data.assessments.every((a) => a.kind === 'demo'), 'every listed item is a demo assessment');
+  assert.ok(!res.data.assessments.some((a) => a.id === setup.batch_id || a.kind === 'batch'), 'lecturer batches must not be offered to students');
+  assert.ok(!res.data.assessments.some((a) => /c2/i.test(`${a.kind} ${a.source || ''}`)), 'nothing may be labelled as C2');
+  for (const a of res.data.assessments) {
+    for (const k of ['correct_answer', 'correct_options', 'rubric', 'reference_answer', 'expected_concepts']) assert.ok(!(k in a), `${k} leaked in the list`);
+    for (const o of a.options || []) assert.deepStrictEqual(Object.keys(o).sort(), ['label', 'option_id', 'text']);
+  }
+  // the lecturer's batch data is untouched
+  assert.ok(rowsOf('c3_batch_setups').some((r) => r.batch_id === setup.batch_id), 'the batch setup must remain stored');
+});
+
+// --- Demo-only student submission: every built-in demo id, malformed ids, association, no key exposure ----------------
+const DEMO_IDS = ['arch-full', 'arch-partial', 'arch-zero', 'oop-higher', 'quality-multi', 'mcq-correct', 'mcq-incorrect'];
+
+test('every built-in demo assessment id resolves, is listed, and submits to the right assessment', async () => {
+  const listed = (await api('GET', '/assessments', student)).data.assessments.map((a) => a.id).sort();
+  assert.deepStrictEqual(listed, [...DEMO_IDS].sort());
+  const { DEMO_ASSESSMENTS } = await import('../data/demoAssessments.js');
+  for (const id of DEMO_IDS) {
+    const cfg = DEMO_ASSESSMENTS[id].config;
+    const isMcq = cfg.answer_type === 'mcq';
+    const body = isMcq
+      ? { demo_id: id, selected_option_id: cfg.options[0].option_id }
+      : { demo_id: id, student_answer: 'Software architecture is the high-level structure of a system with components and relationships.' };
+    const res = await api('POST', '/assess', student, body);
+    assert.strictEqual(res.status, 200, `${id}: ${JSON.stringify(res.data).slice(0, 150)}`);
+    assert.ok(res.data.submission_id && res.data.persisted === true, `${id}: not saved`);
+    assert.strictEqual(res.data.status, 'pending_review');
+    const stored = rowsOf('c3_submissions').find((r) => String(r._id) === res.data.submission_id);
+    assert.strictEqual(stored.question_id, cfg.question_id, `${id}: wrong question stored`);
+    assert.strictEqual(stored.student_id, 'student123');
+    assert.strictEqual(stored.is_demo, true);
+    assert.strictEqual(stored.answer_type === 'mcq', isMcq);
+    const text = JSON.stringify(res.data);
+    assert.ok(!/correct_option_ids|correct_labels|reference_answer|expected_concepts|"rubric"|scoring_levels/.test(text), `${id}: protected data in the response`);
+  }
+});
+
+test('written-answer and MCQ demo submissions return valid, correctly typed results', async () => {
+  const written = await api('POST', '/assess', student, { demo_id: 'arch-full', student_answer: 'Architecture has components.' });
+  assert.strictEqual(written.status, 200);
+  assert.ok(written.data && typeof written.data === 'object' && written.data.submission_id);
+  const mcq = await api('POST', '/assess', student, { demo_id: 'mcq-correct', selected_option_id: 'B' });
+  assert.strictEqual(mcq.status, 200);
+  assert.strictEqual(mcq.data.is_correct, true);
+  assert.strictEqual(mcq.data.total_awarded_marks, 2);
+  assert.strictEqual(mcq.data.total_possible_marks, 2);
+});
+
+test('unknown or malformed demo ids are rejected with a client error and nothing is stored', async () => {
+  const before = rowsOf('c3_submissions').length;
+  const cases = [
+    ['', 400], [null, 400], [undefined, 400], ['nope', 404], ['ARCH-FULL', 404], [' arch-full', 404], ['arch-full ', 404],
+    ['constructor', 404], ['__proto__', 404], ['toString', 404], ['hasOwnProperty', 404],
+    [['arch-full'], 400], [{ $ne: null }, 400], [123, 400], [true, 400],
+  ];
+  for (const [id, expected] of cases) {
+    const body = { student_answer: 'x' };
+    if (id !== undefined) body.demo_id = id;
+    const res = await api('POST', '/assess', student, body);
+    assert.strictEqual(res.status, expected, `demo_id=${JSON.stringify(id)} -> ${res.status} ${JSON.stringify(res.data)}`);
+    assert.deepStrictEqual(Object.keys(res.data), ['error']);
+  }
+  assert.strictEqual(rowsOf('c3_submissions').length, before, 'nothing may be stored for a rejected id');
 });

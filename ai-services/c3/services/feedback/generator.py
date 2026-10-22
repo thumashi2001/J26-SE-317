@@ -12,7 +12,7 @@ from services.feedback.evidence_formatter import (
 )
 from services.feedback.explanation_builder import (
     build_explanation,
-    build_improvement_suggestions,
+    build_contextual_improvements,
     build_missing_or_partial_areas,
     build_strengths,
 )
@@ -48,6 +48,7 @@ def build_feedback_from_results(
     marking: MarkingResponse,
     analysis: AnswerAnalysisResponse,
     rubric: Rubric,
+    question_text: str | None = None,
 ) -> FeedbackResponse:
     criteria_by_id = {
         criterion.criterion_id: criterion
@@ -67,10 +68,14 @@ def build_feedback_from_results(
         )
         strengths = build_strengths(demonstrated)
         areas = build_missing_or_partial_areas(partial, missing)
-        suggestions = build_improvement_suggestions(
-            partial,
-            missing,
-            bool(result.evidence_sentence_ids),
+        suggestions = build_contextual_improvements(
+            criterion=criterion,
+            result=result,
+            demonstrated=demonstrated,
+            partial=partial,
+            missing=missing,
+            next_level=next_level,
+            question_text=question_text,
         )
         criterion_warnings = list(result.warnings)
         evidence_warning_message = evidence_warning(result)
@@ -143,5 +148,6 @@ def generate_feedback(request: FeedbackRequest) -> FeedbackResponse:
         marking=marking,
         analysis=analysis,
         rubric=request.marking_request.rubric,
+        question_text=request.marking_request.question_text,
     )
 

@@ -113,6 +113,7 @@ def assess_answer(request: AssessmentRequest) -> AssessmentResponse:
         marking=marking,
         analysis=analysis,
         rubric=request.rubric,
+        question_text=request.question_text,
     )
 
     # Step 5: Function 4 — Concept-Based Mind Map Generator

@@ -3,7 +3,9 @@ import * as aiClient from '../services/aiClient.js';
 import * as submissionSvc from '../services/submissionService.js';
 import * as mcqSvc from '../services/mcqMarkingService.js';
 import * as batchSvc from '../services/batchMarkingService.js';
-import { resolveStudentAssessment } from '../services/assessmentConfig.js';
+import { resolveStudentAssessment, listPublicAssessments, listExampleSetups, C2_INTEGRATION } from '../services/assessmentConfig.js';
+import { redactEvaluationForStudent } from '../services/redaction.js';
+import { LIMITS, assertMaxChars, assertMaxItems } from '../services/limits.js';
 
 const AI_URL = () => process.env.C3_AI_URL || 'http://127.0.0.1:8003';
 
@@ -12,12 +14,21 @@ function isMcqPayload(payload) {
   return type === 'mcq' || type === 'multiple-choice' || (Boolean(payload?.options) && !payload?.rubric?.criteria?.[0]?.scoring_levels?.some(l => l.required_concepts?.length > 1));
 }
 
+// Never expose internal addresses; unexpected (status-less) failures get a generic message.
+function publicMessage(err) {
+  if (!err.status) {
+    console.error('[c3] unexpected error:', err.message);
+    return 'The request could not be completed';
+  }
+  return String(err.message).replace(/https?:\/\/[^\s)]+/g, '[internal service]');
+}
+
 function handle(fn) {
   return async (req, res) => {
     try {
       res.json(await fn(req));
     } catch (err) {
-      res.status(err.status || 500).json({ error: err.message });
+      res.status(err.status || 500).json({ error: publicMessage(err) });
     }
   };
 }
@@ -69,11 +80,15 @@ export const assessAnswer = handle(async (req) => {
     throw err;
   }
 
+  assertMaxChars(rawPayload.student_answer, LIMITS.ANSWER_CHARS, 'Answer');
+  assertMaxItems(rawPayload.selected_options, LIMITS.OPTIONS, 'Selected options');
+
   // Students never choose the question, answer key or rubric: those come from the server.
   const payload = req.user.role === 'student'
     ? await resolveStudentAssessment(rawPayload)
     : { ...rawPayload, config_source: 'lecturer_supplied' };
 
+  const startedAt = Date.now();
   let aiResult;
   if (isMcqPayload(payload)) {
     payload.answer_type = 'mcq';
@@ -83,6 +98,9 @@ export const assessAnswer = handle(async (req) => {
     aiResult = await aiClient.assessAnswer(AI_URL(), payload);
   }
 
+  // NFR-C3-08: record how long the response took to evaluate
+  if (aiResult && typeof aiResult === 'object') aiResult.processing_time_ms = Date.now() - startedAt;
+
   // Persistence must succeed: never report an unsaved result as saved.
   try {
     const { submissionId, resultId } = await submissionSvc.createSubmissionWithResult({
@@ -90,8 +108,10 @@ export const assessAnswer = handle(async (req) => {
       payload,
       aiResult,
     });
+    // The stored evaluation is complete; students receive a copy without any multiple-choice answer key.
+    const visible = req.user.role === 'student' ? redactEvaluationForStudent(aiResult) : aiResult;
     return {
-      ...aiResult,
+      ...visible,
       submission_id: submissionId,
       result_id: resultId,
       persisted: true,
@@ -105,6 +125,10 @@ export const assessAnswer = handle(async (req) => {
     throw failure;
   }
 });
+
+export const listAssessments = handle(async () => ({ assessments: await listPublicAssessments(), integrations: { c2: C2_INTEGRATION } }));
+
+export const listExamples = handle(async () => ({ examples: listExampleSetups() }));
 
 export const listSubmissions = handle(async (req) => {
   const { status } = req.query || {};

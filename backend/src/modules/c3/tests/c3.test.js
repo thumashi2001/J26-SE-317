@@ -53,26 +53,46 @@ test('C3 Module Backend Integration', async (t) => {
     assert.strictEqual(res.status, 401);
   });
 
-  await t.test('authenticated request works and routes correctly', async () => {
+  await t.test('authenticated staff request works and routes correctly', async () => {
     aiRequests = [];
-    const res = await fetchApi('/analysis', studentToken, { question_id: 'Q1' });
+    const res = await fetchApi('/analysis', lecturerToken, { student_id: 'student123', question_id: 'Q1' });
     assert.strictEqual(res.status, 200);
     assert.deepStrictEqual(res.data, { status: 'mock_success' });
     assert.strictEqual(aiRequests.length, 1);
     assert.strictEqual(aiRequests[0].path, '/analysis/answer');
   });
 
-  await t.test('student identity comes from req.user.sub', async () => {
+  await t.test('student_id is consumed and other fields are forwarded unchanged', async () => {
     aiRequests = [];
-    await fetchApi('/analysis', studentToken, { question_id: 'Q2' });
+    await fetchApi('/analysis', lecturerToken, { student_id: 'student123', question_id: 'Q2' });
     assert.strictEqual(aiRequests[0].body.student_id, undefined);
     assert.strictEqual(aiRequests[0].body.question_id, 'Q2', 'other fields must be forwarded unchanged');
   });
 
-  await t.test('student cannot impersonate another student', async () => {
-    const res = await fetchApi('/analysis', studentToken, { student_id: 'student456' });
-    assert.strictEqual(res.status, 403);
-    assert.strictEqual(res.data.error, 'You can only see your own data');
+  await t.test('students are denied on all four raw analysis endpoints and no AI call is made', async () => {
+    aiRequests = [];
+    for (const ep of ['/analysis', '/marking', '/feedback', '/mindmap']) {
+      const res = await fetchApi(ep, studentToken, { question_id: 'Q1', student_id: 'student123' });
+      assert.strictEqual(res.status, 403, `${ep} must reject students`);
+      assert.strictEqual(res.data.correct_labels, undefined);
+    }
+    // A student supplying their own MCQ key must not get a self-grading oracle
+    const mcq = await fetchApi('/marking', studentToken, {
+      answer_type: 'mcq', question_id: 'Q1', question_text: 'q', max_marks: 1,
+      correct_answer: 'A', selected_option_id: 'A', options: [{ option_id: 'A', label: 'A', text: 'a' }, { option_id: 'B', label: 'B', text: 'b' }],
+    });
+    assert.strictEqual(mcq.status, 403);
+    assert.strictEqual(JSON.stringify(mcq.data).includes('is_correct'), false);
+    assert.strictEqual(aiRequests.length, 0, 'rejected requests must not reach the AI service');
+  });
+
+  await t.test('raw analysis endpoints: anonymous 401, lecturer 200, admin 403', async () => {
+    const adminToken = signToken({ sub: 'admin1', role: 'admin' });
+    for (const ep of ['/analysis', '/marking', '/feedback', '/mindmap']) {
+      assert.strictEqual((await fetchApi(ep, null, {})).status, 401, `${ep} anonymous`);
+      assert.strictEqual((await fetchApi(ep, lecturerToken, { student_id: 'student123' })).status, 200, `${ep} lecturer`);
+      assert.strictEqual((await fetchApi(ep, adminToken, { student_id: 'student123' })).status, 403, `${ep} admin`);
+    }
   });
 
   await t.test('lecturer authorization where applicable (can supply studentId)', async () => {
@@ -91,29 +111,30 @@ test('C3 Module Backend Integration', async (t) => {
   await t.test('Python 5xx is surfaced to the client as 502 Bad Gateway', async () => {
     nextAiStatus = 500;
     nextAiResponse = { detail: 'Internal Server Error' };
-    const res = await fetchApi('/marking', studentToken, {});
+    const res = await fetchApi('/marking', lecturerToken, { student_id: 'student123' });
     assert.strictEqual(res.status, 502);
     assert.ok(res.data.error.includes('C3 AI service returned 500'));
     nextAiStatus = 200; // reset
   });
   
-  await t.test('Python service timeout/unreachable is handled', async () => {
+  await t.test('Python service timeout/unreachable is handled without revealing the internal address', async () => {
     // temporarily change URL to an unreachable port
     const oldUrl = process.env.C3_AI_URL;
     process.env.C3_AI_URL = 'http://127.0.0.1:12345';
-    const res = await fetchApi('/feedback', studentToken, {});
+    const res = await fetchApi('/feedback', lecturerToken, { student_id: 'student123' });
     assert.strictEqual(res.status, 502);
     assert.ok(res.data.error.includes('unreachable'));
+    assert.ok(!res.data.error.includes('127.0.0.1'), 'internal service address must not be exposed');
     process.env.C3_AI_URL = oldUrl;
   });
 
   await t.test('all C3 endpoints including /assess are registered', async () => {
     aiRequests = [];
     nextAiResponse = { success: true };
-    await fetchApi('/analysis', studentToken, {});
-    await fetchApi('/marking', studentToken, {});
-    await fetchApi('/feedback', studentToken, {});
-    await fetchApi('/mindmap', studentToken, {});
+    await fetchApi('/analysis', lecturerToken, { student_id: 'student123' });
+    await fetchApi('/marking', lecturerToken, { student_id: 'student123' });
+    await fetchApi('/feedback', lecturerToken, { student_id: 'student123' });
+    await fetchApi('/mindmap', lecturerToken, { student_id: 'student123' });
     await fetchApi('/assess', lecturerToken, { student_id: 'student123' });
     
     const paths = aiRequests.map(r => r.path);
@@ -124,6 +145,13 @@ test('C3 Module Backend Integration', async (t) => {
       '/mindmap/generate',
       '/c3/assess'
     ]);
+  });
+
+  await t.test('unknown C3 path returns a JSON 404', async () => {
+    const res = await fetch(`${baseUrl}/does-not-exist`, { headers: { Authorization: `Bearer ${studentToken}` } });
+    assert.strictEqual(res.status, 404);
+    assert.match(res.headers.get('content-type'), /application\/json/);
+    assert.deepStrictEqual(await res.json(), { error: 'Not found' });
   });
 
   // Lecturer & Human-In-The-Loop Workflow Tests
@@ -211,6 +239,7 @@ test('C3 Module Backend Integration', async (t) => {
               return false;
             });
             if (item && u.$set) Object.assign(item, u.$set);
+            if (item && u.$push) for (const [k, v] of Object.entries(u.$push)) (item[k] ||= []).push(v);
             return { matchedCount: item ? 1 : 0 };
           }
         };
@@ -252,6 +281,7 @@ test('C3 Module Backend Integration', async (t) => {
               return false;
             });
             if (item && u.$set) Object.assign(item, u.$set);
+            if (item && u.$push) for (const [k, v] of Object.entries(u.$push)) (item[k] ||= []).push(v);
             return { matchedCount: item ? 1 : 0 };
           }
         };
@@ -519,7 +549,8 @@ test('C3 Module Backend Integration', async (t) => {
   };
 
   await t.test('MCQ: correct answer awards full marks (2/2, 100%)', async () => {
-    const res = await fetchApi('/marking', studentToken, {
+    const res = await fetchApi('/marking', lecturerToken, {
+      student_id: 'student123',
       ...standardMcqPayload,
       selected_option_id: 'B'
     });
@@ -533,7 +564,8 @@ test('C3 Module Backend Integration', async (t) => {
   });
 
   await t.test('MCQ: incorrect answer awards zero marks (0/2, 0%)', async () => {
-    const res = await fetchApi('/marking', studentToken, {
+    const res = await fetchApi('/marking', lecturerToken, {
+      student_id: 'student123',
       ...standardMcqPayload,
       selected_option_id: 'A'
     });
@@ -545,7 +577,8 @@ test('C3 Module Backend Integration', async (t) => {
   });
 
   await t.test('MCQ: unanswered question awards zero marks safely without crashing', async () => {
-    const res = await fetchApi('/marking', studentToken, {
+    const res = await fetchApi('/marking', lecturerToken, {
+      student_id: 'student123',
       ...standardMcqPayload,
       selected_option_id: null
     });
@@ -557,7 +590,8 @@ test('C3 Module Backend Integration', async (t) => {
   });
 
   await t.test('MCQ: invalid option ID is rejected with 400', async () => {
-    const res = await fetchApi('/marking', studentToken, {
+    const res = await fetchApi('/marking', lecturerToken, {
+      student_id: 'student123',
       ...standardMcqPayload,
       selected_option_id: 'Z'
     });
@@ -566,14 +600,16 @@ test('C3 Module Backend Integration', async (t) => {
   });
 
   await t.test('MCQ: missing question_id or text is rejected with 400', async () => {
-    const res1 = await fetchApi('/marking', studentToken, {
+    const res1 = await fetchApi('/marking', lecturerToken, {
+      student_id: 'student123',
       ...standardMcqPayload,
       question_id: ''
     });
     assert.strictEqual(res1.status, 400);
     assert.ok(res1.data.error.includes('question_id is required'));
 
-    const res2 = await fetchApi('/marking', studentToken, {
+    const res2 = await fetchApi('/marking', lecturerToken, {
+      student_id: 'student123',
       ...standardMcqPayload,
       question_text: ''
     });
@@ -582,7 +618,8 @@ test('C3 Module Backend Integration', async (t) => {
   });
 
   await t.test('MCQ: missing answer key is rejected with 400', async () => {
-    const res = await fetchApi('/marking', studentToken, {
+    const res = await fetchApi('/marking', lecturerToken, {
+      student_id: 'student123',
       question_id: 'MCQ-NO-KEY',
       question_text: 'Which is valid?',
       answer_type: 'mcq',
@@ -593,7 +630,8 @@ test('C3 Module Backend Integration', async (t) => {
   });
 
   await t.test('MCQ: duplicate option IDs are rejected with 400', async () => {
-    const res = await fetchApi('/marking', studentToken, {
+    const res = await fetchApi('/marking', lecturerToken, {
+      student_id: 'student123',
       ...standardMcqPayload,
       options: [
         { option_id: 'A', text: 'Option A1' },
@@ -619,7 +657,8 @@ test('C3 Module Backend Integration', async (t) => {
     };
 
     // Submitting by label "2" should resolve to opt_micro and award full marks
-    const resByLabel = await fetchApi('/marking', studentToken, {
+    const resByLabel = await fetchApi('/marking', lecturerToken, {
+      student_id: 'student123',
       ...customOptionsPayload,
       selected_option_id: '2'
     });
@@ -628,7 +667,8 @@ test('C3 Module Backend Integration', async (t) => {
     assert.strictEqual(resByLabel.data.total_awarded_marks, 3);
 
     // Submitting by text "Microservices" should also resolve correctly
-    const resByText = await fetchApi('/marking', studentToken, {
+    const resByText = await fetchApi('/marking', lecturerToken, {
+      student_id: 'student123',
       ...customOptionsPayload,
       selected_option_id: 'Microservices'
     });
@@ -638,7 +678,8 @@ test('C3 Module Backend Integration', async (t) => {
   });
 
   await t.test('MCQ: valid and invalid mark ranges are validated strictly', async () => {
-    const resInvalid = await fetchApi('/marking', studentToken, {
+    const resInvalid = await fetchApi('/marking', lecturerToken, {
+      student_id: 'student123',
       ...standardMcqPayload,
       max_marks: -5,
       selected_option_id: 'B'
@@ -663,7 +704,8 @@ test('C3 Module Backend Integration', async (t) => {
     };
 
     // 1. Fully correct
-    const resFull = await fetchApi('/marking', studentToken, {
+    const resFull = await fetchApi('/marking', lecturerToken, {
+      student_id: 'student123',
       ...multiPayload,
       selected_options: ['B', 'C']
     });
@@ -672,7 +714,8 @@ test('C3 Module Backend Integration', async (t) => {
     assert.strictEqual(resFull.data.total_awarded_marks, 4);
 
     // 2. Partial / incomplete -> 0 marks
-    const resPartial = await fetchApi('/marking', studentToken, {
+    const resPartial = await fetchApi('/marking', lecturerToken, {
+      student_id: 'student123',
       ...multiPayload,
       selected_options: ['B']
     });
@@ -681,7 +724,8 @@ test('C3 Module Backend Integration', async (t) => {
     assert.strictEqual(resPartial.data.total_awarded_marks, 0);
 
     // 3. Extra wrong option -> 0 marks
-    const resWrong = await fetchApi('/marking', studentToken, {
+    const resWrong = await fetchApi('/marking', lecturerToken, {
+      student_id: 'student123',
       ...multiPayload,
       selected_options: ['B', 'C', 'A']
     });
@@ -934,12 +978,21 @@ test('C3 Module Backend Integration', async (t) => {
   });
 
   await t.test('Batch Marking: lecturer can finalize entire batch in one confirmed operation & syncs to C1', async () => {
+    // Unreviewed results are never finalized silently (human-in-the-loop)
+    const refused = await fetchApi(`/batch/${savedBatchId}/finalize-all`, lecturerToken, {});
+    assert.strictEqual(refused.status, 409);
+    const subsInBatch = mockSubmissions.filter((s) => s.batch_id === savedBatchId);
+    for (const sub of subsInBatch) {
+      const rev = await fetchApi(`/submissions/${sub._id}/review`, lecturerToken, { decision: 'accepted' });
+      assert.strictEqual(rev.status, 200);
+    }
+
     const resFinalizeAll = await fetchApi(`/batch/${savedBatchId}/finalize-all`, lecturerToken, {});
     assert.strictEqual(resFinalizeAll.status, 200);
     assert.strictEqual(resFinalizeAll.data.finalized_count, 2);
+    assert.strictEqual(resFinalizeAll.data.skipped_unreviewed_count, 0);
 
     // Verify submissions in mockSubmissions are finalized
-    const subsInBatch = mockSubmissions.filter((s) => s.batch_id === savedBatchId);
     assert.strictEqual(subsInBatch[0].status, 'finalized');
     assert.strictEqual(subsInBatch[1].status, 'finalized');
 

@@ -1,5 +1,5 @@
 /* =========================================================================
-   Component 3: AI-Powered Automated Marking & Answer Analysis Styles
+   Marking & answer analysis pages. Colours come from the shared tokens in index.css (light and dark).
    ========================================================================= */
 
 .c3-page {
@@ -24,7 +24,7 @@
 
 .c3-badge-research {
   background: var(--ink);
-  color: #bcd0e2;
+  color: var(--muted);
   font-size: 0.8rem;
   padding: 4px 12px;
   border-radius: 20px;
@@ -34,7 +34,7 @@
 
 /* Presets Bar */
 .c3-presets-bar {
-  background: #ffffff;
+  background: var(--panel);
   border: 1px solid var(--line);
   border-radius: 12px;
   padding: 16px 20px;
@@ -66,12 +66,12 @@
 
 .c3-preset-btn:hover {
   border-color: var(--primary);
-  background: #e8f6f1;
+  background: var(--green-bg);
 }
 
 .c3-preset-btn.active {
   background: var(--primary);
-  color: #ffffff;
+  color: var(--panel);
   border-color: var(--primary);
   font-weight: 600;
 }
@@ -89,9 +89,9 @@
 .c3-textarea {
   font: inherit;
   padding: 12px 14px;
-  border: 1.5px solid #bccad7;
+  border: 1.5px solid var(--line-strong);
   border-radius: 9px;
-  background: #fff;
+  background: var(--panel);
   color: var(--text);
   width: 100%;
   max-width: 100%;
@@ -127,7 +127,7 @@
   width: 16px;
   height: 16px;
   border: 2px solid rgba(255, 255, 255, 0.4);
-  border-top-color: #ffffff;
+  border-top-color: var(--panel);
   border-radius: 50%;
   animation: c3-spin 0.7s linear infinite;
   margin-right: 8px;
@@ -135,86 +135,6 @@
 
 @keyframes c3-spin {
   to { transform: rotate(360deg); }
-}
-
-/* Result Overview Banner */
-.c3-result-banner {
-  background: linear-gradient(135deg, var(--ink) 0%, #153350 100%);
-  color: #ffffff;
-  border-radius: 14px;
-  padding: 26px 30px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 20px;
-}
-
-.c3-banner-title {
-  color: #ffffff;
-  margin: 0 0 4px;
-}
-
-.c3-banner-sub {
-  color: #bcd0e2;
-  margin: 0;
-  font-size: 0.9rem;
-}
-
-.c3-score-display {
-  display: flex;
-  align-items: center;
-  gap: 24px;
-}
-
-.c3-score-ring-wrap {
-  position: relative;
-  width: 100px;
-  height: 100px;
-}
-
-.c3-score-circle-text {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  text-align: center;
-}
-
-.c3-score-percent {
-  font-family: var(--font-head);
-  font-weight: 700;
-  font-size: 1.5rem;
-  line-height: 1;
-}
-
-.c3-score-denom-label {
-  font-size: 0.75rem;
-  color: #bcd0e2;
-  margin-top: 2px;
-}
-
-.c3-score-numbers {
-  display: flex;
-  flex-direction: column;
-}
-
-.c3-score-big {
-  font-family: var(--font-head);
-  font-size: 2.8rem;
-  font-weight: 700;
-  line-height: 1;
-}
-
-.c3-score-total {
-  font-size: 1.4rem;
-  color: #8aa3ba;
-}
-
-.c3-score-legend {
-  font-size: 0.85rem;
-  color: #bcd0e2;
-  margin-top: 4px;
 }
 
 /* Overall Feedback Card */
@@ -256,7 +176,7 @@
 
 /* Criteria Results */
 .c3-criterion-card {
-  border-left: 5px solid #087a63;
+  border-left: 5px solid var(--green-ink);
   margin-bottom: 18px;
 }
 
@@ -338,7 +258,7 @@
   display: flex;
   align-items: baseline;
   gap: 10px;
-  background: #f7fafc;
+  background: var(--surface-soft);
   border: 1px solid var(--line);
   border-radius: 8px;
   padding: 8px 12px;
@@ -346,7 +266,7 @@
 
 .c3-sentence-tag {
   background: var(--ink);
-  color: #ffffff;
+  color: var(--panel);
   font-size: 0.75rem;
   font-weight: 600;
   padding: 2px 7px;
@@ -376,25 +296,25 @@
 }
 
 .c3-concept-pill.demonstrated {
-  background: #e6f7f2;
-  color: #065543;
-  border: 1px solid #0f9a78;
+  background: var(--green-bg);
+  color: var(--green-ink);
+  border: 1px solid var(--green-ink);
 }
 
 .c3-concept-pill.partial {
-  background: #fef5e7;
-  color: #7a5200;
-  border: 1px solid #d9901a;
+  background: var(--amber-bg);
+  color: var(--amber-ink);
+  border: 1px solid var(--amber-ink);
 }
 
 .c3-concept-pill.missing {
-  background: #fdf0ef;
-  color: #8a1f17;
-  border: 1px solid #d6453d;
+  background: var(--red-bg);
+  color: var(--red-ink);
+  border: 1px solid var(--red-ink);
 }
 
 .c3-explanation-box {
-  background: #f9fbfd;
+  background: var(--surface-soft);
   border: 1px solid var(--line);
   border-radius: 8px;
   padding: 12px 14px;
@@ -433,27 +353,27 @@
 }
 
 .c3-feedback-col.strengths {
-  background: #f0faf6;
-  border: 1px solid #c8ede0;
-  color: #065543;
+  background: var(--green-bg);
+  border: 1px solid var(--green-bg);
+  color: var(--green-ink);
 }
 
 .c3-feedback-col.gaps {
-  background: #fef9ef;
-  border: 1px solid #fae8c8;
-  color: #7a5200;
+  background: var(--amber-bg);
+  border: 1px solid var(--amber-bg);
+  color: var(--amber-ink);
 }
 
 .c3-feedback-col.suggestions {
-  background: #f2f7fb;
-  border: 1px solid #d4e6f4;
-  color: #1b4d75;
+  background: var(--surface-soft);
+  border: 1px solid var(--line);
+  color: var(--primary-dark);
 }
 
 .c3-feedback-col.next-level {
-  background: #fbf5fc;
-  border: 1px solid #eed6f5;
-  color: #5c2069;
+  background: var(--chip-bg);
+  border: 1px solid var(--chip-bg);
+  color: var(--primary-dark);
 }
 
 .c3-criterion-warnings {
@@ -516,7 +436,7 @@
 
 .c3-tab-btn.active {
   background: var(--ink);
-  color: #ffffff;
+  color: var(--panel);
   font-weight: 600;
 }
 
@@ -549,7 +469,7 @@
 }
 
 .c3-concept-table tr:hover {
-  background: #fafcfe;
+  background: var(--surface-soft);
 }
 
 .c3-overlap-bar-wrap {
@@ -585,23 +505,23 @@
 
 /* Status Chips */
 .c3-status-demonstrated {
-  background: #e6f7f2 !important;
-  color: #065543 !important;
+  background: var(--green-bg) !important;
+  color: var(--green-ink) !important;
 }
 
 .c3-status-partial {
-  background: #fef5e7 !important;
-  color: #7a5200 !important;
+  background: var(--amber-bg) !important;
+  color: var(--amber-ink) !important;
 }
 
 .c3-status-missing {
-  background: #fdf0ef !important;
-  color: #8a1f17 !important;
+  background: var(--red-bg) !important;
+  color: var(--red-ink) !important;
 }
 
 .c3-status-root {
-  background: #0e2238 !important;
-  color: #ffffff !important;
+  background: var(--ink) !important;
+  color: var(--panel) !important;
 }
 
 /* Mind Map Styling */
@@ -647,14 +567,14 @@
 
 .c3-filter-pill.active {
   background: var(--ink);
-  color: #ffffff;
+  color: var(--panel);
   border-color: var(--ink);
   font-weight: 600;
 }
 
 .c3-svg-scroll {
   overflow-x: auto;
-  background: #f9fbfd;
+  background: var(--surface-soft);
   border: 1px solid var(--line);
   border-radius: 10px;
   padding: 10px;
@@ -666,8 +586,8 @@
 
 .c3-node-inspector {
   margin-top: 14px;
-  background: #ffffff;
-  border: 1.5px solid #087a63;
+  background: var(--panel);
+  border: 1.5px solid var(--green-ink);
 }
 
 .c3-inspector-head {
@@ -686,7 +606,7 @@
 }
 
 .c3-inspector-evidence {
-  background: #f7fafc;
+  background: var(--surface-soft);
   border-radius: 8px;
   padding: 10px 14px;
   font-size: 0.88rem;
@@ -709,15 +629,15 @@
 }
 
 .c3-alert-error {
-  background: #fdf2f2;
-  border: 1px solid #f8b4b4;
-  color: #9b1c1c;
+  background: var(--red-bg);
+  border: 1px solid var(--red-line);
+  color: var(--red-ink);
 }
 
 .c3-alert-warning {
-  background: #fef9ed;
-  border: 1px solid #fce3a3;
-  color: #723b13;
+  background: var(--amber-bg);
+  border: 1px solid var(--amber-line);
+  color: var(--amber-ink);
 }
 
 /* Responsive adjustments */
@@ -743,7 +663,7 @@
 }
 
 .c3-queue-stat-card {
-  background: #ffffff;
+  background: var(--panel);
   border: 1px solid var(--line);
   border-radius: 12px;
   padding: 16px 20px;
@@ -771,14 +691,14 @@
 .c3-queue-table {
   width: 100%;
   border-collapse: collapse;
-  background: #ffffff;
+  background: var(--panel);
   border-radius: 12px;
   overflow: hidden;
   border: 1px solid var(--line);
 }
 
 .c3-queue-table th {
-  background: #f7fafc;
+  background: var(--surface-soft);
   padding: 12px 16px;
   font-size: 0.8rem;
   font-weight: 700;
@@ -796,7 +716,7 @@
 }
 
 .c3-queue-table tr:hover td {
-  background: #fcfdfd;
+  background: var(--surface-soft);
 }
 
 /* Workflow Status Badges */
@@ -813,21 +733,21 @@
 }
 
 .c3-badge-status.pending_review {
-  background: #fef5e7;
-  color: #7a5200;
-  border: 1px solid #f6cf8a;
+  background: var(--amber-bg);
+  color: var(--amber-ink);
+  border: 1px solid var(--amber-line);
 }
 
 .c3-badge-status.reviewed {
-  background: #eef7fc;
-  color: #1b4d75;
-  border: 1px solid #b8dcf2;
+  background: var(--surface-soft);
+  color: var(--primary-dark);
+  border: 1px solid var(--line);
 }
 
 .c3-badge-status.finalized {
-  background: #e6f7f2;
-  color: #065543;
-  border: 1px solid #82dec5;
+  background: var(--green-bg);
+  color: var(--green-ink);
+  border: 1px solid var(--green-ink);
 }
 
 .c3-badge-decision {
@@ -839,18 +759,18 @@
 }
 
 .c3-badge-decision.accepted {
-  background: #e6f7f2;
-  color: #065543;
+  background: var(--green-bg);
+  color: var(--green-ink);
 }
 
 .c3-badge-decision.overridden {
-  background: #fdf2f2;
-  color: #9b1c1c;
+  background: var(--red-bg);
+  color: var(--red-ink);
 }
 
 /* Lecturer Review Detail Action Bar */
 .c3-review-actions-bar {
-  background: #ffffff;
+  background: var(--panel);
   border: 1.5px solid var(--line);
   border-radius: 14px;
   padding: 20px 24px;
@@ -863,8 +783,8 @@
 }
 
 .c3-btn-accept {
-  background: #087a63;
-  color: #ffffff;
+  background: var(--green-ink);
+  color: var(--panel);
   border: none;
   padding: 10px 20px;
   border-radius: 8px;
@@ -875,13 +795,13 @@
 }
 
 .c3-btn-accept:hover:not(:disabled) {
-  background: #065543;
+  background: var(--green-ink);
   box-shadow: 0 4px 8px rgba(8, 122, 99, 0.25);
 }
 
 .c3-btn-override {
-  background: #c05621;
-  color: #ffffff;
+  background: var(--amber-ink);
+  color: var(--panel);
   border: none;
   padding: 10px 20px;
   border-radius: 8px;
@@ -892,13 +812,13 @@
 }
 
 .c3-btn-override:hover:not(:disabled) {
-  background: #9c4215;
+  background: var(--amber-ink);
   box-shadow: 0 4px 8px rgba(192, 86, 33, 0.25);
 }
 
 .c3-btn-finalize {
   background: var(--ink);
-  color: #ffffff;
+  color: var(--panel);
   border: none;
   padding: 10px 24px;
   border-radius: 8px;
@@ -909,7 +829,7 @@
 }
 
 .c3-btn-finalize:hover:not(:disabled) {
-  background: #153350;
+  background: var(--ink);
   box-shadow: 0 4px 12px rgba(14, 34, 56, 0.3);
 }
 
@@ -929,7 +849,7 @@
 }
 
 .c3-mark-tile {
-  background: #ffffff;
+  background: var(--panel);
   border: 1px solid var(--line);
   border-radius: 12px;
   padding: 18px 22px;
@@ -939,12 +859,12 @@
 }
 
 .c3-mark-tile.ai-proposed {
-  border-left: 5px solid #2b6cb0;
+  border-left: 5px solid var(--primary-dark);
 }
 
 .c3-mark-tile.lecturer-final {
-  border-left: 5px solid #087a63;
-  background: #f7fdfb;
+  border-left: 5px solid var(--green-ink);
+  background: var(--green-bg);
 }
 
 .c3-mark-tile-title {
@@ -980,7 +900,7 @@
 }
 
 .c3-modal-content {
-  background: #ffffff;
+  background: var(--panel);
   border-radius: 14px;
   max-width: 540px;
   width: 100%;
@@ -991,7 +911,7 @@
 
 .c3-modal-header {
   padding: 18px 24px;
-  background: #f7fafc;
+  background: var(--surface-soft);
   border-bottom: 1px solid var(--line);
   display: flex;
   justify-content: space-between;
@@ -1011,7 +931,7 @@
 
 .c3-modal-footer {
   padding: 16px 24px;
-  background: #f7fafc;
+  background: var(--surface-soft);
   border-top: 1px solid var(--line);
   display: flex;
   justify-content: flex-end;
@@ -1030,7 +950,7 @@
 }
 
 .c3-queue-stat-card {
-  background: #ffffff;
+  background: var(--panel);
   border: 1px solid var(--line);
   border-radius: 12px;
   padding: 16px 20px;
@@ -1060,14 +980,14 @@
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
-  background: #ffffff;
+  background: var(--panel);
   border: 1px solid var(--line);
   border-radius: 12px;
   overflow: hidden;
 }
 
 .c3-queue-table th {
-  background: #f7fafc;
+  background: var(--surface-soft);
   padding: 12px 16px;
   font-size: 0.82rem;
   text-transform: uppercase;
@@ -1090,7 +1010,7 @@
 }
 
 .c3-queue-table tr:hover td {
-  background: #fafcfe;
+  background: var(--surface-soft);
 }
 
 /* Provenance Badges */
@@ -1107,22 +1027,22 @@
 
 .c3-badge-provenance.pp1_demo,
 .c3-badge-provenance.demo {
-  background: #f3e8ff;
-  color: #6b21a8;
-  border: 1px solid #d8b4fe;
+  background: var(--chip-bg);
+  color: var(--primary-dark);
+  border: 1px solid var(--line);
 }
 
 .c3-badge-provenance.student {
-  background: #e0f2fe;
-  color: #0369a1;
-  border: 1px solid #bae6fd;
+  background: var(--chip-bg);
+  color: var(--primary-dark);
+  border: 1px solid var(--chip-bg);
 }
 
 .c3-badge-provenance.test_fixture,
 .c3-badge-provenance.test {
-  background: #f1f5f9;
-  color: #64748b;
-  border: 1px solid #cbd5e1;
+  background: var(--surface-soft);
+  color: var(--muted);
+  border: 1px solid var(--line);
 }
 
 /* Status Badges */
@@ -1138,27 +1058,27 @@
 }
 
 .c3-badge-status.pending_review {
-  background: #fef5e7;
-  color: #7a5200;
-  border: 1px solid #f6d192;
+  background: var(--amber-bg);
+  color: var(--amber-ink);
+  border: 1px solid var(--amber-line);
 }
 
 .c3-badge-status.reviewed {
-  background: #e6f0fa;
-  color: #1b4d75;
-  border: 1px solid #b5d5f5;
+  background: var(--surface-soft);
+  color: var(--primary-dark);
+  border: 1px solid var(--line);
 }
 
 .c3-badge-status.finalized {
-  background: #e6f7f2;
-  color: #065543;
-  border: 1px solid #82dec5;
+  background: var(--green-bg);
+  color: var(--green-ink);
+  border: 1px solid var(--green-ink);
 }
 
 .c3-badge-status.failed {
-  background: #fdf0ef;
-  color: #8a1f17;
-  border: 1px solid #f5b7b1;
+  background: var(--red-bg);
+  color: var(--red-ink);
+  border: 1px solid var(--red-line);
 }
 
 .c3-badge-decision {
@@ -1171,13 +1091,13 @@
 }
 
 .c3-badge-decision.accepted {
-  background: #e6f7f2;
-  color: #065543;
+  background: var(--green-bg);
+  color: var(--green-ink);
 }
 
 .c3-badge-decision.overridden {
-  background: #fef5e7;
-  color: #9c4215;
+  background: var(--amber-bg);
+  color: var(--amber-ink);
 }
 
 /* Mode Switcher Tabs */
@@ -1223,3 +1143,165 @@
   margin-bottom: 14px;
 }
 
+
+/* =========================================================================
+   Shared marking UI (components/c3ui.jsx) - built on the global .page-head / .pill / .btn / .panel classes
+   ========================================================================= */
+.c3-head { align-items: flex-end; flex-wrap: wrap; }
+.c3-head h1 { margin: 0 0 4px; }
+.c3-head p { margin: 0; max-width: 62ch; }
+.c3-actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.btn.c3-sm, .c3-sm { padding: 7px 14px; font-size: 0.88rem; }
+a.btn.secondary, a.btn { text-decoration: none; }
+.c3-status-info { background: var(--chip-bg); color: var(--primary-dark); }
+
+.c3-spin-wrap { display: inline-flex; align-items: center; gap: 10px; color: var(--muted); }
+.c3-spin { width: 18px; height: 18px; border: 2px solid var(--line-strong); border-top-color: var(--primary); border-radius: 50%; animation: c3-spin 0.7s linear infinite; }
+@media (prefers-reduced-motion: reduce) { .c3-spin { animation-duration: 2.4s; } }
+
+.c3-notice { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; border: 1px solid var(--line); border-left-width: 4px; border-radius: 10px; padding: 12px 16px; background: var(--info-bg); color: var(--text); }
+.c3-notice strong { display: block; margin-bottom: 2px; }
+.c3-notice-body > div { font-size: 0.92rem; }
+.c3-notice-actions { display: flex; gap: 12px; align-items: center; flex: none; }
+.c3-notice-error { background: var(--red-soft); border-color: var(--red-line); border-left-color: var(--red-ink); color: var(--red-ink); }
+.c3-notice-warn { background: var(--amber-soft); border-color: var(--amber-line); border-left-color: var(--amber-ink); color: var(--amber-ink); }
+.c3-notice-success { background: var(--green-bg); border-color: var(--line); border-left-color: var(--green-ink); color: var(--green-ink); }
+.c3-notice-info { border-left-color: var(--primary); }
+
+.c3-empty { text-align: center; padding: 40px 24px; }
+.c3-empty h3 { margin: 0 0 6px; }
+.c3-empty p { margin: 0 0 16px; }
+
+/* dialog */
+.c3-backdrop { position: fixed; inset: 0; background: rgba(10, 20, 33, 0.55); display: grid; place-items: center; padding: 16px; z-index: 200; overflow-y: auto; }
+.c3-dialog { background: var(--panel); color: var(--text); border: 1px solid var(--line); border-radius: 14px; width: min(520px, 100%); max-height: calc(100vh - 32px); display: flex; flex-direction: column; box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3); }
+.c3-dialog.wide { width: min(960px, 100%); }
+.c3-dialog-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 16px 20px; border-bottom: 1px solid var(--line); }
+.c3-dialog-head h2 { margin: 0; font-size: 1.15rem; }
+.c3-close { width: auto; padding: 6px 12px; }
+.c3-dialog-body { padding: 18px 20px; overflow-y: auto; }
+.c3-dialog-foot { display: flex; justify-content: flex-end; gap: 10px; padding: 14px 20px; border-top: 1px solid var(--line); }
+
+/* stepper */
+.c3-stepper { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 8px; }
+.c3-stepper button { width: 100%; display: flex; align-items: center; gap: 10px; text-align: left; font: inherit; background: var(--panel); color: var(--text); border: 1px solid var(--line); border-radius: 10px; padding: 10px 14px; cursor: pointer; }
+.c3-stepper button:hover:not(:disabled) { border-color: var(--line-hover); }
+.c3-stepper button:disabled { opacity: 0.55; cursor: not-allowed; }
+.c3-stepper li.on button { border-color: var(--primary); background: var(--picked-bg); font-weight: 600; }
+.c3-step-num { flex: none; display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: var(--grey-bg); font-size: 0.8rem; font-weight: 700; }
+.c3-stepper li.on .c3-step-num { background: var(--primary); color: #fff; }
+.c3-step-badge { margin-left: auto; font-size: 0.78rem; color: var(--muted); }
+
+/* result summary card (replaces the dark banner) */
+.c3-mark-card { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 20px; align-items: center; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 22px 24px; }
+.c3-mark-card h2 { margin: 6px 0 4px; font-size: 1.25rem; }
+.c3-mark-card p { margin: 0; }
+.c3-mark-figure { text-align: right; }
+.c3-mark-big { font-family: var(--font-head); font-size: 2.8rem; font-weight: 700; line-height: 1; }
+.c3-mark-of { font-size: 1.3rem; color: var(--muted); }
+.c3-mark-sub { color: var(--muted); font-size: 0.86rem; margin-top: 4px; }
+.c3-bar { height: 8px; background: var(--track); border-radius: 6px; overflow: hidden; margin-top: 10px; min-width: 160px; }
+.c3-bar > span { display: block; height: 100%; background: var(--primary); }
+.c3-bar.final > span { background: var(--good); }
+@media (max-width: 640px) { .c3-mark-card { grid-template-columns: 1fr; } .c3-mark-figure { text-align: left; } }
+
+/* student assessment picker + answer form */
+.c3-picker { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.c3-pick { text-align: left; font: inherit; color: var(--text); background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; cursor: pointer; }
+.c3-pick:hover { border-color: var(--line-hover); }
+.c3-pick[aria-pressed='true'] { border-color: var(--primary); background: var(--picked-bg); }
+.c3-pick strong { display: block; margin-bottom: 4px; font-size: 0.95rem; }
+.c3-pick span { font-size: 0.82rem; color: var(--muted); }
+.c3-question { background: var(--info-bg); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; margin: 0 0 14px; }
+.c3-field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+.c3-field > label, .c3-field > .c3-label { font-size: 0.88rem; font-weight: 600; }
+.c3-field textarea, .c3-queue-filters input { font: inherit; padding: 10px 12px; border: 1px solid var(--line-strong); border-radius: 9px; background: var(--panel); color: var(--text); width: 100%; }
+.c3-field textarea { min-height: 150px; resize: vertical; }
+.c3-field textarea:focus { border-color: var(--primary); }
+.c3-field .c3-error { color: var(--red-ink); font-size: 0.84rem; margin: 0; }
+.c3-options { display: grid; gap: 8px; }
+.c3-option { display: flex; gap: 10px; align-items: flex-start; border: 1px solid var(--line); border-radius: 10px; padding: 10px 14px; background: var(--panel); cursor: pointer; }
+.c3-option:has(input:checked) { border-color: var(--primary); background: var(--picked-bg); }
+.c3-option input { width: auto; margin-top: 3px; }
+.c3-form-actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+
+/* queue */
+.c3-queue-filters { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; justify-content: space-between; }
+.c3-queue-filters input { max-width: 300px; }
+.c3-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
+.c3-stat { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
+.c3-stat b { display: block; font-family: var(--font-head); font-size: 1.8rem; line-height: 1.1; }
+.c3-stat span { color: var(--muted); font-size: 0.86rem; }
+.c3-table th { white-space: nowrap; }
+.c3-table td { vertical-align: top; }
+.c3-trunc { max-width: 280px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.c3-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* concept map nodes use the shared status tokens so they follow light/dark */
+.c3-mm-edge { fill: none; stroke: var(--line-strong); stroke-width: 1.5; }
+.c3-mm-edge.active { stroke: var(--primary); stroke-width: 2.5; }
+.c3-mm-node { cursor: pointer; outline: none; }
+.c3-mm-node rect { fill: var(--surface-soft); stroke: var(--line-strong); stroke-width: 1.5; }
+.c3-mm-node rect.sel { stroke-width: 3; stroke: var(--primary); }
+.c3-mm-node:focus-visible rect { stroke: var(--primary); stroke-width: 3; }
+.c3-mm-node text { fill: var(--text); font-family: var(--font-body); font-size: 12px; font-weight: 600; }
+.c3-mm-node .t2 { font-size: 10px; font-weight: 500; fill: var(--muted); }
+.c3-mm-node.root rect { fill: var(--ink); stroke: var(--ink); }
+.c3-mm-node.root text { fill: var(--panel); font-family: var(--font-head); font-weight: 700; font-size: 13px; }
+.c3-mm-node.demonstrated rect { fill: var(--green-bg); stroke: var(--good); }
+.c3-mm-node.demonstrated text { fill: var(--green-ink); }
+.c3-mm-node.partial rect { fill: var(--amber-bg); stroke: var(--amber-ink); }
+.c3-mm-node.partial text { fill: var(--amber-ink); }
+.c3-mm-node.missing rect { fill: var(--red-bg); stroke: var(--bad); }
+.c3-mm-node.missing text { fill: var(--red-ink); }
+.c3-mm-node.dim { opacity: 0.3; }
+.c3-mm-list { margin-top: 10px; font-size: 0.9rem; }
+.c3-mm-list summary { cursor: pointer; color: var(--primary-dark); }
+.c3-mm-list ul { margin: 8px 0 0; padding-left: 18px; }
+
+.c3-result { display: flex; flex-direction: column; gap: 14px; }
+.c3-answer-box { background: var(--surface-soft); border: 1px solid var(--line); border-radius: 8px; padding: 12px 16px; white-space: pre-wrap; font-size: 0.93rem; line-height: 1.55; }
+
+/* review page */
+.c3-dual { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; }
+.c3-dual > div { background: var(--surface-soft); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; }
+.c3-dual-label { font-size: 0.82rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); margin-bottom: 4px; }
+.c3-reason { margin-top: 14px; border-left: 4px solid var(--amber-ink); background: var(--amber-soft); border-radius: 8px; padding: 10px 14px; }
+.c3-reason p { margin: 4px 0 0; font-style: italic; }
+
+/* batch marking forms */
+.c3-grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
+.c3-grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; }
+.c3-example-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 14px; }
+.c3-chip-btn { width: auto; padding: 4px 12px; font-size: 0.82rem; border-radius: 20px; }
+.c3-rubric { border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; margin: 0 0 4px; }
+.c3-rubric legend { font-weight: 600; padding: 0 6px; }
+.c3-crit-row { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; margin-bottom: 8px; }
+.c3-crit-row .c3-field { margin-bottom: 0; }
+.c3-crit-row .c3-field:first-child { width: 90px; }
+.c3-crit-row .c3-grow { flex: 1; min-width: 200px; }
+.c3-crit-row .c3-field:nth-child(3) { width: 100px; }
+.c3-rubric-foot { display: flex; justify-content: space-between; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 10px; }
+.c3-sum.ok { color: var(--green-ink); }
+.c3-sum.bad { color: var(--red-ink); font-weight: 600; }
+.c3-opt-row { display: flex; gap: 10px; align-items: center; margin-bottom: 8px; }
+.c3-opt-correct { display: flex; align-items: center; gap: 6px; font-weight: 600; flex: none; }
+.c3-opt-correct input { width: auto; }
+.c3-inline-review { background: var(--surface-soft); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
+.c3-grid-rows { display: flex; flex-direction: column; gap: 4px; }
+
+/* small fixes found in browser testing */
+.c3-page .table-wrap { position: relative; }
+.c3-sr { left: 0; top: 0; }
+ul.c3-concept-pills-row { list-style: none; padding: 0; margin: 12px 0 0; display: flex; flex-wrap: wrap; gap: 8px; }
+
+.c3-table .pill { white-space: nowrap; }
+.c3-queue-filters input { max-width: 340px; min-width: 240px; }
+
+/* Source badge (Sample / Test data): inline, in normal flow. Do not reuse the global .chip class, which pages/auth.css
+   redefines as an absolutely positioned animated decoration. */
+.c3-source-badge { display: inline-block; position: static; font-size: 0.78rem; font-weight: 600; line-height: 1.4; padding: 2px 10px; border-radius: 20px; background: var(--chip-bg); color: var(--primary-dark); border: 1px solid var(--line); vertical-align: middle; white-space: nowrap; }
+.c3-source-badge.test { background: var(--panel); color: var(--muted); }
+
+.c3-pick .c3-source-badge { font-size: 0.74rem; padding: 1px 9px; margin-right: 2px; }
+.c3-source-badge.demo { background: var(--chip-bg); color: var(--primary-dark); }

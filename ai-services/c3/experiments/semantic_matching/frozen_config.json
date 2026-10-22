@@ -1,0 +1,421 @@
+{
+ "fixtures_sha256": "0655ec620648203e4a88bf2782af0007c912951a337a155a86acdd0e77201322",
+ "selection_split": "validation",
+ "methods": {
+  "M0_lexical_current": {
+   "threshold": 1.0,
+   "note": "existing rule: concept 'demonstrated' only when overlap == 1.0 (not tuned)"
+  },
+  "M1_embedding_name": {
+   "threshold": 0.167707128539536
+  },
+  "M2_embedding_description": {
+   "threshold": 0.35639637345824493
+  },
+  "M3_hybrid_guarded": {
+   "w": 1.0,
+   "threshold": 0.0
+  },
+  "M3b_hybrid_unguarded": {
+   "w": 1.0,
+   "threshold": 0.35639637345824493
+  },
+  "M4_length_only": {
+   "direction": 1,
+   "threshold": 10.0
+  }
+ },
+ "validation_metrics": {
+  "M0_lexical_current": {
+   "params": {
+    "threshold": 1.0,
+    "note": "existing rule: concept 'demonstrated' only when overlap == 1.0 (not tuned)"
+   },
+   "confusion": {
+    "tp": 21,
+    "fp": 18,
+    "fn": 9,
+    "tn": 15
+   },
+   "precision": 0.5384615384615384,
+   "recall": 0.7,
+   "f1": 0.6086956521739131,
+   "auc": 0.5681818181818181,
+   "answer_mark_mae_of_4": 1.7142857142857142,
+   "answer_mark_exact": 0.5714285714285714,
+   "partial_credit_correct": "3/3",
+   "by_answer_type": {
+    "CONCISE_CORRECT": {
+     "n": 9,
+     "positives": 9,
+     "recall": 1.0,
+     "false_positive_rate": null
+    },
+    "EXACT": {
+     "n": 9,
+     "positives": 9,
+     "recall": 1.0,
+     "false_positive_rate": null
+    },
+    "IRRELEVANT": {
+     "n": 9,
+     "positives": 0,
+     "recall": null,
+     "false_positive_rate": 0.0
+    },
+    "KEYWORD_STUFFED": {
+     "n": 9,
+     "positives": 0,
+     "recall": null,
+     "false_positive_rate": 1.0
+    },
+    "LEXICAL_WRONG": {
+     "n": 9,
+     "positives": 0,
+     "recall": null,
+     "false_positive_rate": 1.0
+    },
+    "PARAPHRASE": {
+     "n": 9,
+     "positives": 9,
+     "recall": 0.0,
+     "false_positive_rate": null
+    },
+    "PARTIAL": {
+     "n": 9,
+     "positives": 3,
+     "recall": 1.0,
+     "false_positive_rate": 0.0
+    }
+   },
+   "score_mean_positive": 0.7,
+   "score_mean_negative": 0.5757575757575758
+  },
+  "M1_embedding_name": {
+   "params": {
+    "threshold": 0.167707128539536
+   },
+   "confusion": {
+    "tp": 29,
+    "fp": 22,
+    "fn": 1,
+    "tn": 11
+   },
+   "precision": 0.5686274509803921,
+   "recall": 0.9666666666666667,
+   "f1": 0.7160493827160493,
+   "auc": 0.6282828282828283,
+   "answer_mark_mae_of_4": 1.3333333333333333,
+   "answer_mark_exact": 0.6190476190476191,
+   "partial_credit_correct": "2/3",
+   "by_answer_type": {
+    "CONCISE_CORRECT": {
+     "n": 9,
+     "positives": 9,
+     "recall": 1.0,
+     "false_positive_rate": null
+    },
+    "EXACT": {
+     "n": 9,
+     "positives": 9,
+     "recall": 1.0,
+     "false_positive_rate": null
+    },
+    "IRRELEVANT": {
+     "n": 9,
+     "positives": 0,
+     "recall": null,
+     "false_positive_rate": 0.0
+    },
+    "KEYWORD_STUFFED": {
+     "n": 9,
+     "positives": 0,
+     "recall": null,
+     "false_positive_rate": 1.0
+    },
+    "LEXICAL_WRONG": {
+     "n": 9,
+     "positives": 0,
+     "recall": null,
+     "false_positive_rate": 1.0
+    },
+    "PARAPHRASE": {
+     "n": 9,
+     "positives": 9,
+     "recall": 0.8888888888888888,
+     "false_positive_rate": null
+    },
+    "PARTIAL": {
+     "n": 9,
+     "positives": 3,
+     "recall": 1.0,
+     "false_positive_rate": 0.6666666666666666
+    }
+   },
+   "score_mean_positive": 0.4732722169633582,
+   "score_mean_negative": 0.3657970206070551
+  },
+  "M2_embedding_description": {
+   "params": {
+    "threshold": 0.35639637345824493
+   },
+   "confusion": {
+    "tp": 27,
+    "fp": 17,
+    "fn": 3,
+    "tn": 16
+   },
+   "precision": 0.6136363636363636,
+   "recall": 0.9,
+   "f1": 0.7297297297297297,
+   "auc": 0.7575757575757576,
+   "answer_mark_mae_of_4": 1.1428571428571428,
+   "answer_mark_exact": 0.6190476190476191,
+   "partial_credit_correct": "3/3",
+   "by_answer_type": {
+    "CONCISE_CORRECT": {
+     "n": 9,
+     "positives": 9,
+     "recall": 1.0,
+     "false_positive_rate": null
+    },
+    "EXACT": {
+     "n": 9,
+     "positives": 9,
+     "recall": 1.0,
+     "false_positive_rate": null
+    },
+    "IRRELEVANT": {
+     "n": 9,
+     "positives": 0,
+     "recall": null,
+     "false_positive_rate": 0.0
+    },
+    "KEYWORD_STUFFED": {
+     "n": 9,
+     "positives": 0,
+     "recall": null,
+     "false_positive_rate": 0.5555555555555556
+    },
+    "LEXICAL_WRONG": {
+     "n": 9,
+     "positives": 0,
+     "recall": null,
+     "false_positive_rate": 1.0
+    },
+    "PARAPHRASE": {
+     "n": 9,
+     "positives": 9,
+     "recall": 0.6666666666666666,
+     "false_positive_rate": null
+    },
+    "PARTIAL": {
+     "n": 9,
+     "positives": 3,
+     "recall": 1.0,
+     "false_positive_rate": 0.5
+    }
+   },
+   "score_mean_positive": 0.6331837227024631,
+   "score_mean_negative": 0.3650727341121115
+  },
+  "M3_hybrid_guarded": {
+   "params": {
+    "w": 1.0,
+    "threshold": 0.0
+   },
+   "confusion": {
+    "tp": 30,
+    "fp": 30,
+    "fn": 0,
+    "tn": 3
+   },
+   "precision": 0.5,
+   "recall": 1.0,
+   "f1": 0.6666666666666666,
+   "auc": 0.6378787878787879,
+   "answer_mark_mae_of_4": 1.8095238095238095,
+   "answer_mark_exact": 0.42857142857142855,
+   "partial_credit_correct": "0/3",
+   "by_answer_type": {
+    "CONCISE_CORRECT": {
+     "n": 9,
+     "positives": 9,
+     "recall": 1.0,
+     "false_positive_rate": null
+    },
+    "EXACT": {
+     "n": 9,
+     "positives": 9,
+     "recall": 1.0,
+     "false_positive_rate": null
+    },
+    "IRRELEVANT": {
+     "n": 9,
+     "positives": 0,
+     "recall": null,
+     "false_positive_rate": 0.6666666666666666
+    },
+    "KEYWORD_STUFFED": {
+     "n": 9,
+     "positives": 0,
+     "recall": null,
+     "false_positive_rate": 1.0
+    },
+    "LEXICAL_WRONG": {
+     "n": 9,
+     "positives": 0,
+     "recall": null,
+     "false_positive_rate": 1.0
+    },
+    "PARAPHRASE": {
+     "n": 9,
+     "positives": 9,
+     "recall": 1.0,
+     "false_positive_rate": null
+    },
+    "PARTIAL": {
+     "n": 9,
+     "positives": 3,
+     "recall": 1.0,
+     "false_positive_rate": 1.0
+    }
+   },
+   "score_mean_positive": 0.4829763246158286,
+   "score_mean_negative": 0.3215368293237374
+  },
+  "M3b_hybrid_unguarded": {
+   "params": {
+    "w": 1.0,
+    "threshold": 0.35639637345824493
+   },
+   "confusion": {
+    "tp": 27,
+    "fp": 17,
+    "fn": 3,
+    "tn": 16
+   },
+   "precision": 0.6136363636363636,
+   "recall": 0.9,
+   "f1": 0.7297297297297297,
+   "auc": 0.7575757575757576,
+   "answer_mark_mae_of_4": 1.1428571428571428,
+   "answer_mark_exact": 0.6190476190476191,
+   "partial_credit_correct": "3/3",
+   "by_answer_type": {
+    "CONCISE_CORRECT": {
+     "n": 9,
+     "positives": 9,
+     "recall": 1.0,
+     "false_positive_rate": null
+    },
+    "EXACT": {
+     "n": 9,
+     "positives": 9,
+     "recall": 1.0,
+     "false_positive_rate": null
+    },
+    "IRRELEVANT": {
+     "n": 9,
+     "positives": 0,
+     "recall": null,
+     "false_positive_rate": 0.0
+    },
+    "KEYWORD_STUFFED": {
+     "n": 9,
+     "positives": 0,
+     "recall": null,
+     "false_positive_rate": 0.5555555555555556
+    },
+    "LEXICAL_WRONG": {
+     "n": 9,
+     "positives": 0,
+     "recall": null,
+     "false_positive_rate": 1.0
+    },
+    "PARAPHRASE": {
+     "n": 9,
+     "positives": 9,
+     "recall": 0.6666666666666666,
+     "false_positive_rate": null
+    },
+    "PARTIAL": {
+     "n": 9,
+     "positives": 3,
+     "recall": 1.0,
+     "false_positive_rate": 0.5
+    }
+   },
+   "score_mean_positive": 0.6331837227024631,
+   "score_mean_negative": 0.3650727341121115
+  },
+  "M4_length_only": {
+   "params": {
+    "direction": 1,
+    "threshold": 10.0
+   },
+   "confusion": {
+    "tp": 30,
+    "fp": 33,
+    "fn": 0,
+    "tn": 0
+   },
+   "precision": 0.47619047619047616,
+   "recall": 1.0,
+   "f1": 0.6451612903225806,
+   "auc": 0.5378787878787878,
+   "answer_mark_mae_of_4": 2.0,
+   "answer_mark_exact": 0.42857142857142855,
+   "partial_credit_correct": "0/3",
+   "by_answer_type": {
+    "CONCISE_CORRECT": {
+     "n": 9,
+     "positives": 9,
+     "recall": 1.0,
+     "false_positive_rate": null
+    },
+    "EXACT": {
+     "n": 9,
+     "positives": 9,
+     "recall": 1.0,
+     "false_positive_rate": null
+    },
+    "IRRELEVANT": {
+     "n": 9,
+     "positives": 0,
+     "recall": null,
+     "false_positive_rate": 1.0
+    },
+    "KEYWORD_STUFFED": {
+     "n": 9,
+     "positives": 0,
+     "recall": null,
+     "false_positive_rate": 1.0
+    },
+    "LEXICAL_WRONG": {
+     "n": 9,
+     "positives": 0,
+     "recall": null,
+     "false_positive_rate": 1.0
+    },
+    "PARAPHRASE": {
+     "n": 9,
+     "positives": 9,
+     "recall": 1.0,
+     "false_positive_rate": null
+    },
+    "PARTIAL": {
+     "n": 9,
+     "positives": 3,
+     "recall": 1.0,
+     "false_positive_rate": 1.0
+    }
+   },
+   "score_mean_positive": 33.06666666666667,
+   "score_mean_negative": 29.757575757575758
+  }
+ },
+ "primary_candidate": "M3b_hybrid_unguarded",
+ "design_note": "M3 (lexical negation guard, fixed a priori) turned out harmful on validation (flags legitimate phrases such as 'keeps no client session'); M3b (same hybrid without the guard) was added after seeing VALIDATION results only; the test split had not been loaded",
+ "dev_split_use": "inspection only (sentence splitting, label sanity); no parameter was fitted on it"
+}

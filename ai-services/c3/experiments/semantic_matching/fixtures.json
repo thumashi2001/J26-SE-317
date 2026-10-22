@@ -1,0 +1,738 @@
+{
+ "name": "c3-semantic-matching-controlled-fixtures",
+ "version": "1.0",
+ "purpose": "Concept-level semantic matching evaluation (FR-C3-09). One rubric of three required concepts per item.",
+ "label_provenance": "AUTHOR-LABELLED BY CONSTRUCTION: each answer was written to demonstrate (or deliberately not demonstrate) specific concepts and the per-concept label was fixed at writing time, before any model was run. NOT human-marker validated and NOT real student data. Split is by item (no concept shared across splits).",
+ "mark_rule": "Rubric criterion, max 4: 0 demonstrated concepts -> 0; 1 or 2 -> 2; all 3 -> 4 (same L0/L2/L4 structure as the server rubric arch-full).",
+ "answer_types": [
+  "EXACT",
+  "PARAPHRASE",
+  "PARTIAL",
+  "LEXICAL_WRONG",
+  "IRRELEVANT",
+  "KEYWORD_STUFFED",
+  "CONCISE_CORRECT"
+ ],
+ "items": [
+  {
+   "item_id": "I1-oop",
+   "split": "dev",
+   "question": "Explain the three core pillars of object-oriented programming.",
+   "concepts": [
+    {
+     "id": "c1",
+     "name": "encapsulation",
+     "description": "Bundling data with the methods that operate on it and hiding internal state behind a public interface"
+    },
+    {
+     "id": "c2",
+     "name": "inheritance",
+     "description": "A class acquiring the attributes and behaviour of a parent class so code can be reused and specialised"
+    },
+    {
+     "id": "c3",
+     "name": "polymorphism",
+     "description": "Different classes responding to the same method call in their own way"
+    }
+   ],
+   "answers": [
+    {
+     "answer_id": "I1-oop-EXACT",
+     "type": "EXACT",
+     "text": "Encapsulation bundles data and methods together and hides internal state behind a public interface. Inheritance lets a subclass acquire the attributes and behaviour of a parent class for reuse. Polymorphism lets different classes respond to the same method call in their own way.",
+     "demonstrated": [
+      "c1",
+      "c2",
+      "c3"
+     ]
+    },
+    {
+     "answer_id": "I1-oop-PARAPHRASE",
+     "type": "PARAPHRASE",
+     "text": "Objects keep their data private and only let other code touch it through a few approved methods. A new class can start from an existing one and take over everything it already does, adding its own extras. The same instruction sent to different kinds of objects can produce a different result depending on what each object actually is.",
+     "demonstrated": [
+      "c1",
+      "c2",
+      "c3"
+     ]
+    },
+    {
+     "answer_id": "I1-oop-PARTIAL",
+     "type": "PARTIAL",
+     "text": "Encapsulation bundles data and methods together and hides the internal state behind a public interface. The rest of the syllabus is covered in later weeks.",
+     "demonstrated": [
+      "c1"
+     ]
+    },
+    {
+     "answer_id": "I1-oop-LEXICAL_WRONG",
+     "type": "LEXICAL_WRONG",
+     "text": "Encapsulation means making every field public so that any class can change it directly. Inheritance means copying the source file of one class into another by hand. Polymorphism means a class that can only ever have a single method.",
+     "demonstrated": []
+    },
+    {
+     "answer_id": "I1-oop-IRRELEVANT",
+     "type": "IRRELEVANT",
+     "text": "The campus library opens at eight in the morning and closes at ten at night, and students must bring their identity cards to borrow books.",
+     "demonstrated": []
+    },
+    {
+     "answer_id": "I1-oop-KEYWORD_STUFFED",
+     "type": "KEYWORD_STUFFED",
+     "text": "Encapsulation, inheritance and polymorphism are three words that appear in almost every object oriented programming textbook and in many lecture slides, exam papers and job interview lists. Students often highlight encapsulation, inheritance and polymorphism in their notes before the examination, and tutors frequently mention encapsulation, inheritance and polymorphism during revision sessions without going into any detail about them.",
+     "demonstrated": []
+    },
+    {
+     "answer_id": "I1-oop-CONCISE_CORRECT",
+     "type": "CONCISE_CORRECT",
+     "text": "Encapsulation hides data, inheritance reuses parent behaviour, polymorphism varies behaviour by class.",
+     "demonstrated": [
+      "c1",
+      "c2",
+      "c3"
+     ]
+    }
+   ]
+  },
+  {
+   "item_id": "I2-rest",
+   "split": "dev",
+   "question": "Describe three constraints of a RESTful web service.",
+   "concepts": [
+    {
+     "id": "c1",
+     "name": "statelessness",
+     "description": "Each request carries all the information needed; the server keeps no client session between requests"
+    },
+    {
+     "id": "c2",
+     "name": "resource identification",
+     "description": "Every resource is identified by its own URI"
+    },
+    {
+     "id": "c3",
+     "name": "uniform interface",
+     "description": "Resources are manipulated through a small, standard set of HTTP methods"
+    }
+   ],
+   "answers": [
+    {
+     "answer_id": "I2-rest-EXACT",
+     "type": "EXACT",
+     "text": "A RESTful service is based on statelessness, so each request carries all the information needed and the server keeps no client session between requests. Resource identification means every resource has its own URI. A uniform interface means resources are manipulated through a small standard set of HTTP methods.",
+     "demonstrated": [
+      "c1",
+      "c2",
+      "c3"
+     ]
+    },
+    {
+     "answer_id": "I2-rest-PARAPHRASE",
+     "type": "PARAPHRASE",
+     "text": "The server does not remember anything about a client between calls, so every call must bring along everything required to process it. Each thing the service exposes has its own web address that names it. Clients work with those things using the same few verbs, such as get, post, put and delete, whatever the thing is.",
+     "demonstrated": [
+      "c1",
+      "c2",
+      "c3"
+     ]
+    },
+    {
+     "answer_id": "I2-rest-PARTIAL",
+     "type": "PARTIAL",
+     "text": "A RESTful service is based on statelessness, so each request carries all the information needed and the server keeps no client session between requests.",
+     "demonstrated": [
+      "c1"
+     ]
+    },
+    {
+     "answer_id": "I2-rest-LEXICAL_WRONG",
+     "type": "LEXICAL_WRONG",
+     "text": "Statelessness means the server stores every client session in memory for as long as the user stays logged in. Resource identification means all resources share one single URI. A uniform interface means each resource must invent its own private protocol.",
+     "demonstrated": []
+    },
+    {
+     "answer_id": "I2-rest-IRRELEVANT",
+     "type": "IRRELEVANT",
+     "text": "The football tournament will be held in the main stadium next month, and tickets for students are sold at a discount at the sports office.",
+     "demonstrated": []
+    },
+    {
+     "answer_id": "I2-rest-KEYWORD_STUFFED",
+     "type": "KEYWORD_STUFFED",
+     "text": "Statelessness, resource identification and uniform interface are phrases that students see in the REST chapter of the course notes and on the revision list, and statelessness, resource identification and uniform interface are also popular words in interview preparation guides and blog posts about web programming that people share online.",
+     "demonstrated": []
+    },
+    {
+     "answer_id": "I2-rest-CONCISE_CORRECT",
+     "type": "CONCISE_CORRECT",
+     "text": "Statelessness means no stored sessions; resource identification gives each resource a URI; a uniform interface uses standard HTTP methods.",
+     "demonstrated": [
+      "c1",
+      "c2",
+      "c3"
+     ]
+    }
+   ]
+  },
+  {
+   "item_id": "I3-keys",
+   "split": "dev",
+   "question": "Explain the role of keys and table design in a relational database.",
+   "concepts": [
+    {
+     "id": "c1",
+     "name": "primary key",
+     "description": "A column or set of columns that uniquely identifies each row of a table"
+    },
+    {
+     "id": "c2",
+     "name": "foreign key",
+     "description": "A column that refers to the primary key of another table to link related rows"
+    },
+    {
+     "id": "c3",
+     "name": "normalization",
+     "description": "Organising tables to reduce redundancy and avoid update anomalies"
+    }
+   ],
+   "answers": [
+    {
+     "answer_id": "I3-keys-EXACT",
+     "type": "EXACT",
+     "text": "A primary key is a column or set of columns that uniquely identifies each row of a table. A foreign key is a column that refers to the primary key of another table and links related rows. Normalization organises tables to reduce redundancy and avoid update anomalies.",
+     "demonstrated": [
+      "c1",
+      "c2",
+      "c3"
+     ]
+    },
+    {
+     "answer_id": "I3-keys-PARAPHRASE",
+     "type": "PARAPHRASE",
+     "text": "Every row needs some value that no other row shares, so that it can always be found on its own. A column in one table can store the identifying value of a row held in a different table, which ties the two rows together. Tables are also split up and arranged so the same fact is not stored many times and changing it in one place cannot leave contradicting copies.",
+     "demonstrated": [
+      "c1",
+      "c2",
+      "c3"
+     ]
+    },
+    {
+     "answer_id": "I3-keys-PARTIAL",
+     "type": "PARTIAL",
+     "text": "A primary key is a column or set of columns that uniquely identifies each row of a table.",
+     "demonstrated": [
+      "c1"
+     ]
+    },
+    {
+     "answer_id": "I3-keys-LEXICAL_WRONG",
+     "type": "LEXICAL_WRONG",
+     "text": "A primary key is a column that may contain duplicates and nulls so rows cannot be told apart. A foreign key is a column that encrypts the table with a password. Normalization means copying every fact into as many tables as possible to increase redundancy.",
+     "demonstrated": []
+    },
+    {
+     "answer_id": "I3-keys-IRRELEVANT",
+     "type": "IRRELEVANT",
+     "text": "The weather forecast predicts light rain on Tuesday with sunshine returning by Thursday afternoon across the coastal region.",
+     "demonstrated": []
+    },
+    {
+     "answer_id": "I3-keys-KEYWORD_STUFFED",
+     "type": "KEYWORD_STUFFED",
+     "text": "Primary key, foreign key and normalization are standard database terms that appear in every database textbook, and lecturers repeat primary key, foreign key and normalization in the revision slides, in the practical sheets and in the final examination preparation notes for the whole database module.",
+     "demonstrated": []
+    },
+    {
+     "answer_id": "I3-keys-CONCISE_CORRECT",
+     "type": "CONCISE_CORRECT",
+     "text": "A primary key uniquely identifies rows, a foreign key links tables, normalization reduces redundancy.",
+     "demonstrated": [
+      "c1",
+      "c2",
+      "c3"
+     ]
+    }
+   ]
+  },
+  {
+   "item_id": "I4-modules",
+   "split": "validation",
+   "question": "Explain how cohesion, coupling and information hiding contribute to good modular design.",
+   "concepts": [
+    {
+     "id": "c1",
+     "name": "cohesion",
+     "description": "How strongly the responsibilities inside a single module belong together"
+    },
+    {
+     "id": "c2",
+     "name": "coupling",
+     "description": "How much one module depends on the internals of other modules"
+    },
+    {
+     "id": "c3",
+     "name": "information hiding",
+     "description": "Exposing only a stable interface while keeping design decisions private within a module"
+    }
+   ],
+   "answers": [
+    {
+     "answer_id": "I4-modules-EXACT",
+     "type": "EXACT",
+     "text": "Cohesion describes how strongly the responsibilities inside a single module belong together. Coupling describes how much one module depends on the internals of other modules. Information hiding exposes only a stable interface while keeping design decisions private within a module.",
+     "demonstrated": [
+      "c1",
+      "c2",
+      "c3"
+     ]
+    },
+    {
+     "answer_id": "I4-modules-PARAPHRASE",
+     "type": "PARAPHRASE",
+     "text": "A good unit does one job and everything inside it is there for that job. Units should rely on each other as little as possible and should not need to know how their neighbours work inside. Only a small, steady set of entry points is shown to the outside, and the choices about how things are built stay private.",
+     "demonstrated": [
+      "c1",
+      "c2",
+      "c3"
+     ]
+    },
+    {
+     "answer_id": "I4-modules-PARTIAL",
+     "type": "PARTIAL",
+     "text": "Cohesion describes how strongly the responsibilities inside a single module belong together.",
+     "demonstrated": [
+      "c1"
+     ]
+    },
+    {
+     "answer_id": "I4-modules-LEXICAL_WRONG",
+     "type": "LEXICAL_WRONG",
+     "text": "Cohesion means that a module contains many unrelated responsibilities mixed together. Coupling means modules should depend on as many internals of each other as possible. Information hiding means every internal detail should be public to all other modules.",
+     "demonstrated": []
+    },
+    {
+     "answer_id": "I4-modules-IRRELEVANT",
+     "type": "IRRELEVANT",
+     "text": "The canteen menu this week includes rice and curry on Monday, pasta on Wednesday and fish on Friday, with vegetarian options daily.",
+     "demonstrated": []
+    },
+    {
+     "answer_id": "I4-modules-KEYWORD_STUFFED",
+     "type": "KEYWORD_STUFFED",
+     "text": "Cohesion, coupling and information hiding are terms that many students underline in their lecture notes, and cohesion, coupling and information hiding are mentioned again in the tutorial sheets, the lab manuals and several past paper questions that the department publishes before the semester examinations.",
+     "demonstrated": []
+    },
+    {
+     "answer_id": "I4-modules-CONCISE_CORRECT",
+     "type": "CONCISE_CORRECT",
+     "text": "Cohesion groups related duties, coupling measures dependence between modules, information hiding keeps internals private.",
+     "demonstrated": [
+      "c1",
+      "c2",
+      "c3"
+     ]
+    }
+   ]
+  },
+  {
+   "item_id": "I5-testing",
+   "split": "validation",
+   "question": "Distinguish between unit, integration and regression testing.",
+   "concepts": [
+    {
+     "id": "c1",
+     "name": "unit testing",
+     "description": "Checking a single function or class in isolation"
+    },
+    {
+     "id": "c2",
+     "name": "integration testing",
+     "description": "Checking that separately built components work correctly together"
+    },
+    {
+     "id": "c3",
+     "name": "regression testing",
+     "description": "Re-running earlier tests after a change to confirm nothing that worked has broken"
+    }
+   ],
+   "answers": [
+    {
+     "answer_id": "I5-testing-EXACT",
+     "type": "EXACT",
+     "text": "Unit testing checks a single function or class in isolation. Integration testing checks that separately built components work correctly together. Regression testing re-runs earlier tests after a change to confirm that nothing that worked has broken.",
+     "demonstrated": [
+      "c1",
+      "c2",
+      "c3"
+     ]
+    },
+    {
+     "answer_id": "I5-testing-PARAPHRASE",
+     "type": "PARAPHRASE",
+     "text": "The smallest pieces, such as one function, are exercised on their own away from everything else. Once pieces are joined, further checks make sure they cooperate properly across their boundaries. After any modification, the old checks are run again to be sure that behaviour which used to work still does.",
+     "demonstrated": [
+      "c1",
+      "c2",
+      "c3"
+     ]
+    },
+    {
+     "answer_id": "I5-testing-PARTIAL",
+     "type": "PARTIAL",
+     "text": "Unit testing checks a single function or class in isolation.",
+     "demonstrated": [
+      "c1"
+     ]
+    },
+    {
+     "answer_id": "I5-testing-LEXICAL_WRONG",
+     "type": "LEXICAL_WRONG",
+     "text": "Unit testing means running the whole finished system with real users only. Integration testing means testing one variable at a time while ignoring other components. Regression testing means deleting old tests after every change so that previous behaviour is no longer checked.",
+     "demonstrated": []
+    },
+    {
+     "answer_id": "I5-testing-IRRELEVANT",
+     "type": "IRRELEVANT",
+     "text": "The annual sports day will include running races, a relay and a tug of war between the faculties, starting after the opening ceremony.",
+     "demonstrated": []
+    },
+    {
+     "answer_id": "I5-testing-KEYWORD_STUFFED",
+     "type": "KEYWORD_STUFFED",
+     "text": "Unit testing, integration testing and regression testing are listed in the syllabus for the quality assurance module, and unit testing, integration testing and regression testing are discussed in textbooks, online tutorials and conference talks that many software engineers read during their careers.",
+     "demonstrated": []
+    },
+    {
+     "answer_id": "I5-testing-CONCISE_CORRECT",
+     "type": "CONCISE_CORRECT",
+     "text": "Unit testing isolates one function, integration testing checks components together, regression testing reruns old tests after changes.",
+     "demonstrated": [
+      "c1",
+      "c2",
+      "c3"
+     ]
+    }
+   ]
+  },
+  {
+   "item_id": "I6-acid",
+   "split": "validation",
+   "question": "Explain three ACID properties of database transactions.",
+   "concepts": [
+    {
+     "id": "c1",
+     "name": "atomicity",
+     "description": "A transaction either completes entirely or has no effect at all"
+    },
+    {
+     "id": "c2",
+     "name": "isolation",
+     "description": "Concurrent transactions do not see each other's uncommitted changes"
+    },
+    {
+     "id": "c3",
+     "name": "durability",
+     "description": "Once committed, a transaction's changes survive crashes and power failures"
+    }
+   ],
+   "answers": [
+    {
+     "answer_id": "I6-acid-EXACT",
+     "type": "EXACT",
+     "text": "Atomicity means a transaction either completes entirely or has no effect at all. Isolation means concurrent transactions do not see each other's uncommitted changes. Durability means that once committed, a transaction's changes survive crashes and power failures.",
+     "demonstrated": [
+      "c1",
+      "c2",
+      "c3"
+     ]
+    },
+    {
+     "answer_id": "I6-acid-PARAPHRASE",
+     "type": "PARAPHRASE",
+     "text": "A group of operations is treated as a single unit: either every step takes effect or none of them does. Two people working at the same time cannot see half-finished work belonging to one another. Once the system has confirmed a change, it stays in place even if the machine fails straight afterwards.",
+     "demonstrated": [
+      "c1",
+      "c2",
+      "c3"
+     ]
+    },
+    {
+     "answer_id": "I6-acid-PARTIAL",
+     "type": "PARTIAL",
+     "text": "Atomicity means a transaction either completes entirely or has no effect at all.",
+     "demonstrated": [
+      "c1"
+     ]
+    },
+    {
+     "answer_id": "I6-acid-LEXICAL_WRONG",
+     "type": "LEXICAL_WRONG",
+     "text": "Atomicity means a transaction may stop halfway and keep only some of its changes. Isolation means every transaction should read the uncommitted changes of all others. Durability means committed changes are discarded when the power fails.",
+     "demonstrated": []
+    },
+    {
+     "answer_id": "I6-acid-IRRELEVANT",
+     "type": "IRRELEVANT",
+     "text": "The student council meets every second Thursday to discuss club budgets, event planning and requests for new equipment.",
+     "demonstrated": []
+    },
+    {
+     "answer_id": "I6-acid-KEYWORD_STUFFED",
+     "type": "KEYWORD_STUFFED",
+     "text": "Atomicity, isolation and durability are three letters out of the famous acronym that students memorise for database examinations, and atomicity, isolation and durability appear in countless slides, quizzes and flash cards that circulate among classmates before the final paper.",
+     "demonstrated": []
+    },
+    {
+     "answer_id": "I6-acid-CONCISE_CORRECT",
+     "type": "CONCISE_CORRECT",
+     "text": "Atomicity is all-or-nothing, isolation hides uncommitted changes, durability keeps committed changes after crashes.",
+     "demonstrated": [
+      "c1",
+      "c2",
+      "c3"
+     ]
+    }
+   ]
+  },
+  {
+   "item_id": "I7-observer",
+   "split": "test",
+   "question": "Describe the Observer design pattern.",
+   "concepts": [
+    {
+     "id": "c1",
+     "name": "subject",
+     "description": "The object that holds state and keeps a list of its observers"
+    },
+    {
+     "id": "c2",
+     "name": "observer",
+     "description": "An object that registers with the subject to be informed of changes"
+    },
+    {
+     "id": "c3",
+     "name": "notification",
+     "description": "The subject automatically informs every registered observer when its state changes"
+    }
+   ],
+   "answers": [
+    {
+     "answer_id": "I7-observer-EXACT",
+     "type": "EXACT",
+     "text": "In the Observer pattern the subject is the object that holds state and keeps a list of its observers. An observer is an object that registers with the subject to be informed of changes. Notification happens automatically: the subject informs every registered observer when its state changes.",
+     "demonstrated": [
+      "c1",
+      "c2",
+      "c3"
+     ]
+    },
+    {
+     "answer_id": "I7-observer-PARAPHRASE",
+     "type": "PARAPHRASE",
+     "text": "One object owns the interesting data and remembers who is interested in it. Other objects sign up with that owner so that they can hear about modifications. Whenever the data is modified the owner alerts everyone on its list without being asked.",
+     "demonstrated": [
+      "c1",
+      "c2",
+      "c3"
+     ]
+    },
+    {
+     "answer_id": "I7-observer-PARTIAL",
+     "type": "PARTIAL",
+     "text": "In the Observer pattern the subject is the object that holds state and keeps a list of its observers.",
+     "demonstrated": [
+      "c1"
+     ]
+    },
+    {
+     "answer_id": "I7-observer-LEXICAL_WRONG",
+     "type": "LEXICAL_WRONG",
+     "text": "The subject is an object that never stores any state and knows nothing about other objects. An observer is an object that must repeatedly poll the subject in a loop and refuses to register. Notification means the subject deletes every observer when its state changes.",
+     "demonstrated": []
+    },
+    {
+     "answer_id": "I7-observer-IRRELEVANT",
+     "type": "IRRELEVANT",
+     "text": "The hostel warden announced that the water supply will be interrupted on Saturday morning for maintenance of the main tank.",
+     "demonstrated": []
+    },
+    {
+     "answer_id": "I7-observer-KEYWORD_STUFFED",
+     "type": "KEYWORD_STUFFED",
+     "text": "Subject, observer and notification are words that appear in the design patterns chapter, and subject, observer and notification are also used in newspapers, schools and email programs in many different meanings that have nothing to do with a particular pattern unless the lecturer explains it in the class.",
+     "demonstrated": []
+    },
+    {
+     "answer_id": "I7-observer-CONCISE_CORRECT",
+     "type": "CONCISE_CORRECT",
+     "text": "The subject keeps observers and sends a notification to each when its state changes.",
+     "demonstrated": [
+      "c1",
+      "c2",
+      "c3"
+     ]
+    }
+   ]
+  },
+  {
+   "item_id": "I8-ci",
+   "split": "test",
+   "question": "Explain the main practices of continuous integration.",
+   "concepts": [
+    {
+     "id": "c1",
+     "name": "automated build",
+     "description": "Compiling and packaging the software automatically on every change"
+    },
+    {
+     "id": "c2",
+     "name": "automated testing",
+     "description": "Running the test suite automatically for each change to detect failures early"
+    },
+    {
+     "id": "c3",
+     "name": "frequent merging",
+     "description": "Developers merge small changes into the shared branch many times a day"
+    }
+   ],
+   "answers": [
+    {
+     "answer_id": "I8-ci-EXACT",
+     "type": "EXACT",
+     "text": "Continuous integration relies on an automated build, which compiles and packages the software automatically on every change. It also uses automated testing, running the test suite automatically for each change to detect failures early. Developers practise frequent merging of small changes into the shared branch many times a day.",
+     "demonstrated": [
+      "c1",
+      "c2",
+      "c3"
+     ]
+    },
+    {
+     "answer_id": "I8-ci-PARAPHRASE",
+     "type": "PARAPHRASE",
+     "text": "Every time someone submits code, a server assembles the program by itself without anyone pressing a button. The same server then runs all the checks to find problems quickly. People hand in their work to the common line of development in small pieces and do it over and over each day instead of saving it up.",
+     "demonstrated": [
+      "c1",
+      "c2",
+      "c3"
+     ]
+    },
+    {
+     "answer_id": "I8-ci-PARTIAL",
+     "type": "PARTIAL",
+     "text": "Continuous integration relies on an automated build, which compiles and packages the software automatically on every change.",
+     "demonstrated": [
+      "c1"
+     ]
+    },
+    {
+     "answer_id": "I8-ci-LEXICAL_WRONG",
+     "type": "LEXICAL_WRONG",
+     "text": "An automated build means a developer compiles the code by hand once a month. Automated testing means no tests are ever run until the product is released. Frequent merging means developers keep their changes on private branches for several months before combining them.",
+     "demonstrated": []
+    },
+    {
+     "answer_id": "I8-ci-IRRELEVANT",
+     "type": "IRRELEVANT",
+     "text": "The new cafeteria will have more seating and a coffee counter, and it is expected to open when the renovation work finishes next term.",
+     "demonstrated": []
+    },
+    {
+     "answer_id": "I8-ci-KEYWORD_STUFFED",
+     "type": "KEYWORD_STUFFED",
+     "text": "Automated build, automated testing and frequent merging are phrases that fill the slides of the DevOps lecture, and automated build, automated testing and frequent merging are also repeated in job advertisements, conference agendas and training brochures that companies send to their software teams every year.",
+     "demonstrated": []
+    },
+    {
+     "answer_id": "I8-ci-CONCISE_CORRECT",
+     "type": "CONCISE_CORRECT",
+     "text": "An automated build and automated testing run on every change, with frequent merging into the shared branch.",
+     "demonstrated": [
+      "c1",
+      "c2",
+      "c3"
+     ]
+    }
+   ]
+  },
+  {
+   "item_id": "I9-scaling",
+   "split": "test",
+   "question": "Explain how load balancing supports scalable systems.",
+   "concepts": [
+    {
+     "id": "c1",
+     "name": "request distribution",
+     "description": "Spreading incoming requests across several servers so none is overloaded"
+    },
+    {
+     "id": "c2",
+     "name": "horizontal scaling",
+     "description": "Adding more servers instead of making one server larger"
+    },
+    {
+     "id": "c3",
+     "name": "fault tolerance",
+     "description": "The system keeps working when a server fails by routing traffic to healthy servers"
+    }
+   ],
+   "answers": [
+    {
+     "answer_id": "I9-scaling-EXACT",
+     "type": "EXACT",
+     "text": "Request distribution means spreading incoming requests across several servers so none is overloaded. Horizontal scaling adds more servers instead of making one server larger. Fault tolerance means the system keeps working when a server fails by routing traffic to healthy servers.",
+     "demonstrated": [
+      "c1",
+      "c2",
+      "c3"
+     ]
+    },
+    {
+     "answer_id": "I9-scaling-PARAPHRASE",
+     "type": "PARAPHRASE",
+     "text": "Incoming traffic is shared out among a group of machines so that no single one gets swamped. When demand grows, the capacity is increased by putting extra machines alongside the existing ones rather than replacing one with a bigger one. If one of the machines breaks, the others carry on and users do not notice because traffic is sent only to the ones still working.",
+     "demonstrated": [
+      "c1",
+      "c2",
+      "c3"
+     ]
+    },
+    {
+     "answer_id": "I9-scaling-PARTIAL",
+     "type": "PARTIAL",
+     "text": "Request distribution means spreading incoming requests across several servers so none is overloaded.",
+     "demonstrated": [
+      "c1"
+     ]
+    },
+    {
+     "answer_id": "I9-scaling-LEXICAL_WRONG",
+     "type": "LEXICAL_WRONG",
+     "text": "Request distribution means sending every request to the same single server to make it busier. Horizontal scaling means replacing many servers by one smaller server. Fault tolerance means the whole system stops when any one server fails.",
+     "demonstrated": []
+    },
+    {
+     "answer_id": "I9-scaling-IRRELEVANT",
+     "type": "IRRELEVANT",
+     "text": "The lecturer will upload the revision notes for the poetry module to the learning portal by the end of the week.",
+     "demonstrated": []
+    },
+    {
+     "answer_id": "I9-scaling-KEYWORD_STUFFED",
+     "type": "KEYWORD_STUFFED",
+     "text": "Request distribution, horizontal scaling and fault tolerance are important phrases in the scalability chapter, and request distribution, horizontal scaling and fault tolerance are often repeated by cloud vendors in webinars, brochures and certification guides that engineers collect while preparing for interviews.",
+     "demonstrated": []
+    },
+    {
+     "answer_id": "I9-scaling-CONCISE_CORRECT",
+     "type": "CONCISE_CORRECT",
+     "text": "Request distribution spreads load, horizontal scaling adds servers, fault tolerance routes around failed servers.",
+     "demonstrated": [
+      "c1",
+      "c2",
+      "c3"
+     ]
+    }
+   ]
+  }
+ ]
+}

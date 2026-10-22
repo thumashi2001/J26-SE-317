@@ -1,5 +1,6 @@
 import { getDb } from '../../../config/db.js';
 import { ObjectId } from 'mongodb';
+import { redactEvaluationForStudent } from './redaction.js';
 import { syncC3AssessmentToC1 } from '../../../integration/c3-c1/index.js';
 
 function httpError(status, message) {
@@ -296,6 +297,9 @@ export async function getSubmissionDetail(submissionId, studentId, role) {
       ? Math.round((automatedMark / totalPossible) * 1000) / 10
       : null);
 
+  // Students see their own answer and results, never the authoritative configuration (reference answer, rubric,
+  // expected concepts, answer key). Lecturers and admins receive everything for review.
+  const isStaff = role === 'lecturer' || role === 'admin';
   return {
     submission: {
       _id: sId,
@@ -303,13 +307,16 @@ export async function getSubmissionDetail(submissionId, studentId, role) {
       question_id: submission.question_id || 'SE-DB-001',
       question_text: submission.question_text || '',
       student_answer: submission.student_answer || '',
-      reference_answer: submission.reference_answer || null,
-      expected_concepts: submission.expected_concepts || null,
       options: submission.options || aiEvaluation?.options || null,
       selected_options: submission.selected_options || aiEvaluation?.selected_option_ids || null,
-      correct_options: submission.correct_options || aiEvaluation?.correct_option_ids || null,
       answer_type: submission.answer_type || 'short',
-      rubric: submission.rubric || null,
+      // Authoritative configuration exists in the response for staff only; for students the keys are absent.
+      ...(isStaff && {
+        reference_answer: submission.reference_answer || null,
+        expected_concepts: submission.expected_concepts || null,
+        correct_options: submission.correct_options || aiEvaluation?.correct_option_ids || null,
+        rubric: submission.rubric || null,
+      }),
       status: result?.status || submission.status || 'pending_review',
       submitted_at: submission.submitted_at,
       updated_at: submission.updated_at,
@@ -322,13 +329,14 @@ export async function getSubmissionDetail(submissionId, studentId, role) {
       automated_mark: automatedMark,
       total_possible_marks: totalPossible,
       percentage: percentage,
-      ai_evaluation: aiEvaluation,
+      ai_evaluation: isStaff ? aiEvaluation : redactEvaluationForStudent(aiEvaluation),
       lecturer_decision: result?.lecturer_decision || null,
       final_mark: result?.final_mark ?? null,
       override_reason: result?.override_reason || null,
       reviewed_by: result?.reviewed_by || result?.lecturer_id || null,
       reviewed_at: result?.reviewed_at || null,
       finalized_at: result?.finalized_at || null,
+      ...(isStaff && { review_history: Array.isArray(result?.review_history) ? result.review_history : [] }),
       status: result?.status || submission.status || 'pending_review',
     },
   };
@@ -406,7 +414,11 @@ export async function reviewSubmission(submissionId, lecturerId, { decision, new
 
   const reviewWrite = await resultsCol().updateOne(
     { _id: result._id, status: { $ne: 'finalized' } },
-    { $set: updateData }
+    {
+      $set: updateData,
+      // Append-only audit trail (NFR-C3-22): earlier decisions stay visible after a later change
+      $push: { review_history: { action: 'reviewed', by: lecturerId, at: now, decision, automated_mark: automatedMark, final_mark: finalMark, override_reason: reason } },
+    }
   );
   if (reviewWrite && reviewWrite.matchedCount === 0) {
     throw httpError(409, 'This assessment has already been finalized and cannot be modified');
@@ -465,6 +477,7 @@ export async function finalizeSubmission(submissionId, lecturerId) {
         finalized_by: lecturerId,
         updated_at: now,
       },
+      $push: { review_history: { action: 'finalized', by: lecturerId, at: now, decision: result.lecturer_decision, final_mark: result.final_mark } },
     }
   );
   if (finalizeWrite && finalizeWrite.matchedCount === 0) {

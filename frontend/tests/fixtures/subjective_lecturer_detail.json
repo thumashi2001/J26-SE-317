@@ -1,0 +1,326 @@
+{
+ "submission": {
+  "_id": "6ad8c84c5cb1228ff22b60ca",
+  "student_id": "IT10000001",
+  "question_id": "SE3010-Q01",
+  "question_text": "Explain the concept of software architecture and how its key elements organize a system.",
+  "student_answer": "Software architecture provides a high-level structure for large-scale software systems. It guides developers.",
+  "reference_answer": "Software architecture defines the high-level structure of a system comprising components and their relationships.",
+  "expected_concepts": [
+   "high-level structure",
+   "components",
+   "relationships"
+  ],
+  "options": null,
+  "selected_options": null,
+  "correct_options": null,
+  "answer_type": "short",
+  "rubric": {
+   "rubric_id": "R-ARCH-01",
+   "title": "Software Architecture Evaluation Rubric",
+   "criteria": [
+    {
+     "criterion_id": "C1",
+     "description": "Demonstrate understanding of architectural structure and components.",
+     "max_marks": 4,
+     "required_concepts": [
+      "high-level structure",
+      "components",
+      "relationships"
+     ],
+     "scoring_levels": [
+      {
+       "level_id": "L0",
+       "label": "Unsatisfactory",
+       "mark": 0,
+       "descriptor": "No relevant architectural concepts demonstrated."
+      },
+      {
+       "level_id": "L2",
+       "label": "Developing",
+       "mark": 2,
+       "descriptor": "At least one architectural concept demonstrated.",
+       "required_concepts": [
+        "high-level structure",
+        "components",
+        "relationships"
+       ],
+       "evidence_rule": {
+        "type": "required_concept_count",
+        "minimum_demonstrated": 1
+       }
+      },
+      {
+       "level_id": "L4",
+       "label": "Proficient",
+       "mark": 4,
+       "descriptor": "All three core concepts (structure, components, relationships) clearly demonstrated.",
+       "required_concepts": [
+        "high-level structure",
+        "components",
+        "relationships"
+       ],
+       "evidence_rule": {
+        "type": "required_concept_count",
+        "minimum_demonstrated": 3
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "status": "pending_review",
+  "submitted_at": "2026-10-21T14:12:28.239Z",
+  "updated_at": "2026-10-21T14:12:28.239Z",
+  "is_demo": true,
+  "provenance": "pp1_demo"
+ },
+ "result": {
+  "_id": "6ad8c84c5cb1228ff22b60cb",
+  "submission_id": "6ad8c84c5cb1228ff22b60ca",
+  "automated_mark": 2,
+  "total_possible_marks": 4,
+  "percentage": 50,
+  "ai_evaluation": {
+   "question_id": "SE3010-Q01",
+   "total_awarded_marks": 2,
+   "total_possible_marks": 4,
+   "percentage": 50,
+   "marking": {
+    "question_id": "SE3010-Q01",
+    "criteria_results": [
+     {
+      "criterion_id": "C1",
+      "criterion_description": "Demonstrate understanding of architectural structure and components.",
+      "selected_level_id": "L2",
+      "selected_level_label": "Developing",
+      "rubric_descriptor": "At least one architectural concept demonstrated.",
+      "awarded_mark": 2,
+      "max_marks": 4,
+      "evidence_sentence_ids": [
+       1
+      ],
+      "supporting_concepts": [
+       "high-level structure"
+      ],
+      "explanation": "Selected rubric level 'Developing' (2 marks) for criterion C1. Supporting concepts: high-level structure. Evidence sentence IDs: 1. The proposed result is based on the rubric requirements and deterministic lexical evidence.",
+      "warnings": []
+     }
+    ],
+    "total_awarded_marks": 2,
+    "total_possible_marks": 4,
+    "percentage": 50,
+    "overall_explanation": "The overall proposed mark is derived by summing the rubric-defined criterion marks: C1=2/4. It is a deterministic baseline proposal, not a claim of factual correctness or final lecturer judgment.",
+    "warnings": [],
+    "marking_version": "baseline-v1"
+   },
+   "analysis": {
+    "question_id": "SE3010-Q01",
+    "normalized_answer": "Software architecture provides a high-level structure for large-scale software systems. It guides developers.",
+    "sentence_count": 2,
+    "token_count": 13,
+    "sentences": [
+     {
+      "sentence_id": 1,
+      "text": "Software architecture provides a high-level structure for large-scale software systems."
+     },
+     {
+      "sentence_id": 2,
+      "text": "It guides developers."
+     }
+    ],
+    "reference_similarity": 0.41403933560541256,
+    "concept_matches": [
+     {
+      "concept": "high-level structure",
+      "status": "demonstrated",
+      "overlap_score": 1,
+      "evidence_sentence_ids": [
+       1
+      ]
+     },
+     {
+      "concept": "components",
+      "status": "not_demonstrated",
+      "overlap_score": 0,
+      "evidence_sentence_ids": []
+     },
+     {
+      "concept": "relationships",
+      "status": "not_demonstrated",
+      "overlap_score": 0,
+      "evidence_sentence_ids": []
+     }
+    ],
+    "warnings": [],
+    "analysis_version": "baseline-v1"
+   },
+   "feedback": {
+    "question_id": "SE3010-Q01",
+    "criteria_feedback": [
+     {
+      "criterion_id": "C1",
+      "criterion_description": "Demonstrate understanding of architectural structure and components.",
+      "max_marks": 4,
+      "selected_level_id": "L2",
+      "selected_level_descriptor": "At least one architectural concept demonstrated.",
+      "awarded_mark": 2,
+      "evidence_sentence_ids": [
+       1
+      ],
+      "supporting_concepts": [
+       "high-level structure"
+      ],
+      "demonstrated_concepts": [
+       "high-level structure"
+      ],
+      "partial_concepts": [],
+      "missing_concepts": [
+       "components",
+       "relationships"
+      ],
+      "next_level_improvements": [],
+      "explanation": "Criterion C1 received the proposed mark 2/4 at rubric level 'L2'. Supporting concepts: high-level structure. Student evidence is referenced by sentence IDs: 1. This explanation reports the existing rubric result and does not create a new mark.",
+      "strengths": [
+       "Demonstrated concept supported by the answer: high-level structure."
+      ],
+      "missing_or_partial_areas": [
+       "Required concept was not demonstrated by the available evidence: components.",
+       "Required concept was not demonstrated by the available evidence: relationships."
+      ],
+      "improvement_suggestions": [
+       "Add answer evidence addressing 'components'.",
+       "Add answer evidence addressing 'relationships'."
+      ],
+      "warnings": []
+     }
+    ],
+    "overall_feedback": {
+     "total_mark": 2,
+     "total_possible": 4,
+     "percentage": 50,
+     "overall_summary": "Function 2 proposed 2 of 4 marks across 1 criterion(s).",
+     "overall_strengths": [
+      "Demonstrated concept supported by the answer: high-level structure."
+     ],
+     "overall_missing_concepts": [
+      "components",
+      "relationships"
+     ],
+     "overall_next_level_improvements": [],
+     "overall_improvement_suggestions": [
+      "Add answer evidence addressing 'components'.",
+      "Add answer evidence addressing 'relationships'."
+     ]
+    },
+    "warnings": [],
+    "feedback_version": "baseline-v1"
+   },
+   "mindmap": {
+    "question_id": "SE3010-Q01",
+    "root_node_id": "root_se3010-q01",
+    "title": "Concept Map: SE3010-Q01",
+    "nodes": [
+     {
+      "node_id": "root_se3010-q01",
+      "type": "root",
+      "concept": "SE3010-Q01",
+      "label": "Explain the concept of software architecture and how its key elements organize a system.",
+      "source": "system",
+      "status": null,
+      "evidence_sentence_ids": [],
+      "parent_node_id": null,
+      "children": [
+       "concept_high-level_structure",
+       "concept_components",
+       "concept_relationships"
+      ],
+      "relationship_type": null
+     },
+     {
+      "node_id": "concept_high-level_structure",
+      "type": "concept",
+      "concept": "high-level structure",
+      "label": "High-Level Structure",
+      "source": "student_answer",
+      "status": "demonstrated",
+      "evidence_sentence_ids": [
+       1
+      ],
+      "parent_node_id": "root_se3010-q01",
+      "children": [],
+      "relationship_type": "child"
+     },
+     {
+      "node_id": "concept_components",
+      "type": "concept",
+      "concept": "components",
+      "label": "Components",
+      "source": "expected_concept",
+      "status": "not_demonstrated",
+      "evidence_sentence_ids": [],
+      "parent_node_id": "root_se3010-q01",
+      "children": [],
+      "relationship_type": "child"
+     },
+     {
+      "node_id": "concept_relationships",
+      "type": "concept",
+      "concept": "relationships",
+      "label": "Relationships",
+      "source": "expected_concept",
+      "status": "not_demonstrated",
+      "evidence_sentence_ids": [],
+      "parent_node_id": "root_se3010-q01",
+      "children": [],
+      "relationship_type": "child"
+     }
+    ],
+    "relationships": [
+     {
+      "relationship_id": "85ba0f8c3e9428827f1be3dad1aa1823",
+      "source_node_id": "root_se3010-q01",
+      "target_node_id": "concept_high-level_structure",
+      "relationship_type": "child",
+      "evidence": "Deterministic baseline structural attachment."
+     },
+     {
+      "relationship_id": "cfb1a04d5ac8c3f10178396ba354e6c2",
+      "source_node_id": "root_se3010-q01",
+      "target_node_id": "concept_components",
+      "relationship_type": "child",
+      "evidence": "Deterministic baseline structural attachment."
+     },
+     {
+      "relationship_id": "5546c18918eb688aa5138c1cc08e3e19",
+      "source_node_id": "root_se3010-q01",
+      "target_node_id": "concept_relationships",
+      "relationship_type": "child",
+      "evidence": "Deterministic baseline structural attachment."
+     }
+    ],
+    "summary": {
+     "total_nodes": 4,
+     "demonstrated_count": 1,
+     "partial_count": 0,
+     "missing_count": 2
+    },
+    "warnings": [
+     "Mind map contains 2 missing expected concept(s)."
+    ],
+    "generation_version": "baseline-v1"
+   },
+   "warnings": [
+    "Mind map contains 2 missing expected concept(s)."
+   ],
+   "pipeline_version": "integrated-v1"
+  },
+  "lecturer_decision": null,
+  "final_mark": null,
+  "override_reason": null,
+  "reviewed_by": null,
+  "reviewed_at": null,
+  "finalized_at": null,
+  "status": "pending_review"
+ }
+}

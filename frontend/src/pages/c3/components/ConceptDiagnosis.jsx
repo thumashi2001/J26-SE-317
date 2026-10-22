@@ -1,164 +1,86 @@
 import React, { useState } from 'react';
 
-/**
- * Concept Analysis & Lexical Evidence Diagnosis Table
- * Displays fine-grained concept coverage, token overlap score, and sentence grounding.
- */
+const STATUS_LABEL = { demonstrated: 'Demonstrated', partial: 'Partial', not_demonstrated: 'Missing', missing: 'Missing' };
+const STATUS_CLASS = { demonstrated: 'status-approved', partial: 'status-pending', not_demonstrated: 'status-rejected', missing: 'status-rejected' };
+
+// Concept coverage of the answer, with the sentences that support each concept.
+// The overlap figure is the share of the concept's words found in the answer (a word-match measure, not a meaning score).
 export default function ConceptDiagnosis({ analysis, sentenceMap }) {
-  const [activeTab, setActiveTab] = useState('all');
+  const [filter, setFilter] = useState('all');
+  if (!analysis || !analysis.concept_matches || analysis.concept_matches.length === 0) return null;
 
-  if (!analysis || !analysis.concept_matches) return null;
-
-  const {
-    concept_matches = [],
-    sentence_count,
-    token_count,
-    reference_similarity,
-    analysis_version,
-  } = analysis;
-
-  const filtered = concept_matches.filter((c) => {
-    if (activeTab === 'all') return true;
-    return c.status === activeTab;
-  });
-
-  const demonstratedCount = concept_matches.filter((c) => c.status === 'demonstrated').length;
-  const partialCount = concept_matches.filter((c) => c.status === 'partial').length;
-  const missingCount = concept_matches.filter((c) => c.status === 'not_demonstrated').length;
+  const { concept_matches: matches, sentence_count } = analysis;
+  const norm = (s) => (s === 'missing' ? 'not_demonstrated' : s);
+  const count = (s) => matches.filter((c) => norm(c.status) === s).length;
+  const shown = matches.filter((c) => filter === 'all' || norm(c.status) === filter);
+  const tabs = [
+    ['all', 'All', matches.length],
+    ['demonstrated', 'Demonstrated', count('demonstrated')],
+    ['partial', 'Partial', count('partial')],
+    ['not_demonstrated', 'Missing', count('not_demonstrated')],
+  ];
 
   return (
-    <div className="panel c3-concept-diagnosis-panel">
+    <section className="panel c3-concept-diagnosis-panel" aria-label="Concept diagnosis">
       <div className="c3-diagnosis-head">
         <div>
-          <h3>Concept-Level Diagnosis & Semantic Evidence</h3>
+          <h3>Concept diagnosis</h3>
           <p className="small muted" style={{ margin: '2px 0 0' }}>
-            Function 1 lexical overlap analysis • Version: {analysis_version || 'baseline-v1'}
+            Which expected concepts the answer covers{sentence_count ? ` · ${sentence_count} sentences analysed` : ''}
           </p>
         </div>
-
-        {/* NLP Lexical Stats Pills */}
-        <div className="c3-nlp-stats">
-          <span className="c3-stat-tag">
-            <strong>{sentence_count}</strong> Sentences
-          </span>
-          <span className="c3-stat-tag">
-            <strong>{token_count}</strong> Tokens
-          </span>
-          {reference_similarity !== null && reference_similarity !== undefined && (
-            <span className="c3-stat-tag">
-              Reference Sim: <strong>{Math.round(reference_similarity * 100)}%</strong>
-            </span>
-          )}
-        </div>
       </div>
 
-      {/* Tabs */}
-      <div className="c3-concept-tabs">
-        <button
-          type="button"
-          className={`c3-tab-btn ${activeTab === 'all' ? 'active' : ''}`}
-          onClick={() => setActiveTab('all')}
-        >
-          All Concepts ({concept_matches.length})
-        </button>
-        <button
-          type="button"
-          className={`c3-tab-btn demonstrated ${activeTab === 'demonstrated' ? 'active' : ''}`}
-          onClick={() => setActiveTab('demonstrated')}
-        >
-          ✓ Demonstrated ({demonstratedCount})
-        </button>
-        <button
-          type="button"
-          className={`c3-tab-btn partial ${activeTab === 'partial' ? 'active' : ''}`}
-          onClick={() => setActiveTab('partial')}
-        >
-          △ Partial ({partialCount})
-        </button>
-        <button
-          type="button"
-          className={`c3-tab-btn missing ${activeTab === 'not_demonstrated' ? 'active' : ''}`}
-          onClick={() => setActiveTab('not_demonstrated')}
-        >
-          ○ Missing ({missingCount})
-        </button>
+      <div className="tabs" role="group" aria-label="Filter concepts">
+        {tabs.map(([key, label, n]) => (
+          <button key={key} type="button" className={filter === key ? 'on' : ''} aria-pressed={filter === key} onClick={() => setFilter(key)}>
+            {label} <span className="tab-count">{n}</span>
+          </button>
+        ))}
       </div>
 
-      {/* Table */}
-      <div className="c3-concept-table-wrap">
-        <table className="c3-concept-table">
+      <div className="table-wrap">
+        <table className="data-table c3-table">
           <thead>
             <tr>
-              <th>Expected Concept</th>
+              <th>Concept</th>
               <th>Status</th>
-              <th>Token Overlap</th>
-              <th>Evidence Sentences</th>
-              <th>Sentence Excerpt</th>
+              <th>Word overlap</th>
+              <th>Supporting sentence</th>
             </tr>
           </thead>
           <tbody>
-            {filtered.length === 0 ? (
+            {shown.length === 0 ? (
               <tr>
-                <td colSpan="5" className="c3-empty-td muted">
-                  No concepts match this filter.
+                <td colSpan="4" className="muted">
+                  No concepts in this group.
                 </td>
               </tr>
             ) : (
-              filtered.map((item, idx) => {
-                const isDem = item.status === 'demonstrated';
-                const isPart = item.status === 'partial';
+              shown.map((item) => {
+                const pct = Math.round((item.overlap_score || 0) * 100);
+                const ids = item.evidence_sentence_ids || [];
                 return (
-                  <tr key={idx}>
+                  <tr key={item.concept}>
                     <td>
-                      <strong className="c3-concept-name">{item.concept}</strong>
+                      <strong>{item.concept}</strong>
                     </td>
                     <td>
-                      <span
-                        className={`chip ${
-                          isDem
-                            ? 'c3-status-demonstrated'
-                            : isPart
-                            ? 'c3-status-partial'
-                            : 'c3-status-missing'
-                        }`}
-                      >
-                        {isDem ? '✓ Demonstrated' : isPart ? '△ Partial' : '○ Not Demonstrated'}
-                      </span>
+                      <span className={`pill ${STATUS_CLASS[item.status] || 'c3-status-info'}`}>{STATUS_LABEL[item.status] || item.status}</span>
                     </td>
-                    <td>
-                      <div className="c3-overlap-bar-wrap">
-                        <div
-                          className="c3-overlap-bar"
-                          style={{
-                            width: `${Math.round(item.overlap_score * 100)}%`,
-                            backgroundColor: isDem ? '#0f9a78' : isPart ? '#d9901a' : '#d6453d',
-                          }}
-                        />
-                        <span className="c3-overlap-pct">
-                          {Math.round(item.overlap_score * 100)}%
-                        </span>
+                    <td style={{ minWidth: 120 }}>
+                      <div className="c3-bar" role="img" aria-label={`${pct}% of the concept's words found`}>
+                        <span style={{ width: `${pct}%` }} />
                       </div>
+                      <span className="small muted">{pct}%</span>
                     </td>
                     <td>
-                      {item.evidence_sentence_ids && item.evidence_sentence_ids.length > 0 ? (
-                        <div className="c3-sids-wrap">
-                          {item.evidence_sentence_ids.map((sid) => (
-                            <span key={sid} className="c3-sentence-tag">
-                              S{sid}
-                            </span>
-                          ))}
-                        </div>
-                      ) : (
-                        <span className="small muted">—</span>
-                      )}
-                    </td>
-                    <td className="c3-excerpt-td">
-                      {item.evidence_sentence_ids && item.evidence_sentence_ids.length > 0 ? (
+                      {ids.length > 0 ? (
                         <span className="small">
-                          &ldquo;{sentenceMap?.get(item.evidence_sentence_ids[0]) || ''}&rdquo;
+                          <span className="c3-sentence-tag">S{ids[0]}</span> &ldquo;{sentenceMap?.get(ids[0]) || ''}&rdquo;
                         </span>
                       ) : (
-                        <span className="small muted">No matching sentence text</span>
+                        <span className="small muted">No matching sentence</span>
                       )}
                     </td>
                   </tr>
@@ -168,6 +90,6 @@ export default function ConceptDiagnosis({ analysis, sentenceMap }) {
           </tbody>
         </table>
       </div>
-    </div>
+    </section>
   );
 }
