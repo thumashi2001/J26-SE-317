@@ -128,7 +128,8 @@ Limitations that must be stated with the results:
 
 ## Sealing
 
-Two seals, each a SHA-256 over a canonical list of file hashes, stored with the study plan:
+Two seals, each a SHA-256 over a canonical list of file hashes, stored with the study plan (the preparation tooling produces the
+first; the second is not yet automated, see Tooling):
 
 1. **Pre-marking seal:** the selected question ids with the selection seed and rule, the hash of the v2 `manifest.json`, every
    validated rubric document, and every generated sheet.
@@ -157,9 +158,61 @@ experiment results are not edited; they stay pinned to the dataset hashes they r
    lexical baselines, as already done on the v2 marks.
 3. A report of everything above including failures, exclusions and flags.
 
+## Tooling, custody and security limits
+
+Preparation tooling exists in this directory. It has been tested only on simulated toy fixtures; no real sheet has been
+generated, no marker has used it, and none of it has been operationally validated.
+
+| Module | Does |
+|---|---|
+| `sampling.py` | Deterministic question ids: the final set from the eligible validation and test questions, a separate pilot from the training split, disjoint by construction; refuses a request larger than the pool. Output holds ids, splits, modules, question marks and counts only. `validate_plan` re-checks a plan file against the dataset (eligibility, splits, disjointness, marks), because a plan can be edited. |
+| `sheets.py` | Blind sheets per marker, a return template, a separate key and a pre-marking seal. Re-validates the plan, scans every text a marker will see (and the marker pseudonyms) for dataset ids and tier names, and refuses unsafe output locations. Guarded: see below. |
+| `returns.py` | Validates a marker's return against that marker's sheet and turns chosen levels into marks. With `--seal` (or `expected_sheet_sha256`) it also checks the sheet against its sealed hash. |
+| `agreement.py` | Exact agreement, quadratic weighted kappa, ordinal Krippendorff alpha, intraclass correlation, question-level bootstrap; rejects mismatched lengths, out-of-range ranks and ragged matrices; `--seal` checks both sheets against the seal. |
+| `adjudication.py` | Lists disagreements, a blank decision template, and the final labels; excluded items are counted and carry no label. |
+
+**What the current dataset allows.** The eligible validation and test splits hold exactly 26 questions (11 and 15), with 156
+answers. Leaving out the 26 constant-string IRRELEVANT controls gives 130 answers to mark. The final set therefore cannot be
+larger than 26 without using training questions, which the existing models were trained on. The 4-question pilot is drawn from
+the 67 eligible training questions (20 answers to mark), so it cannot take questions from the final set; pilot material may be
+used to refine rubrics and the procedure and is never part of the held-out evaluation. Training-split answers may be analysed
+separately for tier validity, not for held-out model evaluation. Seeds are chosen by the team and recorded in the plan before
+any model output is looked at.
+
+**Simulated versus real.** Every sheet, return, report and label set carries an `origin`. `toy_fixture` material is simulated:
+reports built from it say so, state that it contains no human marks, and the command line needs `--allow-simulated` to compute
+on it. The command line cannot produce `toy_fixture` sheets. Origin `gold` needs a `lecturer_validated` rubric for every
+question, so real gold sheets cannot be produced until lecturers have validated rubrics; origin `pilot` accepts structurally
+valid rubrics, including AI drafts. The `origin` label is a statement by whoever ran the tool: the tools cannot verify who
+marked what.
+
+**Security limits.**
+
+- Hashes and the seal give tamper evidence (they show a file changed after sealing). They do not control who can read or write
+  anything.
+- Opaque ids are a hash of the salt and the answer id. Anyone holding the salt and the dataset can recompute the mapping, and a
+  short or reused salt can be guessed. The tool only enforces a minimum length of 16 characters, which is not a measure of
+  entropy. The salt must be random, secret, and used for one study.
+- The answer key is a plain JSON file. Nothing here encrypts it, authenticates users, or logs access.
+- Blinding hides identifiers and labels. It does not hide style: answer length and wording may still hint at a tier.
+- Markers receive identical text, so nothing prevents them from comparing notes.
+- The generator refuses to write sheets or the key inside a git working tree, but that only protects against accidental commits.
+- Only the pre-marking seal has tooling. The post-marking seal described under Sealing (returns, adjudication records, final
+  labels, key) must be produced by hand until tooling exists, and the returns themselves are not hashed by these scripts. A return
+  is bound to its sheet by the sheet hash it names; checking that hash against the seal needs `--seal` and a seal stored where the
+  people being checked cannot rewrite it.
+- Someone who can rewrite both a sheet and its return can make them consistent with each other; only the seal, held in custody,
+  exposes that. The `origin` label can likewise be rewritten in both files; it is a statement, not a proof.
+- Agreement statistics reject malformed input but assume the returns are honest; they say nothing about who marked.
+
+**Where real arrangements are required before any real use.** (1) Access-controlled storage, outside the repository, for the
+salt, the key, the plan and the seals, with a named custodian. (2) A channel for sending sheets to markers and receiving returns
+that is private to each marker. (3) A pseudonym register held by the custodian. (4) Consent and role records for markers and the
+adjudicator. (5) Lecturers who can validate the rubrics. None of these exists yet.
+
 ## Open decisions
 
-These need an answer from the research team before sheets are generated (milestone 2c):
+These need an answer from the research team before real sheets are generated:
 
 1. Who the two markers and the adjudicator are, and how many hours each can give.
 2. Who drafts the rubrics, who validates them, and how many rubrics validators can review.
@@ -174,4 +227,6 @@ These need an answer from the research team before sheets are generated (milesto
 
 - `rubric_template.json`: the authoring template; unfilled, it is rejected by the checker.
 - `rubric_check.py`: the checker (`python -m datasets.gold.rubric_check`).
-- Sheet generation, sampling and agreement scripts are **not** part of this milestone.
+- `common.py`, `sampling.py`, `sheets.py`, `returns.py`, `agreement.py`, `adjudication.py`: the preparation tooling described
+  above. Tests: `tests/unit/test_gold_sampling_and_sheets.py`, `tests/unit/test_gold_returns_and_agreement.py`, with toy data in
+  `tests/unit/gold_toy_data.py`.

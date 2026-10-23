@@ -248,7 +248,7 @@ def test_protocol_covers_the_required_topics_and_states_its_status():
     text = (GOLD_DIR / "GOLD_PROTOCOL.md").read_text(encoding="utf-8")
     for heading in ("Status and limits", "Roles", "Evaluation subset", "Rubrics", "Blind marking", "Scoring",
                     "Agreement", "Adjudication", "Sealing", "Ethics and provenance", "AI-drafted and lecturer-validated",
-                    "Open decisions"):
+                    "Tooling, custody and security limits", "Open decisions"):
         assert f"\n## {heading}\n" in text, heading
     lowered = text.lower()
     assert "not been operationally validated" in lowered
