@@ -79,6 +79,39 @@ roles and the pseudonyms used for them are recorded in the sealed manifest.
   validate only some rubrics, the gold set contains only those questions. The bar is not lowered to keep the numbers up.
 - Results report how many rubrics were AI-drafted and then validated, and how many were rejected or rewritten.
 
+## Approval, version binding and evidence
+
+**How a rubric becomes `lecturer_validated`.** (1) A drafter produces the rubric document (`ai_drafted` if an AI tool was used).
+(2) An authorised reviewer who is not the drafter reads it against the question and edits it where needed. (3) Only then does a
+person record the review: they set `lecturer_validated` with `validated_by` and `validated_on` in the document, and the custodian
+adds an entry to the approval register. (4) `rubric_check` and `readiness.py` confirm the records are complete and consistent. No
+step is performed by software on a person's behalf.
+
+**Who may approve.** The people named as authorised reviewers in the study plan, whose qualification is judged by the research
+team and supervisor. The software holds no such list and cannot check it; it can only require that the validator differs from the
+drafter and that the register records the role `lecturer`.
+
+**How approval evidence is recorded.** Two records. The rubric document's `provenance` block states drafter, validator and dates;
+use a pseudonym or staff identifier, not a full name, once a document leaves the custodian. The custodian-held approval register
+(`approval.py`, format `c3-gold-approvals/1`) holds, per question, the sha256 of the approved rubric object, the approval date, the
+role, a pointer (`evidence_ref`) to where the institutional evidence is kept, and who recorded it. It accepts no names or other
+personal fields, and it holds a pointer, never the evidence itself.
+
+**What is and is not verified.** Verified by software: the records are complete, dated sensibly, free of placeholder text and
+personal-data fields; the register entry's hash equals the current rubric. **Not verified, and not verifiable by software:** that the
+approver exists, is qualified, was authorised, or that the evidence reference is genuine; anyone who can edit the register can write
+a matching entry. A second person should compare register entries with the institutional records.
+
+**Version binding.** Gold sheet generation is refused unless every question's register entry matches the current rubric, so a
+rubric edited after approval needs a new review and a new entry. The key records, per question, the hash of the whole rubric
+document, the hash of the rubric object and the approval state; the sheet embeds the (re-labelled) rubric content, so the sheet
+hash binds that content; the pre-marking seal covers the key and the sheets. Old sheets stay tied to the hashes they were built from.
+
+**Keeping simulated results from being presented as human results.** Toy-fixture sheets, returns, reports, label sets, seals and
+readiness reports carry the origin `toy_fixture`, the notice "SIMULATED TOY FIXTURE - NOT HUMAN MARKS" and `simulated: true`; the
+command line cannot create toy sheets, and the agreement command refuses toy material without `--allow-simulated`. A reader must still
+check the origin and the notice before quoting a number. The origin is a label written by whoever ran the tool, not proof.
+
 ## Blind marking
 
 - **Markers receive** the question text, the validated rubric, and one answer at a time. Nothing else.
@@ -128,12 +161,14 @@ Limitations that must be stated with the results:
 
 ## Sealing
 
-Two seals, each a SHA-256 over a canonical list of file hashes, stored with the study plan (the preparation tooling produces the
-first; the second is not yet automated, see Tooling):
+Two seals, each a SHA-256 over a canonical list of file hashes, stored with the study plan (`sheets.py` produces the first and
+`seal.py` the second; both are tamper evidence only):
 
-1. **Pre-marking seal:** the selected question ids with the selection seed and rule, the hash of the v2 `manifest.json`, every
-   validated rubric document, and every generated sheet.
-2. **Post-marking seal:** the marker returns, the adjudication records, the final per-criterion labels, and the key file.
+1. **Pre-marking seal:** every sheet and return template, the key (which records the hashes of every rubric document, every rubric
+   object and its approval state, the hash of the plan, and the hash of the v2 `manifest.json`), and the plan, which holds the
+   selection seeds and rule.
+2. **Post-marking seal:** the marker returns (each must name its sealed sheet), the adjudication record and the final
+   per-criterion labels, chained to the pre-marking seal by its hash.
 
 Rules: models are evaluated against the final labels only after the post-marking seal; predictions are produced without access
 to the labels; the evaluation is run once per frozen configuration; any later change creates a new version with a new seal
@@ -170,6 +205,9 @@ generated, no marker has used it, and none of it has been operationally validate
 | `returns.py` | Validates a marker's return against that marker's sheet and turns chosen levels into marks. With `--seal` (or `expected_sheet_sha256`) it also checks the sheet against its sealed hash. |
 | `agreement.py` | Exact agreement, quadratic weighted kappa, ordinal Krippendorff alpha, intraclass correlation, question-level bootstrap; rejects mismatched lengths, out-of-range ranks and ragged matrices; `--seal` checks both sheets against the seal. |
 | `adjudication.py` | Lists disagreements, a blank decision template, and the final labels; excluded items are counted and carry no label. |
+| `approval.py` | The approval register: binds an approval record to the sha256 of the exact rubric, rejects names and placeholder text, and reports a record as missing, stale or inconsistent. It cannot authenticate the approval. |
+| `seal.py` | The post-marking seal: binds each marker return to its sealed sheet, hashes the returns, adjudication record and final labels, and chains to the pre-marking seal. |
+| `readiness.py` | A reproducible audit of how many held-out questions could go to genuine gold-sheet generation, with the dataset version and hashes, blockers, and the people-only actions still needed (`READINESS_CHECKLIST.md`). It reads no marker returns. |
 
 **What the current dataset allows.** The eligible validation and test splits hold exactly 26 questions (11 and 15), with 156
 answers. Leaving out the 26 constant-string IRRELEVANT controls gives 130 answers to mark. The final set therefore cannot be
@@ -181,10 +219,10 @@ any model output is looked at.
 
 **Simulated versus real.** Every sheet, return, report and label set carries an `origin`. `toy_fixture` material is simulated:
 reports built from it say so, state that it contains no human marks, and the command line needs `--allow-simulated` to compute
-on it. The command line cannot produce `toy_fixture` sheets. Origin `gold` needs a `lecturer_validated` rubric for every
-question, so real gold sheets cannot be produced until lecturers have validated rubrics; origin `pilot` accepts structurally
-valid rubrics, including AI drafts. The `origin` label is a statement by whoever ran the tool: the tools cannot verify who
-marked what.
+on it. The command line cannot produce `toy_fixture` sheets. Origin `gold` needs a `lecturer_validated` rubric and a matching
+approval-register entry for every question, so real gold sheets cannot be produced until lecturers have validated the rubrics and
+their approval is recorded; origin `pilot` accepts structurally valid rubrics, including AI drafts. The `origin` label is a
+statement by whoever ran the tool: the tools cannot verify who marked what.
 
 **Security limits.**
 
@@ -197,10 +235,9 @@ marked what.
 - Blinding hides identifiers and labels. It does not hide style: answer length and wording may still hint at a tier.
 - Markers receive identical text, so nothing prevents them from comparing notes.
 - The generator refuses to write sheets or the key inside a git working tree, but that only protects against accidental commits.
-- Only the pre-marking seal has tooling. The post-marking seal described under Sealing (returns, adjudication records, final
-  labels, key) must be produced by hand until tooling exists, and the returns themselves are not hashed by these scripts. A return
-  is bound to its sheet by the sheet hash it names; checking that hash against the seal needs `--seal` and a seal stored where the
-  people being checked cannot rewrite it.
+- Both seals have tooling (`sheets.py`, `seal.py`). A return is bound to its sheet by the sheet hash it names, and the post-marking
+  seal refuses a return that does not name its sealed sheet; checking against the seal needs the seal stored where the people being
+  checked cannot rewrite it. `seal.py` does not hash the key into the second stage: the key is covered by the pre-marking seal.
 - Someone who can rewrite both a sheet and its return can make them consistent with each other; only the seal, held in custody,
   exposes that. The `origin` label can likewise be rewritten in both files; it is a statement, not a proof.
 - Agreement statistics reject malformed input but assume the returns are honest; they say nothing about who marked.
@@ -208,25 +245,31 @@ marked what.
 **Where real arrangements are required before any real use.** (1) Access-controlled storage, outside the repository, for the
 salt, the key, the plan and the seals, with a named custodian. (2) A channel for sending sheets to markers and receiving returns
 that is private to each marker. (3) A pseudonym register held by the custodian. (4) Consent and role records for markers and the
-adjudicator. (5) Lecturers who can validate the rubrics. None of these exists yet.
+adjudicator. (5) Lecturers who can validate the rubrics. None of these exists yet. `READINESS_CHECKLIST.md` lists every such
+item with the software safeguard that exists and the people or institutional action still needed; all are Open.
 
 ## Open decisions
 
-These need an answer from the research team before real sheets are generated:
+**Decided by the research team:** the target evaluation set is the 26 eligible validation and test questions; the pilot is 4
+training-split questions kept apart from the evaluation set; the constant-string IRRELEVANT controls are not marked by humans, and
+that exclusion is documented and the controls stay in the dataset.
+
+These still need an answer from the research team before real sheets are generated:
 
 1. Who the two markers and the adjudicator are, and how many hours each can give.
-2. Who drafts the rubrics, who validates them, and how many rubrics validators can review.
-3. The subset size, given the answers to 1 and 2.
-4. Whether the constant-string IRRELEVANT controls are left out of the sheets.
-5. The acceptance thresholds for agreement and for the proportion of items that may be excluded.
-6. Where the key and the sealed artefacts are stored and who holds them.
-7. Whether markers also write short answers, to reduce dependence on tier-recipe text (a larger change that this protocol
+2. Who drafts the rubrics, who validates them (the authorised-reviewer list), and how many rubrics validators can review.
+3. The acceptance thresholds for agreement and for the proportion of items that may be excluded.
+4. Where the key and the sealed artefacts are stored and who holds them.
+5. Whether markers also write short answers, to reduce dependence on tier-recipe text (a larger change that this protocol
    does not assume).
 
 ## Files
 
 - `rubric_template.json`: the authoring template; unfilled, it is rejected by the checker.
 - `rubric_check.py`: the checker (`python -m datasets.gold.rubric_check`).
-- `common.py`, `sampling.py`, `sheets.py`, `returns.py`, `agreement.py`, `adjudication.py`: the preparation tooling described
-  above. Tests: `tests/unit/test_gold_sampling_and_sheets.py`, `tests/unit/test_gold_returns_and_agreement.py`, with toy data in
+- `common.py`, `sampling.py`, `sheets.py`, `returns.py`, `agreement.py`, `adjudication.py`, `approval.py`, `seal.py`,
+  `readiness.py`: the preparation tooling described above. Tests: `tests/unit/test_gold_sampling_and_sheets.py`,
+  `tests/unit/test_gold_returns_and_agreement.py`, `tests/unit/test_gold_readiness.py`, with toy data in
   `tests/unit/gold_toy_data.py`.
+- `READINESS_CHECKLIST.md`: what must be done by real people or the institution before any real marking.
+- `reports/c3_remediation/25_human_validation_readiness.md`: the generated readiness report for the project dataset.

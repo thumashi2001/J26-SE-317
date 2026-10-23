@@ -8,7 +8,7 @@ import json
 from pathlib import Path
 
 import pytest
-from gold_toy_data import MARKERS, SALT, build_toy_dataset, toy_rubric, toy_rubrics
+from gold_toy_data import MARKERS, SALT, build_toy_dataset, toy_approvals, toy_rubric, toy_rubrics
 
 from datasets.gold import sampling, sheets
 from datasets.gold.common import GoldToolError, canonical_bytes
@@ -26,9 +26,13 @@ def _plan(toy, **kw):
     return sampling.plan(toy, seed="s1", pilot_seed="p1", pilot_size=kw.pop("pilot_size", 4), **kw)
 
 
-def _build(toy, group="final", origin="toy_fixture", status="ai_drafted", markers=MARKERS, salt=SALT, plan=None, rubrics=None):
+def _build(toy, group="final", origin="toy_fixture", status="ai_drafted", markers=MARKERS, salt=SALT, plan=None, rubrics=None,
+           approvals="auto"):
     plan = plan or _plan(toy)
-    return sheets.build_sheets(toy, plan, group, rubrics or toy_rubrics(plan, group, status), list(markers), salt, origin)
+    rubrics = rubrics or toy_rubrics(plan, group, status)
+    if approvals == "auto":  # a matching register is supplied automatically, so tests of other guards reach those guards
+        approvals = toy_approvals(rubrics) if origin == "gold" else None
+    return sheets.build_sheets(toy, plan, group, rubrics, list(markers), salt, origin, approvals)
 
 
 # ------------------------------------------------------------------------------------------------- sampling
@@ -356,6 +360,12 @@ def test_the_command_line_cannot_make_real_sheets_without_validated_rubrics(toy,
         (rubrics / f"{q['question_id']}.json").write_text(json.dumps(toy_rubric(q["question_id"], q["marks"], "ai_drafted")), encoding="utf-8")
     assert sheets.main(base) == 1 and "lecturer_validated" in capsys.readouterr().err
     assert not (tmp_path / "s").exists() and not (tmp_path / "c").exists()
+    validated = {}
     for q in _plan(toy)["final"]["questions"]:
-        (rubrics / f"{q['question_id']}.json").write_text(json.dumps(toy_rubric(q["question_id"], q["marks"], "lecturer_validated")), encoding="utf-8")
-    assert sheets.main(base) == 0 and (tmp_path / "c" / "answer_key.json").exists()
+        validated[q["question_id"]] = toy_rubric(q["question_id"], q["marks"], "lecturer_validated")
+        (rubrics / f"{q['question_id']}.json").write_text(json.dumps(validated[q["question_id"]]), encoding="utf-8")
+    assert sheets.main(base) == 1 and "approval-register entry" in capsys.readouterr().err  # validated, but no approval record
+    assert not (tmp_path / "s").exists()
+    approvals = tmp_path / "approvals.json"
+    approvals.write_text(json.dumps(toy_approvals(validated)), encoding="utf-8")
+    assert sheets.main([*base, "--approvals", str(approvals)]) == 0 and (tmp_path / "c" / "answer_key.json").exists()

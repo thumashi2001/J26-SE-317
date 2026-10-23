@@ -48,7 +48,13 @@ def build_toy_dataset(root: Path) -> Path:
                             " ".join(WORDS[(n + t + j) % 13] for j in range(6 + 3 * (5 - t))) + f" point {n}{t}"})
     _write(root / "01_question_bank.csv", bank)
     _write(root / "02_controlled_answers_eligible.csv", answers)
-    (root / "manifest.json").write_text(json.dumps({"dataset_version": "toy"}), encoding="utf-8")
+    _write(root / "03_rubric_criteria.csv", [{"question_id": q[0], "criterion_id": f"{q[0]}-C01"} for q in QUESTIONS])
+    files = {n: hashlib.sha256((root / n).read_bytes()).hexdigest()
+             for n in ("01_question_bank.csv", "02_controlled_answers_eligible.csv", "03_rubric_criteria.csv")}
+    (root / "manifest.json").write_text(json.dumps({"dataset_version": "toy-v2", "row_dataset_version": "toy-rows",
+                                                    "source_dataset_version": "toy-source", "files": files}), encoding="utf-8")
+    (root / "validation_report.json").write_text(json.dumps({"overall": "FAIL", "hard_failures": ["ratio_concentration"], "checks": [
+        {"name": "ratio_concentration", "status": "fail", "details": {"value": 0.7, "threshold": 0.45}}]}), encoding="utf-8")
     return root
 
 
@@ -72,6 +78,15 @@ def toy_rubric(qid: str, marks: str, status: str = "ai_drafted") -> dict:
 
 def toy_rubrics(plan_doc: dict, group: str, status: str = "ai_drafted") -> dict:
     return {q["question_id"]: toy_rubric(q["question_id"], q["marks"], status) for q in plan_doc[group]["questions"]}
+
+
+def toy_approvals(rubrics: dict, approved_on: str = "2026-10-06") -> dict:
+    """A simulated approval register whose entries match the given rubric documents exactly."""
+    from datasets.gold.approval import FORMAT, rubric_sha256
+
+    return {"format": FORMAT, "entries": [
+        {"question_id": qid, "rubric_sha256": rubric_sha256(doc), "approved_on": approved_on, "approver_role": "lecturer",
+         "evidence_ref": f"toy-evidence-{n}", "recorded_by": "toy-custodian"} for n, (qid, doc) in enumerate(sorted(rubrics.items()), 1)]}
 
 
 def fill_return(sheet: dict, chooser) -> dict:

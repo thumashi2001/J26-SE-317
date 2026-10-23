@@ -31,6 +31,7 @@ import re
 import sys
 from pathlib import Path
 
+from datasets.gold.approval import approval_state, rubric_sha256
 from datasets.gold.common import ORIGINS, GoldToolError, canonical_bytes, sha256_file, sha256_hex
 from datasets.gold.rubric_check import check_document, usable_as_gold
 from datasets.gold.sampling import validate_plan
@@ -86,8 +87,12 @@ def _texts(obj: object):
 
 
 def build_sheets(dataset_dir: Path, plan_doc: dict, group: str, rubrics: dict[str, dict], markers: list[str], salt: str,
-                 origin: str) -> dict:
-    """Pure construction of sheets, return templates, key and seal; nothing is written."""
+                 origin: str, approvals: dict | None = None) -> dict:
+    """Pure construction of sheets, return templates, key and seal; nothing is written.
+
+    Origin 'gold' also needs an approval register (datasets/gold/approval.py) with a matching entry for every question, so a
+    rubric edited after its approval was recorded is refused. The register is a record kept by people and is not authenticated.
+    """
     if group not in GROUP_ORIGINS:
         raise GoldToolError("group must be 'final' or 'pilot'")
     if origin not in ORIGINS or origin not in GROUP_ORIGINS[group]:
@@ -116,10 +121,14 @@ def build_sheets(dataset_dir: Path, plan_doc: dict, group: str, rubrics: dict[st
             raise GoldToolError(f"rubric for {qid} is not acceptable: {problems[0]} (+{len(problems) - 1} more)")
         if origin == "gold" and not usable_as_gold(doc, problems):
             raise GoldToolError(f"origin 'gold' needs a lecturer_validated rubric; {qid} is {doc['provenance']['status']!r}")
+        state = approval_state(approvals, doc)
+        if origin == "gold" and state != "matches":
+            raise GoldToolError(f"origin 'gold' needs an approval-register entry matching the current rubric; {qid}: {state}")
         ref = "RB" + _opaque(salt, "rubric", qid, 8)
         ref_of[qid] = ref
         shown_rubrics[ref], back = _blind_rubric(doc)
-        rubric_key[ref] = {"question_id": qid, "criteria": back}
+        rubric_key[ref] = {"question_id": qid, "criteria": back, "document_sha256": sha256_hex(canonical_bytes(doc)),
+                           "rubric_sha256": rubric_sha256(doc), "approval_state": state}
 
     answers = _read(d / "02_controlled_answers_eligible.csv")
     by_q = {q["question_id"]: q for q in _read(d / "01_question_bank.csv")}
@@ -221,6 +230,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--group", choices=sorted(GROUP_ORIGINS), required=True)
     ap.add_argument("--origin", choices=["pilot", "gold"], required=True)
     ap.add_argument("--rubrics-dir", type=Path, required=True, help="one <question_id>.json gold-rubric document per selected question")
+    ap.add_argument("--approvals", type=Path, default=None, help="approval register (required for origin gold)")
     ap.add_argument("--markers", required=True, help="comma-separated pseudonyms, at least two")
     ap.add_argument("--salt-file", type=Path, required=True)
     ap.add_argument("--sheets-dir", type=Path, required=True)
@@ -235,7 +245,8 @@ def main(argv: list[str] | None = None) -> int:
                 raise GoldToolError(f"missing rubric document {path.name}")
             rubrics[q["question_id"]] = json.loads(path.read_text(encoding="utf-8"))
         salt = args.salt_file.read_text(encoding="utf-8").strip()
-        result = build_sheets(args.dataset, plan_doc, args.group, rubrics, args.markers.split(","), salt, args.origin)
+        approvals = json.loads(args.approvals.read_text(encoding="utf-8")) if args.approvals is not None else None
+        result = build_sheets(args.dataset, plan_doc, args.group, rubrics, args.markers.split(","), salt, args.origin, approvals)
         seal = write_outputs(result, args.sheets_dir, args.custody_dir)
     except (GoldToolError, OSError, ValueError, KeyError) as exc:
         print(f"REFUSED  {exc}", file=sys.stderr)
