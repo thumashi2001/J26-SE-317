@@ -1,0 +1,55 @@
+{
+  "format": "c3-gold-rubric/1",
+  "_instructions": [
+    "Copy this file, replace every <FILL IN ...> value, then run: python -m datasets.gold.rubric_check <your file> --dataset datasets/c3_phase3_v5_repaired_v2",
+    "The 'rubric' object is exactly the marking engine's Rubric (app/schemas/marking.py): rubric -> criteria -> scoring_levels. Marks come only from the 'mark' of a level.",
+    "Give every criterion at least 3 levels, including a 0-mark level and a level worth the criterion's max_marks; criterion max_marks must add up to the question's marks.",
+    "Write descriptors a marker can apply without the tier or any model output: say what the answer must show to sit on that level.",
+    "Positive levels need required_concepts (on the level or on the criterion) so the same rubric can later be run through the engine.",
+    "provenance.status: use 'ai_drafted' for any rubric that an AI tool drafted or helped draft. Only a lecturer who has reviewed it may set 'lecturer_validated', with their name and the review date. Do not set it on someone else's behalf.",
+    "The checker verifies that the record is complete and consistent. It cannot verify that a review really took place."
+  ],
+  "question_id": "<FILL IN: eligible question id from 01_question_bank.csv>",
+  "provenance": {
+    "status": "template",
+    "drafted_by": "",
+    "drafted_on": "",
+    "validated_by": "",
+    "validated_on": "",
+    "validation_notes": ""
+  },
+  "rubric": {
+    "rubric_id": "<FILL IN: rubric id>",
+    "title": "<FILL IN: rubric title>",
+    "criteria": [
+      {
+        "criterion_id": "C1",
+        "description": "<FILL IN: what this criterion marks>",
+        "max_marks": 4,
+        "required_concepts": ["<FILL IN: concept 1>", "<FILL IN: concept 2>"],
+        "scoring_levels": [
+          {
+            "level_id": "L0",
+            "label": "<FILL IN: label for no credit>",
+            "mark": 0,
+            "descriptor": "<FILL IN: what an answer on this level shows (at least 20 characters)>"
+          },
+          {
+            "level_id": "L2",
+            "label": "<FILL IN: label for partial credit>",
+            "mark": 2,
+            "descriptor": "<FILL IN: what an answer on this level shows (at least 20 characters)>",
+            "evidence_rule": {"type": "required_concept_count", "minimum_demonstrated": 1}
+          },
+          {
+            "level_id": "L4",
+            "label": "<FILL IN: label for full credit>",
+            "mark": 4,
+            "descriptor": "<FILL IN: what an answer on this level shows (at least 20 characters)>",
+            "evidence_rule": {"type": "required_concept_count", "minimum_demonstrated": 2}
+          }
+        ]
+      }
+    ]
+  }
+}
