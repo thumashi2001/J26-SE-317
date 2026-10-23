@@ -11,19 +11,21 @@
     },
     {
       "details": {
-        "problems": []
+        "problems": [
+          "dataset_version differs from C3-Phase3-v5-repaired-v2 in ['answers', 'questions', 'rubric', 'controls']"
+        ]
       },
       "hard": true,
       "name": "schema_required_fields",
-      "status": "pass",
-      "summary": "0 problem(s)"
+      "status": "fail",
+      "summary": "1 problem(s)"
     },
     {
       "details": {
         "compared_to_archive": true,
         "parts": {
-          "eligible": 576,
-          "quarantine": 355,
+          "eligible": 558,
+          "quarantine": 373,
           "repaired_ineligible_controls": 71
         },
         "problems": []
@@ -31,7 +33,7 @@
       "hard": true,
       "name": "counts_reconcile",
       "status": "pass",
-      "summary": "original 1002 = eligible 576 + quarantine 355 + ineligible controls 71"
+      "summary": "original 1002 = eligible 558 + quarantine 373 + ineligible controls 71"
     },
     {
       "details": {
@@ -79,7 +81,7 @@
       "hard": true,
       "name": "irrelevant_marks_zero",
       "status": "pass",
-      "summary": "167 IRRELEVANT answers, 0 non-zero"
+      "summary": "164 IRRELEVANT answers, 0 non-zero"
     },
     {
       "details": {
@@ -165,10 +167,6 @@
           [
             "SA-PP-SE3010-089-MOSTLY_CORRECT",
             "SA-PP-SE3010-089-PARTIAL"
-          ],
-          [
-            "SA-PP-SE3080-102-FULL",
-            "SA-PP-SE3080-102-PARTIAL"
           ]
         ],
         "unflagged": []
@@ -176,7 +174,7 @@
       "hard": true,
       "name": "duplicates_within_question",
       "status": "pass",
-      "summary": "4 answers share their text with another variant of the same question; 0 not flagged for review"
+      "summary": "2 answers share their text with another variant of the same question; 0 not flagged for review"
     },
     {
       "details": {
@@ -198,13 +196,13 @@
           "PARTIAL": 7
         },
         "accidental_strings": 4,
-        "intentional_answers": 96,
+        "intentional_answers": 93,
         "intentional_strings": 1
       },
       "hard": false,
       "name": "duplicates_across_questions",
       "status": "warn",
-      "summary": "96 answers are intentional template negative controls (flagged); 9 answers in 4 strings are shared across questions without a flag (accidental)"
+      "summary": "93 answers are intentional template negative controls (flagged); 9 answers in 4 strings are shared across questions without a flag (accidental)"
     },
     {
       "details": {},
@@ -244,41 +242,41 @@
     },
     {
       "details": {
-        "max": 0.9034,
-        "pairs_above": 1,
+        "max": 0.6483,
+        "pairs_above": 0,
         "threshold": 0.8,
         "top5": [
           [
-            0.9034,
-            "PP-SE3080-099",
-            "PP-SE3080-107"
-          ],
-          [
-            0.6442,
+            0.6483,
             "PP-SE3060-015",
             "PP-SE3060-045"
           ],
           [
-            0.6017,
+            0.604,
             "PP-SE3020-030",
             "PP-SE3020-039"
           ],
           [
-            0.6009,
+            0.6026,
             "PP-SE3040-005",
             "PP-SE3040-006"
           ],
           [
-            0.5881,
+            0.5896,
             "PP-SE3030-061",
             "PP-SE3030-079"
+          ],
+          [
+            0.5816,
+            "PP-SE3020-032",
+            "PP-SE3020-037"
           ]
         ]
       },
       "hard": false,
       "name": "near_duplicate_questions_across_splits",
-      "status": "warn",
-      "summary": "max TF-IDF cosine between questions of different splits = 0.903 (threshold 0.8); 1 pairs above (report-only)"
+      "status": "pass",
+      "summary": "max TF-IDF cosine between questions of different splits = 0.648 (threshold 0.8); 0 pairs above (report-only)"
     },
     {
       "details": {
@@ -293,7 +291,7 @@
       "hard": false,
       "name": "cross_split_identical_answer_strings",
       "status": "warn",
-      "summary": "5 answer strings occur in more than one split: 1 intentional template strings (96 answers), 4 unflagged strings (9 answers) (report-only)"
+      "summary": "5 answer strings occur in more than one split: 1 intentional template strings (93 answers), 4 unflagged strings (9 answers) (report-only)"
     },
     {
       "details": {},
@@ -311,7 +309,7 @@
       "hard": true,
       "name": "per_question_coverage",
       "status": "pass",
-      "summary": "96/96 eligible questions have exactly one answer per tier (6 variants)"
+      "summary": "93/93 eligible questions have exactly one answer per tier (6 variants)"
     },
     {
       "details": {
@@ -334,12 +332,12 @@
     },
     {
       "details": {
-        "n_inner": 380,
+        "n_inner": 372,
         "threshold": 0.45,
         "top7": [
           [
             0.8,
-            163
+            160
           ],
           [
             0.6,
@@ -366,34 +364,55 @@
             9
           ]
         ],
-        "value": 0.757895
+        "value": 0.766129
       },
       "hard": true,
       "name": "ratio_concentration",
       "status": "fail",
-      "summary": "share of the 380 inner-label answers on the top-7 ratios = 0.7579 (threshold 0.45, definition: tier_spec.json max_share_on_top7_ratios) - THRESHOLD EXCEEDED; threshold and labels NOT changed"
+      "summary": "share of the 372 inner-label answers on the top-7 ratios = 0.7661 (threshold 0.45, definition: validation_spec.json max_share_on_top7_ratios) - THRESHOLD EXCEEDED; threshold and labels NOT changed"
     },
     {
       "details": {
-        "n": 576,
-        "r": 0.8106568292574906,
+        "n": 558,
+        "r": 0.8320930671715632,
         "threshold": 0.4
       },
       "hard": false,
       "name": "answer_length_vs_mark_pearson",
       "status": "warn",
-      "summary": "Pearson(words, expected_mark/max_marks) = 0.8107 (spec threshold 0.4; report-only)"
+      "summary": "Pearson(words, expected_mark/max_marks) = 0.8321 (spec threshold 0.4; report-only)"
     },
     {
       "details": {
         "eligible_diffs": [],
-        "quarantine_diffs": [],
+        "quarantine_diffs": [
+          "SA-PP-SE3040-009-FULL.expected_relationships",
+          "SA-PP-SE3040-009-FULL.dataset_version",
+          "SA-PP-SE3040-009-MOSTLY_CORRECT.expected_relationships",
+          "SA-PP-SE3040-009-MOSTLY_CORRECT.dataset_version",
+          "SA-PP-SE3040-009-PARTIAL.expected_relationships",
+          "SA-PP-SE3040-009-PARTIAL.dataset_version",
+          "SA-PP-SE3040-009-MISSING_CONCEPT.expected_relationships",
+          "SA-PP-SE3040-009-MISSING_CONCEPT.dataset_version",
+          "SA-PP-SE3040-009-MISCONCEPTION.expected_relationships",
+          "SA-PP-SE3040-009-MISCONCEPTION.dataset_version",
+          "SA-PP-SE3040-009-IRRELEVANT.dataset_version",
+          "SA-PP-SE3080-099-FULL.dataset_version",
+          "SA-PP-SE3080-099-MOSTLY_CORRECT.dataset_version",
+          "SA-PP-SE3080-099-PARTIAL.dataset_version",
+          "SA-PP-SE3080-099-MISSING_CONCEPT.dataset_version",
+          "SA-PP-SE3080-099-MISCONCEPTION.dataset_version",
+          "SA-PP-SE3080-099-IRRELEVANT.dataset_version",
+          "SA-PP-SE3080-102-FULL.dataset_version",
+          "SA-PP-SE3080-102-MOSTLY_CORRECT.dataset_version",
+          "SA-PP-SE3080-102-PARTIAL.dataset_version"
+        ],
         "question_split_diffs": []
       },
       "hard": true,
       "name": "preserved_vs_original",
-      "status": "pass",
-      "summary": "0 eligible-answer fields differ from the original in labels/marks/text/split, 0 question splits changed, 0 quarantine fields differ from the original, 0 quarantine rows without reason"
+      "status": "fail",
+      "summary": "0 eligible-answer fields differ from the original in labels/marks/text/split, 0 question splits changed, 23 quarantine fields differ from the original, 0 quarantine rows without reason"
     },
     {
       "details": {},
@@ -404,12 +423,14 @@
     },
     {
       "details": {
-        "problems": []
+        "problems": [
+          "quarantined answers and ledger rows differ"
+        ]
       },
       "hard": true,
       "name": "repair_manifest_consistent",
-      "status": "pass",
-      "summary": "1023 ledger rows; 0 problem(s)"
+      "status": "fail",
+      "summary": "1023 ledger rows; 1 problem(s)"
     },
     {
       "details": {},
@@ -420,22 +441,25 @@
     }
   ],
   "hard_failures": [
-    "ratio_concentration"
+    "schema_required_fields",
+    "ratio_concentration",
+    "preserved_vs_original",
+    "repair_manifest_consistent"
   ],
   "overall": "FAIL",
   "scope": "full",
   "sections": {
     "empty_cells_by_table": {
       "eligible_answers": {
-        "evidence_requirements": 576,
-        "expected_concepts": 576,
-        "reference_answer": 576,
-        "repair_categories": 456,
-        "rubric": 576,
-        "source_replaced_question_id": 576
+        "evidence_requirements": 558,
+        "expected_concepts": 558,
+        "reference_answer": 558,
+        "repair_categories": 448,
+        "rubric": 558,
+        "source_replaced_question_id": 558
       },
       "question_bank": {
-        "eligibility_reason": 96,
+        "eligibility_reason": 93,
         "replaced_question_id": 104,
         "source_replaced_question_id": 96
       },
@@ -450,36 +474,36 @@
     },
     "label_distribution_eligible": {
       "ALL": {
-        "n": 576,
+        "n": 558,
         "tiers": {
           "FULL": {
             "mean_ratio": 1.0,
-            "n": 96,
+            "n": 93,
             "share": 0.1667
           },
           "IRRELEVANT": {
             "mean_ratio": 0.0,
-            "n": 96,
+            "n": 93,
             "share": 0.1667
           },
           "MISCONCEPTION": {
-            "mean_ratio": 0.7875,
-            "n": 96,
+            "mean_ratio": 0.7961,
+            "n": 93,
             "share": 0.1667
           },
           "MISSING_CONCEPT": {
-            "mean_ratio": 0.7875,
-            "n": 96,
+            "mean_ratio": 0.7961,
+            "n": 93,
             "share": 0.1667
           },
           "MOSTLY_CORRECT": {
-            "mean_ratio": 0.7875,
-            "n": 96,
+            "mean_ratio": 0.7961,
+            "n": 93,
             "share": 0.1667
           },
           "PARTIAL": {
-            "mean_ratio": 0.6234,
-            "n": 96,
+            "mean_ratio": 0.6173,
+            "n": 93,
             "share": 0.1667
           }
         }
@@ -520,36 +544,36 @@
         }
       },
       "train": {
-        "n": 420,
+        "n": 402,
         "tiers": {
           "FULL": {
             "mean_ratio": 1.0,
-            "n": 70,
+            "n": 67,
             "share": 0.1667
           },
           "IRRELEVANT": {
             "mean_ratio": 0.0,
-            "n": 70,
+            "n": 67,
             "share": 0.1667
           },
           "MISCONCEPTION": {
-            "mean_ratio": 0.783,
-            "n": 70,
+            "mean_ratio": 0.7947,
+            "n": 67,
             "share": 0.1667
           },
           "MISSING_CONCEPT": {
-            "mean_ratio": 0.783,
-            "n": 70,
+            "mean_ratio": 0.7947,
+            "n": 67,
             "share": 0.1667
           },
           "MOSTLY_CORRECT": {
-            "mean_ratio": 0.783,
-            "n": 70,
+            "mean_ratio": 0.7947,
+            "n": 67,
             "share": 0.1667
           },
           "PARTIAL": {
-            "mean_ratio": 0.6228,
-            "n": 70,
+            "mean_ratio": 0.6143,
+            "n": 67,
             "share": 0.1667
           }
         }
@@ -598,14 +622,14 @@
     "original_vs_repaired": {
       "answers": {
         "controls": 71,
-        "eligible": 576,
+        "eligible": 558,
         "original": 1002,
-        "quarantine": 355
+        "quarantine": 373
       },
       "answers_by_split": {
         "eligible": {
           "test": 90,
-          "train": 420,
+          "train": 402,
           "validation": 66
         },
         "original": {
@@ -616,12 +640,12 @@
       },
       "label_distribution": {
         "eligible": {
-          "FULL": 96,
-          "IRRELEVANT": 96,
-          "MISCONCEPTION": 96,
-          "MISSING_CONCEPT": 96,
-          "MOSTLY_CORRECT": 96,
-          "PARTIAL": 96
+          "FULL": 93,
+          "IRRELEVANT": 93,
+          "MISCONCEPTION": 93,
+          "MISSING_CONCEPT": 93,
+          "MOSTLY_CORRECT": 93,
+          "PARTIAL": 93
         },
         "original": {
           "FULL": 167,
@@ -634,16 +658,16 @@
       },
       "length_mark_pearson": {
         "original_all": 0.08877780168372715,
-        "repaired_eligible": 0.8106568292574906
+        "repaired_eligible": 0.8320930671715632
       },
       "questions": {
-        "eligible": 96,
-        "ineligible": 71,
+        "eligible": 93,
+        "ineligible": 74,
         "original": 167
       },
       "ratio_concentration": {
         "original_all": 0.7579,
-        "repaired_eligible": 0.7579
+        "repaired_eligible": 0.7661
       }
     },
     "quarantine_cells_with_nan_expected": 252
@@ -652,7 +676,6 @@
     "rubric_criterion_sums_ineligible",
     "nan_in_ineligible_controls",
     "duplicates_across_questions",
-    "near_duplicate_questions_across_splits",
     "cross_split_identical_answer_strings",
     "criterion_id_map",
     "answer_length_vs_mark_pearson"

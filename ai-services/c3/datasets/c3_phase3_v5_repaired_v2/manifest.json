@@ -1,9 +1,9 @@
 {
   "accounting": {
     "canonical": {
-      "eligible": 576,
+      "eligible": 558,
       "original_answers": 576,
-      "quarantined": 0,
+      "quarantined": 18,
       "repaired_ineligible_controls": 0
     },
     "replacement_block_A": {
@@ -48,39 +48,41 @@
       "criterion_map_marks_agree_true": 1,
       "criterion_map_resolved": 96,
       "criterion_map_unresolved": 391,
-      "eligible_answers": 576,
+      "eligible_answers": 558,
       "eligible_by_split": {
         "test": 90,
-        "train": 420,
+        "train": 402,
         "validation": 66
       },
       "eligible_label_distribution": {
-        "FULL": 96,
-        "IRRELEVANT": 96,
-        "MISCONCEPTION": 96,
-        "MISSING_CONCEPT": 96,
-        "MOSTLY_CORRECT": 96,
-        "PARTIAL": 96
+        "FULL": 93,
+        "IRRELEVANT": 93,
+        "MISCONCEPTION": 93,
+        "MISSING_CONCEPT": 93,
+        "MOSTLY_CORRECT": 93,
+        "PARTIAL": 93
       },
-      "eligible_questions": 96,
+      "eligible_questions": 93,
       "eligible_questions_by_split": {
         "test": 15,
-        "train": 70,
+        "train": 67,
         "validation": 11
       },
       "ineligible_questions": 71,
       "placeholder_flagged_eligible": 0,
       "quarantine_by_reason": {
         "unrecoverable_nan": 252,
-        "unsupported_flat_mark": 103
+        "unsupported_flat_mark": 103,
+        "v2_question_quarantine": 18
       },
-      "quarantined_answers": 355,
+      "quarantined_answers": 373,
+      "quarantined_questions_v2": 3,
       "repaired_ineligible_controls": 71,
       "review_queue": 4,
       "rubric_rows": 230,
       "rubric_rows_rekeyed": 8,
       "scope_review_questions": 2,
-      "template_negative_controls_eligible": 96
+      "template_negative_controls_eligible": 93
     }
   },
   "dataset_version": "C3-Phase3-v5-repaired-v2",
@@ -285,7 +287,10 @@
   "original_split_files_match_master_order": true,
   "qa": {
     "hard_checks_failed": [
-      "ratio_concentration"
+      "schema_required_fields",
+      "ratio_concentration",
+      "preserved_vs_original",
+      "repair_manifest_consistent"
     ],
     "source": "validation_report.json (real checks); the original claim 'ALL PASS' is not carried over",
     "status": "FAIL"
@@ -464,11 +469,48 @@
   "source_dataset_version": "C3-Phase3-v5-FINAL",
   "v2_derivation": {
     "answers_moved": 18,
+    "counts_reconciled_from": "the CSV files in this directory (Stage 1 dataset-integrity fix)",
     "quarantined_questions": {
       "PP-SE3040-009": "code/diagram-dependent question cannot be assessed from text alone (scope review)",
       "PP-SE3080-099": "cross-split near-duplicate of test question PP-SE3080-107 (cosine 0.903 > 0.8); train copy removed so the test split is unchanged",
       "PP-SE3080-102": "anomalous labels: PARTIAL scored equal to FULL and MOSTLY_CORRECT scored 0 with identical answer strings (see review_queue.csv)"
     },
-    "source": "c3_phase3_v5_repaired"
+    "source": "c3_phase3_v5_repaired",
+    "v1_counts_superseded": {
+      "accounting.canonical": {
+        "eligible": 576,
+        "original_answers": 576,
+        "quarantined": 0,
+        "repaired_ineligible_controls": 0
+      },
+      "counts.repaired": {
+        "eligible_answers": 576,
+        "eligible_by_split": {
+          "test": 90,
+          "train": 420,
+          "validation": 66
+        },
+        "eligible_label_distribution": {
+          "FULL": 96,
+          "IRRELEVANT": 96,
+          "MISCONCEPTION": 96,
+          "MISSING_CONCEPT": 96,
+          "MOSTLY_CORRECT": 96,
+          "PARTIAL": 96
+        },
+        "eligible_questions": 96,
+        "eligible_questions_by_split": {
+          "test": 15,
+          "train": 70,
+          "validation": 11
+        },
+        "quarantine_by_reason": {
+          "unrecoverable_nan": 252,
+          "unsupported_flat_mark": 103
+        },
+        "quarantined_answers": 355,
+        "template_negative_controls_eligible": 96
+      }
+    }
   }
 }
