@@ -42,13 +42,13 @@ This directory is `C3-Phase3-v5-repaired-v2`. `datasets/repair/derive_v2.py` der
 |---|---|---|---|
 | ratio concentration | 0.7661 | 0.45 | FAIL |
 
-Overall: **FAIL**. Hard failures: `schema_required_fields`, `ratio_concentration`, `preserved_vs_original`, `repair_manifest_consistent`. Nothing was relaxed or relabelled to change this.
+Overall: **FAIL**. The only hard failure is `ratio_concentration`. Nothing was relaxed or relabelled to change this.
 
-- `ratio_concentration`: 76.6% of the 372 inner-label answers sit on seven mark ratios (threshold 0.45). The labels are tier-based; the threshold and labels are unchanged.
-- `schema_required_fields`: the rows in the v2 CSVs still carry `dataset_version = C3-Phase3-v5-repaired`, while `manifest.json` says `C3-Phase3-v5-repaired-v2`.
-- `preserved_vs_original`: the 18 answers quarantined in v2 were copied from the repaired rows, so the validator reports 23 quarantine fields (mainly `dataset_version` and `expected_relationships`) that differ from the original archive.
-- `repair_manifest_consistent`: `repair_manifest.csv` is the v1 ledger (355 quarantined answers); the 18 v2 answers are listed only in `v2_repair_ledger.csv`.
-- The last three are structural gaps left by `derive_v2.py` and were not fixed here, because fixing them means editing the CSVs or the ledger.
+- `ratio_concentration`: 76.6% of the 372 inner-label answers (the 558 eligible answers minus 186 anchors at mark ratio 0 or 1) sit on seven mark ratios (threshold 0.45). MOSTLY_CORRECT, MISSING_CONCEPT and MISCONCEPTION have identical ratio distributions, so the labels are tier-based. The threshold and labels are unchanged.
+- Row version: the rows in the v2 CSVs carry `dataset_version = C3-Phase3-v5-REPAIRED-r2`, the stamp of the repair release that produced them. v2 removes rows but never rewrites them, so the manifest names the directory release (`dataset_version = C3-Phase3-v5-repaired-v2`) and declares the row stamp separately as `row_dataset_version`. The validator requires every row to carry that stamp.
+- Lineage of the 18 v2-quarantined answers: each is a copy of its v1 eligible row (on the columns `quarantine.csv` carries), so 23 fields differ from the original archive: `dataset_version` on 18 (the file-level `version_stamp` entries in `repair_manifest.csv`) and `expected_relationships` on 5 (`nan_list_element` entries that drop a literal `"nan"` list element). The validator accepts these only because `repair_manifest.csv` records exactly those original and repaired values; any other difference from the archive still fails. The archive was never modified, so every original value remains recoverable.
+- Ledgers: `repair_manifest.csv` is the unchanged v1 ledger (355 quarantined answers). `v2_repair_ledger.csv` extends it with the 18 answers quarantined in v2; the validator requires them to be disjoint from the v1 set, to match the `v2:` quarantine rows, and to be absent from the eligible set.
+- Experiment results recorded before this documentation was reconciled (`reports/c3_remediation/experiments/results_*.json`) pin the sha256 of `manifest.json` as it was then. No CSV hash changed, so those results still refer to the same data; the earlier manifest is recoverable from git history (commit `7cd34b6`).
 - Improved by v2: the maximum cross-split question similarity is 0.648 (no pair above the 0.8 threshold; v1 had one pair at 0.903). The answer-length versus mark correlation (Pearson 0.8321, threshold 0.4) is still a warning.
 
 ## Counts

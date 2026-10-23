@@ -287,15 +287,13 @@
   "original_split_files_match_master_order": true,
   "qa": {
     "hard_checks_failed": [
-      "schema_required_fields",
-      "ratio_concentration",
-      "preserved_vs_original",
-      "repair_manifest_consistent"
+      "ratio_concentration"
     ],
     "source": "validation_report.json (real checks); the original claim 'ALL PASS' is not carried over",
     "status": "FAIL"
   },
   "repair_tool_version": "1.0.0",
+  "row_dataset_version": "C3-Phase3-v5-REPAIRED-r2",
   "scope": "full",
   "scope_question_ids": [
     "PP-SE3010-083",

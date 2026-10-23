@@ -13,7 +13,15 @@ from pathlib import Path
 
 import pytest
 
-from datasets.repair.common import LABELS, SPLITS, TIER_SPEC_PATH, ratio_concentration
+from datasets.repair.common import (
+    ARCHIVE_DIR,
+    LABELS,
+    REPAIRED_VERSION,
+    SPLITS,
+    TIER_SPEC_PATH,
+    ratio_concentration,
+    truncate_value,
+)
 
 V2_DIR = Path(__file__).resolve().parents[2] / "datasets" / "c3_phase3_v5_repaired_v2"
 
@@ -195,3 +203,71 @@ def test_card_reports_the_ratio_failure_honestly(report):
     assert row[0] == f"{check['details']['value']:.4f}"
     assert row[1] == str(check["details"]["threshold"])
     assert row[2].upper() == check["status"].upper()
+
+
+# ------------------------------------------------------------------- lineage: archive -> v1 -> v2 -> quarantine
+ARCHIVE = Path(ARCHIVE_DIR)
+V1_DIR = V2_DIR.parent / "c3_phase3_v5_repaired"
+SNAPSHOT = Path(__file__).resolve().parents[4] / "reports" / "c3_remediation" / "dataset_v2_hash_manifest.json"
+needs_archive = pytest.mark.skipif(not (ARCHIVE / "02_FINAL_controlled_answers.csv").exists(), reason="archive not present")
+
+
+def _read(path):
+    with open(path, encoding="utf-8", newline="") as f:
+        return list(csv.DictReader(f))
+
+
+def test_rows_carry_the_declared_row_stamp(manifest):
+    assert manifest["row_dataset_version"] == REPAIRED_VERSION
+    for name in ("01_question_bank.csv", "02_controlled_answers_eligible.csv", "03_rubric_criteria.csv",
+                 "repaired_ineligible_controls.csv"):
+        assert {r["dataset_version"] for r in _rows(name)} == {manifest["row_dataset_version"]}, name
+
+
+@needs_archive
+def test_every_archive_difference_of_a_v2_quarantined_answer_is_in_the_v1_ledger(data):
+    archive = {r["answer_id"]: r for r in _read(ARCHIVE / "02_FINAL_controlled_answers.csv")}
+    ledger = _rows("repair_manifest.csv")
+    stamps = {(r["original_value"], r["repaired_value"]) for r in ledger
+              if r["record_type"] == "file" and r["field"] == "dataset_version"}
+    logged = {(r["record_id"], r["field"], r["original_value"], r["repaired_value"])
+              for r in ledger if r["record_type"] == "answer"}
+    by_id = {r["answer_id"]: r for r in data["quarantine"]}
+    for led in data["ledger_v2"]:
+        row, orig = by_id[led["answer_id"]], archive[led["answer_id"]]
+        for col, old in orig.items():
+            if col == "answer_id" or row[col] == old:
+                continue
+            ok = (old, row[col]) in stamps if col == "dataset_version" else (
+                (led["answer_id"], col, truncate_value(old), truncate_value(row[col])) in logged)
+            assert ok, f"{led['answer_id']}.{col} differs from the archive without a ledger entry"
+
+
+@pytest.mark.skipif(not (V1_DIR / "02_controlled_answers_eligible.csv").exists(), reason="v1 directory not present")
+def test_v2_quarantined_rows_are_copies_of_their_v1_eligible_rows(data):
+    v1 = {r["answer_id"]: r for r in _read(V1_DIR / "02_controlled_answers_eligible.csv")}
+    by_id = {r["answer_id"]: r for r in data["quarantine"]}
+    for led in data["ledger_v2"]:
+        row, source = by_id[led["answer_id"]], v1[led["answer_id"]]
+        shared = [c for c in row if c in source and c != "quarantine_reason"]  # quarantine.csv carries fewer columns
+        assert "answer_quality" in shared and "student_answer" in shared
+        assert {c: row[c] for c in shared} == {c: source[c] for c in shared}
+
+
+def test_v2_ledger_extends_the_v1_ledger_without_duplicates(data):
+    v2_ids = [r["answer_id"] for r in data["ledger_v2"]]
+    v1_quarantined = {r["record_id"] for r in _rows("repair_manifest.csv") if r["repair_status"] == "quarantined"}
+    assert len(v2_ids) == len(set(v2_ids))
+    assert not set(v2_ids) & v1_quarantined
+    assert not set(v2_ids) & {r["answer_id"] for r in data["answers"]}
+    assert {r["answer_id"] for r in data["quarantine"]} == v1_quarantined | set(v2_ids)
+
+
+def test_snapshot_hash_manifest_equals_the_canonical_manifest(manifest):
+    if not SNAPSHOT.exists():
+        pytest.skip("hash-manifest snapshot not present")
+    assert json.loads(SNAPSHOT.read_text(encoding="utf-8")) == manifest
+
+
+def test_only_the_genuine_ratio_failure_remains(report):
+    assert set(report["hard_failures"]) - {"ratio_concentration"} == set()

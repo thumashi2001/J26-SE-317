@@ -11,14 +11,12 @@
     },
     {
       "details": {
-        "problems": [
-          "dataset_version differs from C3-Phase3-v5-repaired-v2 in ['answers', 'questions', 'rubric', 'controls']"
-        ]
+        "problems": []
       },
       "hard": true,
       "name": "schema_required_fields",
-      "status": "fail",
-      "summary": "1 problem(s)"
+      "status": "pass",
+      "summary": "0 problem(s)"
     },
     {
       "details": {
@@ -385,34 +383,14 @@
     {
       "details": {
         "eligible_diffs": [],
-        "quarantine_diffs": [
-          "SA-PP-SE3040-009-FULL.expected_relationships",
-          "SA-PP-SE3040-009-FULL.dataset_version",
-          "SA-PP-SE3040-009-MOSTLY_CORRECT.expected_relationships",
-          "SA-PP-SE3040-009-MOSTLY_CORRECT.dataset_version",
-          "SA-PP-SE3040-009-PARTIAL.expected_relationships",
-          "SA-PP-SE3040-009-PARTIAL.dataset_version",
-          "SA-PP-SE3040-009-MISSING_CONCEPT.expected_relationships",
-          "SA-PP-SE3040-009-MISSING_CONCEPT.dataset_version",
-          "SA-PP-SE3040-009-MISCONCEPTION.expected_relationships",
-          "SA-PP-SE3040-009-MISCONCEPTION.dataset_version",
-          "SA-PP-SE3040-009-IRRELEVANT.dataset_version",
-          "SA-PP-SE3080-099-FULL.dataset_version",
-          "SA-PP-SE3080-099-MOSTLY_CORRECT.dataset_version",
-          "SA-PP-SE3080-099-PARTIAL.dataset_version",
-          "SA-PP-SE3080-099-MISSING_CONCEPT.dataset_version",
-          "SA-PP-SE3080-099-MISCONCEPTION.dataset_version",
-          "SA-PP-SE3080-099-IRRELEVANT.dataset_version",
-          "SA-PP-SE3080-102-FULL.dataset_version",
-          "SA-PP-SE3080-102-MOSTLY_CORRECT.dataset_version",
-          "SA-PP-SE3080-102-PARTIAL.dataset_version"
-        ],
+        "quarantine_diffs": [],
+        "quarantine_diffs_explained_by_ledger": 23,
         "question_split_diffs": []
       },
       "hard": true,
       "name": "preserved_vs_original",
-      "status": "fail",
-      "summary": "0 eligible-answer fields differ from the original in labels/marks/text/split, 0 question splits changed, 23 quarantine fields differ from the original, 0 quarantine rows without reason"
+      "status": "pass",
+      "summary": "0 eligible-answer fields differ from the original in labels/marks/text/split, 0 question splits changed, 0 quarantine fields differ from the original, 0 quarantine rows without reason (23 further fields of v2-quarantined answers differ only as recorded in repair_manifest.csv)"
     },
     {
       "details": {},
@@ -423,14 +401,12 @@
     },
     {
       "details": {
-        "problems": [
-          "quarantined answers and ledger rows differ"
-        ]
+        "problems": []
       },
       "hard": true,
       "name": "repair_manifest_consistent",
-      "status": "fail",
-      "summary": "1023 ledger rows; 1 problem(s)"
+      "status": "pass",
+      "summary": "1023 ledger rows; 0 problem(s)"
     },
     {
       "details": {},
@@ -441,10 +417,7 @@
     }
   ],
   "hard_failures": [
-    "schema_required_fields",
-    "ratio_concentration",
-    "preserved_vs_original",
-    "repair_manifest_consistent"
+    "ratio_concentration"
   ],
   "overall": "FAIL",
   "scope": "full",

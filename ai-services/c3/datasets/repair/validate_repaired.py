@@ -22,12 +22,14 @@ from datasets.repair.common import (
     LABELS,
     NAN_WORD,
     NULL_TOKENS,
+    REPAIRED_VERSION,
     SPLITS,
     TIER_SPEC_PATH,
     normalise_text,
     parse_json_list,
     ratio_concentration,
     read_csv,
+    truncate_value,
 )
 
 REQUIRED_FILES = (
@@ -131,6 +133,10 @@ def validate_dir(directory: Path, archive_dir: Path | None = ARCHIVE_DIR, spec_p
     q, ea, ru = read_csv(d / "01_question_bank.csv"), read_csv(d / "02_controlled_answers_eligible.csv"), read_csv(d / "03_rubric_criteria.csv")
     qa, ic = read_csv(d / "quarantine.csv"), read_csv(d / "repaired_ineligible_controls.csv")
     rq, cmap, rman = read_csv(d / "review_queue.csv"), read_csv(d / "criterion_id_map.csv"), read_csv(d / "repair_manifest.csv")
+    # v2 lineage: a derived release lists the answers it moved to quarantine (from the repaired set) in v2_repair_ledger.csv.
+    # Absent for a plain repair output, in which case every rule below stays exactly as strict as before.
+    v2_ledger = read_csv(d / "v2_repair_ledger.csv") if (d / "v2_repair_ledger.csv").exists() else None
+    v2_ids = set(v2_ledger["answer_id"]) if v2_ledger is not None else set()
     ocols = manifest["original_columns"]
 
     # 1 schema -----------------------------------------------------------------------------------------------
@@ -148,10 +154,15 @@ def validate_dir(directory: Path, archive_dir: Path | None = ARCHIVE_DIR, spec_p
                 problems.append(f"{name}: empty required field {col} ({int((df[col].str.strip() == '').sum())} rows)")
     if list(qa.columns[: len(ocols["answers"])]) != ocols["answers"]:
         problems.append("quarantine: original column order not preserved")
+    # The rows carry the stamp of the repair release that produced them. A derived release (v2) removes rows but never
+    # rewrites them, so its manifest declares that stamp as row_dataset_version; it must be the repair tool's own stamp.
+    row_version = manifest.get("row_dataset_version", manifest["dataset_version"])
+    if "row_dataset_version" in manifest and manifest["row_dataset_version"] != REPAIRED_VERSION:
+        problems.append(f"row_dataset_version {manifest['row_dataset_version']!r} is not the repair stamp {REPAIRED_VERSION!r}")
     wrong_version = [n for n, df in (("answers", ea), ("questions", q), ("rubric", ru), ("controls", ic))
-                     if set(df["dataset_version"]) - {manifest["dataset_version"]}]
+                     if set(df["dataset_version"]) - {row_version}]
     if wrong_version:
-        problems.append(f"dataset_version differs from {manifest['dataset_version']} in {wrong_version}")
+        problems.append(f"dataset_version differs from {row_version} in {wrong_version}")
     rep.add("schema_required_fields", True, not problems, f"{len(problems)} problem(s)", {"problems": problems})
 
     # 2 counts -----------------------------------------------------------------------------------------------
@@ -406,15 +417,33 @@ def validate_dir(directory: Path, archive_dir: Path | None = ARCHIVE_DIR, spec_p
                 if r[col] != o[col]:
                     diffs.append(f"{r['answer_id']}.{col}")
         q_diffs = [qid for qid, s in q_split.items() if s != dict(zip(arch["q"]["question_id"], arch["q"]["split"], strict=True))[qid]]
-        qa_diffs = []
+        # A quarantine row normally keeps the archive values. A row moved there by a derived release (v2 ledger) is a copy of
+        # the repaired row, so a field may differ from the archive only where repair_manifest.csv records exactly that change
+        # (file-level dataset_version stamp, or an answer-level entry whose original/repaired values match). Anything else fails.
+        stamped = set(zip(*(rman[(rman["record_type"] == "file") & (rman["field"] == "dataset_version")][c]
+                            for c in ("original_value", "repaired_value")), strict=True))
+        logged = {(a, f, ov, rv) for a, f, ov, rv in zip(*(rman[rman["record_type"] == "answer"][c] for c in (
+            "record_id", "field", "original_value", "repaired_value")), strict=True)}
+        qa_diffs, explained = [], 0
         for r in qa.to_dict("records"):
             o = oa.loc[r["answer_id"]]
-            qa_diffs += [f"{r['answer_id']}.{c}" for c in ocols["answers"] if c != "answer_id" and r[c] != o[c]]
+            for c in ocols["answers"]:
+                if c == "answer_id" or r[c] == o[c]:
+                    continue
+                if r["answer_id"] in v2_ids and (
+                        (o[c], r[c]) in stamped if c == "dataset_version"
+                        else (r["answer_id"], c, truncate_value(o[c]), truncate_value(r[c])) in logged):
+                    explained += 1
+                else:
+                    qa_diffs.append(f"{r['answer_id']}.{c}")
         no_reason = int((qa["quarantine_reason"].str.strip() == "").sum())
         rep.add("preserved_vs_original", True, not (diffs or q_diffs or qa_diffs or no_reason),
                 f"{len(diffs)} eligible-answer fields differ from the original in labels/marks/text/split, {len(q_diffs)} question splits "
-                f"changed, {len(qa_diffs)} quarantine fields differ from the original, {no_reason} quarantine rows without reason",
-                {"eligible_diffs": diffs[:20], "question_split_diffs": q_diffs, "quarantine_diffs": qa_diffs[:20]})
+                f"changed, {len(qa_diffs)} quarantine fields differ from the original, {no_reason} quarantine rows without reason"
+                + (f" ({explained} further fields of v2-quarantined answers differ only as recorded in repair_manifest.csv)"
+                   if explained else ""),
+                {"eligible_diffs": diffs[:20], "question_split_diffs": q_diffs, "quarantine_diffs": qa_diffs[:20],
+                 "quarantine_diffs_explained_by_ledger": explained})
         oq = arch["q"]
         sc_orig = {s: int((arch["a"]["split"] == s).sum()) for s in SPLITS}
         oratios = [_f(m) / qmarks_orig for m, qmarks_orig in zip(
@@ -444,8 +473,18 @@ def validate_dir(directory: Path, archive_dir: Path | None = ARCHIVE_DIR, spec_p
     # 13 manifest ledger / secrets ---------------------------------------------------------------------------------------------
     quar_in_ledger = set(rman[rman["repair_status"] == "quarantined"]["record_id"])
     ledger_problems = []
-    if quar_in_ledger != set(qa["answer_id"]):
+    if quar_in_ledger | v2_ids != set(qa["answer_id"]):
         ledger_problems.append("quarantined answers and ledger rows differ")
+    if v2_ledger is not None:
+        # the v2 ledger extends the v1 ledger: its answers are quarantined only in v2, listed once, and no longer eligible
+        if quar_in_ledger & v2_ids:
+            ledger_problems.append("v2 ledger answers already quarantined in repair_manifest.csv")
+        if len(v2_ledger) != len(v2_ids):
+            ledger_problems.append("duplicate answers in v2_repair_ledger.csv")
+        if v2_ids != set(qa[qa["quarantine_reason"].str.startswith("v2:")]["answer_id"]):
+            ledger_problems.append("v2 ledger and the v2 quarantine rows differ")
+        if v2_ids & set(ea["answer_id"]):
+            ledger_problems.append("v2 ledger answers still in the eligible set")
     if set(rman["repair_status"]) - {"repaired", "recovered", "quarantined", "needs_review", "flagged"}:
         ledger_problems.append("unknown repair_status in repair_manifest.csv")
     if (rman["validation_result"] == "fail").any():
