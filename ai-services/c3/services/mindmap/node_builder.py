@@ -1,3 +1,9 @@
+"""Builds the boxes (nodes) of the answer-specific mind map.
+
+One root node (the question) and one node per concept. A concept node carries the status from Function 1
+(demonstrated / partial / not_demonstrated) and the sentence numbers that contain evidence, so the map is derived from
+the real analysis and not from hard-coded content.
+"""
 
 from app.schemas.analysis import AnswerAnalysisResponse
 from app.schemas.mindmap import Node
@@ -42,6 +48,7 @@ def build_concept_nodes(analysis: AnswerAnalysisResponse, expected_concepts: lis
         if concept_lower in processed_concepts:
             continue
 
+        # "student_answer" = the student's words touched this concept; "expected_concept" = it only comes from the rubric.
         source = "student_answer" if match.status in ["demonstrated", "partial"] else "expected_concept"
         nodes.append(Node(
             node_id=generate_node_id(match.concept),

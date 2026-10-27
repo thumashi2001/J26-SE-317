@@ -17,3 +17,15 @@ def test_baseline_relationships():
     assert child1.parent_node_id == "root_1"
     assert child1.relationship_type == "child"
     assert "c_1" in root.children
+
+
+def test_cooccurrence_links_only_concepts_sharing_a_sentence():
+    from app.schemas.mindmap import Node
+    from services.mindmap.relationship_builder import build_cooccurrence_relationships
+
+    def node(i, sents):
+        return Node(node_id=i, type="concept", concept=i, label=i, source="x", evidence_sentence_ids=sents)
+
+    rels = build_cooccurrence_relationships([node("a", [1, 2]), node("b", [2]), node("c", [3]), node("m", [])])
+    assert [(r.source_node_id, r.target_node_id) for r in rels] == [("a", "b")]
+    assert rels[0].relationship_type == "co_mentioned" and "sentence 2" in rels[0].evidence

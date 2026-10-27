@@ -1,7 +1,15 @@
+"""Function 4: assemble the answer-specific concept mind map from the answer analysis.
+
+Lines: structural root->concept links plus "co_mentioned" links between concepts written in the same sentence.
+
+In the live flow the orchestrator calls build_mindmap_from_analysis() with the analysis it already computed;
+generate_mindmap() is the version behind the stand-alone /mindmap/generate endpoint (it analyses the answer itself).
+Node/Express stores the resulting map inside the submission result in MongoDB; it is not stored in Neo4j.
+"""
 from app.schemas.analysis import AnswerAnalysisResponse
 from app.schemas.mindmap import MindMapRequest, MindMapResponse, MindMapSummary
 from services.mindmap.node_builder import build_concept_nodes, build_root_node
-from services.mindmap.relationship_builder import build_baseline_relationships
+from services.mindmap.relationship_builder import build_baseline_relationships, build_cooccurrence_relationships
 from services.semantic.analyzer import analyze_answer
 
 GENERATION_VERSION = "baseline-v1"
@@ -13,14 +21,18 @@ def build_mindmap_from_analysis(
     analysis: AnswerAnalysisResponse,
     expected_concepts: list[str],
 ) -> MindMapResponse:
+    """Root node + one node per concept + structural root->concept links + a small summary."""
     root_node = build_root_node(
         question_id=question_id,
         question_text=question_text,
     )
     concept_nodes = build_concept_nodes(analysis, expected_concepts)
     relationships = build_baseline_relationships(root_node, concept_nodes)
+    # Evidence-based concept-to-concept lines (same-sentence co-occurrence); never invented semantic relations.
+    relationships += build_cooccurrence_relationships(concept_nodes)
     all_nodes = [root_node] + concept_nodes
 
+    # Counts shown in the summary and used for the warnings below.
     demonstrated = sum(1 for n in concept_nodes if n.status == "demonstrated")
     partial = sum(1 for n in concept_nodes if n.status == "partial")
     missing = sum(1 for n in concept_nodes if n.status == "not_demonstrated")
@@ -64,4 +76,3 @@ def generate_mindmap(request: MindMapRequest) -> MindMapResponse:
         analysis=analysis,
         expected_concepts=expected_concepts,
     )
-
