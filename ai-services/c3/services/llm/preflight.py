@@ -8,6 +8,9 @@ caller aborts with the exact reason. The written preflight.json holds no API key
   Gemini : GeminiProvider.verify_model (ListModels, generateContent); embedding models must list
            embedContent or batchEmbedContents in supportedGenerationMethods.
   OpenAI : GET {OPENAI_BASE_URL}/models/{id} with Bearer auth (404 = not found, 401/403 = auth error).
+
+STATUS: offline safety check run by the experiment runner before spending LLM quota. NOT USED BY LIVE MARKING: the web
+service's /c3/assess path never imports or calls this module's functionality.
 """
 
 from __future__ import annotations

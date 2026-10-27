@@ -3,6 +3,9 @@ AdaptiveLearnSE Component 3 — Local LLM Provider (Ollama / Local REST Server)
 Connects to locally hosted inference endpoints with zero external network transmission.
 Enforces strict model availability checks, transparent real vs mock execution flags,
 and explicit error reporting without silent mock fallback.
+
+STATUS: offline/experiment support (optional Ollama daemon; not installed or required for the demo). NOT USED BY LIVE
+MARKING: the web service's /c3/assess path never imports or calls this module's functionality.
 """
 
 import json

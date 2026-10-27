@@ -294,7 +294,8 @@ class TestFactory:
 
     def test_list_available_providers_has_no_mock(self):
         names = [p["provider"] for p in list_available_providers()]
-        assert names == ["gemini", "openai", "local-ollama"]
+        assert names == ["gemini", "openai", "local-ollama", "groq", "openrouter", "deepseek", "cerebras", "mistral"]
+        assert "mock" not in names
 
 
 class TestGeminiThinkingControl:

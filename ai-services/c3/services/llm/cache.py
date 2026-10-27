@@ -5,6 +5,8 @@ Wraps any provider and stores successful responses in an append-only JSONL file 
 sha256 of (provider, model, prompts, generation parameters). A re-run therefore reproduces the
 original real responses exactly, saves API cost, and keeps experiment provenance auditable.
 Only genuine, successful provider responses are cached; failures are never stored.
+
+STATUS: offline experiments only (it makes repeated research runs reproducible and saves API quota).
 """
 
 import hashlib
@@ -17,6 +19,7 @@ from .base import BaseLLMProvider, LLMRequest, LLMResponse
 
 
 def request_cache_key(provider: str, model: str, request: LLMRequest) -> str:
+    """Same provider + model + prompts + settings always give the same key, so a repeat run reuses the stored reply."""
     material = {
         "provider": provider,
         "model": model,
@@ -81,6 +84,7 @@ class CachedLLMProvider(BaseLLMProvider):
         return request.model
 
     def generate(self, request: LLMRequest) -> LLMResponse:
+        # 1) cache hit -> return the stored real response; 2) miss -> call the real provider and store the reply.
         key = request_cache_key(self.inner.provider_name, self._model_of(request), request)
         with self._lock:
             entry = self._entries.get(key)

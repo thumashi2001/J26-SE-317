@@ -1,0 +1,58 @@
+{
+ "dataset": "c3_phase3_v5_repaired_v2",
+ "split": "validation",
+ "n_answers": 5,
+ "conditions": [
+  "no_rag",
+  "rag"
+ ],
+ "label_caveat": "expected marks are tier-derived, not human-marked",
+ "corpus_provenance": {
+  "dataset_dir": "c3_phase3_v5_repaired_v2",
+  "split_used": "train",
+  "questions_used": 67,
+  "documents": 133,
+  "duplicates_dropped": 1,
+  "source_sha256": {
+   "01_question_bank.csv": "8c2bcfcd6344e7d4461f29cab1a72a3b107b6879dc2bb0616363dfdab92c2dca"
+  },
+  "excluded": "validation/test questions, all student answers and all marks"
+ },
+ "provider_status": {
+  "gemini": {
+   "status": "EXECUTED",
+   "cache_hits": 10,
+   "cache_misses": 0,
+   "model": "gemini-3.6-flash",
+   "stopped": null,
+   "rows": 10
+  }
+ },
+ "per_provider_condition": {
+  "gemini|no_rag": {
+   "n_calls": 5,
+   "n_ok": 5,
+   "n_failed": 0,
+   "failure_reasons": {},
+   "nmae": 0.09333333333333335,
+   "mae_marks": 1.4,
+   "mean_signed_error": -0.09333333333333335,
+   "pearson_r": 0.5739159886636681,
+   "qwk_11bins": 0.29378531073446335,
+   "mean_latency_s": 0.0
+  },
+  "gemini|rag": {
+   "n_calls": 5,
+   "n_ok": 5,
+   "n_failed": 0,
+   "failure_reasons": {},
+   "nmae": 0.09333333333333335,
+   "mae_marks": 1.4,
+   "mean_signed_error": -0.09333333333333335,
+   "pearson_r": 0.5739159886636681,
+   "qwk_11bins": 0.29378531073446335,
+   "mean_latency_s": 0.11000000000000001
+  }
+ },
+ "pairwise_agreement": []
+}

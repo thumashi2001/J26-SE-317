@@ -2,6 +2,10 @@
 AdaptiveLearnSE Component 3 — Google Gemini REST Provider
 Real execution against the Gemini generateContent API using httpx. Credentials and the model
 come from the environment (GEMINI_API_KEY, C3_GEMINI_MODEL); nothing is simulated.
+
+STATUS: offline/experiment support. Only experiments call generate(); /health merely reports whether GEMINI_API_KEY is
+configured (no key is ever printed). NOT USED BY LIVE MARKING: the web service's /c3/assess path never imports or
+calls this module's functionality.
 """
 
 import json

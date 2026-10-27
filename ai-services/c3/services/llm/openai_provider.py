@@ -2,6 +2,9 @@
 AdaptiveLearnSE Component 3 — OpenAI REST API Provider
 Real execution against an OpenAI-compatible chat/completions endpoint using httpx. The model
 comes from C3_OPENAI_MODEL; credentials from OPENAI_API_KEY. Nothing is simulated.
+
+STATUS: offline/experiment support (second real provider for the multi-LLM comparison). NOT USED BY LIVE MARKING: the
+web service's /c3/assess path never imports or calls this module's functionality.
 """
 
 import json
@@ -27,9 +30,13 @@ class OpenAIProvider(BaseLLMProvider):
         api_key: str | None = None,
         base_url: str | None = None,
         model: str | None = None,
+        key_env: str = "OPENAI_API_KEY",
     ):
         super().__init__(provider_name)
-        self.api_key = api_key if api_key is not None else os.getenv("OPENAI_API_KEY", "")
+        # key_env names the environment variable holding the key, so OpenAI-compatible hosts (Groq, OpenRouter,
+        # DeepSeek ...) can reuse this class with their own key and base URL (see factory.OPENAI_COMPATIBLE_PRESETS).
+        self.key_env = key_env
+        self.api_key = api_key if api_key is not None else os.getenv(key_env, "")
         self.base_url = (base_url or os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1")).rstrip("/")
         self.model = model or os.getenv("C3_OPENAI_MODEL", DEFAULT_OPENAI_MODEL)
 
@@ -43,7 +50,7 @@ class OpenAIProvider(BaseLLMProvider):
             "configured": self.is_available(),
             "base_url": self.base_url,
             "is_real_execution": self.is_available(),
-            "status": "ready" if self.is_available() else "pending_credentials (OPENAI_API_KEY not set)",
+            "status": "ready" if self.is_available() else f"pending_credentials ({self.key_env} not set)",
         }
 
     def _failure(self, model: str, start: float, message: str, **extra: Any) -> LLMResponse:
@@ -61,7 +68,7 @@ class OpenAIProvider(BaseLLMProvider):
         model = self.model if request.model in ("default", "") else request.model
         start = time.perf_counter()
         if not self.is_available():
-            return self._failure(model, start, "OPENAI_API_KEY is not configured.")
+            return self._failure(model, start, f"{self.key_env} is not configured.")
 
         headers = {"Authorization": f"Bearer {self.api_key}", "Content-Type": "application/json"}
         payload: dict[str, Any] = {
@@ -82,7 +89,7 @@ class OpenAIProvider(BaseLLMProvider):
                 headers=headers,
                 payload=payload,
                 timeout=request.timeout_seconds,
-                limiter=get_rate_limiter("openai"),
+                limiter=get_rate_limiter(self.provider_name),  # one limiter per host so free-tier quotas stay separate
             )
             choice = data["choices"][0]
             raw_text = choice["message"]["content"] or ""

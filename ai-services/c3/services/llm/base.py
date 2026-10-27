@@ -1,6 +1,11 @@
 """
 AdaptiveLearnSE Component 3 — Provider-Neutral LLM Service Interface
 Defines common data contracts, options, usage metrics, and abstract provider interface.
+
+STATUS: OFFLINE / EXPERIMENT SUPPORT ONLY. These classes describe how the project would talk to a large language model
+(LLM) such as Gemini, OpenAI or a local Ollama model. The live student marking path (POST /c3/assess) never creates an
+LLM request, so no LLM influences a live mark. They are used by the research experiments (experiments/*.py) and by
+the /health report, which only says whether a provider is *configured*.
 """
 
 from abc import ABC, abstractmethod
@@ -10,6 +15,8 @@ from pydantic import BaseModel, Field
 
 
 class LLMUsage(BaseModel):
+    """Token counts and estimated cost of one call (for experiment bookkeeping)."""
+
     prompt_tokens: int = 0
     completion_tokens: int = 0
     total_tokens: int = 0
@@ -17,6 +24,8 @@ class LLMUsage(BaseModel):
 
 
 class LLMRequest(BaseModel):
+    """One request to a model. temperature is kept low (0.1) so repeated runs behave similarly."""
+
     prompt: str
     system_prompt: str = "You are an expert AI examiner assessing university software engineering answers."
     model: str = "default"
@@ -28,6 +37,8 @@ class LLMRequest(BaseModel):
 
 
 class LLMResponse(BaseModel):
+    """One reply. is_real_execution is True only for genuine provider calls (there is no simulated LLM in C3)."""
+
     raw_content: str
     parsed_json: dict[str, Any] | None = None
     model_identifier: str

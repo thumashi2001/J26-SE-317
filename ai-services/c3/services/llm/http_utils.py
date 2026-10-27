@@ -13,6 +13,9 @@ Optional per-provider overrides C3_LLM_RPM_GEMINI / C3_LLM_RPM_OPENAI take prece
 to C3_LLM_RPM, and an explicit 0 disables limiting for that provider only. Keys are "gemini",
 "gemini-embedding", "openai", "openai-embedding", and "<provider>:<model>" (Gemini chat calls use one limiter per model because free-tier quotas are per model); each key has its own limiter, so the chat and embedding
 endpoints of one provider are limited independently.
+
+STATUS: offline/experiment support. Retry and rate-limit helpers for real LLM and embedding HTTP calls. NOT USED BY
+LIVE MARKING: the web service's /c3/assess path never imports or calls this module's functionality.
 """
 
 import os

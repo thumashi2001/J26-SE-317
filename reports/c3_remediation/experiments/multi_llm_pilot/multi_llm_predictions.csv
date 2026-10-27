@@ -1,0 +1,11 @@
+provider,condition,answer_id,question_id,tier,max_marks,expected_mark,llm_status,predicted_mark,detail,model,retrieved,retrieval_status,tokens,latency_s
+gemini,no_rag,SA-PP-SE3020-037-FULL,PP-SE3020-037,FULL,15.0,15.0,ok,15.0,,gemini-3.6-flash,[],disabled,955,0.0
+gemini,rag,SA-PP-SE3020-037-FULL,PP-SE3020-037,FULL,15.0,15.0,ok,15.0,,gemini-3.6-flash,"[""train:PP-SE3020-032#concepts"", ""train:PP-SE3020-032#ref"", ""train:PP-SE3070-028#ref""]",ok,1155,0.22
+gemini,no_rag,SA-PP-SE3020-037-PARTIAL,PP-SE3020-037,PARTIAL,15.0,12.0,ok,5.0,,gemini-3.6-flash,[],disabled,1018,0.0
+gemini,rag,SA-PP-SE3020-037-PARTIAL,PP-SE3020-037,PARTIAL,15.0,12.0,ok,5.0,,gemini-3.6-flash,"[""train:PP-SE3020-032#concepts"", ""train:PP-SE3020-032#ref"", ""train:PP-SE3070-028#ref""]",ok,1263,0.0
+gemini,no_rag,SA-SYN-SE3020-009-MISCONCEPTION,SYN-SE3020-009,MISCONCEPTION,10.0,8.0,ok,8.0,,gemini-3.6-flash,[],disabled,737,0.0
+gemini,rag,SA-SYN-SE3020-009-MISCONCEPTION,SYN-SE3020-009,MISCONCEPTION,10.0,8.0,ok,8.0,,gemini-3.6-flash,"[""train:PP-SE3020-039#ref"", ""train:PP-SE3020-039#concepts"", ""train:PP-SE3020-036#ref""]",ok,842,0.1
+gemini,no_rag,SA-SYN-SE3030-016-MISSING_CONCEPT,SYN-SE3030-016,MISSING_CONCEPT,10.0,8.0,ok,8.0,,gemini-3.6-flash,[],disabled,610,0.0
+gemini,rag,SA-SYN-SE3030-016-MISSING_CONCEPT,SYN-SE3030-016,MISSING_CONCEPT,10.0,8.0,ok,8.0,,gemini-3.6-flash,"[""train:PP-SE3030-065#ref"", ""train:PP-SE3030-068#ref"", ""train:PP-SE3030-061#ref""]",ok,1068,0.08
+gemini,no_rag,SA-SYN-SE3030-018-MISSING_CONCEPT,SYN-SE3030-018,MISSING_CONCEPT,10.0,8.0,ok,8.0,,gemini-3.6-flash,[],disabled,570,0.0
+gemini,rag,SA-SYN-SE3030-018-MISSING_CONCEPT,SYN-SE3030-018,MISSING_CONCEPT,10.0,8.0,ok,8.0,,gemini-3.6-flash,"[""train:PP-SE3030-073#ref"", ""train:SYN-SE3020-012#ref"", ""train:PP-SE3030-073#concepts""]",ok,867,0.15
