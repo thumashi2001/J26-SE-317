@@ -1,0 +1,41 @@
+{
+  "model": "sentence-transformers/all-MiniLM-L6-v2 (pretrained, not trained here)",
+  "threshold": 0.5,
+  "test": {
+    "n_pairs": 356,
+    "n_positive": 295,
+    "n_negative": 61,
+    "lexical_live_rule": {
+      "precision": 0.9479,
+      "recall": 0.9864,
+      "f1": 0.9668,
+      "tp": 291,
+      "fp": 16,
+      "fn": 4
+    },
+    "lexical_any_overlap": {
+      "precision": 0.918,
+      "recall": 0.9864,
+      "f1": 0.951,
+      "tp": 291,
+      "fp": 26,
+      "fn": 4
+    },
+    "semantic": {
+      "precision": 0.9327,
+      "recall": 0.9864,
+      "f1": 0.9588,
+      "tp": 291,
+      "fp": 21,
+      "fn": 4
+    },
+    "f1_ci95_lexical": [
+      0.9516,
+      0.9765
+    ],
+    "f1_ci95_semantic": [
+      0.941,
+      0.9726
+    ]
+  }
+}

@@ -1,3 +1,15 @@
+"""Function 1: analyse the student's answer (the evidence source for everything that follows).
+
+SIMPLE ENGLISH
+    For every concept the rubric cares about (e.g. "components") this module asks: do the concept's words appear in
+    the answer? and in which sentences? The result is a status per concept:
+        demonstrated      all of the concept's words appear in the answer      (overlap = 1.0)
+        partial           some, but not all, of the words appear               (0 < overlap < 1)
+        not_demonstrated  none of the words appear                             (overlap = 0)
+    This is plain word matching ("lexical" analysis). On its own it does not understand meaning, so a correct answer
+    written in different words (a paraphrase) is reported as not_demonstrated. With C3_SEMANTIC_MATCH=local an optional
+    sentence-embedding layer (services/semantic/semantic_matcher.py) upgrades such concepts and flags them "semantic". These statuses feed the marking engine.
+"""
 from app.schemas.analysis import (
     AnswerAnalysisRequest,
     AnswerAnalysisResponse,
@@ -6,11 +18,14 @@ from app.schemas.analysis import (
 )
 from services.preprocessing.text_normalizer import process_text, tokenize
 from services.semantic.baseline import lexical_cosine_similarity, token_overlap_score
+from services.semantic.semantic_matcher import get_matcher, semantic_threshold
 
 ANALYSIS_VERSION = "baseline-v1"
+SEMANTIC_ANALYSIS_VERSION = "semantic-v1"  # used only when the optional semantic layer actually ran
 
 
 def _concept_status(overlap_score: float) -> str:
+    """The runtime threshold: exactly 1.0 = demonstrated, anything above 0 = partial, 0 = not demonstrated."""
     if overlap_score == 1.0:
         return "demonstrated"
     if overlap_score > 0.0:
@@ -19,9 +34,11 @@ def _concept_status(overlap_score: float) -> str:
 
 
 def _match_concepts(concepts: list[str], sentences: list[str], answer_tokens: list[str]) -> list[ConceptMatch]:
+    """For each concept: overall overlap with the whole answer, and which sentences contain any of its words."""
     matches: list[ConceptMatch] = []
     for concept in concepts:
         overlap_score = token_overlap_score(concept, answer_tokens)
+        # Sentence numbers (starting at 1) that share at least one word with the concept = the "evidence".
         evidence_sentence_ids = [
             sentence_id
             for sentence_id, sentence in enumerate(sentences, start=1)
@@ -38,18 +55,44 @@ def _match_concepts(concepts: list[str], sentences: list[str], answer_tokens: li
     return matches
 
 
+def _add_semantic_evidence(matches: list[ConceptMatch], sentences: list[str]) -> bool:
+    """Optional semantic layer: upgrade a concept to `demonstrated` when a sentence means it (cosine >= threshold).
+
+    Only concepts the word matching did not already fully find are changed, and each change is flagged
+    match_method="semantic" with its score. Returns True when the layer ran. Marks are untouched here.
+    """
+    matcher = get_matcher()
+    if matcher is None or not matches:
+        return False
+    sims = matcher.similarities([m.concept for m in matches], sentences)
+    if sims is None:
+        return False
+    threshold = semantic_threshold()
+    for row, match in zip(sims, matches, strict=True):
+        match.semantic_score = round(float(row.max()), 4)
+        if match.status != "demonstrated" and match.semantic_score >= threshold:
+            match.status = "demonstrated"
+            match.match_method = "semantic"
+            hits = [i for i, v in enumerate(row, start=1) if v >= threshold]
+            match.evidence_sentence_ids = sorted(set(match.evidence_sentence_ids) | set(hits))
+    return True
+
+
 def analyze_answer(request: AnswerAnalysisRequest) -> AnswerAnalysisResponse:
     """Run Function 1's deterministic processing and lexical analysis.
 
     The result is structured evidence for later C3 stages. It does not award
     marks, assess rubric criteria, or claim genuine semantic understanding.
     """
+    # 1) clean and split the answer
     processed_answer = process_text(request.student_answer)
+    # 2) how similar are the answer's words to the model answer? (informational only; never changes a mark)
     reference_similarity = lexical_cosine_similarity(
         processed_answer.normalized_text,
         request.reference_answer or "",
     )
     concepts = request.expected_concepts or []
+    # 3) warnings the lecturer will see (empty answer, very short answer, missing reference or concepts)
     warnings: list[str] = []
     if not processed_answer.normalized_text:
         warnings.append("student_answer is empty or contains only whitespace")
@@ -60,6 +103,10 @@ def analyze_answer(request: AnswerAnalysisRequest) -> AnswerAnalysisResponse:
     if not concepts:
         warnings.append("expected_concepts were not provided")
 
+    concept_matches = _match_concepts(concepts, processed_answer.sentences, processed_answer.tokens)
+    semantic_ran = _add_semantic_evidence(concept_matches, processed_answer.sentences)
+
+    # 4) assemble the evidence object used by marking, feedback and the mind map
     return AnswerAnalysisResponse(
         question_id=request.question_id,
         normalized_answer=processed_answer.normalized_text,
@@ -70,11 +117,7 @@ def analyze_answer(request: AnswerAnalysisRequest) -> AnswerAnalysisResponse:
             for index, sentence in enumerate(processed_answer.sentences, start=1)
         ],
         reference_similarity=reference_similarity,
-        concept_matches=_match_concepts(
-            concepts,
-            processed_answer.sentences,
-            processed_answer.tokens,
-        ),
+        concept_matches=concept_matches,
         warnings=warnings,
-        analysis_version=ANALYSIS_VERSION,
+        analysis_version=SEMANTIC_ANALYSIS_VERSION if semantic_ran else ANALYSIS_VERSION,
     )
