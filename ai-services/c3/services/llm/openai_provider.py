@@ -55,18 +55,6 @@ class OpenAIProvider(BaseLLMProvider):
             "status": "ready" if self.is_available() else f"pending_credentials ({self.key_env} not set)",
         }
 
-    def _failure(self, model: str, start: float, message: str, **extra: Any) -> LLMResponse:
-        """Build a failed LLMResponse (no content) recording the error and how long the attempt took."""
-        return LLMResponse(
-            raw_content=extra.pop("raw_content", ""),
-            model_identifier=extra.pop("model_identifier", model),
-            provider_name=self.provider_name,
-            latency_ms=round((time.perf_counter() - start) * 1000.0, 2),
-            is_success=False,
-            error_message=message,
-            **extra,
-        )
-
     def generate(self, request: LLMRequest) -> LLMResponse:
         """Send one chat request to the OpenAI-compatible endpoint and return its reply, or a failed response."""
         model = self.model if request.model in ("default", "") else request.model

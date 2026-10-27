@@ -8,6 +8,7 @@ LLM request, so no LLM influences a live mark. They are used by the research exp
 the /health report, which only says whether a provider is *configured*.
 """
 
+import time
 from abc import ABC, abstractmethod
 from typing import Any
 
@@ -58,6 +59,18 @@ class BaseLLMProvider(ABC):
 
     def __init__(self, provider_name: str):
         self.provider_name = provider_name
+
+    def _failure(self, model: str, start: float, message: str, **extra: Any) -> LLMResponse:
+        """Build a failed LLMResponse (no content) recording the error and how long the attempt took."""
+        return LLMResponse(
+            raw_content=extra.pop("raw_content", ""),
+            model_identifier=extra.pop("model_identifier", model),
+            provider_name=self.provider_name,
+            latency_ms=round((time.perf_counter() - start) * 1000.0, 2),
+            is_success=False,
+            error_message=message,
+            **extra,
+        )
 
     @abstractmethod
     def is_available(self) -> bool:

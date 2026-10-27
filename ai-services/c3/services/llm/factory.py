@@ -9,6 +9,7 @@ The live marking path does not call get_llm_provider().
 """
 
 import os
+from collections.abc import Callable
 
 from .base import BaseLLMProvider
 from .gemini_provider import GeminiProvider
@@ -34,6 +35,27 @@ SUPPORTED_PROVIDERS = ("gemini", "openai", "local", *OPENAI_COMPATIBLE_PRESETS)
 _provider_registry: dict[str, BaseLLMProvider] = {}
 
 
+def _build_compatible(name: str) -> BaseLLMProvider:
+    """An OpenAI-compatible host: same protocol as OpenAI, with its own base URL, key variable and default model."""
+    base_url, key_env, default_model = OPENAI_COMPATIBLE_PRESETS[name]
+    return OpenAIProvider(
+        provider_name=name,
+        base_url=os.getenv(f"{name.upper()}_BASE_URL", base_url),
+        model=os.getenv(f"C3_{name.upper()}_MODEL", default_model),
+        key_env=key_env,
+    )
+
+
+# How to build each provider. Adding a provider means adding one entry here (or one preset above); get_llm_provider
+# itself never has to change (open for extension, closed for modification).
+_BUILDERS: dict[str, Callable[[str], BaseLLMProvider]] = {
+    "gemini": lambda _name: GeminiProvider(),
+    "openai": lambda _name: OpenAIProvider(),
+    "local": lambda _name: LocalLLMProvider(),
+    **dict.fromkeys(OPENAI_COMPATIBLE_PRESETS, _build_compatible),
+}
+
+
 class UnknownProviderError(ValueError):
     """Raised when C3_LLM_PROVIDER names a provider that does not exist."""
 
@@ -56,20 +78,7 @@ def get_llm_provider(provider_type: str | None = None) -> BaseLLMProvider:
     """Return the singleton for the requested provider (default: C3_LLM_PROVIDER, else gemini)."""
     name = normalise_provider_name(provider_type)
     if name not in _provider_registry:
-        if name == "gemini":
-            _provider_registry[name] = GeminiProvider()
-        elif name == "openai":
-            _provider_registry[name] = OpenAIProvider()
-        elif name in OPENAI_COMPATIBLE_PRESETS:
-            base_url, key_env, default_model = OPENAI_COMPATIBLE_PRESETS[name]
-            _provider_registry[name] = OpenAIProvider(
-                provider_name=name,
-                base_url=os.getenv(f"{name.upper()}_BASE_URL", base_url),
-                model=os.getenv(f"C3_{name.upper()}_MODEL", default_model),
-                key_env=key_env,
-            )
-        else:
-            _provider_registry[name] = LocalLLMProvider()
+        _provider_registry[name] = _BUILDERS[name](name)
     return _provider_registry[name]
 
 

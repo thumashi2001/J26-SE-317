@@ -11,7 +11,7 @@ READ THIS FIRST (viva summary)
     mark (services/ml/scorer.py); it never changes a mark. The feedback and the mind map can never change the marks either:
     the marks are fixed in step F2 and step 3 below re-checks that.
 """
-from app.schemas.analysis import AnswerAnalysisRequest
+from app.schemas.analysis import AnswerAnalysisRequest, AnswerAnalysisResponse
 from app.schemas.assessment import AIScoreEstimate, AssessmentRequest, AssessmentResponse
 from app.schemas.marking import (
     CriterionMarkingResult,
@@ -70,14 +70,33 @@ def _ai_estimate(request: AssessmentRequest, awarded: float, possible: float) ->
     """Advisory transformer estimate, or None when the scorer is off/unavailable. Never raises, never alters marks."""
     if not request.reference_answer:
         return None
-    ratio = get_scorer().estimate_ratio(request.reference_answer, request.student_answer)
+    scorer = get_scorer()
+    ratio = scorer.estimate_ratio(request.reference_answer, request.student_answer)
     if ratio is None:
         return None
-    scorer = get_scorer()
     rubric_ratio = min(1.0, max(0.0, awarded / possible))
     diff = ratio - rubric_ratio
     return AIScoreEstimate(estimated_ratio=ratio, estimated_marks=round(ratio * possible, 2), rubric_ratio=rubric_ratio,
                            difference=round(diff, 4), needs_review=abs(diff) > AI_REVIEW_THRESHOLD, model=scorer.model_name)
+
+
+def _mark(request: AssessmentRequest, analysis: AnswerAnalysisResponse) -> MarkingResponse:
+    """Function 2: choose one rubric level per criterion and total the fixed marks (the only place marks are decided)."""
+    criteria_results = [evaluate_criterion(criterion, analysis) for criterion in request.rubric.criteria]
+    total_awarded_marks = sum(result.awarded_mark for result in criteria_results)
+    total_possible_marks = sum(result.max_marks for result in criteria_results)
+    marking_warnings = list(analysis.warnings)
+    marking_warnings.extend(warning for result in criteria_results for warning in result.warnings)
+    return MarkingResponse(
+        question_id=request.question_id,
+        criteria_results=criteria_results,
+        total_awarded_marks=total_awarded_marks,
+        total_possible_marks=total_possible_marks,
+        percentage=round(total_awarded_marks / total_possible_marks * 100, 2),
+        overall_explanation=_overall_explanation(criteria_results),
+        warnings=marking_warnings,
+        marking_version=MARKING_VERSION,
+    )
 
 
 def assess_answer(request: AssessmentRequest) -> AssessmentResponse:
@@ -106,47 +125,9 @@ def assess_answer(request: AssessmentRequest) -> AssessmentResponse:
 
     # Step 2: Function 2 — Rubric-Aware Marking Engine
     # THE MARKS ARE DECIDED HERE: one rubric level is selected per criterion and its fixed mark is awarded.
-    criteria_results = [
-        evaluate_criterion(criterion, analysis)
-        for criterion in request.rubric.criteria
-    ]
-    total_awarded_marks = sum(result.awarded_mark for result in criteria_results)
-    total_possible_marks = sum(result.max_marks for result in criteria_results)
-    percentage = round(total_awarded_marks / total_possible_marks * 100, 2)
+    marking = _mark(request, analysis)
 
-    marking_warnings = list(analysis.warnings)
-    marking_warnings.extend(
-        warning
-        for result in criteria_results
-        for warning in result.warnings
-    )
-
-    marking = MarkingResponse(
-        question_id=request.question_id,
-        criteria_results=criteria_results,
-        total_awarded_marks=total_awarded_marks,
-        total_possible_marks=total_possible_marks,
-        percentage=percentage,
-        overall_explanation=_overall_explanation(criteria_results),
-        warnings=marking_warnings,
-        marking_version=MARKING_VERSION,
-    )
-
-    # Step 3: Strict Mark Authority Check
-    # Function 2 is the authoritative source of truth for marks
-    # (a safeguard: the totals stored in the marking object must equal the totals just calculated)
-    if marking.total_awarded_marks != total_awarded_marks:
-        raise ValueError(
-            f"Mark authority violation: F2 total ({marking.total_awarded_marks}) "
-            f"!= calculated total ({total_awarded_marks})"
-        )
-    if marking.percentage != percentage:
-        raise ValueError(
-            f"Mark authority violation: F2 percentage ({marking.percentage}) "
-            f"!= calculated percentage ({percentage})"
-        )
-
-    # Step 4: Function 3 — Explainable Feedback Generation
+    # Step 3: Function 3 — Explainable Feedback Generation
     # Text only: built FROM the finished marking and analysis, so it cannot alter a mark.
     feedback = build_feedback_from_results(
         marking=marking,
@@ -155,7 +136,7 @@ def assess_answer(request: AssessmentRequest) -> AssessmentResponse:
         question_text=request.question_text,
     )
 
-    # Step 5: Function 4 — Concept-Based Mind Map Generator
+    # Step 4: Function 4 — Concept-Based Mind Map Generator
     # One root node (the question) plus one node per concept, coloured by the concept status from step 1.
     expected_concepts = analysis_req.expected_concepts or []
     mindmap = build_mindmap_from_analysis(
@@ -165,8 +146,8 @@ def assess_answer(request: AssessmentRequest) -> AssessmentResponse:
         expected_concepts=expected_concepts,
     )
 
-    # Step 5b (optional): advisory AI score estimate. It is computed from the finished marks and cannot change them.
-    ai_estimate = _ai_estimate(request, total_awarded_marks, total_possible_marks)
+    # Step 5 (optional): advisory AI score estimate. It is computed from the finished marks and cannot change them.
+    ai_estimate = _ai_estimate(request, marking.total_awarded_marks, marking.total_possible_marks)
 
     # Step 6: Aggregate warnings
     # (merge and de-duplicate the warnings produced by the steps above)
