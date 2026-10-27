@@ -29,7 +29,7 @@ def build_mindmap_from_analysis(
     concept_nodes = build_concept_nodes(analysis, expected_concepts)
     relationships = build_baseline_relationships(root_node, concept_nodes)
     # Evidence-based concept-to-concept lines (same-sentence co-occurrence); never invented semantic relations.
-    relationships += build_cooccurrence_relationships(concept_nodes)
+    relationships += build_cooccurrence_relationships(concept_nodes, [item.text for item in analysis.sentences])
     all_nodes = [root_node] + concept_nodes
 
     # Counts shown in the summary and used for the warnings below.

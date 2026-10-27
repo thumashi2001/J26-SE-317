@@ -21,10 +21,14 @@ function normalise(mindmap) {
     source: r.source_node_id ?? r.source ?? r.from,
     target: r.target_node_id ?? r.target ?? r.to,
     type: r.relationship_type ?? r.type,
+    evidence: r.evidence,
   }));
   const rootId = mindmap.root_node_id ?? nodes.find((n) => n.type === 'root')?.node_id ?? nodes[0]?.node_id;
   return { nodes, edges, rootId };
 }
+
+// Readable names for relationship types ('co_mentioned' = same sentence only; the others come from a cue phrase).
+const REL_LABEL = { co_mentioned: 'Mentioned together', is_a: 'Is a kind of', part_of: 'Is part of', depends_on: 'Depends on', leads_to: 'Leads to', contrasts_with: 'Contrasts with' };
 
 // Draws the answer-to-concept map: nodes are concepts/sentences coloured by status; click a node to see its evidence.
 export default function MindMapGraph({ mindmap, sentences = [] }) {
@@ -155,6 +159,17 @@ export default function MindMapGraph({ mindmap, sentences = [] }) {
               </button>
             </div>
           </div>
+          {/* Concept-to-concept lines touching this node (typed ones name the cue phrase the student used). */}
+          {selected.node_id !== root.node_id && edges.filter((e) => e.type !== 'child' && (e.source === selected.node_id || e.target === selected.node_id)).length > 0 && (
+            <div className="c3-inspector-evidence">
+              <strong>Relationships in the answer</strong>
+              {edges.filter((e) => e.type !== 'child' && (e.source === selected.node_id || e.target === selected.node_id)).map((e) => (
+                <div key={e.id} className="c3-evidence-quote">
+                  <span className="c3-sentence-tag">{REL_LABEL[e.type] || e.type}</span> {e.evidence}
+                </div>
+              ))}
+            </div>
+          )}
           {selected.evidence_sentence_ids?.length > 0 ? (
             <div className="c3-inspector-evidence">
               <strong>Evidence in the answer</strong>
