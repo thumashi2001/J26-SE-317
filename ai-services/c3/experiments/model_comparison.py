@@ -9,6 +9,12 @@ configuration; fixed seeds; library versions and dataset hashes recorded. Nothin
 except the one-off download of public pretrained weights (sentence-transformers/all-MiniLM-L6-v2, roberta-base).
 
 Usage: python -m experiments.model_comparison --run A|B|C|REF|all --out DIR
+
+STATUS: offline research script (run from ai-services/c3, use --out with a temporary folder to keep the repository
+clean). This is where models are actually TRAINED: TF-IDF and SBERT-feature Ridge/GBR heads (scikit-learn) and a
+RoBERTa-base fine-tune (about 33 min on CPU; the trained weights are not saved). None of these models is used by live
+marking. Evidence of the run: reports/c3_remediation/experiments/ (log_C.txt, results_*.json) and the charts in
+reports/c3_remediation/figures/.
 """
 
 from __future__ import annotations
@@ -46,8 +52,26 @@ def seed_all(seed: int = SEED) -> None:
         pass
 
 
-def load(dataset: Path = DATASET) -> dict[str, pd.DataFrame]:
+def load_answers_with_reference(dataset: Path = DATASET) -> pd.DataFrame:
+    """Eligible answers with the REAL reference answer attached.
+
+    DATA NOTE: the `reference_answer` column inside 02_controlled_answers_eligible.csv is empty for every row; the
+    reference answers live in 01_question_bank.csv. Results produced before 2026-10-27 (reports 03, 12, F-lite, the
+    first extra comparison) therefore saw the student answer only. This function fills the column from the question bank.
+    """
     ans = pd.read_csv(dataset / "02_controlled_answers_eligible.csv", dtype=str, keep_default_na=False)
+    bank = pd.read_csv(dataset / "01_question_bank.csv", dtype=str, keep_default_na=False)[["question_id", "reference_answer"]]
+    ans = ans.drop(columns=["reference_answer"]).merge(bank, on="question_id", how="left", validate="many_to_one")
+    if (ans["reference_answer"].fillna("").str.strip() == "").any():
+        raise ValueError("some eligible answers have no reference answer in the question bank")
+    return ans
+
+
+def load(dataset: Path = DATASET, with_reference: bool = True) -> dict[str, pd.DataFrame]:
+    """Frozen splits. with_reference=False reproduces the earlier answer-only inputs (empty reference) for ablations."""
+    ans = load_answers_with_reference(dataset)
+    if not with_reference:
+        ans["reference_answer"] = ""
     ans["max"] = ans["max_marks"].astype(float)
     ans["gt"] = ans["expected_mark"].astype(float)
     ans["y"] = (ans["gt"] / ans["max"]).clip(0, 1)
