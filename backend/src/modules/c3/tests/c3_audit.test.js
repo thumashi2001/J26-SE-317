@@ -583,6 +583,20 @@ test('Subjective results are returned to students unchanged (no key exists to re
   assert.strictEqual(redactEvaluationForStudent(null), null);
 });
 
+test('The advisory AI estimate (and its warning) is removed from the student copy, kept for staff', async () => {
+  const { redactEvaluationForStudent } = await import('../services/redaction.js');
+  const stored = {
+    answer_type: 'short', total_awarded_marks: 3, marking: { marking_version: 'f2-rubric-v1' },
+    ai_estimate: { estimated_ratio: 0.2, needs_review: true },
+    warnings: ['The AI score estimate differs noticeably from the rubric mark; lecturer review is recommended.', 'other note'],
+  };
+  const student = redactEvaluationForStudent(stored);
+  assert.ok(!('ai_estimate' in student));
+  assert.deepStrictEqual(student.warnings, ['other note']);
+  assert.equal(student.total_awarded_marks, 3);
+  assert.ok(stored.ai_estimate, 'the stored record must not be modified');
+});
+
 test('GET /examples (answer keys and rubrics) is staff-only', async () => {
   assert.strictEqual((await api('GET', '/examples', student)).status, 403);
   assert.strictEqual((await api('GET', '/examples', null)).status, 401);

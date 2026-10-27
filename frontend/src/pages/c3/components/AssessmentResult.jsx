@@ -59,6 +59,24 @@ export default function AssessmentResult({ evaluation, historicalResult, questio
         </>
       )}
 
+      {/* Advisory AI estimate: only present in the staff copy of the evaluation (the server removes it for students). */}
+      {evaluation?.ai_estimate && (
+        <section className="panel" aria-label="AI score estimate" style={{ margin: 0 }}>
+          <h3 style={{ margin: '0 0 8px' }}>AI second opinion (advisory)</h3>
+          <p style={{ margin: 0 }}>
+            Estimated mark: <strong>{Math.round(evaluation.ai_estimate.estimated_marks * 10) / 10} / {total}</strong>
+            {' '}({Math.round(evaluation.ai_estimate.estimated_ratio * 100)}%) &middot; Rubric mark: {proposed} / {total}
+            {' '}
+            <span className={`pill ${evaluation.ai_estimate.needs_review ? 'status-rejected' : 'status-approved'}`}>
+              {evaluation.ai_estimate.needs_review ? 'Differs - review recommended' : 'Consistent with rubric'}
+            </span>
+          </p>
+          <p className="small muted" style={{ margin: '8px 0 0' }}>
+            {evaluation.ai_estimate.note}
+          </p>
+        </section>
+      )}
+
       {a.warnings.length > 0 && (
         <Notice tone="warn" title="Notes about this result">
           <ul style={{ margin: '4px 0 0', paddingLeft: 18 }}>
