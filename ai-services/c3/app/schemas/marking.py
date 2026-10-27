@@ -97,6 +97,18 @@ class MarkingRequest(AnswerAnalysisRequest):
     """Everything in an analysis request plus the rubric to mark against."""
 
     rubric: Rubric
+    # Optional total supplied by the caller (for example the C2 question record). It is never used to compute a mark; it is
+    # only cross-checked against the rubric so an inconsistent configuration is rejected instead of silently marked.
+    max_marks: float | None = Field(default=None, gt=0.0)
+
+    @model_validator(mode="after")
+    def validate_max_marks_matches_rubric(self) -> "MarkingRequest":
+        """If the caller states a total, it must equal the sum of the rubric's criterion maximums."""
+        if self.max_marks is not None:
+            total = sum(criterion.max_marks for criterion in self.rubric.criteria)
+            if abs(total - self.max_marks) > 1e-9:
+                raise ValueError(f"max_marks ({self.max_marks}) does not equal the rubric total ({total})")
+        return self
 
 
 class CriterionMarkingResult(BaseModel):
