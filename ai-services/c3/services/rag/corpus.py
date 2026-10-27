@@ -19,10 +19,12 @@ import pandas as pd
 
 
 def _read(path: Path) -> pd.DataFrame:
+    """Read a CSV as text (no type guessing, empty cells stay empty)."""
     return pd.read_csv(path, dtype=str, keep_default_na=False)
 
 
 def _sha256(path: Path) -> str:
+    """Hash of a file's bytes, recorded for provenance."""
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
@@ -41,6 +43,7 @@ def build_training_corpus(dataset_dir: str | Path, split: str = "train") -> tupl
     dropped = 0
 
     def add(doc_id: str, title: str, content: str, source_type: str, question_id: str) -> None:
+        """Add one document to the corpus unless it is empty or an exact duplicate of one already added."""
         nonlocal dropped
         content = " ".join(content.split())
         key = hashlib.sha256(content.lower().encode()).hexdigest()

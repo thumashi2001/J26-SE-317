@@ -59,6 +59,7 @@ def retrieve_evidence(store: CurriculumVectorStore | None, query: str, question_
 
 
 def _evidence_block(hits: list[dict[str, Any]]) -> str:
+    """Format retrieved passages as clearly-marked untrusted evidence text for the prompt."""
     if not hits:
         return "<<EVIDENCE>>\n(no supporting material retrieved)\n<<END EVIDENCE>>"
     parts = [f"[{i}] source={h['citation']} relevance={h['relevance_score']}\n{json.dumps(h['content'])}"
@@ -76,6 +77,7 @@ def build_prompt(question: str, reference_answer: str, rubric: list[dict[str, An
 
 
 def validate_output(parsed: dict[str, Any] | None, rubric: list[dict[str, Any]], max_marks: float) -> dict[str, Any]:
+    """Check the reply covers every rubric criterion with marks in range; else raise RagMarkingError."""
     if not isinstance(parsed, dict) or not isinstance(parsed.get("criteria"), list):
         raise RagMarkingError("response has no 'criteria' list")
     limits = {c["criterion_id"]: float(c["max_marks"]) for c in rubric}

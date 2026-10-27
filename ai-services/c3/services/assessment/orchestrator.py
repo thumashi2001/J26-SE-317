@@ -53,6 +53,7 @@ def _analysis_request(request: AssessmentRequest) -> AnswerAnalysisRequest:
 
 
 def _overall_explanation(results: list[CriterionMarkingResult]) -> str:
+    """One sentence listing each criterion's mark, e.g. 'C1=2/4; C2=3/3'."""
     # Sentence such as "C1=2/4; C2=3/3" explaining how the total was formed.
     details = "; ".join(
         f"{result.criterion_id}={result.awarded_mark:g}/{result.max_marks:g}"

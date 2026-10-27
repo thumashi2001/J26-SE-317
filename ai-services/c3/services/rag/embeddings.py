@@ -34,6 +34,7 @@ class EmbeddingError(RuntimeError):
 
 
 class EmbeddingProvider(ABC):
+    """Base class: turns texts into unit-length vectors, with an optional on-disk cache."""
     provider_name: str
     model: str
 
@@ -47,15 +48,21 @@ class EmbeddingProvider(ABC):
             self._load_cache()
 
     @abstractmethod
-    def is_available(self) -> bool: ...
+    def is_available(self) -> bool:
+        """True when this provider can run (key set, or library installed for the local one)."""
+        ...
 
     @abstractmethod
-    def _embed_batch(self, texts: list[str], task: str) -> list[list[float]]: ...
+    def _embed_batch(self, texts: list[str], task: str) -> list[list[float]]:
+        """Return one raw vector per text for a batch (implemented by each provider)."""
+        ...
 
     def _key(self, text: str, task: str) -> str:
+        """Cache key that identifies provider, model, task and text."""
         return hashlib.sha256(f"{self.provider_name}|{self.model}|{task}|{text}".encode()).hexdigest()
 
     def _load_cache(self) -> None:
+        """Read stored vectors from the cache file, skipping damaged lines."""
         if not self._cache_path or not self._cache_path.exists():
             return
         with self._cache_path.open(encoding="utf-8") as fh:
@@ -67,6 +74,7 @@ class EmbeddingProvider(ABC):
                     continue
 
     def _append_cache(self, items: dict[str, list[float]]) -> None:
+        """Append newly computed vectors to the cache file."""
         if not self._cache_path or not items:
             return
         self._cache_path.parent.mkdir(parents=True, exist_ok=True)
@@ -101,6 +109,7 @@ class EmbeddingProvider(ABC):
         return matrix / norms
 
     def diagnostics(self) -> dict[str, Any]:
+        """Status information for reports (provider, model, vectors cached, readiness)."""
         return {
             "provider": self.provider_name,
             "model": self.model,
@@ -114,6 +123,7 @@ class EmbeddingProvider(ABC):
 
 
 class GeminiEmbedding(EmbeddingProvider):
+    """Embeddings from the Gemini API (needs GEMINI_API_KEY)."""
     provider_name = "gemini"
 
     def __init__(self, api_key: str | None = None, model: str | None = None, cache_file: str | Path | None = None):
@@ -123,9 +133,11 @@ class GeminiEmbedding(EmbeddingProvider):
         super().__init__(cache_file)
 
     def is_available(self) -> bool:
+        """True when this provider can run (key set, or library installed for the local one)."""
         return bool(self.api_key)
 
     def _embed_batch(self, texts: list[str], task: str) -> list[list[float]]:
+        """Return one raw vector per text for a batch (implemented by each provider)."""
         task_type = "RETRIEVAL_QUERY" if task == "query" else "RETRIEVAL_DOCUMENT"
         payload = {
             "requests": [
@@ -149,6 +161,7 @@ class GeminiEmbedding(EmbeddingProvider):
 
 
 class OpenAIEmbedding(EmbeddingProvider):
+    """Embeddings from the OpenAI API (needs OPENAI_API_KEY)."""
     provider_name = "openai"
 
     def __init__(self, api_key: str | None = None, model: str | None = None, cache_file: str | Path | None = None):
@@ -158,9 +171,11 @@ class OpenAIEmbedding(EmbeddingProvider):
         super().__init__(cache_file)
 
     def is_available(self) -> bool:
+        """True when this provider can run (key set, or library installed for the local one)."""
         return bool(self.api_key) and not self.api_key.startswith("change-me")
 
     def _embed_batch(self, texts: list[str], task: str) -> list[list[float]]:
+        """Return one raw vector per text for a batch (implemented by each provider)."""
         data, _ = post_json_with_retry(
             f"{self.base_url}/embeddings",
             headers={"Authorization": f"Bearer {self.api_key}", "Content-Type": "application/json"},
@@ -192,6 +207,7 @@ class LocalSentenceTransformerEmbedding(EmbeddingProvider):
         self._encoder: Any = None
 
     def is_available(self) -> bool:
+        """True when this provider can run (key set, or library installed for the local one)."""
         try:
             import sentence_transformers  # noqa: F401
         except ImportError:
@@ -199,6 +215,7 @@ class LocalSentenceTransformerEmbedding(EmbeddingProvider):
         return True
 
     def _embed_batch(self, texts: list[str], task: str) -> list[list[float]]:
+        """Return one raw vector per text for a batch (implemented by each provider)."""
         if self._encoder is None:
             from sentence_transformers import SentenceTransformer
 
@@ -207,6 +224,7 @@ class LocalSentenceTransformerEmbedding(EmbeddingProvider):
         return self._encoder.encode(texts, batch_size=32, normalize_embeddings=True, show_progress_bar=False).tolist()
 
     def diagnostics(self) -> dict[str, Any]:
+        """Status information for reports (provider, model, vectors cached, readiness)."""
         info = super().diagnostics()
         info["status"] = "ready" if self.is_available() else "missing_dependency: sentence-transformers"
         info["runs_locally"] = True

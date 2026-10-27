@@ -41,9 +41,11 @@ class OpenAIProvider(BaseLLMProvider):
         self.model = model or os.getenv("C3_OPENAI_MODEL", DEFAULT_OPENAI_MODEL)
 
     def is_available(self) -> bool:
+        """True when a real-looking API key is set for this provider."""
         return bool(self.api_key and not self.api_key.startswith("change-me") and len(self.api_key) > 10)
 
     def health_check(self) -> dict[str, Any]:
+        """Safe status for diagnostics (no network call)."""
         return {
             "provider": self.provider_name,
             "model": self.model,
@@ -54,6 +56,7 @@ class OpenAIProvider(BaseLLMProvider):
         }
 
     def _failure(self, model: str, start: float, message: str, **extra: Any) -> LLMResponse:
+        """Build a failed LLMResponse (no content) recording the error and how long the attempt took."""
         return LLMResponse(
             raw_content=extra.pop("raw_content", ""),
             model_identifier=extra.pop("model_identifier", model),
@@ -65,6 +68,7 @@ class OpenAIProvider(BaseLLMProvider):
         )
 
     def generate(self, request: LLMRequest) -> LLMResponse:
+        """Send one chat request to the OpenAI-compatible endpoint and return its reply, or a failed response."""
         model = self.model if request.model in ("default", "") else request.model
         start = time.perf_counter()
         if not self.is_available():

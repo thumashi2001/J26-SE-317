@@ -127,6 +127,7 @@ class CCKGGraphAdapter:
         self._init_connection()
 
     def _init_connection(self):
+        """Open the Neo4j connection; on failure use the in-memory graph unless strict mode forbids it."""
         try:
             import neo4j
             self._driver = neo4j.GraphDatabase.driver(
@@ -144,6 +145,7 @@ class CCKGGraphAdapter:
 
     @property
     def is_live(self) -> bool:
+        """True when the adapter is talking to a real Neo4j database (not the in-memory fallback)."""
         return self._is_live_neo4j
 
     def status(self) -> dict[str, Any]:
@@ -157,6 +159,7 @@ class CCKGGraphAdapter:
         }
 
     def close(self):
+        """Close the Neo4j driver if one is open; errors while closing are ignored."""
         if self._driver:
             try:
                 self._driver.close()
@@ -233,6 +236,7 @@ class CCKGGraphAdapter:
         visited = set()
 
         def dfs(c_name: str):
+            """Depth-first walk collecting a concept and its prerequisites (each visited once)."""
             c_norm = c_name.lower().strip()
             if c_norm in visited:
                 return
@@ -292,6 +296,7 @@ _adapter_instance = None
 
 
 def get_cckg_adapter() -> CCKGGraphAdapter:
+    """Return the single shared CCKG adapter, creating it on first use."""
     global _adapter_instance
     if _adapter_instance is None:
         _adapter_instance = CCKGGraphAdapter()

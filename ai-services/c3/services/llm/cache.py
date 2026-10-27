@@ -50,6 +50,7 @@ class CachedLLMProvider(BaseLLMProvider):
         self._load()
 
     def _load(self) -> None:
+        """Read previously stored real responses from the JSONL file into memory (ignores a torn last line)."""
         if not self.cache_file.exists():
             return
         with self.cache_file.open("rb") as raw:
@@ -71,19 +72,23 @@ class CachedLLMProvider(BaseLLMProvider):
                     self._entries[entry["key"]] = entry
 
     def is_available(self) -> bool:
+        """Same as the wrapped provider: is it configured?"""
         return self.inner.is_available()
 
     def health_check(self) -> dict[str, Any]:
+        """The wrapped provider's status plus the cache file path and entry count."""
         info = dict(self.inner.health_check())
         info.update({"cache_file": str(self.cache_file), "cache_entries": len(self._entries)})
         return info
 
     def _model_of(self, request: LLMRequest) -> str:
+        """The concrete model name used for the cache key ('default' is resolved to the provider's model)."""
         if request.model in ("default", ""):
             return str(getattr(self.inner, "model", "default"))
         return request.model
 
     def generate(self, request: LLMRequest) -> LLMResponse:
+        """Return the stored real reply for a repeated request; otherwise call the provider and store it."""
         # 1) cache hit -> return the stored real response; 2) miss -> call the real provider and store the reply.
         key = request_cache_key(self.inner.provider_name, self._model_of(request), request)
         with self._lock:

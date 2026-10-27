@@ -25,6 +25,7 @@ class EvidenceRule(BaseModel):
 
     @model_validator(mode="after")
     def validate_thresholds(self) -> "EvidenceRule":
+        """Check the evidence rule asks for something and that partial credit matches partial concepts."""
         # The three checks keep the rule self-consistent: it must ask for something, and partial credit must be switched
         # on exactly when partial concepts are required.
         if self.minimum_demonstrated == 0 and self.minimum_partial == 0:
@@ -56,6 +57,7 @@ class ScoringLevel(BaseModel):
     @field_validator("required_concepts", "evidence_requirements")
     @classmethod
     def validate_non_blank_requirements(cls, values: list[str]) -> list[str]:
+        """Reject blank requirement strings and return them trimmed."""
         if any(not value.strip() for value in values):
             raise ValueError("requirements cannot contain blank values")
         return [value.strip() for value in values]
@@ -75,6 +77,7 @@ class RubricCriterion(BaseModel):
     @field_validator("required_concepts")
     @classmethod
     def validate_non_blank_concepts(cls, values: list[str]) -> list[str]:
+        """Reject blank required-concept strings and return them trimmed."""
         if any(not value.strip() for value in values):
             raise ValueError("required_concepts cannot contain blank values")
         return [value.strip() for value in values]

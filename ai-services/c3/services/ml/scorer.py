@@ -45,6 +45,7 @@ class MLScorer:
         self.model_name: str | None = None
 
     def configured(self) -> bool:
+        """True when a checkpoint file exists in the configured folder."""
         return bool(self.model_dir and (self.model_dir / "model.pt").is_file())
 
     def _load(self) -> None:
@@ -65,12 +66,14 @@ class MLScorer:
                 tok = AutoTokenizer.from_pretrained(self.model_dir)
 
                 class Reg(nn.Module):  # same architecture as training: encoder -> CLS -> linear -> sigmoid
+                    """Trained model: encoder, first-token vector, one linear layer, sigmoid (a 0..1 mark ratio)."""
                     def __init__(self):
                         super().__init__()
                         self.enc = AutoModel.from_config(config)
                         self.head = nn.Linear(config.hidden_size, 1)
 
                     def forward(self, **kw):
+                        """Run the encoder and return the estimated mark ratio for each input."""
                         return torch.sigmoid(self.head(self.enc(**kw).last_hidden_state[:, 0])).squeeze(-1)
 
                 model = Reg()

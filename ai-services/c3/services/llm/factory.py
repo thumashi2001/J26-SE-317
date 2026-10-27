@@ -39,6 +39,7 @@ class UnknownProviderError(ValueError):
 
 
 def normalise_provider_name(provider_type: str | None = None) -> str:
+    """Provider name from the argument or C3_LLM_PROVIDER ('ollama' = 'local'); unknown names raise."""
     # Read the provider name from the argument or from the C3_LLM_PROVIDER environment variable.
     name = (provider_type or os.getenv("C3_LLM_PROVIDER", DEFAULT_PROVIDER)).lower().strip()
     if name == "ollama":

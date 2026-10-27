@@ -128,6 +128,7 @@ def _concept_hint(concept: str, architecture: bool) -> str:
 
 
 def _quoted(items: list[str]) -> str:
+    """Format a list of names as a quoted, comma-separated string."""
     # ['a', 'b'] -> "'a', 'b'"
     return ", ".join(f"'{item}'" for item in items)
 

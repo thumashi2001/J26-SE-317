@@ -46,6 +46,7 @@ class OverallFeedback(BaseModel):
 
 
 class FeedbackResponse(BaseModel):
+    """Function 3 output: per-criterion feedback, the overall feedback block, and any warnings."""
     question_id: str
     criteria_feedback: list[CriterionFeedback]
     overall_feedback: OverallFeedback

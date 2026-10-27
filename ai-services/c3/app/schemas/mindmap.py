@@ -11,6 +11,7 @@ from app.schemas.analysis import AnswerAnalysisRequest
 
 
 class MindMapRequest(BaseModel):
+    """Input for the mind map: the same analysis request used by Function 1."""
     analysis_request: AnswerAnalysisRequest
 
 
@@ -40,6 +41,7 @@ class Relationship(BaseModel):
 
 
 class MindMapSummary(BaseModel):
+    """Counts shown above the map: total nodes and how many concepts are demonstrated, partial or missing."""
     total_nodes: int
     demonstrated_count: int
     partial_count: int
@@ -47,6 +49,7 @@ class MindMapSummary(BaseModel):
 
 
 class MindMapResponse(BaseModel):
+    """Function 4 output: a root node, concept nodes, the links between them, and the summary counts."""
     question_id: str
     root_node_id: str
     title: str

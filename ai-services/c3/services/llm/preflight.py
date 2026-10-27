@@ -32,6 +32,7 @@ KEY_ENV = {"gemini": "GEMINI_API_KEY", "openai": "OPENAI_API_KEY"}
 
 @dataclass(frozen=True)
 class ModelRequirement:
+    """One model the run needs: its role, provider, model name and whether it is an LLM or an embedding."""
     role: str  # e.g. "generator", "verifier", "llm:gemini", "embedding"
     provider: str  # gemini | openai
     model: str
@@ -40,6 +41,7 @@ class ModelRequirement:
 
 @dataclass
 class ModelCheck:
+    """The outcome of verifying one ModelRequirement (ok or not, with a short reason and timestamp)."""
     role: str
     provider: str
     model: str
@@ -50,14 +52,17 @@ class ModelCheck:
 
 
 def _now() -> str:
+    """Current UTC time as an ISO string."""
     return datetime.now(UTC).isoformat(timespec="seconds")
 
 
 def _result(req: ModelRequirement, ok: bool, detail: str) -> ModelCheck:
+    """Package a requirement and its outcome into a ModelCheck."""
     return ModelCheck(req.role, req.provider, req.model, ok, detail, _now(), req.kind)
 
 
 def _http_reason(status: int) -> str:
+    """Plain-English explanation of an HTTP error status from a provider."""
     if status in (401, 403):
         return f"HTTP {status} authentication/permission error (check the API key)"
     if status == 400:
@@ -70,6 +75,7 @@ def _http_reason(status: int) -> str:
 
 
 def _check_gemini(req: ModelRequirement, api_key: str | None, http_client: httpx.Client | None) -> ModelCheck:
+    """Verify a Gemini model (or embedding model) is reachable with the configured key."""
     provider = GeminiProvider(model=req.model, api_key=api_key)
     if not provider.is_available():
         return _result(req, False, f"{KEY_ENV['gemini']} is not set; cannot verify the model")
@@ -95,6 +101,7 @@ def _check_gemini(req: ModelRequirement, api_key: str | None, http_client: httpx
 
 
 def _check_openai(req: ModelRequirement, api_key: str | None, http_client: httpx.Client | None) -> ModelCheck:
+    """Verify an OpenAI model (or embedding model) is reachable with the configured key."""
     provider = OpenAIProvider(model=req.model, api_key=api_key)
     if not provider.is_available():
         return _result(req, False, f"{KEY_ENV['openai']} is not set; cannot verify the model")
@@ -165,16 +172,19 @@ def run_preflight(
 
 
 def all_ok(checks: list[ModelCheck]) -> bool:
+    """True only when there is at least one check and every check passed."""
     return bool(checks) and all(c.ok for c in checks)
 
 
 def write_preflight(path: Path, checks: list[ModelCheck]) -> None:
+    """Save the checks to a JSON file so a run records what was verified."""
     path.parent.mkdir(parents=True, exist_ok=True)
     body = {"all_ok": all_ok(checks), "checked_at": _now(), "checks": [asdict(c) for c in checks]}
     path.write_text(json.dumps(body, indent=2) + "\n", encoding="utf-8")
 
 
 def format_checks(checks: list[ModelCheck]) -> str:
+    """One printable line per check ([ok] or [FAIL])."""
     return "\n".join(f"  [{'ok' if c.ok else 'FAIL'}] {c.role}: {c.provider}/{c.model} - {c.detail}" for c in checks)
 
 

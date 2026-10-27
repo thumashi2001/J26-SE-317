@@ -50,6 +50,7 @@ def _analysis_request(request: FeedbackRequest) -> AnswerAnalysisRequest:
 
 
 def _unique(values: list[str]) -> list[str]:
+    """Remove duplicates while keeping the original order."""
     # Remove duplicates but keep the original order.
     return list(dict.fromkeys(values))
 

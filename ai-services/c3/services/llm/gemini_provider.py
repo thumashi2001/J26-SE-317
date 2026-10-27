@@ -52,12 +52,15 @@ class GeminiProvider(BaseLLMProvider):
         self.http_client: httpx.Client | None = None  # optional injected client (tests / preflight)
 
     def _headers(self) -> dict[str, str]:
+        """HTTP headers for Gemini requests (the key is sent in a header, never in the URL)."""
         return {"x-goog-api-key": self.api_key, "Content-Type": "application/json"}
 
     def is_available(self) -> bool:
+        """True when a real-looking GEMINI_API_KEY is set."""
         return bool(self.api_key) and not self.api_key.lower().startswith("change-me")
 
     def list_models(self) -> list[dict[str, Any]]:
+        """Ask Gemini which models this key may use."""
         data = get_json(f"{self.base_url}/models?pageSize=1000", headers=self._headers(), client=self.http_client)
         return data.get("models", [])
 
@@ -84,6 +87,7 @@ class GeminiProvider(BaseLLMProvider):
             return False, f"ListModels failed: {type(exc).__name__}: {exc}"
 
     def health_check(self) -> dict[str, Any]:
+        """Safe status for diagnostics (no network call)."""
         return {
             "provider": self.provider_name,
             "model": self.model,
@@ -94,6 +98,7 @@ class GeminiProvider(BaseLLMProvider):
         }
 
     def _failure(self, model: str, start: float, message: str, **extra: Any) -> LLMResponse:
+        """Build a failed LLMResponse (no content) recording the error and how long the attempt took."""
         return LLMResponse(
             raw_content=extra.pop("raw_content", ""),
             model_identifier=extra.pop("model_identifier", model),
@@ -105,6 +110,7 @@ class GeminiProvider(BaseLLMProvider):
         )
 
     def generate(self, request: LLMRequest) -> LLMResponse:
+        """Send one request to Gemini and return its reply, or a failed response describing what went wrong."""
         model = self.model if request.model in ("default", "") else request.model
         start = time.perf_counter()
         if not self.is_available():

@@ -38,6 +38,7 @@ class RateLimiter:
         self._next_allowed = 0.0
 
     def wait(self) -> None:
+        """Block just long enough to respect the provider's requests-per-minute limit."""
         if not self.min_interval:
             return
         with self._lock:
@@ -68,6 +69,7 @@ def get_rate_limiter(key: str) -> RateLimiter:
 
 
 def _backoff(attempt: int) -> float:
+    """Seconds to wait before retry number `attempt` (doubles each time, capped at 30)."""
     return float(min(2**attempt, 30))
 
 
@@ -117,6 +119,7 @@ def post_json_with_retry(
 def get_json(
     url: str, *, headers: dict[str, str], timeout: float = 15.0, client: httpx.Client | None = None
 ) -> dict[str, Any]:
+    """GET a URL and return its JSON body (raises on an HTTP error)."""
     if client is not None:
         res = client.get(url, headers=headers, timeout=timeout)
         res.raise_for_status()

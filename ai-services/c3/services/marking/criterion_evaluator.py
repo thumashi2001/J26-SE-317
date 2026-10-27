@@ -38,6 +38,7 @@ class LevelEvidence:
 
 
 def _concept_matches(analysis: AnswerAnalysisResponse) -> dict[str, object]:
+    """Look-up table from lowercase concept name to its Function 1 match."""
     # Look-up table: concept name (lowercase) -> its ConceptMatch from Function 1.
     return {match.concept.casefold(): match for match in analysis.concept_matches}
 

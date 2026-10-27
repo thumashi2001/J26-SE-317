@@ -31,6 +31,7 @@ class AnswerAnalysisRequest(BaseModel):
     def validate_expected_concepts(
         cls, concepts: list[str] | None
     ) -> list[str] | None:
+        """Reject blank concept strings and return the trimmed list (None stays None)."""
         # Reject lists that contain blank strings; otherwise return the trimmed concepts.
         if concepts is None:
             return None

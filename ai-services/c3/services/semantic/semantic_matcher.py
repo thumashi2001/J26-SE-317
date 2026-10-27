@@ -34,6 +34,7 @@ DEFAULT_THRESHOLD = 0.5  # replaced by the TRAIN-calibrated value recorded in th
 
 
 def semantic_threshold() -> float:
+    """Similarity cut-off from C3_SEMANTIC_THRESHOLD (default if unset or not a number)."""
     try:
         return float(os.getenv(ENV_THRESHOLD, DEFAULT_THRESHOLD))
     except ValueError:
@@ -49,6 +50,7 @@ class SemanticMatcher:
         self._failure: str | None = None
 
     def _get(self):
+        """Create the embedding model on first use; remember a failure instead of raising."""
         with self._lock:
             if self._provider is None and self._failure is None:
                 try:
