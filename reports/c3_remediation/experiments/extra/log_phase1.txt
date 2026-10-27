@@ -1,0 +1,90 @@
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/103 [00:00<?, ?it/s]Loading weights: 100%|##########| 103/103 [00:00<00:00, 1477.40it/s]
+Loading weights:   0%|          | 0/103 [00:00<?, ?it/s]Loading weights:  63%|######3   | 65/103 [00:00<00:00, 649.22it/s]Loading weights: 100%|##########| 103/103 [00:00<00:00, 977.35it/s]
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights:   8%|8         | 16/199 [00:00<00:01, 156.48it/s]Loading weights:  18%|#8        | 36/199 [00:00<00:00, 170.28it/s]Loading weights:  30%|##9       | 59/199 [00:00<00:00, 177.32it/s]Loading weights:  59%|#####8    | 117/199 [00:00<00:00, 316.14it/s]Loading weights:  75%|#######5  | 150/199 [00:00<00:00, 309.76it/s]Loading weights: 100%|##########| 199/199 [00:00<00:00, 354.79it/s]
+== fine-tuning distilroberta-base
+Could not reach the Hub ([Errno 11001] getaddrinfo failed). Using cached commit hash for 'distilroberta-base'.
+Loading weights:   0%|          | 0/103 [00:00<?, ?it/s]Loading weights:   7%|6         | 7/103 [00:00<00:01, 67.18it/s]Loading weights:  14%|#3        | 14/103 [00:00<00:01, 60.57it/s]Loading weights:  20%|##        | 21/103 [00:00<00:01, 59.21it/s]Loading weights:  56%|#####6    | 58/103 [00:00<00:00, 169.54it/s]Loading weights: 100%|##########| 103/103 [00:00<00:00, 226.72it/s]
+[transformers] [1mRobertaModel LOAD REPORT[0m from: distilroberta-base
+Key                       | Status     |  | 
+--------------------------+------------+--+-
+lm_head.dense.weight      | UNEXPECTED |  | 
+lm_head.dense.bias        | UNEXPECTED |  | 
+lm_head.layer_norm.weight | UNEXPECTED |  | 
+lm_head.bias              | UNEXPECTED |  | 
+lm_head.layer_norm.bias   | UNEXPECTED |  | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+distilroberta-base 20261021 {'epoch': 1, 'train_mse': 0.08614210395225838, 'validation_nmae': 0.07715078049536907, 'elapsed_s': 319.2}
+distilroberta-base 20261021 {'epoch': 2, 'train_mse': 0.012030368643020517, 'validation_nmae': 0.06376681551845235, 'elapsed_s': 610.5}
+distilroberta-base 20261021 {'epoch': 3, 'train_mse': 0.009426906617373965, 'validation_nmae': 0.05253073248222019, 'elapsed_s': 904.1}
+distilroberta-base 20261021 {'epoch': 4, 'train_mse': 0.005151845138306864, 'validation_nmae': 0.04888848472527707, 'elapsed_s': 1191.1}
+distilroberta-base 20261021 {'epoch': 5, 'train_mse': 0.004161400600007518, 'validation_nmae': 0.03634508368164075, 'elapsed_s': 1482.2}
+distilroberta-base 20261021 {'epoch': 6, 'train_mse': 0.0032724508322400053, 'validation_nmae': 0.039777200722954036, 'elapsed_s': 1636.5}
+== fine-tuning bert-base-uncased
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights:  11%|#1        | 22/199 [00:00<00:00, 217.14it/s]Loading weights:  22%|##2       | 44/199 [00:00<00:00, 180.39it/s]Loading weights: 100%|##########| 199/199 [00:00<00:00, 779.56it/s]
+[transformers] [1mBertModel LOAD REPORT[0m from: bert-base-uncased
+Key                                        | Status     |  | 
+-------------------------------------------+------------+--+-
+cls.seq_relationship.bias                  | UNEXPECTED |  | 
+cls.predictions.transform.LayerNorm.weight | UNEXPECTED |  | 
+cls.seq_relationship.weight                | UNEXPECTED |  | 
+cls.predictions.transform.dense.bias       | UNEXPECTED |  | 
+cls.predictions.transform.LayerNorm.bias   | UNEXPECTED |  | 
+cls.predictions.transform.dense.weight     | UNEXPECTED |  | 
+cls.predictions.bias                       | UNEXPECTED |  | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+bert-base-uncased 20261021 {'epoch': 1, 'train_mse': 0.030755195548915447, 'validation_nmae': 0.06353731609880925, 'elapsed_s': 425.9}
+bert-base-uncased 20261021 {'epoch': 2, 'train_mse': 0.007606394385075688, 'validation_nmae': 0.11484137330430025, 'elapsed_s': 945.2}
+bert-base-uncased 20261021 {'epoch': 3, 'train_mse': 0.006018833104643823, 'validation_nmae': 0.041250339047701055, 'elapsed_s': 1491.8}
+bert-base-uncased 20261021 {'epoch': 4, 'train_mse': 0.003988056349225194, 'validation_nmae': 0.04529247061095454, 'elapsed_s': 2022.1}
+bert-base-uncased 20261021 {'epoch': 5, 'train_mse': 0.004023085305448714, 'validation_nmae': 0.03329828889080973, 'elapsed_s': 2564.3}
+bert-base-uncased 20261021 {'epoch': 6, 'train_mse': 0.0030777911610428746, 'validation_nmae': 0.030894758434909762, 'elapsed_s': 2939.8}
+== fine-tuning roberta-base
+Loading weights:   0%|          | 0/197 [00:00<?, ?it/s]Loading weights:   6%|5         | 11/197 [00:00<00:01, 100.72it/s]Loading weights:  11%|#1        | 22/197 [00:00<00:01, 105.32it/s]Loading weights:  21%|##        | 41/197 [00:00<00:01, 129.54it/s]Loading weights:  27%|##7       | 54/197 [00:00<00:01, 113.11it/s]Loading weights:  34%|###3      | 66/197 [00:00<00:01, 82.14it/s] Loading weights:  40%|###9      | 78/197 [00:00<00:01, 88.52it/s]Loading weights:  45%|####4     | 88/197 [00:01<00:01, 62.31it/s]Loading weights: 100%|##########| 197/197 [00:01<00:00, 175.53it/s]
+[transformers] [1mRobertaModel LOAD REPORT[0m from: roberta-base
+Key                       | Status     | 
+--------------------------+------------+-
+lm_head.dense.weight      | UNEXPECTED | 
+lm_head.dense.bias        | UNEXPECTED | 
+lm_head.layer_norm.weight | UNEXPECTED | 
+lm_head.bias              | UNEXPECTED | 
+lm_head.layer_norm.bias   | UNEXPECTED | 
+pooler.dense.weight       | MISSING    | 
+pooler.dense.bias         | MISSING    | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+- MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+roberta-base 20261021 {'epoch': 1, 'train_mse': 0.08190556444616905, 'validation_nmae': 0.07443786820001674, 'elapsed_s': 511.9}
+roberta-base 20261021 {'epoch': 2, 'train_mse': 0.010435100422421498, 'validation_nmae': 0.05009265047300494, 'elapsed_s': 976.7}
+roberta-base 20261021 {'epoch': 3, 'train_mse': 0.005471604539788634, 'validation_nmae': 0.036413856467627216, 'elapsed_s': 1256.1}
+roberta-base 20261021 {'epoch': 4, 'train_mse': 0.003351700003157527, 'validation_nmae': 0.032791118062185966, 'elapsed_s': 1732.6}
+roberta-base 20261021 {'epoch': 5, 'train_mse': 0.002367839223556962, 'validation_nmae': 0.04066165038821935, 'elapsed_s': 2447.0}
+roberta-base 20261021 {'epoch': 6, 'train_mse': 0.0021270111884310176, 'validation_nmae': 0.027302998269936343, 'elapsed_s': 3018.7}
+== fine-tuning cross-encoder/ms-marco-MiniLM-L-6-v2
+Loading weights:   0%|          | 0/103 [00:00<?, ?it/s]Loading weights:  65%|######5   | 67/103 [00:00<00:00, 669.28it/s]Loading weights: 100%|##########| 103/103 [00:00<00:00, 979.83it/s]
+[transformers] [1mBertModel LOAD REPORT[0m from: cross-encoder/ms-marco-MiniLM-L-6-v2
+Key               | Status     |  | 
+------------------+------------+--+-
+classifier.weight | UNEXPECTED |  | 
+classifier.bias   | UNEXPECTED |  | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+cross-encoder/ms-marco-MiniLM-L-6-v2 20261021 {'epoch': 1, 'train_mse': 0.053796807943440196, 'validation_nmae': 0.10964662132389617, 'elapsed_s': 137.9}
+cross-encoder/ms-marco-MiniLM-L-6-v2 20261021 {'epoch': 2, 'train_mse': 0.010519087231203691, 'validation_nmae': 0.10094558152962814, 'elapsed_s': 273.2}
+cross-encoder/ms-marco-MiniLM-L-6-v2 20261021 {'epoch': 3, 'train_mse': 0.007385171961447048, 'validation_nmae': 0.08504788079722361, 'elapsed_s': 410.7}
+cross-encoder/ms-marco-MiniLM-L-6-v2 20261021 {'epoch': 4, 'train_mse': 0.005972296150982732, 'validation_nmae': 0.07541039201120535, 'elapsed_s': 545.9}
+cross-encoder/ms-marco-MiniLM-L-6-v2 20261021 {'epoch': 5, 'train_mse': 0.004639399736026182, 'validation_nmae': 0.07129205875888918, 'elapsed_s': 682.5}
+cross-encoder/ms-marco-MiniLM-L-6-v2 20261021 {'epoch': 6, 'train_mse': 0.0042234774984752955, 'validation_nmae': 0.06712201582775876, 'elapsed_s': 819.6}
+X1_minilm_svr val nMAE 0.0508 
+X2_minilm_random_forest val nMAE 0.0613 
+X3_mpnet_features_ridge val nMAE 0.0738 
+D_distilroberta-base val nMAE 0.0363 seeds mean/sd 0.0363/0.0000
+D_bert-base-uncased val nMAE 0.0309 seeds mean/sd 0.0309/0.0000
+D_roberta-base val nMAE 0.0273 seeds mean/sd 0.0273/0.0000
+D_ms-marco-MiniLM-L-6-v2 val nMAE 0.0671 seeds mean/sd 0.0671/0.0000

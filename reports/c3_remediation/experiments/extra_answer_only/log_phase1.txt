@@ -1,0 +1,104 @@
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/103 [00:00<?, ?it/s]Loading weights: 100%|##########| 103/103 [00:00<00:00, 1288.04it/s]
+Loading weights:   0%|          | 0/103 [00:00<?, ?it/s]Loading weights: 100%|##########| 103/103 [00:00<00:00, 1156.86it/s]
+C:\Users\M S I\Desktop\Reserach\DEVELOPMENT\ADAPTIVE_LEARN_SE\ai-services\c3\.venv_c3\Lib\site-packages\huggingface_hub\file_download.py:149: UserWarning: `huggingface_hub` cache-system uses symlinks by default to efficiently store duplicated files but your machine does not support them in C:\Users\M S I\.cache\huggingface\hub. Caching files will still work but in a degraded version that might require more space on your disk. This warning can be disabled by setting the `HF_HUB_DISABLE_SYMLINKS_WARNING` environment variable. For more details, see https://huggingface.co/docs/huggingface_hub/how-to-cache#limitations.
+To support symlinks on Windows, you either need to activate Developer Mode or to run Python as an administrator. In order to activate developer mode, see this article: https://docs.microsoft.com/en-us/windows/apps/get-started/enable-your-device-for-development
+  warnings.warn(message)
+C:\Users\M S I\Desktop\Reserach\DEVELOPMENT\ADAPTIVE_LEARN_SE\ai-services\c3\.venv_c3\Lib\site-packages\huggingface_hub\file_download.py:149: UserWarning: `huggingface_hub` cache-system uses symlinks by default to efficiently store duplicated files but your machine does not support them in C:\Users\M S I\.cache\huggingface\hub\models--sentence-transformers--all-mpnet-base-v2. Caching files will still work but in a degraded version that might require more space on your disk. This warning can be disabled by setting the `HF_HUB_DISABLE_SYMLINKS_WARNING` environment variable. For more details, see https://huggingface.co/docs/huggingface_hub/how-to-cache#limitations.
+To support symlinks on Windows, you either need to activate Developer Mode or to run Python as an administrator. In order to activate developer mode, see this article: https://docs.microsoft.com/en-us/windows/apps/get-started/enable-your-device-for-development
+  warnings.warn(message)
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights:   7%|6         | 13/199 [00:00<00:01, 113.17it/s]Loading weights:  13%|#2        | 25/199 [00:00<00:01, 107.59it/s]Loading weights:  22%|##2       | 44/199 [00:00<00:01, 136.94it/s]Loading weights:  32%|###2      | 64/199 [00:00<00:00, 148.26it/s]Loading weights:  40%|###9      | 79/199 [00:00<00:00, 127.02it/s]Loading weights:  47%|####6     | 93/199 [00:00<00:00, 112.70it/s]Loading weights: 100%|##########| 199/199 [00:00<00:00, 246.23it/s]
+== fine-tuning distilroberta-base
+C:\Users\M S I\Desktop\Reserach\DEVELOPMENT\ADAPTIVE_LEARN_SE\ai-services\c3\.venv_c3\Lib\site-packages\huggingface_hub\file_download.py:149: UserWarning: `huggingface_hub` cache-system uses symlinks by default to efficiently store duplicated files but your machine does not support them in C:\Users\M S I\.cache\huggingface\hub\models--distilroberta-base. Caching files will still work but in a degraded version that might require more space on your disk. This warning can be disabled by setting the `HF_HUB_DISABLE_SYMLINKS_WARNING` environment variable. For more details, see https://huggingface.co/docs/huggingface_hub/how-to-cache#limitations.
+To support symlinks on Windows, you either need to activate Developer Mode or to run Python as an administrator. In order to activate developer mode, see this article: https://docs.microsoft.com/en-us/windows/apps/get-started/enable-your-device-for-development
+  warnings.warn(message)
+Loading weights:   0%|          | 0/103 [00:00<?, ?it/s]Loading weights:  23%|##3       | 24/103 [00:00<00:00, 228.52it/s]Loading weights:  68%|######7   | 70/103 [00:00<00:00, 324.05it/s]Loading weights: 100%|##########| 103/103 [00:00<00:00, 355.85it/s]
+[transformers] [1mRobertaModel LOAD REPORT[0m from: distilroberta-base
+Key                       | Status     |  | 
+--------------------------+------------+--+-
+lm_head.dense.weight      | UNEXPECTED |  | 
+lm_head.layer_norm.bias   | UNEXPECTED |  | 
+lm_head.bias              | UNEXPECTED |  | 
+lm_head.layer_norm.weight | UNEXPECTED |  | 
+lm_head.dense.bias        | UNEXPECTED |  | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+distilroberta-base 20261021 {'epoch': 1, 'train_mse': 0.07400493051240507, 'validation_nmae': 0.06817538453096694, 'elapsed_s': 475.7}
+distilroberta-base 20261021 {'epoch': 2, 'train_mse': 0.009902010769096773, 'validation_nmae': 0.08266077894717455, 'elapsed_s': 642.6}
+distilroberta-base 20261021 {'epoch': 3, 'train_mse': 0.00826917174335949, 'validation_nmae': 0.04455150058634127, 'elapsed_s': 811.1}
+distilroberta-base 20261021 {'epoch': 4, 'train_mse': 0.005819629601102128, 'validation_nmae': 0.04128984300447909, 'elapsed_s': 976.5}
+distilroberta-base 20261021 {'epoch': 5, 'train_mse': 0.004866099790716312, 'validation_nmae': 0.03789564825848422, 'elapsed_s': 1141.7}
+distilroberta-base 20261021 {'epoch': 6, 'train_mse': 0.004703291824218685, 'validation_nmae': 0.0358849629232039, 'elapsed_s': 1302.4}
+== fine-tuning cross-encoder/ms-marco-MiniLM-L-6-v2
+C:\Users\M S I\Desktop\Reserach\DEVELOPMENT\ADAPTIVE_LEARN_SE\ai-services\c3\.venv_c3\Lib\site-packages\huggingface_hub\file_download.py:149: UserWarning: `huggingface_hub` cache-system uses symlinks by default to efficiently store duplicated files but your machine does not support them in C:\Users\M S I\.cache\huggingface\hub\models--cross-encoder--ms-marco-MiniLM-L-6-v2. Caching files will still work but in a degraded version that might require more space on your disk. This warning can be disabled by setting the `HF_HUB_DISABLE_SYMLINKS_WARNING` environment variable. For more details, see https://huggingface.co/docs/huggingface_hub/how-to-cache#limitations.
+To support symlinks on Windows, you either need to activate Developer Mode or to run Python as an administrator. In order to activate developer mode, see this article: https://docs.microsoft.com/en-us/windows/apps/get-started/enable-your-device-for-development
+  warnings.warn(message)
+Loading weights:   0%|          | 0/103 [00:00<?, ?it/s]Loading weights: 100%|##########| 103/103 [00:00<00:00, 1190.25it/s]
+[transformers] [1mBertModel LOAD REPORT[0m from: cross-encoder/ms-marco-MiniLM-L-6-v2
+Key               | Status     |  | 
+------------------+------------+--+-
+classifier.bias   | UNEXPECTED |  | 
+classifier.weight | UNEXPECTED |  | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+cross-encoder/ms-marco-MiniLM-L-6-v2 20261021 {'epoch': 1, 'train_mse': 0.08036368195690326, 'validation_nmae': 0.11794503769188215, 'elapsed_s': 1076.9}
+cross-encoder/ms-marco-MiniLM-L-6-v2 20261021 {'epoch': 2, 'train_mse': 0.01512303925162779, 'validation_nmae': 0.0775653899506186, 'elapsed_s': 1142.9}
+cross-encoder/ms-marco-MiniLM-L-6-v2 20261021 {'epoch': 3, 'train_mse': 0.01156666400420725, 'validation_nmae': 0.08503039829432964, 'elapsed_s': 1210.8}
+cross-encoder/ms-marco-MiniLM-L-6-v2 20261021 {'epoch': 4, 'train_mse': 0.009673074877644837, 'validation_nmae': 0.07528704022367795, 'elapsed_s': 1278.0}
+cross-encoder/ms-marco-MiniLM-L-6-v2 20261021 {'epoch': 5, 'train_mse': 0.008884099821226477, 'validation_nmae': 0.06763323480771345, 'elapsed_s': 1346.3}
+cross-encoder/ms-marco-MiniLM-L-6-v2 20261021 {'epoch': 6, 'train_mse': 0.008349750927111958, 'validation_nmae': 0.070570298822766, 'elapsed_s': 1415.5}
+== fine-tuning bert-base-uncased
+C:\Users\M S I\Desktop\Reserach\DEVELOPMENT\ADAPTIVE_LEARN_SE\ai-services\c3\.venv_c3\Lib\site-packages\huggingface_hub\file_download.py:149: UserWarning: `huggingface_hub` cache-system uses symlinks by default to efficiently store duplicated files but your machine does not support them in C:\Users\M S I\.cache\huggingface\hub\models--bert-base-uncased. Caching files will still work but in a degraded version that might require more space on your disk. This warning can be disabled by setting the `HF_HUB_DISABLE_SYMLINKS_WARNING` environment variable. For more details, see https://huggingface.co/docs/huggingface_hub/how-to-cache#limitations.
+To support symlinks on Windows, you either need to activate Developer Mode or to run Python as an administrator. In order to activate developer mode, see this article: https://docs.microsoft.com/en-us/windows/apps/get-started/enable-your-device-for-development
+  warnings.warn(message)
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights:   8%|7         | 15/199 [00:00<00:01, 138.07it/s]Loading weights:  15%|#4        | 29/199 [00:00<00:01, 115.26it/s]Loading weights:  23%|##2       | 45/199 [00:00<00:01, 126.16it/s]Loading weights:  29%|##9       | 58/199 [00:00<00:01, 97.76it/s] Loading weights:  35%|###4      | 69/199 [00:00<00:01, 96.67it/s]Loading weights: 100%|##########| 199/199 [00:00<00:00, 289.70it/s]
+[transformers] [1mBertModel LOAD REPORT[0m from: bert-base-uncased
+Key                                        | Status     |  | 
+-------------------------------------------+------------+--+-
+cls.predictions.transform.LayerNorm.bias   | UNEXPECTED |  | 
+cls.seq_relationship.weight                | UNEXPECTED |  | 
+cls.seq_relationship.bias                  | UNEXPECTED |  | 
+cls.predictions.bias                       | UNEXPECTED |  | 
+cls.predictions.transform.dense.bias       | UNEXPECTED |  | 
+cls.predictions.transform.LayerNorm.weight | UNEXPECTED |  | 
+cls.predictions.transform.dense.weight     | UNEXPECTED |  | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+bert-base-uncased 20261021 {'epoch': 1, 'train_mse': 0.04008943906322641, 'validation_nmae': 0.06117157695306974, 'elapsed_s': 1098.9}
+bert-base-uncased 20261021 {'epoch': 2, 'train_mse': 0.008262007425432627, 'validation_nmae': 0.0602227976760178, 'elapsed_s': 1384.6}
+bert-base-uncased 20261021 {'epoch': 3, 'train_mse': 0.009313558508058204, 'validation_nmae': 0.051131102865505394, 'elapsed_s': 1681.6}
+bert-base-uncased 20261021 {'epoch': 4, 'train_mse': 0.0061144289248292825, 'validation_nmae': 0.037716743990948244, 'elapsed_s': 1976.1}
+bert-base-uncased 20261021 {'epoch': 5, 'train_mse': 0.004665177478802515, 'validation_nmae': 0.03887575737680449, 'elapsed_s': 2277.9}
+bert-base-uncased 20261021 {'epoch': 6, 'train_mse': 0.00420144457075819, 'validation_nmae': 0.03741366166282783, 'elapsed_s': 2576.7}
+== fine-tuning roberta-base
+Loading weights:   0%|          | 0/197 [00:00<?, ?it/s]Loading weights:   7%|7         | 14/197 [00:00<00:01, 134.57it/s]Loading weights:  14%|#4        | 28/197 [00:00<00:01, 131.10it/s]Loading weights:  22%|##1       | 43/197 [00:00<00:01, 135.90it/s]Loading weights:  29%|##8       | 57/197 [00:00<00:01, 133.32it/s]Loading weights:  36%|###6      | 71/197 [00:00<00:01, 112.61it/s]Loading weights:  44%|####3     | 86/197 [00:00<00:00, 113.01it/s]Loading weights:  50%|####9     | 98/197 [00:00<00:00, 113.83it/s]Loading weights: 100%|##########| 197/197 [00:00<00:00, 220.00it/s]
+[transformers] [1mRobertaModel LOAD REPORT[0m from: roberta-base
+Key                       | Status     | 
+--------------------------+------------+-
+lm_head.dense.weight      | UNEXPECTED | 
+lm_head.layer_norm.bias   | UNEXPECTED | 
+lm_head.bias              | UNEXPECTED | 
+lm_head.layer_norm.weight | UNEXPECTED | 
+lm_head.dense.bias        | UNEXPECTED | 
+pooler.dense.weight       | MISSING    | 
+pooler.dense.bias         | MISSING    | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+- MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+roberta-base 20261021 {'epoch': 1, 'train_mse': 0.06866841051372495, 'validation_nmae': 0.055112783898684126, 'elapsed_s': 308.8}
+roberta-base 20261021 {'epoch': 2, 'train_mse': 0.008464262572890935, 'validation_nmae': 0.05814799051816489, 'elapsed_s': 584.0}
+roberta-base 20261021 {'epoch': 3, 'train_mse': 0.009024126345433054, 'validation_nmae': 0.054232745619321406, 'elapsed_s': 761.8}
+roberta-base 20261021 {'epoch': 4, 'train_mse': 0.006177745890381991, 'validation_nmae': 0.038559662167857764, 'elapsed_s': 12805.9}
+roberta-base 20261021 {'epoch': 5, 'train_mse': 0.004785687655710907, 'validation_nmae': 0.03770650530417421, 'elapsed_s': 12952.1}
+roberta-base 20261021 {'epoch': 6, 'train_mse': 0.004624098766916136, 'validation_nmae': 0.037993539037380473, 'elapsed_s': 13092.4}
+X1_minilm_svr val nMAE 0.0939 
+X2_minilm_random_forest val nMAE 0.086 
+X3_mpnet_features_ridge val nMAE 0.0818 
+D_distilroberta-base val nMAE 0.0359 seeds mean/sd 0.0359/0.0000
+D_ms-marco-MiniLM-L-6-v2 val nMAE 0.0676 seeds mean/sd 0.0676/0.0000
+D_bert-base-uncased val nMAE 0.0374 seeds mean/sd 0.0374/0.0000
+D_roberta-base val nMAE 0.0377 seeds mean/sd 0.0377/0.0000

@@ -1,0 +1,61 @@
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/103 [00:00<?, ?it/s]Loading weights: 100%|##########| 103/103 [00:00<00:00, 2819.80it/s]
+Loading weights:   0%|          | 0/103 [00:00<?, ?it/s]Loading weights: 100%|##########| 103/103 [00:00<00:00, 3047.50it/s]
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights:  14%|#4        | 28/199 [00:00<00:00, 219.25it/s]Loading weights:  28%|##8       | 56/199 [00:00<00:00, 244.18it/s]Loading weights:  41%|####      | 81/199 [00:00<00:00, 224.42it/s]Loading weights: 100%|##########| 199/199 [00:00<00:00, 547.24it/s]
+Loading weights:   0%|          | 0/103 [00:00<?, ?it/s]Loading weights:  23%|##3       | 24/103 [00:00<00:00, 218.75it/s]Loading weights: 100%|##########| 103/103 [00:00<00:00, 571.62it/s]
+[transformers] [1mRobertaModel LOAD REPORT[0m from: distilroberta-base
+Key                       | Status     |  | 
+--------------------------+------------+--+-
+lm_head.dense.weight      | UNEXPECTED |  | 
+lm_head.bias              | UNEXPECTED |  | 
+lm_head.layer_norm.bias   | UNEXPECTED |  | 
+lm_head.dense.bias        | UNEXPECTED |  | 
+lm_head.layer_norm.weight | UNEXPECTED |  | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+Loading weights:   0%|          | 0/103 [00:00<?, ?it/s]Loading weights: 100%|##########| 103/103 [00:00<00:00, 2429.94it/s]
+[transformers] [1mBertModel LOAD REPORT[0m from: cross-encoder/ms-marco-MiniLM-L-6-v2
+Key               | Status     |  | 
+------------------+------------+--+-
+classifier.bias   | UNEXPECTED |  | 
+classifier.weight | UNEXPECTED |  | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights:  12%|#2        | 24/199 [00:00<00:00, 234.87it/s]Loading weights:  24%|##4       | 48/199 [00:00<00:00, 209.92it/s]Loading weights: 100%|##########| 199/199 [00:00<00:00, 870.34it/s]
+[transformers] [1mBertModel LOAD REPORT[0m from: bert-base-uncased
+Key                                        | Status     |  | 
+-------------------------------------------+------------+--+-
+cls.predictions.bias                       | UNEXPECTED |  | 
+cls.seq_relationship.bias                  | UNEXPECTED |  | 
+cls.seq_relationship.weight                | UNEXPECTED |  | 
+cls.predictions.transform.dense.bias       | UNEXPECTED |  | 
+cls.predictions.transform.LayerNorm.weight | UNEXPECTED |  | 
+cls.predictions.transform.LayerNorm.bias   | UNEXPECTED |  | 
+cls.predictions.transform.dense.weight     | UNEXPECTED |  | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+Loading weights:   0%|          | 0/197 [00:00<?, ?it/s]Loading weights:   4%|4         | 8/197 [00:00<00:03, 54.77it/s]Loading weights:  12%|#1        | 23/197 [00:00<00:01, 95.51it/s]Loading weights:  17%|#7        | 34/197 [00:00<00:01, 91.04it/s]Loading weights: 100%|##########| 197/197 [00:00<00:00, 414.69it/s]
+[transformers] [1mRobertaModel LOAD REPORT[0m from: roberta-base
+Key                       | Status     | 
+--------------------------+------------+-
+lm_head.dense.weight      | UNEXPECTED | 
+lm_head.bias              | UNEXPECTED | 
+lm_head.layer_norm.bias   | UNEXPECTED | 
+lm_head.dense.bias        | UNEXPECTED | 
+lm_head.layer_norm.weight | UNEXPECTED | 
+pooler.dense.bias         | MISSING    | 
+pooler.dense.weight       | MISSING    | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+- MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+D_distilroberta-base                          val nMAE 0.0359  test nMAE 0.0380  QWK 0.982
+D_bert-base-uncased                           val nMAE 0.0374  test nMAE 0.0432  QWK 0.975
+D_roberta-base                                val nMAE 0.0377  test nMAE 0.0382  QWK 0.980
+D_ms-marco-MiniLM-L-6-v2                      val nMAE 0.0676  test nMAE 0.0613  QWK 0.965
+X3_mpnet_features_ridge                       val nMAE 0.0818  test nMAE 0.0776  QWK 0.935
+X2_minilm_random_forest                       val nMAE 0.0860  test nMAE 0.0762  QWK 0.931
+X1_minilm_svr                                 val nMAE 0.0939  test nMAE 0.0809  QWK 0.931
