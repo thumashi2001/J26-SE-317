@@ -1,0 +1,317 @@
+[
+ {
+  "label": "assessments list needs login",
+  "role": "anon",
+  "method": "GET",
+  "path": "/c3/assessments",
+  "status": 401,
+  "expected": "401",
+  "ok": true
+ },
+ {
+  "label": "student may list assessments",
+  "role": "student",
+  "method": "GET",
+  "path": "/c3/assessments",
+  "status": 200,
+  "expected": "200",
+  "ok": true
+ },
+ {
+  "label": "student cannot supply own key",
+  "role": "student",
+  "method": "POST",
+  "path": "/c3/assess",
+  "status": 400,
+  "expected": "400",
+  "ok": true
+ },
+ {
+  "label": "student assess with demo id",
+  "role": "student",
+  "method": "POST",
+  "path": "/c3/assess",
+  "status": 200,
+  "expected": "200",
+  "ok": true
+ },
+ {
+  "label": "student cannot review",
+  "role": "student",
+  "method": "POST",
+  "path": "/c3/submissions/6ae0e5106102d4aa3318e178/review",
+  "status": 403,
+  "expected": "403",
+  "ok": true
+ },
+ {
+  "label": "student cannot finalize",
+  "role": "student",
+  "method": "POST",
+  "path": "/c3/submissions/6ae0e5106102d4aa3318e178/finalize",
+  "status": 403,
+  "expected": "403",
+  "ok": true
+ },
+ {
+  "label": "student cannot create batch",
+  "role": "student",
+  "method": "POST",
+  "path": "/c3/batch/setup",
+  "status": 403,
+  "expected": "403",
+  "ok": true
+ },
+ {
+  "label": "student cannot mark batch",
+  "role": "student",
+  "method": "POST",
+  "path": "/c3/batch/mark",
+  "status": 403,
+  "expected": "403",
+  "ok": true
+ },
+ {
+  "label": "student cannot read staff examples (keys/rubrics)",
+  "role": "student",
+  "method": "GET",
+  "path": "/c3/examples",
+  "status": 403,
+  "expected": "403",
+  "ok": true
+ },
+ {
+  "label": "lecturer can read examples",
+  "role": "lecturer",
+  "method": "GET",
+  "path": "/c3/examples",
+  "status": 200,
+  "expected": "200",
+  "ok": true
+ },
+ {
+  "label": "student cannot list batches",
+  "role": "student",
+  "method": "GET",
+  "path": "/c3/batch/setup",
+  "status": 403,
+  "expected": "403",
+  "ok": true
+ },
+ {
+  "label": "lecturer can list submissions",
+  "role": "lecturer",
+  "method": "GET",
+  "path": "/c3/submissions",
+  "status": 200,
+  "expected": "200",
+  "ok": true
+ },
+ {
+  "label": "lecturer can list batches",
+  "role": "lecturer",
+  "method": "GET",
+  "path": "/c3/batch/setup",
+  "status": 200,
+  "expected": "200",
+  "ok": true
+ },
+ {
+  "label": "admin can list batches (policy: admin oversees)",
+  "role": "admin",
+  "method": "GET",
+  "path": "/c3/batch/setup",
+  "status": 200,
+  "expected": "200",
+  "ok": true
+ },
+ {
+  "label": "admin can read any submission detail",
+  "role": "admin",
+  "method": "GET",
+  "path": "/c3/submissions/6ae0e5106102d4aa3318e178",
+  "status": 200,
+  "expected": "200",
+  "ok": true
+ },
+ {
+  "label": "admin may NOT assess as a student",
+  "role": "admin",
+  "method": "POST",
+  "path": "/c3/assess",
+  "status": 403,
+  "expected": "403",
+  "ok": true
+ },
+ {
+  "label": "raw /c3/analysis: student denied",
+  "role": "student",
+  "method": "POST",
+  "path": "/c3/analysis",
+  "status": 403,
+  "expected": "403",
+  "ok": true
+ },
+ {
+  "label": "raw /c3/analysis: admin denied",
+  "role": "admin",
+  "method": "POST",
+  "path": "/c3/analysis",
+  "status": 403,
+  "expected": "403",
+  "ok": true
+ },
+ {
+  "label": "raw /c3/analysis: anonymous denied",
+  "role": "anon",
+  "method": "POST",
+  "path": "/c3/analysis",
+  "status": 401,
+  "expected": "401",
+  "ok": true
+ },
+ {
+  "label": "raw /c3/analysis: lecturer reaches validation",
+  "role": "lecturer",
+  "method": "POST",
+  "path": "/c3/analysis",
+  "status": 400,
+  "expected": "400",
+  "ok": true
+ },
+ {
+  "label": "raw /c3/marking: student denied",
+  "role": "student",
+  "method": "POST",
+  "path": "/c3/marking",
+  "status": 403,
+  "expected": "403",
+  "ok": true
+ },
+ {
+  "label": "raw /c3/marking: admin denied",
+  "role": "admin",
+  "method": "POST",
+  "path": "/c3/marking",
+  "status": 403,
+  "expected": "403",
+  "ok": true
+ },
+ {
+  "label": "raw /c3/marking: anonymous denied",
+  "role": "anon",
+  "method": "POST",
+  "path": "/c3/marking",
+  "status": 401,
+  "expected": "401",
+  "ok": true
+ },
+ {
+  "label": "raw /c3/marking: lecturer reaches validation",
+  "role": "lecturer",
+  "method": "POST",
+  "path": "/c3/marking",
+  "status": 400,
+  "expected": "400",
+  "ok": true
+ },
+ {
+  "label": "raw /c3/feedback: student denied",
+  "role": "student",
+  "method": "POST",
+  "path": "/c3/feedback",
+  "status": 403,
+  "expected": "403",
+  "ok": true
+ },
+ {
+  "label": "raw /c3/feedback: admin denied",
+  "role": "admin",
+  "method": "POST",
+  "path": "/c3/feedback",
+  "status": 403,
+  "expected": "403",
+  "ok": true
+ },
+ {
+  "label": "raw /c3/feedback: anonymous denied",
+  "role": "anon",
+  "method": "POST",
+  "path": "/c3/feedback",
+  "status": 401,
+  "expected": "401",
+  "ok": true
+ },
+ {
+  "label": "raw /c3/feedback: lecturer reaches validation",
+  "role": "lecturer",
+  "method": "POST",
+  "path": "/c3/feedback",
+  "status": 400,
+  "expected": "400",
+  "ok": true
+ },
+ {
+  "label": "raw /c3/mindmap: student denied",
+  "role": "student",
+  "method": "POST",
+  "path": "/c3/mindmap",
+  "status": 403,
+  "expected": "403",
+  "ok": true
+ },
+ {
+  "label": "raw /c3/mindmap: admin denied",
+  "role": "admin",
+  "method": "POST",
+  "path": "/c3/mindmap",
+  "status": 403,
+  "expected": "403",
+  "ok": true
+ },
+ {
+  "label": "raw /c3/mindmap: anonymous denied",
+  "role": "anon",
+  "method": "POST",
+  "path": "/c3/mindmap",
+  "status": 401,
+  "expected": "401",
+  "ok": true
+ },
+ {
+  "label": "raw /c3/mindmap: lecturer reaches validation",
+  "role": "lecturer",
+  "method": "POST",
+  "path": "/c3/mindmap",
+  "status": 400,
+  "expected": "400",
+  "ok": true
+ },
+ {
+  "label": "unknown C3 path is a JSON 404",
+  "role": "student",
+  "method": "GET",
+  "path": "/c3/does-not-exist",
+  "status": 404,
+  "expected": "404",
+  "ok": true
+ },
+ {
+  "label": "finalize-all by a student is denied",
+  "role": "student",
+  "method": "POST",
+  "path": "/c3/batch/x/finalize-all",
+  "status": 403,
+  "expected": "403",
+  "ok": true
+ },
+ {
+  "label": "student cannot read another student's submission",
+  "role": "student",
+  "method": "GET",
+  "path": "/c3/submissions/6ae0e4e06102d4aa3318e174",
+  "status": 403,
+  "expected": "403",
+  "ok": true
+ }
+]
