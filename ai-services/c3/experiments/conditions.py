@@ -39,10 +39,12 @@ LLM_CONDITIONS = ("A", "B", "C", "D")
 
 
 class ConditionError(RuntimeError):
+    """Raised when an experiment condition cannot run (e.g. a provider has no credentials)."""
     pass
 
 
 def _select(release: Release, split: str, limit: int | None) -> pd.DataFrame:
+    """Rows of the chosen split; with a limit, a seeded random subset so smoke runs are repeatable."""
     answers = release.split_answers(split)
     if limit:
         # deterministic stratified smoke subset: first `limit` rows after a seeded shuffle
@@ -51,6 +53,7 @@ def _select(release: Release, split: str, limit: int | None) -> pd.DataFrame:
 
 
 def _row_base(row: pd.Series) -> dict[str, Any]:
+    """The columns every result row carries (ids, tier, expected mark, maximum)."""
     return {
         "answer_id": row["answer_id"],
         "question_id": row["question_id"],
@@ -65,6 +68,7 @@ def _row_base(row: pd.Series) -> dict[str, Any]:
 
 
 def run_lexical_baseline(release: Release, split: str, limit: int | None = None) -> pd.DataFrame:
+    """Baseline: mark = word-overlap similarity to the reference answer x maximum marks."""
     rows = []
     for _, row in _select(release, split, limit).iterrows():
         q = release.question(row["question_id"])
@@ -75,6 +79,7 @@ def run_lexical_baseline(release: Release, split: str, limit: int | None = None)
 
 
 def _marking_request(release: Release, row: pd.Series) -> MarkingRequest:
+    """Build the rubric-engine request for one answer from the release's question bank."""
     q = release.question(row["question_id"])
     return MarkingRequest.model_validate(
         {
@@ -90,6 +95,7 @@ def _marking_request(release: Release, row: pd.Series) -> MarkingRequest:
 
 
 def run_condition_e(release: Release, split: str, limit: int | None = None) -> pd.DataFrame:
+    """Condition E: the live deterministic rubric engine; failures are counted, never scored as zero."""
     rows = []
     for _, row in _select(release, split, limit).iterrows():
         base = _row_base(row)
@@ -107,6 +113,7 @@ def run_condition_e(release: Release, split: str, limit: int | None = None) -> p
 
 
 def make_provider(provider_name: str, cache_dir: Path, model_override: str | None = None):
+    """Create a real LLM provider wrapped in the response cache; refuses a provider without credentials."""
     provider = get_llm_provider(provider_name)
     if model_override:
         provider.model = model_override
@@ -146,6 +153,7 @@ class ContextBuilder:
             self.graph = CCKGGraphAdapter(strict=True)  # raises if Neo4j is not live
 
     def for_question(self, question_id: str) -> str:
+        """Retrieved-context text for a question (cached); never uses the question's own reference answer."""
         if question_id in self._cache:
             return self._cache[question_id]
         q = self.release.question(question_id)
@@ -170,6 +178,7 @@ def run_llm_condition(
     cache_dir: Path | None = None,
     model_override: str | None = None,
 ) -> tuple[pd.DataFrame, dict[str, Any]]:
+    """Run an LLM condition (A-D): build the prompt, call the model, parse the mark; failed calls are excluded and counted."""
     if condition not in LLM_CONDITIONS:
         raise ConditionError(f"Unknown LLM condition {condition}")
     cache_dir = cache_dir or fw.RESULTS_ROOT / "llm_cache"
@@ -215,6 +224,7 @@ def run_llm_condition(
 
 
 def _norm(df: pd.DataFrame, col: str) -> np.ndarray:
+    """A mark column divided by the maximum marks, clipped to 0..1."""
     return (df[col].to_numpy(dtype=float) / df["max_marks"].to_numpy(dtype=float)).clip(0.0, 1.0)
 
 
@@ -244,6 +254,7 @@ def fit_condition_f(feat: pd.DataFrame, step: float = 0.1) -> dict[str, float]:
 
 
 def apply_condition_f(feat: pd.DataFrame, params: dict[str, float]) -> np.ndarray:
+    """Condition F: weighted blend of E, LLM and similarity ratios; marks forced to 0 when E is 0 and similarity is low."""
     e, lm, s = feat["e_norm"].to_numpy(), feat["l_norm"].to_numpy(), feat["s_norm"].to_numpy()
     pred = params["w_e"] * e + params["w_l"] * lm + params["w_s"] * s
     pred = np.where((e == 0.0) & (s < params["tau"]), 0.0, pred)
@@ -261,6 +272,7 @@ def similarity_features(release: Release, answers: pd.DataFrame, embedder) -> np
 def build_f_features(
     release: Release, split: str, e_preds: pd.DataFrame, l_preds: pd.DataFrame, embedder, sim_bounds: tuple[float, float]
 ) -> pd.DataFrame:
+    """Assemble the per-answer ratios (E, LLM, similarity) that condition F blends."""
     answers = release.split_answers(split)
     sims = similarity_features(release, answers, embedder)
     lo, hi = sim_bounds
@@ -287,4 +299,5 @@ def similarity_bounds(release: Release, embedder) -> tuple[float, float]:
 
 
 def env_flag(name: str) -> bool:
+    """True when the environment variable is set to '1'."""
     return os.getenv(name, "0") == "1"

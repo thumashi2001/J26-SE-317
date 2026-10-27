@@ -33,6 +33,7 @@ MODEL_NOTE = "sentence-transformers/all-MiniLM-L6-v2 (pretrained, not trained he
 
 
 def _list(cell: str) -> list[str]:
+    """Parse a JSON list cell into strings (empty on bad input)."""
     try:
         value = json.loads(cell) if cell else []
     except json.JSONDecodeError:
@@ -64,6 +65,7 @@ def build_pairs(split: str, matcher: SemanticMatcher) -> pd.DataFrame:
 
 
 def prf(label: np.ndarray, pred: np.ndarray) -> dict[str, float]:
+    """Precision, recall and F1 with the true/false positive and negative counts."""
     tp = int(((pred == 1) & (label == 1)).sum())
     fp = int(((pred == 1) & (label == 0)).sum())
     fn = int(((pred == 0) & (label == 1)).sum())
@@ -74,6 +76,7 @@ def prf(label: np.ndarray, pred: np.ndarray) -> dict[str, float]:
 
 
 def predictions(pairs: pd.DataFrame, threshold: float | None) -> np.ndarray:
+    """Concept 'found' decisions: word match only, or word match OR similarity above the threshold."""
     lex = pairs["lexical"].to_numpy() == 1.0
     if threshold is None:
         return lex.astype(int)
@@ -81,6 +84,7 @@ def predictions(pairs: pd.DataFrame, threshold: float | None) -> np.ndarray:
 
 
 def choose_threshold(train: pd.DataFrame) -> tuple[float, list[dict]]:
+    """Pick the similarity threshold with the best F1 on TRAIN; also return the whole curve."""
     grid = [round(t, 2) for t in np.arange(0.20, 0.91, 0.02)]
     curve = [{"threshold": t, **prf(train["label"].to_numpy(), predictions(train, t))} for t in grid]
     best = max(curve, key=lambda c: (c["f1"], c["threshold"]))
@@ -88,6 +92,7 @@ def choose_threshold(train: pd.DataFrame) -> tuple[float, list[dict]]:
 
 
 def bootstrap_f1(pairs: pd.DataFrame, threshold: float | None, n: int = 1000, seed: int = 20261027) -> list[float]:
+    """95% interval for F1 from resampling whole questions."""
     rng = np.random.default_rng(seed)
     groups = {q: g for q, g in pairs.groupby("question_id")}
     qs = list(groups)
@@ -99,6 +104,7 @@ def bootstrap_f1(pairs: pd.DataFrame, threshold: float | None, n: int = 1000, se
 
 
 def report(pairs: pd.DataFrame, threshold: float) -> dict:
+    """Counts, precision/recall/F1 for each method and bootstrap intervals for one split."""
     lab = pairs["label"].to_numpy()
     lexical_partial = (pairs["lexical"].to_numpy() > 0).astype(int)
     return {
@@ -111,6 +117,7 @@ def report(pairs: pd.DataFrame, threshold: float) -> dict:
 
 
 def main() -> int:
+    """Phase 1 (train threshold, validation report) or, with --final, score the test split once."""
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", required=True)
     ap.add_argument("--final", action="store_true", help="score the test split once")

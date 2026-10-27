@@ -16,10 +16,12 @@ from datasets.gold.common import GoldToolError, canonical_bytes, sha256_hex
 
 
 def sheet_sha256(sheet: dict) -> str:
+    """Fingerprint of a marking sheet, stored in the return so it cannot be mixed up."""
     return sha256_hex(canonical_bytes(sheet))
 
 
 def _levels(sheet: dict, rubric_ref: str) -> dict[str, dict[str, dict]]:
+    """Look-up of rubric levels by criterion for a sheet's rubric."""
     return {c["criterion"]: {lv["level"]: lv for lv in c["levels"]} for c in sheet["rubrics"][rubric_ref]["criteria"]}
 
 
@@ -95,6 +97,7 @@ def marks_from_return(sheet: dict, ret: dict, expected_sheet_sha256: str | None 
 
 
 def main(argv: list[str] | None = None) -> int:
+    """Command-line entry point."""
     ap = argparse.ArgumentParser(description="Validate a marker return against its sheet")
     ap.add_argument("sheet", type=Path)
     ap.add_argument("ret", type=Path)

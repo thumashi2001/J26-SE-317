@@ -37,6 +37,7 @@ SEED = 20261021
 
 
 def evaluate(store: CurriculumVectorStore, queries: pd.DataFrame, k: int, threshold: float) -> dict:
+    """Retrieval quality: share of queries whose top-k includes a same-module document, plus empty and near-duplicate rates."""
     # Per query: retrieve top-k, then count a hit when any retrieved document is from the same module (relevance proxy).
     hit_at_k, top1_sims, empty, near_dup, counts = [], [], 0, 0, []
     for q in queries.to_dict("records"):
@@ -60,11 +61,13 @@ def evaluate(store: CurriculumVectorStore, queries: pd.DataFrame, k: int, thresh
 
 # Look up the module a retrieved document belongs to (used by the relevance proxy).
 def store_module(store: CurriculumVectorStore, doc_id: str) -> str:
+    """Module code of a stored document."""
     return next(d["module_code"] for d in store.docs if d["doc_id"] == doc_id)
 
 
 # Baseline: pick k random documents (never the query's own) and apply the same same-module hit rule.
 def random_control(docs: list[dict], queries: pd.DataFrame, k: int, trials: int = 200) -> float:
+    """Hit rate of picking k documents at random, as a floor for comparison."""
     rng = np.random.default_rng(SEED)
     hits = []
     for q in queries.to_dict("records"):
@@ -76,6 +79,7 @@ def random_control(docs: list[dict], queries: pd.DataFrame, k: int, trials: int 
 
 
 def main(argv=None) -> int:
+    """Build the train-only corpus, evaluate retrieval and write the results."""
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", type=Path, required=True)
     ap.add_argument("--embedding", default="local")

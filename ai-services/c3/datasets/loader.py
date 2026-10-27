@@ -37,6 +37,7 @@ class ReleaseError(RuntimeError):
 
 
 def sha256_file(path: Path) -> str:
+    """SHA-256 of a file's contents."""
     digest = hashlib.sha256()
     with path.open("rb") as fh:
         for chunk in iter(lambda: fh.read(1 << 20), b""):
@@ -45,6 +46,7 @@ def sha256_file(path: Path) -> str:
 
 
 def _read_csv(path: Path) -> pd.DataFrame:
+    """Read a release file as text; raise ReleaseError if it is missing."""
     if not path.exists():
         raise ReleaseError(f"Missing release file: {path}")
     # keep_default_na=False: an empty answer must stay "" and the literal text "nan" must stay text
@@ -52,6 +54,7 @@ def _read_csv(path: Path) -> pd.DataFrame:
 
 
 def _parse_json_columns(df: pd.DataFrame, columns: tuple[str, ...], where: str) -> pd.DataFrame:
+    """Parse columns that hold JSON text into Python lists."""
     for column in columns:
         if column not in df.columns:
             raise ReleaseError(f"{where} is missing required column '{column}'")
@@ -64,6 +67,7 @@ def _parse_json_columns(df: pd.DataFrame, columns: tuple[str, ...], where: str) 
 
 @dataclass(frozen=True)
 class Release:
+    """One loaded dataset release: manifest, questions, answers and rubrics, with split helpers."""
     path: Path
     manifest: dict[str, Any]
     questions: pd.DataFrame
@@ -72,9 +76,11 @@ class Release:
 
     @property
     def version(self) -> str:
+        """The release's dataset version string."""
         return str(self.manifest["dataset_version"])
 
     def question(self, question_id: str) -> dict[str, Any]:
+        """The question-bank row for a question id."""
         rows = self.questions[self.questions["question_id"] == question_id]
         if rows.empty:
             raise KeyError(f"Unknown question_id {question_id}")
@@ -99,11 +105,13 @@ class Release:
         return {"rubric_id": rubric_id, "title": f"Rubric for {question_id}", "criteria": criteria}
 
     def split_questions(self, split: str) -> pd.DataFrame:
+        """Questions of one split (train, validation or test)."""
         if split not in SPLITS:
             raise ValueError(f"split must be one of {SPLITS}")
         return self.questions[self.questions["split"] == split].reset_index(drop=True)
 
     def split_answers(self, split: str, include_needs_review: bool = True) -> pd.DataFrame:
+        """Answers of one split, optionally leaving out those that need review."""
         if split not in SPLITS:
             raise ValueError(f"split must be one of {SPLITS}")
         df = self.answers[self.answers["split"] == split]
@@ -113,6 +121,7 @@ class Release:
 
 
 def load_release(path: str | Path | None = None, verify_hashes: bool = True) -> Release:
+    """Load a release folder, verifying file hashes against the manifest unless told not to."""
     root = Path(path) if path else DEFAULT_RELEASE_DIR
     manifest_path = root / "manifest.json"
     if not manifest_path.exists():

@@ -19,8 +19,10 @@ def canonical_bytes(obj: object) -> bytes:
 
 
 def sha256_hex(data: bytes) -> str:
+    """SHA-256 of bytes as hex."""
     return hashlib.sha256(data).hexdigest()
 
 
 def sha256_file(path: Path) -> str:
+    """SHA-256 of a file's contents."""
     return sha256_hex(Path(path).read_bytes())

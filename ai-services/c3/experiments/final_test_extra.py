@@ -37,12 +37,14 @@ def predict_checkpoint(ckpt_dir: Path, df) -> np.ndarray:
     tok = AutoTokenizer.from_pretrained(ckpt_dir)
 
     class Reg(nn.Module):
+        """Regression model: transformer encoder, first-token vector, one linear layer, sigmoid (a 0..1 mark ratio)."""
         def __init__(self):
             super().__init__()
             self.enc = AutoModel.from_pretrained(blob["model_name"])
             self.head = nn.Linear(self.enc.config.hidden_size, 1)
 
         def forward(self, **kw):
+            """Encode the (reference, answer) pair and return the estimated mark ratio."""
             return torch.sigmoid(self.head(self.enc(**kw).last_hidden_state[:, 0])).squeeze(-1)
 
     model = Reg()
@@ -60,6 +62,7 @@ def predict_checkpoint(ckpt_dir: Path, df) -> np.ndarray:
 
 
 def main(argv=None) -> int:
+    """Phase 2: reload the validation-selected models and score the held-out test split exactly once."""
     ap = argparse.ArgumentParser()
     ap.add_argument("--phase1", type=Path, required=True)
     ap.add_argument("--ckpt", type=Path, required=True)

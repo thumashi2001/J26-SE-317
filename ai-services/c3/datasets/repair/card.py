@@ -7,12 +7,14 @@ from typing import Any
 
 
 def _kv_table(d: dict[str, Any], key_head: str, val_head: str) -> list[str]:
+    """Two-column Markdown table from a dictionary."""
     lines = [f"| {key_head} | {val_head} |", "|---|---|"]
     lines += [f"| {k} | {v} |" for k, v in d.items()]
     return lines
 
 
 def render_card(manifest: dict[str, Any], report: dict[str, Any] | None, metrics: dict[str, Any] | None) -> str:
+    """Build the dataset card (counts, repairs, validation and metrics) as Markdown."""
     c = manifest["counts"]
     o, r = c["original"], c["repaired"]
     acc = manifest["accounting"]

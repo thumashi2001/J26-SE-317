@@ -47,19 +47,23 @@ HYBRIDS = ("M3_hybrid_guarded", "M3b_hybrid_unguarded")
 
 
 def fixtures_hash() -> str:
+    """SHA-256 of the fixture file, checked so selection and evaluation use the same data."""
     return hashlib.sha256(FIXTURES.read_bytes()).hexdigest()
 
 
 def load_items(splits: tuple[str, ...]) -> list[dict]:
+    """Fixture items for the requested splits (the test split is never loaded during selection)."""
     doc = json.loads(FIXTURES.read_text(encoding="utf8"))
     return [i for i in doc["items"] if i["split"] in splits]
 
 
 def mark_from_count(n_demonstrated: int, n_concepts: int) -> int:
+    """Toy mark rule for the experiment: 0 / 2 / 4 by how many concepts are demonstrated."""
     return 0 if n_demonstrated == 0 else (4 if n_demonstrated == n_concepts else 2)
 
 
 def build_rows(items: list[dict], emb: LocalSentenceTransformerEmbedding) -> list[dict]:
+    """One row per (answer, concept) with lexical and embedding scores."""
     rows = []
     for item in items:
         for ans in item["answers"]:
@@ -84,6 +88,7 @@ def build_rows(items: list[dict], emb: LocalSentenceTransformerEmbedding) -> lis
 
 
 def score_of(method: str, row: dict, params: dict) -> float:
+    """The score a method assigns to a row."""
     if method == "M0_lexical_current":
         return row["lex"]
     if method == "M1_embedding_name":
@@ -99,6 +104,7 @@ def score_of(method: str, row: dict, params: dict) -> float:
 
 
 def f1_of(pred: np.ndarray, y: np.ndarray) -> float:
+    """F1 of binary predictions against labels."""
     tp = int(((pred == 1) & (y == 1)).sum())
     fp = int(((pred == 1) & (y == 0)).sum())
     fn = int(((pred == 0) & (y == 1)).sum())
@@ -118,6 +124,7 @@ def select_threshold(scores: np.ndarray, y: np.ndarray) -> float:
 
 
 def fit_method(method: str, rows: list[dict]) -> dict:
+    """Choose a method's threshold (and blend weight) on validation only."""
     y = np.array([r["label"] for r in rows])
     if method == "M0_lexical_current":
         return {"threshold": 1.0, "note": "existing rule: concept 'demonstrated' only when overlap == 1.0 (not tuned)"}
@@ -144,11 +151,13 @@ def fit_method(method: str, rows: list[dict]) -> dict:
 
 
 def predict(method: str, rows: list[dict], params: dict) -> np.ndarray:
+    """Binary decisions: score at or above the fitted threshold."""
     s = np.array([score_of(method, r, params) for r in rows])
     return (s >= params["threshold"]).astype(int)
 
 
 def answer_marks(rows: list[dict], pred: np.ndarray) -> dict[str, tuple[int, int]]:
+    """True and predicted toy marks per answer, derived from concept decisions."""
     by: dict[str, dict] = {}
     for r, p in zip(rows, pred, strict=True):
         a = by.setdefault(r["answer_id"], {"n": r["n_concepts"], "pred": 0, "true": 0, "type": r["type"]})
@@ -158,6 +167,7 @@ def answer_marks(rows: list[dict], pred: np.ndarray) -> dict[str, tuple[int, int
 
 
 def metrics(method: str, rows: list[dict], params: dict, boot: bool = True) -> dict:
+    """Precision, recall, F1 and optional bootstrap interval for a method."""
     y = np.array([r["label"] for r in rows])
     pred = predict(method, rows, params)
     scores = np.array([score_of(method, r, params) for r in rows])
@@ -199,6 +209,7 @@ def metrics(method: str, rows: list[dict], params: dict, boot: bool = True) -> d
 
 
 def calibration(method: str, params: dict, val_rows: list[dict], test_rows: list[dict]) -> dict:
+    """Platt scaling fitted on validation, then checked on test."""
     sv = np.array([[score_of(method, r, params)] for r in val_rows]); yv = np.array([r["label"] for r in val_rows])
     st = np.array([[score_of(method, r, params)] for r in test_rows]); yt = np.array([r["label"] for r in test_rows])
     lr = LogisticRegression().fit(sv, yv)  # Platt scaling fitted on validation only
@@ -236,6 +247,7 @@ def dataset_secondary(emb, frozen: dict) -> dict:
 
 
 def cmd_select() -> None:
+    """Select thresholds on validation and freeze them in a file."""
     emb = LocalSentenceTransformerEmbedding()
     items = load_items(("dev", "validation"))  # the held-out test split is never loaded here
     rows = build_rows(items, emb)
@@ -254,6 +266,7 @@ def cmd_select() -> None:
 
 
 def cmd_evaluate() -> None:
+    """Score the test split once with the frozen configuration; refuses if the fixtures changed."""
     frozen = json.loads(FROZEN.read_text(encoding="utf8"))
     if frozen["fixtures_sha256"] != fixtures_hash():
         raise SystemExit("fixtures changed after the configuration was frozen: re-run `select`")

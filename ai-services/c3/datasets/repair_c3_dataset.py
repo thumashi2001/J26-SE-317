@@ -27,6 +27,7 @@ from datasets.repair.repair import diff_table, run_repair  # noqa: E402
 
 
 def main(argv: list[str] | None = None) -> int:
+    """Repair the original dataset deterministically, or only verify the archive checksums."""
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--verify-original", action="store_true", help="only verify the archive SHA256SUMS and exit")
     ap.add_argument("--sample", action="store_true", help="repair 6 sample questions into a timestamped SAMPLE dir")

@@ -45,10 +45,12 @@ class OutputExistsError(RuntimeError):
 
 
 def sha256_bytes(data: bytes) -> str:
+    """SHA-256 of bytes as hex."""
     return hashlib.sha256(data).hexdigest()
 
 
 def sha256_file(path: Path) -> str:
+    """SHA-256 of a file's contents."""
     digest = hashlib.sha256()
     with Path(path).open("rb") as fh:
         for chunk in iter(lambda: fh.read(1 << 20), b""):
@@ -85,15 +87,18 @@ def read_csv(path: Path) -> pd.DataFrame:
 
 
 def write_csv(df: pd.DataFrame, path: Path) -> None:
+    """Write a table as UTF-8 CSV with Unix line endings."""
     df.to_csv(path, index=False, encoding="utf-8", lineterminator="\n")
 
 
 def write_json(obj: Any, path: Path) -> None:
+    """Write sorted, indented JSON with Unix line endings."""
     with Path(path).open("w", encoding="utf-8", newline="\n") as fh:
         fh.write(json.dumps(obj, indent=2, ensure_ascii=False, sort_keys=True) + "\n")
 
 
 def fmt_float(value: float) -> str:
+    """Float as text, the same way every time."""
     return f"{float(value)}"
 
 
@@ -117,6 +122,7 @@ def parse_json_list(value: str) -> list[Any] | None:
 
 
 def dump_json_list(items: list[Any]) -> str:
+    """A list as JSON text for a CSV cell."""
     return json.dumps(items, ensure_ascii=False)
 
 
@@ -131,10 +137,12 @@ def drop_null_elements(value: str) -> tuple[str, int]:
 
 
 def normalise_text(text: str) -> str:
+    """Collapse whitespace and ignore case, for comparing texts."""
     return " ".join(text.split()).casefold()
 
 
 def load_original(archive_dir: Path = ARCHIVE_DIR) -> dict[str, pd.DataFrame]:
+    """Load the untouched original release files from the archive."""
     return {key: read_csv(Path(archive_dir) / name) for key, name in ORIGINAL_FILES.items()}
 
 

@@ -21,21 +21,25 @@ from datasets.gold.returns import marks_from_return
 
 
 def _same_length(a: list, b: list) -> None:
+    """Raise if the two rating lists differ in length."""
     if len(a) != len(b):
         raise GoldToolError(f"the two ratings have different lengths ({len(a)} and {len(b)})")
 
 
 def _ranks_in_range(values, k: int) -> None:
+    """Raise unless every rank is an integer from 0 to k-1."""
     if any(not isinstance(v, int) or isinstance(v, bool) or not 0 <= v < k for v in values if v is not None):
         raise GoldToolError(f"every rank must be an integer from 0 to {k - 1}")
 
 
 def exact_agreement(a: list, b: list) -> float | None:
+    """Share of items where both markers gave the same value."""
     _same_length(a, b)
     return sum(x == y for x, y in zip(a, b, strict=True)) / len(a) if a else None
 
 
 def mean_abs_difference(a: list[float], b: list[float]) -> float | None:
+    """Average absolute difference between the two markers' values."""
     _same_length(a, b)
     return sum(abs(x - y) for x, y in zip(a, b, strict=True)) / len(a) if a else None
 
@@ -74,6 +78,7 @@ def krippendorff_alpha_ordinal(units: list[list[int | None]], k: int) -> float |
         return None
 
     def delta2(c: int, d: int) -> float:
+        """Squared distance term used by Krippendorff's alpha for two ranks."""
         lo, hi = min(c, d), max(c, d)
         return (sum(n_c[lo:hi + 1]) - (n_c[c] + n_c[d]) / 2.0) ** 2
 
@@ -153,6 +158,7 @@ def _pairs(sheet_a: dict, ret_a: dict, sheet_b: dict, ret_b: dict, sealed: dict[
 
 def agreement_report(sheet_a: dict, ret_a: dict, sheet_b: dict, ret_b: dict, n_boot: int = 1000, seed: object = "agreement",
                      sealed: dict[str, str] | None = None) -> dict:
+    """Agreement statistics between two markers (exact, weighted, difference, bootstrap intervals)."""
     both, excluded = _pairs(sheet_a, ret_a, sheet_b, ret_b, sealed)
     origin = sheet_a["origin"]
     criteria = [{"question": q, "item": i, "crit": c, "k": a["criteria"][c]["levels"], "a": a["criteria"][c]["rank"],
@@ -191,6 +197,7 @@ def agreement_report(sheet_a: dict, ret_a: dict, sheet_b: dict, ret_b: dict, n_b
 
 
 def main(argv: list[str] | None = None) -> int:
+    """Command-line entry point."""
     ap = argparse.ArgumentParser(description="Agreement report for two markers")
     for name in ("sheet_a", "return_a", "sheet_b", "return_b"):
         ap.add_argument(name, type=Path)

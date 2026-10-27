@@ -36,6 +36,7 @@ def rubric_sha256(doc: dict) -> str:
 
 
 def _date(value: object) -> datetime.date | None:
+    """Parse an ISO date, or None when it is not valid."""
     try:
         return datetime.date.fromisoformat(str(value))
     except ValueError:

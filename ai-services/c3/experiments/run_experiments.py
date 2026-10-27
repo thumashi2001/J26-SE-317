@@ -38,10 +38,12 @@ ALL_CONDITIONS = ["baseline", "E", "A", "B", "C", "D", "F"]
 
 
 def _ctx(run_id, condition, provider, model, release, split, prompt_hash, extra=None) -> fw.RunContext:
+    """Build the RunContext that identifies one run."""
     return fw.RunContext(run_id, condition, provider, model, release.version, split, prompt_hash, extra or {})
 
 
 def _prompt_hash(condition: str) -> str:
+    """Fingerprint of the prompt template used by a condition."""
     import inspect
 
     sources = {"A": fw.prompt_condition_a, "B": fw.prompt_rubric, "C": fw.prompt_rubric, "D": fw.prompt_rubric,
@@ -51,6 +53,7 @@ def _prompt_hash(condition: str) -> str:
 
 
 def results_table(summaries: list[dict]) -> str:
+    """Markdown table summarising every run."""
     header = ("| Condition | Provider | Model | n scored / failed | MAE | nMAE | RMSE | r | within ±2 marks % | "
               "within 10% of max % |\n|---|---|---|---|---|---|---|---|---|---|\n")
     rows = []
@@ -75,10 +78,12 @@ def required_models(conds: list[str], providers: list[str], f_provider: str | No
     reqs: list[ModelRequirement] = []
 
     def add(role: str, provider: str, model: str, kind: str = "llm") -> None:
+        """Add a model requirement unless the same one is already listed."""
         if not any((r.provider, r.model, r.kind) == (provider, model, kind) for r in reqs):
             reqs.append(ModelRequirement(role, provider, model, kind))
 
     def llm_model(provider: str) -> str | None:
+        """Default model name of an LLM provider."""
         return {"gemini": GeminiProvider, "openai": OpenAIProvider}[provider]().model if provider in (
             "gemini", "openai") else None
 
@@ -96,6 +101,7 @@ def required_models(conds: list[str], providers: list[str], f_provider: str | No
 
 
 def run_model_preflight(reqs: list[ModelRequirement], out_dir: Path) -> bool:
+    """Check the needed models are reachable before any experiment call is made."""
     ok, summary = preflight_or_report(reqs, out_dir / "preflight.json", probe=True)
     print("Model preflight:\n" + summary)
     if not ok:
@@ -104,6 +110,7 @@ def run_model_preflight(reqs: list[ModelRequirement], out_dir: Path) -> bool:
 
 
 def main() -> int:
+    """Run the lexical baseline and the chosen conditions, then write the summary."""
     ap = argparse.ArgumentParser()
     ap.add_argument("--conditions", default=",".join(ALL_CONDITIONS))
     ap.add_argument("--providers", default="gemini,openai")
@@ -140,6 +147,7 @@ def main() -> int:
     failures: list[str] = []
 
     def record(name, ctx, preds, extra):
+        """Save one run's results and print a one-line summary."""
         s = fw.write_run(out_dir, name, ctx, preds, extra)
         summaries.append(s)
         o = s["metrics"].get("overall")

@@ -48,6 +48,7 @@ EPS = 1e-6
 
 
 def _f(value: str) -> float:
+    """Text to float (0.0 if it cannot be read)."""
     try:
         return float(value)
     except (TypeError, ValueError):
@@ -81,16 +82,19 @@ def null_cell_problems(value: str) -> list[str]:
 
 
 class Report:
+    """Collects validation checks, each marked pass, fail or warning."""
     def __init__(self) -> None:
         self.checks: list[dict[str, Any]] = []
         self.sections: dict[str, Any] = {}
 
     def add(self, name: str, hard: bool, ok: bool, summary: str, details: Any = None, kind: str | None = None) -> None:
+        """Record one check with its outcome and details."""
         status = kind or ("pass" if ok else ("fail" if hard else "warn"))
         self.checks.append({"name": name, "hard": hard, "status": status, "summary": summary,
                             "details": details if details is not None else {}})
 
     def as_dict(self, scope: str) -> dict[str, Any]:
+        """The report as a dictionary with an overall PASS or FAIL."""
         hard_failures = [c["name"] for c in self.checks if c["hard"] and c["status"] == "fail"]
         return {"scope": scope, "overall": "FAIL" if hard_failures else "PASS",
                 "hard_failures": hard_failures,
@@ -99,6 +103,7 @@ class Report:
 
 
 def _label_distribution(df: pd.DataFrame, mark_col: str = "expected_mark", max_col: str = "max_marks") -> dict[str, Any]:
+    """Mark-ratio distribution per split."""
     out: dict[str, Any] = {}
     for split in (*SPLITS, "ALL"):
         sub = df if split == "ALL" else df[df["split"] == split]
@@ -113,6 +118,7 @@ def _label_distribution(df: pd.DataFrame, mark_col: str = "expected_mark", max_c
 
 
 def _pearson(x: list[float], y: list[float]) -> float | None:
+    """Pearson correlation, or None when it is undefined."""
     if len(x) < 2 or np.std(x) == 0 or np.std(y) == 0:
         return None
     return float(np.corrcoef(x, y)[0, 1])
@@ -120,6 +126,7 @@ def _pearson(x: list[float], y: list[float]) -> float | None:
 
 def validate_dir(directory: Path, archive_dir: Path | None = ARCHIVE_DIR, spec_path: Path = TIER_SPEC_PATH
                  ) -> dict[str, Any]:  # noqa: C901 - one linear sequence of checks
+    """Run every dataset check (counts, splits, labels, rubrics, lineage) and return the report."""
     d = Path(directory)
     rep = Report()
     missing = [f for f in REQUIRED_FILES if not (d / f).exists()]
@@ -499,6 +506,7 @@ def validate_dir(directory: Path, archive_dir: Path | None = ARCHIVE_DIR, spec_p
 
 
 def main(argv: list[str] | None = None) -> int:
+    """Command-line entry point."""
     ap = argparse.ArgumentParser(description="Validate a repaired C3 dataset directory")
     ap.add_argument("directory", type=Path)
     ap.add_argument("--json", nargs="?", const="-", default=None, help="write the JSON report (path, or '-' for stdout)")

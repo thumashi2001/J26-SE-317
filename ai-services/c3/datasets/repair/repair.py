@@ -122,6 +122,7 @@ class Ledger:
         self.rows: list[dict[str, str]] = []
 
     def add(self, **kw: str) -> None:
+        """Record one repair decision in the manifest ledger."""
         row = dict.fromkeys(MANIFEST_COLS, "")
         row.update(kw)
         row["original_value"] = truncate_value(row["original_value"])
@@ -130,11 +131,13 @@ class Ledger:
 
 
 def _has_placeholder(*values: str) -> bool:
+    """True when any text contains a known placeholder phrase."""
     text = " ".join(values).casefold()
     return any(p in text for p in PLACEHOLDER_PHRASES)
 
 
 def _best_status(statuses: list[str]) -> str:
+    """The strongest status from a list, by the fixed priority order."""
     for s in STATUS_PRIORITY:
         if s in statuses:
             return s
@@ -148,6 +151,7 @@ def _rubric_key(criterion_id: str) -> tuple[str, str] | None:
 
 
 def _answer_key(criterion_id: str) -> tuple[str, str] | None:
+    """Split a criterion id like 'Q1-C2' into question and criterion parts."""
     m = re.fullmatch(r"(?P<q>.+)-(?P<c>C\d+)", criterion_id)
     return (m.group("q"), m.group("c")) if m else None
 
@@ -179,6 +183,7 @@ def select_sample(q: pd.DataFrame, groups: dict[str, str]) -> list[str]:
 
 
 def _zero_criterion_marks(original: str) -> str:
+    """Criterion marks list with every mark set to zero (used for IRRELEVANT answers)."""
     parsed = parse_json_list(original)
     if parsed is not None:
         zeroed = [{**e, "mark": 0.0} if isinstance(e, dict) else 0.0 for e in parsed]
@@ -198,6 +203,7 @@ def _repair_lists(rec: dict[str, str], columns: tuple[str, ...]) -> dict[str, tu
 
 
 def _list_clean(value: str) -> bool:
+    """True when a JSON list has no null-like entries."""
     return not any(str(e).strip().lower() in NULL_TOKENS for e in parse_json_list(value) or [])
 
 
@@ -294,6 +300,7 @@ def run_repair(
     by_question: dict[str, list[dict[str, str]]] = defaultdict(list)
 
     def add_answer_row(orig: dict[str, str], **kw: str) -> None:
+        """Record a repair decision for an answer row."""
         ledger.add(record_id=orig["answer_id"], record_type="answer", question_id=orig["question_id"],
                    original_file=f_ans, split=orig["split"], **kw)
 
@@ -466,6 +473,7 @@ def run_repair(
         statuses, scope = [], qid in SCOPE_REVIEW_QUESTIONS
 
         def add_q(orig: dict[str, str] = orig, qid: str = qid, **kw: str) -> None:
+            """Record a repair decision for a question row."""
             ledger.add(record_id=qid, record_type="question", question_id=qid, original_file=f_q,
                        split=orig["split"], **kw)
 
@@ -513,6 +521,7 @@ def run_repair(
         statuses = []
 
         def add_r(r: dict[str, str] = r, **kw: str) -> None:
+            """Record a repair decision for a rubric row."""
             ledger.add(record_id=r["criterion_id"], record_type="rubric_row", question_id=r["question_id"],
                        original_file=f_r, split=split_of.get(r["question_id"], ""), **kw)
 
@@ -573,6 +582,7 @@ def run_repair(
     ru_cols = original_columns["rubric"] + RUBRIC_NEW_COLS
 
     def frame(rows: list[dict[str, str]], cols: list[str]) -> pd.DataFrame:
+        """Build a table from rows, keeping the columns even when empty."""
         return pd.DataFrame(rows, columns=cols) if rows else pd.DataFrame(columns=cols)
 
     eligible_df = frame(eligible, ans_cols)
@@ -702,6 +712,7 @@ def diff_table(diff: list[dict[str, Any]]) -> str:
     """Per-record before/after table (markdown) for the sample run."""
 
     def short(s: str) -> str:
+        """Shorten long text for display."""
         return s if len(s) <= 36 else s[:33] + "..."
 
     lines = ["| answer_id | group | tier | split | disposition | status | mark before -> after | "

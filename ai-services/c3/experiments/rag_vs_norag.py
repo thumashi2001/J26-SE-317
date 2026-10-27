@@ -43,6 +43,7 @@ DATASET = HERE / "datasets" / "c3_phase3_v5_repaired_v2"
 
 # Writes an explicit BLOCKED artefact instead of any marks when the live run cannot happen (never fabricates results).
 def blocked(out: Path, reason: str, provider: str) -> int:
+    """Write a BLOCKED result (no marks generated) explaining why the live comparison could not run."""
     art = {"status": "BLOCKED", "reason": reason, "provider_requested": provider,
            "test_answers": int((pd.read_csv(DATASET / "02_controlled_answers_eligible.csv", dtype=str)["split"] == "test").sum()),
            "calls_required": "2 x test answers (conditions A and B)", "results": None,
@@ -53,6 +54,7 @@ def blocked(out: Path, reason: str, provider: str) -> int:
 
 
 def main(argv=None) -> int:
+    """Compare marking with and without retrieved context; refuses to call a live LLM without --run-live."""
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", type=Path, required=True)
     ap.add_argument("--provider", default=os.getenv("C3_LLM_PROVIDER", "gemini"))

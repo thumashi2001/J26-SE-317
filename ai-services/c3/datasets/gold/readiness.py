@@ -36,10 +36,12 @@ HUMAN_ACTIONS = [
 
 
 def _load_json(path: Path):
+    """Read a JSON file."""
     return json.loads(Path(path).read_text(encoding="utf-8"))
 
 
 def _question_record(question: dict, rubrics_dir: Path | None, approvals: dict | None) -> dict:
+    """Readiness facts for one question (rubric state, provenance, problems)."""
     rec = {"question_id": question["question_id"], "split": question["split"], "module_code": question["module_code"],
            "marks": question["marks"], "rubric_state": "missing", "provenance_status": None, "problems": 0,
            "first_problems": [], "approval_state": None, "ready_for_gold": False}
@@ -66,6 +68,7 @@ def _question_record(question: dict, rubrics_dir: Path | None, approvals: dict |
 
 
 def _dataset_block(d: Path) -> dict:
+    """Dataset facts for the audit: manifest, validation result and label statistics."""
     manifest = _load_json(d / "manifest.json")
     report = _load_json(d / "validation_report.json")
     ratio = next((c for c in report["checks"] if c["name"] == "ratio_concentration"), None)
@@ -82,6 +85,7 @@ def _dataset_block(d: Path) -> dict:
 
 
 def audit(dataset_dir: Path, rubrics_dir: Path | None = None, approvals_path: Path | None = None, simulated: bool = False) -> dict:
+    """Read-only audit of whether the dataset is ready for human validation."""
     d = Path(dataset_dir)
     pool = eligible_questions(d)
     held_out = sorted((q for q in pool if q["split"] in FINAL_SPLITS), key=lambda q: q["question_id"])
@@ -159,6 +163,7 @@ def audit(dataset_dir: Path, rubrics_dir: Path | None = None, approvals_path: Pa
 
 
 def render_markdown(a: dict) -> str:
+    """Turn the audit result into a readable report."""
     ds, q, ru, rd, hv = a["dataset"], a["questions"], a["rubrics"], a["readiness"], a["human_validation"]
     ratio = ds["ratio_concentration"]
     lines = ["# Human-validation readiness", ""]
@@ -205,6 +210,7 @@ def render_markdown(a: dict) -> str:
 
 
 def _write_new(path: Path, text: str, dataset_dir: Path) -> None:
+    """Write a file, refusing to overwrite an existing one or to write inside the dataset folder."""
     path = Path(path).resolve()
     if path.exists():
         raise GoldToolError(f"{path.name} already exists; nothing is overwritten")
@@ -214,6 +220,7 @@ def _write_new(path: Path, text: str, dataset_dir: Path) -> None:
 
 
 def main(argv: list[str] | None = None) -> int:
+    """Command-line entry point."""
     ap = argparse.ArgumentParser(description="Human-validation readiness audit (read-only)")
     ap.add_argument("dataset", type=Path)
     ap.add_argument("--rubrics-dir", type=Path, default=None)

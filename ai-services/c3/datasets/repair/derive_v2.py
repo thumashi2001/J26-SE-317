@@ -21,12 +21,14 @@ QUARANTINE_QUESTIONS = {
 
 
 def read(p):
+    """Read a CSV file into a list of rows plus its column names."""
     with open(p, encoding="utf-8", newline="") as f:
         r = csv.DictReader(f)
         return r.fieldnames, list(r)
 
 
 def write(p, fields, rows):
+    """Write rows to a CSV with Unix line endings."""
     with open(p, "w", encoding="utf-8", newline="") as f:
         w = csv.DictWriter(f, fieldnames=fields, lineterminator="\n")
         w.writeheader()
@@ -34,10 +36,12 @@ def write(p, fields, rows):
 
 
 def sha(p):
+    """SHA-256 of a file's contents."""
     return hashlib.sha256(Path(p).read_bytes()).hexdigest()
 
 
 def main(argv=None):
+    """Command-line entry point."""
     ap = argparse.ArgumentParser()
     ap.add_argument("--src", type=Path, default=HERE / "c3_phase3_v5_repaired")
     ap.add_argument("--dst", type=Path, default=HERE / "c3_phase3_v5_repaired_v2")

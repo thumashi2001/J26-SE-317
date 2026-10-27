@@ -26,6 +26,7 @@ BOOTSTRAP_SAMPLES = 2000
 
 
 def git_commit() -> str:
+    """Current git commit hash (recorded for provenance), or 'unknown' outside a repository."""
     try:
         out = subprocess.run(
             ["git", "rev-parse", "HEAD"], capture_output=True, text=True, check=True, cwd=Path(__file__).parent
@@ -36,6 +37,7 @@ def git_commit() -> str:
 
 
 def sha256_text(text: str) -> str:
+    """SHA-256 of a text, used to fingerprint prompts."""
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
 
 
@@ -50,6 +52,7 @@ def pearson(a: np.ndarray, b: np.ndarray) -> float | None:
 
 
 def _bootstrap_ci(values: np.ndarray, seed: int = 20261021) -> list[float] | None:
+    """95% bootstrap confidence interval of the mean (None when there are fewer than 5 values)."""
     if len(values) < 5:
         return None
     rng = np.random.default_rng(seed)
@@ -59,6 +62,7 @@ def _bootstrap_ci(values: np.ndarray, seed: int = 20261021) -> list[float] | Non
 
 
 def _block(df: pd.DataFrame) -> dict[str, Any]:
+    """Error metrics for a set of rows: MAE, normalised MAE, RMSE, correlation and within-tolerance rates."""
     err = (df["predicted_mark"] - df["expected_mark"]).abs().to_numpy(dtype=float)
     norm_err = err / df["max_marks"].to_numpy(dtype=float)
     exp = df["expected_mark"].to_numpy(dtype=float)
@@ -98,6 +102,7 @@ def compute_metrics(preds: pd.DataFrame) -> dict[str, Any]:
 
 @dataclass
 class RunContext:
+    """Everything that identifies one run: condition, provider, model, dataset version, split and prompt hash."""
     run_id: str
     condition: str
     provider: str
@@ -108,6 +113,7 @@ class RunContext:
     extra: dict[str, Any] = field(default_factory=dict)
 
     def as_dict(self) -> dict[str, Any]:
+        """The context as a plain dictionary for the results file."""
         return {
             "run_id": self.run_id,
             "condition": self.condition,
@@ -144,6 +150,7 @@ SYSTEM_PROMPT = (
 
 
 def rubric_text(rubric: dict[str, Any]) -> str:
+    """Render a rubric (criteria and levels) as text for a prompt."""
     lines = []
     for crit in rubric["criteria"]:
         lines.append(f"Criterion {crit['criterion_id']} - {crit['description']} (max {crit['max_marks']:g} marks)")
@@ -157,6 +164,7 @@ def rubric_text(rubric: dict[str, Any]) -> str:
 
 
 def prompt_condition_a(question: dict[str, Any], answer: str) -> str:
+    """Condition A prompt: question and answer only, no rubric."""
     return (
         f"Question:\n{question['question_text']}\n\nMaximum marks: {question['max_marks']:g}\n\n"
         f'Student answer:\n"""{answer}"""\n\n'
@@ -165,6 +173,7 @@ def prompt_condition_a(question: dict[str, Any], answer: str) -> str:
 
 
 def prompt_rubric(question: dict[str, Any], rubric: dict[str, Any], answer: str, context: str = "") -> str:
+    """Rubric prompt (conditions B-D, F): the model must choose one level per criterion; optional extra context."""
     extra = f"\n\n{context}\n" if context else "\n"
     ids = ", ".join(c["criterion_id"] for c in rubric["criteria"])
     return (
@@ -178,6 +187,7 @@ def prompt_rubric(question: dict[str, Any], rubric: dict[str, Any], answer: str,
 
 
 def context_block_rag(hits: list[dict[str, Any]]) -> str:
+    """Format retrieved passages for the prompt, noting they come from other questions."""
     if not hits:
         return "Retrieved reference material: none above the relevance threshold."
     parts = [f"[{i}] ({h['citation']}) {h['content']}" for i, h in enumerate(hits, 1)]
@@ -185,6 +195,7 @@ def context_block_rag(hits: list[dict[str, Any]]) -> str:
 
 
 def context_block_graph(graph_ctx: dict[str, Any]) -> str:
+    """Format curriculum knowledge-graph context for the prompt."""
     text = graph_ctx.get("graphrag_context_text", "").strip()
     return "Curriculum knowledge-graph context:\n" + (text or "no concepts resolved in the graph")
 
@@ -193,10 +204,12 @@ def context_block_graph(graph_ctx: dict[str, Any]) -> str:
 
 
 class ParseError(ValueError):
+    """Raised when a model reply cannot be turned into a valid mark."""
     pass
 
 
 def parse_total_mark(parsed: dict[str, Any] | None, max_marks: float) -> float:
+    """Read and range-check the total mark from a model reply; raises ParseError otherwise."""
     if not parsed or "total_awarded_mark" not in parsed:
         raise ParseError("missing total_awarded_mark")
     try:

@@ -33,6 +33,7 @@ PARTS = {"E": ("REF", "R2_condition_E_binary_rubric"), "A1": ("A", "A1_tfidf_rid
 
 
 def main(argv=None) -> int:
+    """Fit the blend weights on validation only, then report validation and test metrics once."""
     ap = argparse.ArgumentParser()
     ap.add_argument("--results", type=Path, required=True)
     a = ap.parse_args(argv)

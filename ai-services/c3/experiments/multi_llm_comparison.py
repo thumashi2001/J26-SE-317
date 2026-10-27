@@ -62,6 +62,7 @@ def select_answers(answers: pd.DataFrame, split: str, limit: int | None) -> pd.D
 
 
 def _is_quota_error(detail: str | None) -> bool:
+    """True when an error message looks like a rate-limit or daily-quota problem."""
     text = (detail or "").lower()
     return any(m in text for m in QUOTA_MARKERS)
 
@@ -151,6 +152,7 @@ def build_store(embedding: str) -> tuple[CurriculumVectorStore, dict[str, Any]]:
 
 
 def main(argv=None) -> int:
+    """Compare several free LLM providers with and without retrieval; needs --run-live and credentials."""
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", type=Path, required=True)
     ap.add_argument("--providers", default="groq,openrouter,gemini", help="comma list; use 2-3 free-tier providers")

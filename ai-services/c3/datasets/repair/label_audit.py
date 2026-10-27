@@ -31,15 +31,18 @@ CAVEATS = [
 
 
 def _read(path: Path) -> list[dict[str, str]]:
+    """Read a CSV file as a list of dictionaries (one per row, all values text)."""
     with open(path, encoding="utf-8", newline="") as f:
         return list(csv.DictReader(f))
 
 
 def _r(x: float | None, nd: int = 4) -> float | None:
+    """Round a number, keeping None."""
     return None if x is None else round(x, nd)
 
 
 def _corr(xs: list[float], ys: list[float]) -> float | None:
+    """Correlation of two lists, or None when there are too few values."""
     try:
         return statistics.correlation(xs, ys) if len(xs) >= 3 else None
     except statistics.StatisticsError:  # constant input
@@ -47,15 +50,18 @@ def _corr(xs: list[float], ys: list[float]) -> float | None:
 
 
 def _ratio(row: dict[str, str]) -> float:
+    """A row's expected mark divided by its maximum marks."""
     return float(row["expected_mark"]) / float(row["max_marks"])
 
 
 def _count(cell: str) -> int | None:
+    """Length of a JSON list cell, or None if it cannot be parsed."""
     lst = parse_json_list(cell or "")
     return None if lst is None else len(lst)
 
 
 def _tier_marks(answers: list[dict[str, str]]) -> dict:
+    """Per-tier mark-ratio spread and per-question checks of the tier ordering."""
     by_q: dict[str, dict[str, float]] = defaultdict(dict)
     per_tier: dict[str, list[float]] = defaultdict(list)
     for r in answers:
@@ -64,6 +70,7 @@ def _tier_marks(answers: list[dict[str, str]]) -> dict:
     complete = {q: t for q, t in by_q.items() if all(label in t for label in LABELS)}
 
     def same(a: float, b: float) -> bool:
+        """True when two numbers are equal within a tiny tolerance."""
         return abs(a - b) < EPS
 
     return {
@@ -85,6 +92,7 @@ def _tier_marks(answers: list[dict[str, str]]) -> dict:
 
 
 def _concepts(answers: list[dict[str, str]], bank_expected: dict[str, int | None]) -> dict:
+    """Consistency of the demonstrated, missing and incorrect concept lists."""
     cols = ("demonstrated_concepts", "missing_concepts", "incorrect_concepts")
     unparsable = Counter()
     per_tier: dict[str, list[tuple[int, int, int]]] = defaultdict(list)
@@ -122,6 +130,7 @@ def _concepts(answers: list[dict[str, str]], bank_expected: dict[str, int | None
 
 
 def _rubric(directory: Path, eligible: set[str]) -> dict:
+    """Rubric-table checks for the eligible questions."""
     rows = [r for r in _read(directory / "03_rubric_criteria.csv") if r["question_id"] in eligible]
     columns = list(_read(directory / "03_rubric_criteria.csv")[0])
     per_q = Counter(r["question_id"] for r in rows)
@@ -139,6 +148,7 @@ def _rubric(directory: Path, eligible: set[str]) -> dict:
 
 
 def _criterion_ids(directory: Path, answers: list[dict[str, str]], eligible: set[str]) -> dict:
+    """Whether per-answer criterion marks refer to real rubric criteria and sum correctly."""
     rubric_ids = {r["criterion_id"] for r in _read(directory / "03_rubric_criteria.csv") if r["question_id"] in eligible}
     parsed = per_answer = exact = referenced = sums_match = 0
     sizes: Counter = Counter()
@@ -173,6 +183,7 @@ def _criterion_ids(directory: Path, answers: list[dict[str, str]], eligible: set
 
 
 def _length(answers: list[dict[str, str]]) -> dict:
+    """Correlation between answer length and mark ratio (a shortcut risk)."""
     words = [len(r["student_answer"].split()) for r in answers]
     ratios = [_ratio(r) for r in answers]
     tiers = [r["answer_quality"] for r in answers]
@@ -181,6 +192,7 @@ def _length(answers: list[dict[str, str]]) -> dict:
         per_tier[t].append(w)
 
     def subset(keep) -> dict:
+        """Length/mark correlation for the answers whose tier passes the filter."""
         idx = [i for i, t in enumerate(tiers) if keep(t)]
         return {"n": len(idx), "pearson_r": _r(_corr([words[i] for i in idx], [ratios[i] for i in idx]))}
 
@@ -195,6 +207,7 @@ def _length(answers: list[dict[str, str]]) -> dict:
 
 
 def _ratio_concentration(answers: list[dict[str, str]], spec_path: Path) -> dict:
+    """Share of answers on the most common mark ratios against the allowed threshold."""
     threshold = float(json.loads(Path(spec_path).read_text(encoding="utf-8"))["thresholds"]["max_share_on_top7_ratios"])
     ratios = [_ratio(r) for r in answers]
     inner = [(round(x, 3), r["answer_quality"]) for x, r in zip(ratios, answers, strict=True) if 0.0 < x < 1.0]
@@ -220,6 +233,7 @@ def _ratio_concentration(answers: list[dict[str, str]], spec_path: Path) -> dict
 
 
 def audit(directory: Path, spec_path: Path = TIER_SPEC_PATH) -> dict:
+    """Read-only audit of how marks relate to tiers, concepts, rubrics and length."""
     d = Path(directory)
     answers = _read(d / "02_controlled_answers_eligible.csv")
     eligible = {r["question_id"] for r in answers}
@@ -241,6 +255,7 @@ def audit(directory: Path, spec_path: Path = TIER_SPEC_PATH) -> dict:
 
 
 def main(argv: list[str] | None = None) -> int:
+    """Command-line entry point."""
     ap = argparse.ArgumentParser(description="Read-only audit of how marks relate to tiers, concepts, rubrics and length")
     ap.add_argument("directory", type=Path)
     ap.add_argument("--json", nargs="?", const="-", default="-", help="'-' (the default) prints the JSON report to stdout")

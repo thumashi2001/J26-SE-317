@@ -32,6 +32,7 @@ PLACEHOLDER = re.compile(r"\btodo\b|\btbd\b|fill in|placeholder|lorem ipsum|<[^>
 
 
 def _date(value: object) -> datetime.date | None:
+    """Parse an ISO date, or None when it is not valid."""
     try:
         return datetime.date.fromisoformat(str(value))
     except ValueError:
@@ -39,6 +40,7 @@ def _date(value: object) -> datetime.date | None:
 
 
 def _provenance_problems(doc: dict) -> list[str]:
+    """Problems with who wrote and approved the rubric and when."""
     prov = doc.get("provenance")
     if not isinstance(prov, dict):
         return ["provenance: missing or not an object"]
@@ -71,6 +73,7 @@ def _provenance_problems(doc: dict) -> list[str]:
 
 
 def _engine_problems(raw: object) -> tuple[Rubric | None, list[str]]:
+    """Check the rubric loads in the marking engine; return it with any problems."""
     try:
         rubric = Rubric.model_validate(raw)
     except ValidationError as exc:
@@ -83,6 +86,7 @@ def _engine_problems(raw: object) -> tuple[Rubric | None, list[str]]:
 
 
 def _gold_problems(rubric: Rubric) -> list[str]:
+    """Gold-rubric rules: a zero level and a full-marks level, distinct labels and descriptors, concepts for positive levels, no placeholder text."""
     problems = []
     texts = [("rubric_id", rubric.rubric_id), ("title", rubric.title)]
     for c in rubric.criteria:
@@ -154,6 +158,7 @@ def usable_as_gold(doc: dict, problems: list[str]) -> bool:
 
 
 def check_file(path: Path, dataset_dir: Path | None = None) -> tuple[dict | None, list[str]]:
+    """Check one gold-rubric file and list its problems."""
     try:
         doc = json.loads(Path(path).read_text(encoding="utf-8"))
     except (OSError, ValueError) as exc:
@@ -167,6 +172,7 @@ def check_file(path: Path, dataset_dir: Path | None = None) -> tuple[dict | None
 
 
 def main(argv: list[str] | None = None) -> int:
+    """Command-line entry point."""
     ap = argparse.ArgumentParser(description="Check a gold-rubric document")
     ap.add_argument("file", type=Path)
     ap.add_argument("--dataset", type=Path, default=None, help="dataset directory; also checks the question exists and its marks")

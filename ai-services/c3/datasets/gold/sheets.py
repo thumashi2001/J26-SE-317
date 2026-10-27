@@ -51,10 +51,12 @@ INSTRUCTIONS = [
 
 
 def _opaque(salt: str, kind: str, value: str, n: int) -> str:
+    """Short salted hash used to hide real ids on blind sheets."""
     return sha256_hex(f"{salt}|{kind}|{value}".encode())[:n]
 
 
 def _read(path: Path) -> list[dict[str, str]]:
+    """Read a CSV file as a list of dictionaries (one per row, all values text)."""
     with open(path, encoding="utf-8", newline="") as f:
         return list(csv.DictReader(f))
 
@@ -76,6 +78,7 @@ def _blind_rubric(doc: dict) -> tuple[dict, dict]:
 
 
 def _texts(obj: object):
+    """Yield every string inside a nested structure (to scan for leaked wording)."""
     if isinstance(obj, str):
         yield obj
     elif isinstance(obj, dict):
@@ -187,10 +190,12 @@ def build_sheets(dataset_dir: Path, plan_doc: dict, group: str, rubrics: dict[st
 
 
 def _inside_git_worktree(path: Path) -> bool:
+    """True when a path is inside a git repository."""
     return any((p / ".git").exists() for p in [path.resolve(), *path.resolve().parents])
 
 
 def write_outputs(result: dict, sheets_dir: Path, custody_dir: Path, allow_inside_git: bool = False) -> dict:
+    """Write blind sheets and the separate key to different folders, guarding against leaks."""
     sheets_dir, custody_dir = Path(sheets_dir).resolve(), Path(custody_dir).resolve()
     if sheets_dir == custody_dir or sheets_dir in custody_dir.parents or custody_dir in sheets_dir.parents:
         raise GoldToolError("the sheets directory and the custody directory must be separate and not nested")
@@ -224,6 +229,7 @@ def verify_seal(seal: dict, sheets_dir: Path, custody_dir: Path) -> list[str]:
 
 
 def main(argv: list[str] | None = None) -> int:
+    """Command-line entry point."""
     ap = argparse.ArgumentParser(description="Generate blind marking sheets and a separate key (guarded)")
     ap.add_argument("dataset", type=Path)
     ap.add_argument("--plan", type=Path, required=True)

@@ -29,6 +29,7 @@ RULE = ("Questions are grouped by module; within a module they are ordered by sh
 
 
 def _read(path: Path) -> list[dict[str, str]]:
+    """Read a CSV file as a list of dictionaries (one per row, all values text)."""
     with open(path, encoding="utf-8", newline="") as f:
         return list(csv.DictReader(f))
 
@@ -43,6 +44,7 @@ def eligible_questions(dataset_dir: Path) -> list[dict]:
 
 
 def select(pool: list[dict], size: int, seed: object) -> list[dict]:
+    """Deterministic selection of `size` questions from the pool using a seed."""
     if size < 0 or size > len(pool):
         raise GoldToolError(f"cannot select {size} questions from a pool of {len(pool)}; the dataset is not changed to fit a sample")
     by_module: dict[str, list[dict]] = defaultdict(list)
@@ -59,12 +61,14 @@ def select(pool: list[dict], size: int, seed: object) -> list[dict]:
 
 
 def _answer_counts(dataset_dir: Path, question_ids: set[str]) -> dict:
+    """Answer and control counts for the selected questions."""
     rows = [r for r in _read(Path(dataset_dir) / "02_controlled_answers_eligible.csv") if r["question_id"] in question_ids]
     controls = sum(1 for r in rows if r["template_negative_control"] == "True")
     return {"answers": len(rows), "template_controls_excluded_from_marking": controls, "answers_to_mark": len(rows) - controls}
 
 
 def plan(dataset_dir: Path, *, seed: object, pilot_seed: object, final_size: int | None = None, pilot_size: int = 4) -> dict:
+    """Plan the final and pilot question samples for human marking."""
     d = Path(dataset_dir)
     pool = eligible_questions(d)
     final_pool = [q for q in pool if q["split"] in FINAL_SPLITS]
@@ -122,6 +126,7 @@ def validate_plan(dataset_dir: Path, plan_doc: dict) -> None:
 
 
 def main(argv: list[str] | None = None) -> int:
+    """Command-line entry point."""
     ap = argparse.ArgumentParser(description="Select final and pilot question ids deterministically")
     ap.add_argument("dataset", type=Path)
     ap.add_argument("--seed", required=True)

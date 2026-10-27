@@ -12,18 +12,21 @@ from datasets.gold.returns import _levels
 
 
 def disagreements(sheet_a: dict, ret_a: dict, sheet_b: dict, ret_b: dict, sealed: dict[str, str] | None = None) -> list[dict]:
+    """Criteria where the two markers chose different levels."""
     both, _ = _pairs(sheet_a, ret_a, sheet_b, ret_b, sealed)
     return [{"item_id": i, "criterion": c, "level_a": a["criteria"][c]["level"], "level_b": b["criteria"][c]["level"]}
             for i, _, a, b in both for c in a["criteria"] if a["criteria"][c]["level"] != b["criteria"][c]["level"]]
 
 
 def adjudication_template(found: list[dict], adjudicator: str) -> dict:
+    """Blank form for an adjudicator to settle each disagreement."""
     return {"adjudicator": adjudicator, "decisions": [{"item_id": d["item_id"], "criterion": d["criterion"], "level": None, "reason": ""}
                                                      for d in found]}
 
 
 def apply_adjudication(sheet_a: dict, ret_a: dict, sheet_b: dict, ret_b: dict, adjudication: dict,
                        sealed: dict[str, str] | None = None) -> dict:
+    """Combine both markers' returns with the adjudicator's decisions into final gold levels."""
     both, cannot = _pairs(sheet_a, ret_a, sheet_b, ret_b, sealed)
     found = {(d["item_id"], d["criterion"]) for d in disagreements(sheet_a, ret_a, sheet_b, ret_b, sealed)}
     adjudicator = str(adjudication.get("adjudicator", "")).strip()

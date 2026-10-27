@@ -43,6 +43,7 @@ SMOKE_MODEL = "google/bert_uncased_L-2_H-128_A-2"  # ~17 MB, only to prove the p
 
 
 def _key(model_name: str) -> str:
+    """Result key for a fine-tuned model, e.g. 'D_roberta-base'."""
     return "D_" + model_name.split("/")[-1].replace(".", "_")
 
 
@@ -55,17 +56,20 @@ def _val_only(d: dict[str, pd.DataFrame]) -> dict[str, pd.DataFrame]:
 # name -> (sentence encoder, hyper-parameter labels searched on VALIDATION, label -> unfitted sklearn model, feature note).
 # Module level so the final-test script rebuilds exactly the validation-selected model.
 def _svr(label: str):
+    """Build an SVR regressor from a label such as 'C=1'."""
     from sklearn.svm import SVR
     return SVR(C=float(label.split("=")[1]), epsilon=0.02)
 
 
 def _forest(label: str):
+    """Build a random-forest regressor from a label such as 'depth=8'."""
     from sklearn.ensemble import RandomForestRegressor
     depth = label.split("=")[1]
     return RandomForestRegressor(n_estimators=200, max_depth=None if depth == "None" else int(depth), random_state=SEED, n_jobs=-1)
 
 
 def _ridge(label: str):
+    """Build a Ridge regressor from a label such as 'alpha=1'."""
     from sklearn.linear_model import Ridge
     return Ridge(alpha=float(label.split("=")[1]), random_state=SEED)
 
@@ -128,22 +132,26 @@ def finetune_one(d: dict[str, pd.DataFrame], model_name: str, seed: int, *, epoc
     tok = AutoTokenizer.from_pretrained(model_name)
 
     class Reg(nn.Module):
+        """Regression model: transformer encoder, first-token vector, one linear layer, sigmoid (a 0..1 mark ratio)."""
         def __init__(self):
             super().__init__()
             self.enc = AutoModel.from_pretrained(model_name)
             self.head = nn.Linear(self.enc.config.hidden_size, 1)
 
         def forward(self, **kw):
+            """Encode the (reference, answer) pair and return the estimated mark ratio."""
             return torch.sigmoid(self.head(self.enc(**kw).last_hidden_state[:, 0])).squeeze(-1)
 
     model = Reg().to(device)
 
     def enc(df: pd.DataFrame, idx: list[int]):
+        """Tokenise (reference, answer) pairs for the given rows and move them to the device."""
         b = tok(df["reference_answer"].iloc[idx].tolist(), df["student_answer"].iloc[idx].tolist(), truncation=True,
                 max_length=max_len, padding=True, return_tensors="pt")
         return {k: v.to(device) for k, v in b.items()}
 
     def predict(df: pd.DataFrame) -> np.ndarray:
+        """Predict mark ratios for a dataframe in batches."""
         model.eval()
         out = []
         with torch.no_grad():
@@ -216,6 +224,7 @@ def run_finetune_family(d: dict[str, pd.DataFrame], model_name: str, seeds: list
 
 
 def main(argv=None) -> int:
+    """Phase 1: compare the extra models on the validation split only and save the best checkpoints."""
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", type=Path, required=True)
     ap.add_argument("--save-dir", type=Path, default=None, help="where to save each family's validation-best checkpoint")

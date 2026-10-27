@@ -41,6 +41,7 @@ N_BOOT = 2000
 
 
 def seed_all(seed: int = SEED) -> None:
+    """Seed Python, NumPy and torch so a run is repeatable."""
     random.seed(seed)
     np.random.seed(seed)
     try:
@@ -79,6 +80,7 @@ def load(dataset: Path = DATASET, with_reference: bool = True) -> dict[str, pd.D
 
 
 def dataset_hashes(dataset: Path = DATASET) -> dict[str, str]:
+    """SHA-256 of every dataset file, recorded so a result can be tied to exact data."""
     return {p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(dataset.glob("*.csv")) + [dataset / "manifest.json"]}
 
 
@@ -96,6 +98,7 @@ def qwk(y_true: np.ndarray, y_pred: np.ndarray, levels: int = 11) -> float:
 
 
 def score(df: pd.DataFrame, pred: np.ndarray) -> dict[str, Any]:
+    """Metrics for predictions: nMAE, marks MAE, QWK and a question-level bootstrap interval."""
     y = df["y"].to_numpy()
     p = np.clip(np.asarray(pred, float), 0, 1)
     err = np.abs(p - y)
@@ -115,6 +118,7 @@ def score(df: pd.DataFrame, pred: np.ndarray) -> dict[str, Any]:
 
 
 def versions() -> dict[str, str]:
+    """Versions of the libraries used, recorded with the results."""
     out = {"python": platform.python_version(), "numpy": np.__version__, "pandas": pd.__version__}
     for mod in ("sklearn", "torch", "transformers", "sentence_transformers"):
         try:
@@ -126,6 +130,7 @@ def versions() -> dict[str, str]:
 
 # ----------------------------------------------------------------------------------------------------------- A: TF-IDF
 def run_tfidf(d: dict[str, pd.DataFrame]) -> dict[str, Any]:
+    """TF-IDF models (Ridge and gradient boosting) on answer text plus similarity to the reference."""
     from scipy.sparse import csr_matrix, hstack
     from sklearn.ensemble import GradientBoostingRegressor
     from sklearn.feature_extraction.text import TfidfVectorizer
@@ -137,6 +142,7 @@ def run_tfidf(d: dict[str, pd.DataFrame]) -> dict[str, Any]:
     vec.fit(d["train"]["student_answer"])  # fitted on TRAIN only
 
     def feats(df: pd.DataFrame):
+        """Answer vectors plus cosine similarity to the reference (vectors are length-normalised)."""
         a = vec.transform(df["student_answer"])
         r = vec.transform(df["reference_answer"])
         cos = np.asarray(a.multiply(r).sum(1)).ravel()  # tf-idf vectors are l2-normalised -> dot = cosine
@@ -159,6 +165,7 @@ def run_tfidf(d: dict[str, pd.DataFrame]) -> dict[str, Any]:
                                  "validation": score(d["validation"], pv), "test": score(d["test"], pt), "pred_validation": pv.tolist(), "pred_test": pt.tolist()}
     # A2: gradient boosting on two overlap features only (no length features, to avoid the known length shortcut)
     def small(df, cos):
+        """Two small features: cosine similarity and the share of reference words found in the answer."""
         return np.c_[cos, [len(set(a.lower().split()) & set(r.lower().split())) / max(len(set(r.lower().split())), 1) for a, r in zip(df["student_answer"], df["reference_answer"])]]
 
     xs = {s: small(d[s], fa[s][1]) for s in d}
@@ -179,6 +186,7 @@ def run_tfidf(d: dict[str, pd.DataFrame]) -> dict[str, Any]:
 
 # ------------------------------------------------------------------------------------------------------------- B: SBERT
 def run_sbert(d: dict[str, pd.DataFrame]) -> dict[str, Any]:
+    """SBERT (MiniLM) embedding features with Ridge and isotonic calibration."""
     from sentence_transformers import SentenceTransformer
     from sklearn.isotonic import IsotonicRegression
     from sklearn.linear_model import Ridge
@@ -199,6 +207,7 @@ def run_sbert(d: dict[str, pd.DataFrame]) -> dict[str, Any]:
                                            "validation": score(d["validation"], pv), "test": score(d["test"], pt), "pred_validation": pv.tolist(), "pred_test": pt.tolist()}
     # B1: ridge on [cosine, |u-v|, u*v]
     def x(s):
+        """Feature row: cosine, absolute difference and product of the two embeddings."""
         u, v = emb[s]
         return np.c_[cos[s], np.abs(u - v), u * v]
 
@@ -219,6 +228,7 @@ def run_sbert(d: dict[str, pd.DataFrame]) -> dict[str, Any]:
 
 # ---------------------------------------------------------------------------------------------------------- C: RoBERTa
 def run_roberta(d: dict[str, pd.DataFrame], epochs: int = 6, batch: int = 8, lr: float = 2e-5, max_len: int = 256) -> dict[str, Any]:
+    """Fine-tune RoBERTa on (reference, answer) pairs; keep the best validation epoch."""
     import torch
     from torch import nn
     from transformers import AutoModel, AutoTokenizer
@@ -230,21 +240,25 @@ def run_roberta(d: dict[str, pd.DataFrame], epochs: int = 6, batch: int = 8, lr:
     tok = AutoTokenizer.from_pretrained(name)
 
     class Reg(nn.Module):
+        """Regression model: transformer encoder, first-token vector, one linear layer, sigmoid (a 0..1 mark ratio)."""
         def __init__(self):
             super().__init__()
             self.enc = AutoModel.from_pretrained(name)
             self.head = nn.Linear(self.enc.config.hidden_size, 1)
 
         def forward(self, **kw):
+            """Encode the (reference, answer) pair and return the estimated mark ratio."""
             h = self.enc(**kw).last_hidden_state[:, 0]
             return torch.sigmoid(self.head(h)).squeeze(-1)
 
     model = Reg()
 
     def enc(df, idx):
+        """Tokenise (reference, answer) pairs for the given rows."""
         return tok(df["reference_answer"].iloc[idx].tolist(), df["student_answer"].iloc[idx].tolist(), truncation=True, max_length=max_len, padding=True, return_tensors="pt")
 
     def predict(df):
+        """Predict mark ratios for a whole dataframe in small batches."""
         model.eval()
         out = []
         with torch.no_grad():
@@ -288,6 +302,7 @@ def run_roberta(d: dict[str, pd.DataFrame], epochs: int = 6, batch: int = 8, lr:
 
 # -------------------------------------------------------------------------------------- references: baseline and Condition E
 def run_reference(d: dict[str, pd.DataFrame]) -> dict[str, Any]:
+    """Reference condition: score the live rubric engine on the same rows."""
     from datasets.repair.common import read_csv
     from datasets.repair.evaluate_repaired import _rubric_index, run_rows
 
@@ -318,6 +333,7 @@ def run_reference(d: dict[str, pd.DataFrame]) -> dict[str, Any]:
 
 
 def main(argv=None) -> int:
+    """Command line entry: run the chosen model families and write the results file."""
     ap = argparse.ArgumentParser()
     ap.add_argument("--run", default="all", choices=["A", "B", "C", "REF", "all"])
     ap.add_argument("--out", type=Path, required=True)

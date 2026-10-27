@@ -92,12 +92,14 @@ def lexical_baseline(student: str, reference: str, max_marks: float) -> float:
 
 
 def _pearson(x: np.ndarray, y: np.ndarray) -> float | None:
+    """Pearson correlation, or None when it is undefined."""
     if len(x) < 2 or np.std(x) == 0 or np.std(y) == 0:
         return None
     return float(np.corrcoef(x, y)[0, 1])
 
 
 def metrics(pred: list[float], gt: list[float], mx: list[float], clusters: list[str]) -> dict[str, Any]:
+    """Error metrics (MAE, RMSE, correlation, tolerance rates) with a bootstrap interval grouped by question."""
     p, g, m = np.asarray(pred, float), np.asarray(gt, float), np.asarray(mx, float)
     n = len(p)
     if n == 0:
@@ -142,6 +144,7 @@ def evaluate_rows(rows: list[dict[str, Any]]) -> dict[str, Any]:
 
 def run_rows(answers: pd.DataFrame, questions: dict[str, dict[str, str]], rubric_by_q: dict[str, list[dict[str, str]]],
              max_mode: str, allow_fallback: bool, score_failures_zero: bool = False) -> tuple[list[dict[str, Any]], list[dict[str, str]]]:
+    """Run the baseline and the rubric engine on every answer and collect predictions and failures."""
     rows: list[dict[str, Any]] = []
     not_evaluable: list[dict[str, str]] = []
     cache: dict[str, tuple[Rubric | None, str]] = {}
@@ -179,6 +182,7 @@ def run_rows(answers: pd.DataFrame, questions: dict[str, dict[str, str]], rubric
 
 
 def _rubric_index(df: pd.DataFrame) -> dict[str, list[dict[str, str]]]:
+    """Group rubric rows by question id."""
     idx: dict[str, list[dict[str, str]]] = {}
     for r in df.to_dict("records"):
         idx.setdefault(r["question_id"], []).append(r)
@@ -186,10 +190,12 @@ def _rubric_index(df: pd.DataFrame) -> dict[str, list[dict[str, str]]]:
 
 
 def _fmt(v: Any, nd: int = 3) -> str:
+    """Format a number to fixed decimals, or 'n/a'."""
     return "n/a" if v is None else f"{v:.{nd}f}"
 
 
 def _row_md(label: str, m: dict[str, Any]) -> str:
+    """One Markdown table row for a metrics block."""
     if not m or m.get("n", 0) == 0:
         return f"| {label} | 0 | - | - | - | - | - | - |"
     lo, hi = m["mae_ci95_answer_bootstrap"]
@@ -199,6 +205,7 @@ def _row_md(label: str, m: dict[str, Any]) -> str:
 
 
 def render_table(report: dict[str, Any]) -> str:
+    """Markdown table of the evaluation report."""
     head = ("| set / method | n | MAE | RMSE | Pearson r | within +-2 marks | within 10% of max | MAE 95% CI (answer bootstrap) |\n"
             "|---|---|---|---|---|---|---|---|")
     lines = ["Recomputed offline on 2026-10-21 by `datasets/repair/evaluate_repaired.py` (no LLM, nothing tuned). "
@@ -228,6 +235,7 @@ def render_table(report: dict[str, Any]) -> str:
 
 
 def evaluate(directory: Path, archive_dir: Path = ARCHIVE_DIR) -> dict[str, Any]:
+    """Recompute baseline and rubric-engine metrics on a repaired dataset directory."""
     d = Path(directory)
     q = read_csv(d / "01_question_bank.csv")
     questions = {r["question_id"]: r for r in q.to_dict("records")}
@@ -303,6 +311,7 @@ def evaluate(directory: Path, archive_dir: Path = ARCHIVE_DIR) -> dict[str, Any]
 
 
 def main(argv: list[str] | None = None) -> int:
+    """Command-line entry point."""
     ap = argparse.ArgumentParser(description="Recompute baseline / Condition E metrics on the repaired dataset")
     ap.add_argument("directory", type=Path)
     ap.add_argument("--archive", type=Path, default=ARCHIVE_DIR)
