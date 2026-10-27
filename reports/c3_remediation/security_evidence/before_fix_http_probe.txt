@@ -1,0 +1,21 @@
+student POST /c3/analysis: HTTP 200 keys=question_id,normalized_answer,sentence_count,token_count,sentences,reference_similarity,concept_matches,warnings
+student POST /c3/marking: HTTP 200 keys=question_id,answer_type,is_correct,is_unanswered,total_awarded_marks,total_possible_marks,percentage,selected_option_ids correct_labels_in_response=true is_correct=true (self-supplied key C)
+student POST /c3/feedback: HTTP 400 keys=error
+student POST /c3/mindmap: HTTP 400 keys=error
+anonymous POST /c3/analysis: HTTP 401 keys=error
+anonymous POST /c3/marking: HTTP 401 keys=error
+anonymous POST /c3/feedback: HTTP 401 keys=error
+anonymous POST /c3/mindmap: HTTP 401 keys=error
+finalize-all with NO reviewed results: HTTP 200 keys=batch_id,finalized_count,total_submissions,status finalized_count=2; stats finalized=2 reviewed=0
+60 rapid student /c3/assess calls: 429 responses=0
+student answer of 81000 chars: HTTP 200 keys=question_id,total_awarded_marks,total_possible_marks,percentage,marking,analysis,feedback,mindmap
+GET /c3/submissions/xyz: HTTP 404 keys=error
+GET /c3/submissions/000000000000000000000000: HTTP 404 keys=error
+GET /c3/submissions/../../etc/passwd: HTTP 404 (non-JSON text/html; charset=utf-8)
+GET /c3/submissions/%7B%22%24ne%22%3Anull%7D: HTTP 404 keys=error
+GET /c3/does-not-exist: HTTP 404 (non-JSON text/html; charset=utf-8) <!DOCTYPE html> <html lang="en"> <head> <meta charset="utf-8
+malformed JSON body: HTTP 400 (non-JSON text/html; charset=utf-8) <!DOCTYPE html> <html lang="en"> <head> <meta charset="utf-8
+student MCQ live response keys: analysis,answer_type,feedback,is_correct,is_unanswered,marking,mindmap,options,percentage,persisted,question_id,redacted,result_id,selected_labels,selected_option_ids,status,submission_id,total_awarded_marks,total_possible_marks
+student MCQ detail.submission keys: _id,answer_type,correct_options,expected_concepts,is_demo,options,provenance,question_id,question_text,reference_answer,rubric,selected_options,status,student_answer,student_id,submitted_at,updated_at
+student MCQ detail.result.ai_evaluation keys: analysis,answer_type,feedback,is_correct,is_unanswered,marking,mindmap,options,percentage,question_id,redacted,selected_labels,selected_option_ids,total_awarded_marks,total_possible_marks
+admin may assess as student: HTTP 403 keys=error

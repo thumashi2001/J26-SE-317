@@ -1,0 +1,44 @@
+{
+ "phase": "phase2",
+ "rows": [
+  {
+   "id": "F-H1",
+   "reqs": [
+    "FR-C3-45",
+    "FR-C3-46",
+    "NFR-C3-17"
+   ],
+   "scenario": "Stored result and evidence are retrievable after a backend restart",
+   "expected": "200 with the same marks and evidence",
+   "actual": "HTTP 200 mark=4 criteria=1",
+   "status": "PASS",
+   "type": "e2e-api",
+   "evidence": ""
+  },
+  {
+   "id": "F-H2",
+   "reqs": [
+    "NFR-C3-22",
+    "NFR-C3-23"
+   ],
+   "scenario": "Override audit fields survive the restart",
+   "expected": "final mark, reason, reviewer, finalization time still stored",
+   "actual": "status=finalized final=3 reason=true by=SLIITLEC101 finalized_at=true",
+   "status": "PASS",
+   "type": "e2e-api",
+   "evidence": ""
+  },
+  {
+   "id": "F-H3",
+   "reqs": [
+    "FR-C3-46"
+   ],
+   "scenario": "Student history after restart",
+   "expected": "history still lists the earlier submissions",
+   "actual": "100 entries",
+   "status": "PASS",
+   "type": "e2e-api",
+   "evidence": ""
+  }
+ ]
+}

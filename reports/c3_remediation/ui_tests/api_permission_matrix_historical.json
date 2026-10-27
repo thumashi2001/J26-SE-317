@@ -1,0 +1,155 @@
+[
+ {
+  "label": "assessments list needs login",
+  "role": "anon",
+  "method": "GET",
+  "path": "/c3/assessments",
+  "status": 401,
+  "expected": "401",
+  "ok": true
+ },
+ {
+  "label": "student may list assessments",
+  "role": "student",
+  "method": "GET",
+  "path": "/c3/assessments",
+  "status": 200,
+  "expected": "200",
+  "ok": true
+ },
+ {
+  "label": "student cannot supply own key",
+  "role": "student",
+  "method": "POST",
+  "path": "/c3/assess",
+  "status": 400,
+  "expected": "400",
+  "ok": true
+ },
+ {
+  "label": "student assess with demo id",
+  "role": "student",
+  "method": "POST",
+  "path": "/c3/assess",
+  "status": 200,
+  "expected": "200",
+  "ok": true
+ },
+ {
+  "label": "student cannot review",
+  "role": "student",
+  "method": "POST",
+  "path": "/c3/submissions/6ad8c9c20a4baeb1ab0201bf/review",
+  "status": 403,
+  "expected": "403",
+  "ok": true
+ },
+ {
+  "label": "student cannot finalize",
+  "role": "student",
+  "method": "POST",
+  "path": "/c3/submissions/6ad8c9c20a4baeb1ab0201bf/finalize",
+  "status": 403,
+  "expected": "403",
+  "ok": true
+ },
+ {
+  "label": "student cannot create batch",
+  "role": "student",
+  "method": "POST",
+  "path": "/c3/batch/setup",
+  "status": 403,
+  "expected": "403",
+  "ok": true
+ },
+ {
+  "label": "student cannot mark batch",
+  "role": "student",
+  "method": "POST",
+  "path": "/c3/batch/mark",
+  "status": 403,
+  "expected": "403",
+  "ok": true
+ },
+ {
+  "label": "student cannot read staff examples (keys/rubrics)",
+  "role": "student",
+  "method": "GET",
+  "path": "/c3/examples",
+  "status": 403,
+  "expected": "403",
+  "ok": true
+ },
+ {
+  "label": "lecturer can read examples",
+  "role": "lecturer",
+  "method": "GET",
+  "path": "/c3/examples",
+  "status": 200,
+  "expected": "200",
+  "ok": true
+ },
+ {
+  "label": "student cannot list batches",
+  "role": "student",
+  "method": "GET",
+  "path": "/c3/batch/setup",
+  "status": 403,
+  "expected": "403",
+  "ok": true
+ },
+ {
+  "label": "lecturer can list submissions",
+  "role": "lecturer",
+  "method": "GET",
+  "path": "/c3/submissions",
+  "status": 200,
+  "expected": "200",
+  "ok": true
+ },
+ {
+  "label": "lecturer can list batches",
+  "role": "lecturer",
+  "method": "GET",
+  "path": "/c3/batch/setup",
+  "status": 200,
+  "expected": "200",
+  "ok": true
+ },
+ {
+  "label": "admin can list batches (policy: admin oversees)",
+  "role": "admin",
+  "method": "GET",
+  "path": "/c3/batch/setup",
+  "status": 200,
+  "expected": "200",
+  "ok": true
+ },
+ {
+  "label": "admin can read any submission detail",
+  "role": "admin",
+  "method": "GET",
+  "path": "/c3/submissions/6ad8c9c20a4baeb1ab0201bf",
+  "status": 200,
+  "expected": "200",
+  "ok": true
+ },
+ {
+  "label": "admin may NOT assess as a student",
+  "role": "admin",
+  "method": "POST",
+  "path": "/c3/assess",
+  "status": 403,
+  "expected": "403",
+  "ok": true
+ },
+ {
+  "label": "student cannot read another student's submission",
+  "role": "student",
+  "method": "GET",
+  "path": "/c3/submissions/6ad8c9a00a4baeb1ab0201bd",
+  "status": 403,
+  "expected": "403",
+  "ok": true
+ }
+]

@@ -1,0 +1,842 @@
+[
+ {
+  "id": "S1",
+  "role": "student",
+  "desc": "Landing page /c3 shows the task title and the assessment picker",
+  "status": "Passed",
+  "note": "7 assessments",
+  "ms": 1385
+ },
+ {
+  "id": "S1b",
+  "role": "student",
+  "desc": "Nothing is preselected: no answer form and no selected card before the student chooses, and the instruction is shown",
+  "status": "Passed",
+  "note": "",
+  "ms": 1345
+ },
+ {
+  "id": "S2",
+  "role": "student",
+  "desc": "No component/version/prototype labels on student screen",
+  "status": "Passed",
+  "note": "",
+  "ms": 4
+ },
+ {
+  "id": "S3",
+  "role": "student",
+  "desc": "No reference answer, rubric editor, answer key or expected concepts on the answer form",
+  "status": "Passed",
+  "note": "",
+  "ms": 102
+ },
+ {
+  "id": "S4",
+  "role": "student",
+  "desc": "Empty submission shows an inline error and sends nothing",
+  "status": "Passed",
+  "note": "",
+  "ms": 307
+ },
+ {
+  "id": "S5",
+  "role": "student",
+  "desc": "Submit example answer for the first written assessment: result, criteria, concept diagnosis, map",
+  "status": "Passed",
+  "note": "mark 4 / 4100",
+  "ms": 552
+ },
+ {
+  "id": "S6",
+  "role": "student",
+  "desc": "Assess request body contains only the preset id and the answer",
+  "status": "Passed",
+  "note": "demo_id,student_answer",
+  "ms": 1
+ },
+ {
+  "id": "S7",
+  "role": "student",
+  "desc": "Concept map: select a node shows evidence panel; list alternative exists",
+  "status": "Passed",
+  "note": "",
+  "ms": 38
+ },
+ {
+  "id": "S8",
+  "role": "student",
+  "desc": "MCQ assessment: pick option, submit, result shown",
+  "status": "Passed",
+  "note": "",
+  "ms": 366
+ },
+ {
+  "id": "S9",
+  "role": "student",
+  "desc": "My submissions lists both and opens a detail view without reference answer",
+  "status": "Passed",
+  "note": "",
+  "ms": 312
+ },
+ {
+  "id": "S17",
+  "role": "student",
+  "desc": "MCQ result and MCQ history detail contain no correct-option information and no concept map",
+  "status": "Passed",
+  "note": "",
+  "ms": 2048
+ },
+ {
+  "id": "S19",
+  "role": "student",
+  "desc": "Assessments list 404 shows an explicit message; Try again re-requests and then loads the list",
+  "status": "Passed",
+  "note": "",
+  "ms": 1626
+ },
+ {
+  "id": "S20",
+  "role": "student",
+  "desc": "Assessment cards are labelled by real source (Demo / Lecturer-created), the C2-unavailable notice is shown, nothing claims C2, no key or rubric is visible, selecting and submitting still work",
+  "status": "Passed",
+  "note": "",
+  "ms": 1571
+ },
+ {
+  "id": "S21",
+  "role": "student",
+  "desc": "Explicitly selecting a demo card or a lecturer-created card opens exactly that assessment",
+  "status": "Passed",
+  "note": "",
+  "ms": 1365
+ },
+ {
+  "id": "S10",
+  "role": "student",
+  "desc": "API failure on submit shows a friendly message with retry (no stack, no port)",
+  "status": "Passed",
+  "note": "",
+  "ms": 1169
+ },
+ {
+  "id": "S11",
+  "role": "student",
+  "desc": "Assessments list failure shows retry",
+  "status": "Passed",
+  "note": "",
+  "ms": 437
+ },
+ {
+  "id": "S12a",
+  "role": "student",
+  "desc": "Direct URL /lecturer does not open lecturer/admin pages",
+  "status": "Passed",
+  "note": "redirected to /c1/dashboard",
+  "ms": 1307
+ },
+ {
+  "id": "S12b",
+  "role": "student",
+  "desc": "Direct URL /lecturer/c3 does not open lecturer/admin pages",
+  "status": "Passed",
+  "note": "redirected to /c1/dashboard",
+  "ms": 1273
+ },
+ {
+  "id": "S12c",
+  "role": "student",
+  "desc": "Direct URL /lecturer/c3/batch does not open lecturer/admin pages",
+  "status": "Passed",
+  "note": "redirected to /c1/dashboard",
+  "ms": 1287
+ },
+ {
+  "id": "S12d",
+  "role": "student",
+  "desc": "Direct URL /c3/batch does not open lecturer/admin pages",
+  "status": "Passed",
+  "note": "redirected to /c1/dashboard",
+  "ms": 1236
+ },
+ {
+  "id": "S12e",
+  "role": "student",
+  "desc": "Direct URL /c3/review does not open lecturer/admin pages",
+  "status": "Passed",
+  "note": "redirected to /c1/dashboard",
+  "ms": 1207
+ },
+ {
+  "id": "S12f",
+  "role": "student",
+  "desc": "Direct URL /admin does not open lecturer/admin pages",
+  "status": "Passed",
+  "note": "redirected to /c1/dashboard",
+  "ms": 1164
+ },
+ {
+  "id": "S12g",
+  "role": "student",
+  "desc": "Direct URL /admin/lecturers does not open lecturer/admin pages",
+  "status": "Passed",
+  "note": "redirected to /c1/dashboard",
+  "ms": 1240
+ },
+ {
+  "id": "S13",
+  "role": "student",
+  "desc": "Responsive layout at 375px and 768px: no horizontal scroll",
+  "status": "Passed",
+  "note": "",
+  "ms": 2828
+ },
+ {
+  "id": "S14",
+  "role": "student",
+  "desc": "Dark theme renders the picker and result with readable colours",
+  "status": "Passed",
+  "note": "",
+  "ms": 1691
+ },
+ {
+  "id": "S15",
+  "role": "student",
+  "desc": "Keyboard: assessment cards and Submit are reachable with Tab; focus ring visible",
+  "status": "Passed",
+  "note": "",
+  "ms": 1276
+ },
+ {
+  "id": "S-console",
+  "role": "student",
+  "desc": "Browser console/page errors during student session",
+  "status": "Passed",
+  "note": "[console.error] Failed to load resource: the server responded with a status of 404 (Not Found) | [console.error] Failed to load resource: the server responded with a status of 404 (Not Found) | [console.error] Failed to load resource: the server responded with a status of 502 (Bad Gateway) | [consol",
+  "ms": 0
+ },
+ {
+  "id": "L1",
+  "role": "lecturer",
+  "desc": "Overview shows tool cards without \"Component N\" chips",
+  "status": "Passed",
+  "note": "",
+  "ms": 1326
+ },
+ {
+  "id": "L2",
+  "role": "lecturer",
+  "desc": "Batch Marking header, stepper present; no component/version labels",
+  "status": "Passed",
+  "note": "",
+  "ms": 1275
+ },
+ {
+  "id": "L3",
+  "role": "lecturer",
+  "desc": "Saving an empty setup shows inline validation errors",
+  "status": "Passed",
+  "note": "",
+  "ms": 199
+ },
+ {
+  "id": "L4",
+  "role": "lecturer",
+  "desc": "Rubric marks mismatch is flagged before saving",
+  "status": "Passed",
+  "note": "",
+  "ms": 112
+ },
+ {
+  "id": "L5",
+  "role": "lecturer",
+  "desc": "Valid setup saves and opens Student answers",
+  "status": "Passed",
+  "note": "",
+  "ms": 68
+ },
+ {
+  "id": "L6",
+  "role": "lecturer",
+  "desc": "Example rows are checked: invalid and duplicate rows are listed",
+  "status": "Passed",
+  "note": "",
+  "ms": 294
+ },
+ {
+  "id": "L7",
+  "role": "lecturer",
+  "desc": "Marking runs and the results table lists students with automatic marks",
+  "status": "Passed",
+  "note": "",
+  "ms": 249
+ },
+ {
+  "id": "L22",
+  "role": "lecturer",
+  "desc": "Batch \"View analysis\" dialog shows submitted answer, marks/status and the full analysis",
+  "status": "Passed",
+  "note": "",
+  "ms": 725
+ },
+ {
+  "id": "L8",
+  "role": "lecturer",
+  "desc": "Review dialog: invalid override shows errors; valid override saves",
+  "status": "Passed",
+  "note": "",
+  "ms": 554
+ },
+ {
+  "id": "L9",
+  "role": "lecturer",
+  "desc": "Finalize one result from the dialog; finalized result cannot be edited",
+  "status": "Passed",
+  "note": "",
+  "ms": 111
+ },
+ {
+  "id": "L10",
+  "role": "lecturer",
+  "desc": "Escape closes the dialog and returns focus",
+  "status": "Passed",
+  "note": "",
+  "ms": 17
+ },
+ {
+  "id": "L11",
+  "role": "lecturer",
+  "desc": "Finalize reviewed asks for confirmation; cancel keeps results unfinalized",
+  "status": "Passed",
+  "note": "",
+  "ms": 106
+ },
+ {
+  "id": "L11b",
+  "role": "lecturer",
+  "desc": "Finalize reviewed refuses to finalize results the lecturer has not reviewed (409 shown)",
+  "status": "Passed",
+  "note": "",
+  "ms": 811
+ },
+ {
+  "id": "L12",
+  "role": "lecturer",
+  "desc": "After the lecturer reviews the remaining results, Finalize reviewed finalizes every result",
+  "status": "Passed",
+  "note": "",
+  "ms": 1260
+ },
+ {
+  "id": "L13",
+  "role": "lecturer",
+  "desc": "Past batches lists the batch and reopens its results",
+  "status": "Passed",
+  "note": "",
+  "ms": 196
+ },
+ {
+  "id": "L14",
+  "role": "lecturer",
+  "desc": "MCQ batch: setup, check, mark and inspect without page errors",
+  "status": "Passed",
+  "note": "",
+  "ms": 1394
+ },
+ {
+  "id": "L15",
+  "role": "lecturer",
+  "desc": "Marking Review queue lists submissions (student + batch) with filters",
+  "status": "Passed",
+  "note": "9 rows",
+  "ms": 1992
+ },
+ {
+  "id": "L16",
+  "role": "lecturer",
+  "desc": "Queue search with no match shows empty state with Clear filters",
+  "status": "Passed",
+  "note": "",
+  "ms": 90
+ },
+ {
+  "id": "L17",
+  "role": "lecturer",
+  "desc": "Review page: accept, change with validation, finalize with confirmation",
+  "status": "Passed",
+  "note": "",
+  "ms": 2623
+ },
+ {
+  "id": "L23",
+  "role": "lecturer",
+  "desc": "Review page (opened from the queue) shows submitted answer, criteria with evidence, concepts, feedback and the map",
+  "status": "Passed",
+  "note": "http://localhost:5174/lecturer/c3/6ad907efbe3d42eae7ef20e5",
+  "ms": 1954
+ },
+ {
+  "id": "L24",
+  "role": "lecturer",
+  "desc": "MCQ result (review page and batch dialog) shows answer-key match, MCQ feedback and explicit not-produced notes",
+  "status": "Passed",
+  "note": "",
+  "ms": 1970
+ },
+ {
+  "id": "L26",
+  "role": "lecturer",
+  "desc": "A submission saved without analysis shows an explicit notice on the review page (no crash, no empty page)",
+  "status": "Passed",
+  "note": "",
+  "ms": 1355
+ },
+ {
+  "id": "L27",
+  "role": "lecturer",
+  "desc": "Review page at 375px: no horizontal page scroll; map scrolls inside its container and list fallback exists",
+  "status": "Passed",
+  "note": "{\"sw\":620,\"cw\":295,\"ox\":\"auto\"}",
+  "ms": 2029
+ },
+ {
+  "id": "L28",
+  "role": "lecturer",
+  "desc": "Change-the-mark dialog: reason accepts real keystrokes, keeps focus, newline and paste; Escape keeps the draft; Tab stays inside; save persists",
+  "status": "Passed",
+  "note": "",
+  "ms": 5587
+ },
+ {
+  "id": "L28b",
+  "role": "student",
+  "desc": "The student sees the finalized adjusted mark and the adjustment notice with the reason",
+  "status": "Passed",
+  "note": "",
+  "ms": 3742
+ },
+ {
+  "id": "L29",
+  "role": "lecturer",
+  "desc": "Sample badge stays inline in the queue row and in the review header (static, no overlap) at 1280/768/375 px",
+  "status": "Passed",
+  "note": "",
+  "ms": 6009
+ },
+ {
+  "id": "L18",
+  "role": "lecturer",
+  "desc": "Queue failure shows error notice with Try again",
+  "status": "Passed",
+  "note": "",
+  "ms": 1535
+ },
+ {
+  "id": "L19a",
+  "role": "lecturer",
+  "desc": "Direct URL /admin does not open for a lecturer",
+  "status": "Passed",
+  "note": "redirected to /lecturer",
+  "ms": 1194
+ },
+ {
+  "id": "L19b",
+  "role": "lecturer",
+  "desc": "Direct URL /admin/lecturers does not open for a lecturer",
+  "status": "Passed",
+  "note": "redirected to /lecturer",
+  "ms": 1126
+ },
+ {
+  "id": "L19c",
+  "role": "lecturer",
+  "desc": "Direct URL /c3 does not open for a lecturer",
+  "status": "Passed",
+  "note": "redirected to /lecturer",
+  "ms": 1171
+ },
+ {
+  "id": "L20",
+  "role": "lecturer",
+  "desc": "Responsive: batch page and queue at 375px and 768px without horizontal scroll",
+  "status": "Passed",
+  "note": "",
+  "ms": 5090
+ },
+ {
+  "id": "L21",
+  "role": "lecturer",
+  "desc": "Dark theme on batch setup and queue",
+  "status": "Passed",
+  "note": "",
+  "ms": 3197
+ },
+ {
+  "id": "L-console",
+  "role": "lecturer",
+  "desc": "Browser page errors during lecturer session",
+  "status": "Passed",
+  "note": "[console.error] Failed to load resource: the server responded with a status of 409 (Conflict) | [console.error] Failed to load resource: the server responded with a status of 500 (Internal Server Error) | [console.error] Failed to load resource: the server responded with a status of 500 (Internal Se",
+  "ms": 0
+ },
+ {
+  "id": "A1",
+  "role": "admin",
+  "desc": "Admin lands on /admin; sidebar has no marking (C3) entry",
+  "status": "Passed",
+  "note": "menu: INSIGHTS | Learning insights | PEOPLE | Lecturer approvals",
+  "ms": 206
+ },
+ {
+  "id": "A2",
+  "role": "admin",
+  "desc": "/admin/lecturers (approvals) loads",
+  "status": "Passed",
+  "note": "",
+  "ms": 1244
+ },
+ {
+  "id": "A3",
+  "role": "admin",
+  "desc": "Direct URL /lecturer/c3 (marking review) - observed behaviour",
+  "status": "Passed",
+  "note": "/lecturer/c3; Marking Review rendered: true; layout menu: lecturer",
+  "ms": 1482
+ },
+ {
+  "id": "A4",
+  "role": "admin",
+  "desc": "Direct URL /lecturer/c3/batch - observed behaviour",
+  "status": "Passed",
+  "note": "Batch Marking rendered: true",
+  "ms": 1250
+ },
+ {
+  "id": "A5",
+  "role": "admin",
+  "desc": "Student page /c3 is not available to an admin",
+  "status": "Passed",
+  "note": "redirected to /admin",
+  "ms": 1127
+ },
+ {
+  "id": "A-console",
+  "role": "admin",
+  "desc": "Browser page errors during admin session",
+  "status": "Passed",
+  "note": "",
+  "ms": 0
+ },
+ {
+  "id": "API-1",
+  "role": "anon",
+  "desc": "GET /c3/assessments as anon: assessments list needs login",
+  "status": "Passed",
+  "note": "HTTP 401 (expected 401)",
+  "ms": 0
+ },
+ {
+  "id": "API-2",
+  "role": "student",
+  "desc": "GET /c3/assessments as student: student may list assessments",
+  "status": "Passed",
+  "note": "HTTP 200 (expected 200)",
+  "ms": 0
+ },
+ {
+  "id": "API-leak",
+  "role": "student",
+  "desc": "GET /c3/assessments exposes no key/rubric/reference fields",
+  "status": "Passed",
+  "note": "",
+  "ms": 0
+ },
+ {
+  "id": "API-3",
+  "role": "student",
+  "desc": "POST /c3/assess as student: student cannot supply own key",
+  "status": "Passed",
+  "note": "HTTP 400 (expected 400)",
+  "ms": 0
+ },
+ {
+  "id": "API-4",
+  "role": "student",
+  "desc": "POST /c3/assess as student: student assess with demo id",
+  "status": "Passed",
+  "note": "HTTP 200 (expected 200)",
+  "ms": 0
+ },
+ {
+  "id": "API-5",
+  "role": "student",
+  "desc": "POST /c3/submissions/6ad90825be3d42eae7ef20f2/review as student: student cannot review",
+  "status": "Passed",
+  "note": "HTTP 403 (expected 403)",
+  "ms": 0
+ },
+ {
+  "id": "API-6",
+  "role": "student",
+  "desc": "POST /c3/submissions/6ad90825be3d42eae7ef20f2/finalize as student: student cannot finalize",
+  "status": "Passed",
+  "note": "HTTP 403 (expected 403)",
+  "ms": 0
+ },
+ {
+  "id": "API-7",
+  "role": "student",
+  "desc": "POST /c3/batch/setup as student: student cannot create batch",
+  "status": "Passed",
+  "note": "HTTP 403 (expected 403)",
+  "ms": 0
+ },
+ {
+  "id": "API-8",
+  "role": "student",
+  "desc": "POST /c3/batch/mark as student: student cannot mark batch",
+  "status": "Passed",
+  "note": "HTTP 403 (expected 403)",
+  "ms": 0
+ },
+ {
+  "id": "API-9",
+  "role": "student",
+  "desc": "GET /c3/examples as student: student cannot read staff examples (keys/rubrics)",
+  "status": "Passed",
+  "note": "HTTP 403 (expected 403)",
+  "ms": 0
+ },
+ {
+  "id": "API-10",
+  "role": "lecturer",
+  "desc": "GET /c3/examples as lecturer: lecturer can read examples",
+  "status": "Passed",
+  "note": "HTTP 200 (expected 200)",
+  "ms": 0
+ },
+ {
+  "id": "API-11",
+  "role": "student",
+  "desc": "GET /c3/batch/setup as student: student cannot list batches",
+  "status": "Passed",
+  "note": "HTTP 403 (expected 403)",
+  "ms": 0
+ },
+ {
+  "id": "API-12",
+  "role": "lecturer",
+  "desc": "GET /c3/submissions as lecturer: lecturer can list submissions",
+  "status": "Passed",
+  "note": "HTTP 200 (expected 200)",
+  "ms": 0
+ },
+ {
+  "id": "API-13",
+  "role": "lecturer",
+  "desc": "GET /c3/batch/setup as lecturer: lecturer can list batches",
+  "status": "Passed",
+  "note": "HTTP 200 (expected 200)",
+  "ms": 0
+ },
+ {
+  "id": "API-14",
+  "role": "admin",
+  "desc": "GET /c3/batch/setup as admin: admin can list batches (policy: admin oversees)",
+  "status": "Passed",
+  "note": "HTTP 200 (expected 200)",
+  "ms": 0
+ },
+ {
+  "id": "API-15",
+  "role": "admin",
+  "desc": "GET /c3/submissions/6ad90825be3d42eae7ef20f2 as admin: admin can read any submission detail",
+  "status": "Passed",
+  "note": "HTTP 200 (expected 200)",
+  "ms": 0
+ },
+ {
+  "id": "API-16",
+  "role": "admin",
+  "desc": "POST /c3/assess as admin: admin may NOT assess as a student",
+  "status": "Passed",
+  "note": "HTTP 403 (expected 403)",
+  "ms": 0
+ },
+ {
+  "id": "API-17",
+  "role": "student",
+  "desc": "POST /c3/analysis as student: raw /c3/analysis: student denied",
+  "status": "Passed",
+  "note": "HTTP 403 (expected 403)",
+  "ms": 0
+ },
+ {
+  "id": "API-18",
+  "role": "admin",
+  "desc": "POST /c3/analysis as admin: raw /c3/analysis: admin denied",
+  "status": "Passed",
+  "note": "HTTP 403 (expected 403)",
+  "ms": 0
+ },
+ {
+  "id": "API-19",
+  "role": "anon",
+  "desc": "POST /c3/analysis as anon: raw /c3/analysis: anonymous denied",
+  "status": "Passed",
+  "note": "HTTP 401 (expected 401)",
+  "ms": 0
+ },
+ {
+  "id": "API-20",
+  "role": "lecturer",
+  "desc": "POST /c3/analysis as lecturer: raw /c3/analysis: lecturer reaches validation",
+  "status": "Passed",
+  "note": "HTTP 400 (expected 400)",
+  "ms": 0
+ },
+ {
+  "id": "API-21",
+  "role": "student",
+  "desc": "POST /c3/marking as student: raw /c3/marking: student denied",
+  "status": "Passed",
+  "note": "HTTP 403 (expected 403)",
+  "ms": 0
+ },
+ {
+  "id": "API-22",
+  "role": "admin",
+  "desc": "POST /c3/marking as admin: raw /c3/marking: admin denied",
+  "status": "Passed",
+  "note": "HTTP 403 (expected 403)",
+  "ms": 0
+ },
+ {
+  "id": "API-23",
+  "role": "anon",
+  "desc": "POST /c3/marking as anon: raw /c3/marking: anonymous denied",
+  "status": "Passed",
+  "note": "HTTP 401 (expected 401)",
+  "ms": 0
+ },
+ {
+  "id": "API-24",
+  "role": "lecturer",
+  "desc": "POST /c3/marking as lecturer: raw /c3/marking: lecturer reaches validation",
+  "status": "Passed",
+  "note": "HTTP 400 (expected 400)",
+  "ms": 0
+ },
+ {
+  "id": "API-25",
+  "role": "student",
+  "desc": "POST /c3/feedback as student: raw /c3/feedback: student denied",
+  "status": "Passed",
+  "note": "HTTP 403 (expected 403)",
+  "ms": 0
+ },
+ {
+  "id": "API-26",
+  "role": "admin",
+  "desc": "POST /c3/feedback as admin: raw /c3/feedback: admin denied",
+  "status": "Passed",
+  "note": "HTTP 403 (expected 403)",
+  "ms": 0
+ },
+ {
+  "id": "API-27",
+  "role": "anon",
+  "desc": "POST /c3/feedback as anon: raw /c3/feedback: anonymous denied",
+  "status": "Passed",
+  "note": "HTTP 401 (expected 401)",
+  "ms": 0
+ },
+ {
+  "id": "API-28",
+  "role": "lecturer",
+  "desc": "POST /c3/feedback as lecturer: raw /c3/feedback: lecturer reaches validation",
+  "status": "Passed",
+  "note": "HTTP 400 (expected 400)",
+  "ms": 0
+ },
+ {
+  "id": "API-29",
+  "role": "student",
+  "desc": "POST /c3/mindmap as student: raw /c3/mindmap: student denied",
+  "status": "Passed",
+  "note": "HTTP 403 (expected 403)",
+  "ms": 0
+ },
+ {
+  "id": "API-30",
+  "role": "admin",
+  "desc": "POST /c3/mindmap as admin: raw /c3/mindmap: admin denied",
+  "status": "Passed",
+  "note": "HTTP 403 (expected 403)",
+  "ms": 0
+ },
+ {
+  "id": "API-31",
+  "role": "anon",
+  "desc": "POST /c3/mindmap as anon: raw /c3/mindmap: anonymous denied",
+  "status": "Passed",
+  "note": "HTTP 401 (expected 401)",
+  "ms": 0
+ },
+ {
+  "id": "API-32",
+  "role": "lecturer",
+  "desc": "POST /c3/mindmap as lecturer: raw /c3/mindmap: lecturer reaches validation",
+  "status": "Passed",
+  "note": "HTTP 400 (expected 400)",
+  "ms": 0
+ },
+ {
+  "id": "API-33",
+  "role": "student",
+  "desc": "GET /c3/does-not-exist as student: unknown C3 path is a JSON 404",
+  "status": "Passed",
+  "note": "HTTP 404 (expected 404)",
+  "ms": 0
+ },
+ {
+  "id": "API-404json",
+  "role": "student",
+  "desc": "Unknown C3 path returns JSON {error}",
+  "status": "Passed",
+  "note": "",
+  "ms": 0
+ },
+ {
+  "id": "API-34",
+  "role": "student",
+  "desc": "POST /c3/batch/x/finalize-all as student: finalize-all by a student is denied",
+  "status": "Passed",
+  "note": "HTTP 403 (expected 403)",
+  "ms": 0
+ },
+ {
+  "id": "API-redact",
+  "role": "student",
+  "desc": "Student submission detail omits reference/rubric/concepts/key fields",
+  "status": "Passed",
+  "note": "",
+  "ms": 0
+ },
+ {
+  "id": "API-35",
+  "role": "student",
+  "desc": "GET /c3/submissions/6ad907f4be3d42eae7ef20ee as student: student cannot read another student's submission",
+  "status": "Passed",
+  "note": "HTTP 403 (expected 403)",
+  "ms": 0
+ },
+ {
+  "id": "S16",
+  "role": "student",
+  "desc": "After the lecturer finalizes a student submission the student sees Final result with the lecturer mark",
+  "status": "Passed",
+  "note": "",
+  "ms": 4276
+ }
+]

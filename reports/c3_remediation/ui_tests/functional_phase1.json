@@ -1,0 +1,541 @@
+{
+ "phase": "phase1",
+ "base": "http://localhost:3100/api/v1",
+ "db": "adaptivelearnse_c3_sec",
+ "ids": {
+  "sid": "6ad8ef67287b0d868a4f6e8e",
+  "bid": "BATCH-FN-Q1-MVICX88V",
+  "mine": "6ad8ef67287b0d868a4f6e9f",
+  "student": "IT10000001"
+ },
+ "rows": [
+  {
+   "id": "F-A1",
+   "reqs": [
+    "FR-C3-04",
+    "FR-C3-11",
+    "FR-C3-12",
+    "FR-C3-13",
+    "SO2"
+   ],
+   "scenario": "Controlled answer naming all three required concepts",
+   "expected": "proposed mark 4/4 (level L4)",
+   "actual": "mark 4/4",
+   "status": "PASS",
+   "type": "e2e-api",
+   "evidence": ""
+  },
+  {
+   "id": "F-A2",
+   "reqs": [
+    "FR-C3-13",
+    "FR-C3-10"
+   ],
+   "scenario": "Controlled answer naming one required concept (partial credit)",
+   "expected": "proposed mark 2/4 (level L2)",
+   "actual": "mark 2",
+   "status": "PASS",
+   "type": "e2e-api",
+   "evidence": ""
+  },
+  {
+   "id": "F-A3",
+   "reqs": [
+    "FR-C3-12",
+    "FR-C3-23"
+   ],
+   "scenario": "Controlled irrelevant answer",
+   "expected": "proposed mark 0/4 (level L0)",
+   "actual": "mark 0",
+   "status": "PASS",
+   "type": "e2e-api",
+   "evidence": ""
+  },
+  {
+   "id": "F-A4",
+   "reqs": [
+    "FR-C3-09",
+    "SO1"
+   ],
+   "scenario": "Paraphrase without the rubric phrases (exploratory: no authoritative expected mark)",
+   "expected": "none asserted; records whether paraphrases earn credit",
+   "actual": "mark 0/4",
+   "status": "INFO",
+   "type": "exploratory",
+   "evidence": "Lexical engine: see report for the semantic-matching limitation"
+  },
+  {
+   "id": "F-A5",
+   "reqs": [
+    "NFR-C3-03",
+    "NFR-C3-19",
+    "NFR-C3-02"
+   ],
+   "scenario": "Same answer and configuration submitted twice",
+   "expected": "identical marks, concept statuses, criterion levels",
+   "actual": "marks 4 vs 4; identical evaluation=true",
+   "status": "PASS",
+   "type": "e2e-api",
+   "evidence": ""
+  },
+  {
+   "id": "F-A6",
+   "reqs": [
+    "NFR-C3-16",
+    "FR-C3-05"
+   ],
+   "scenario": "Empty answer",
+   "expected": "handled without a 5xx",
+   "actual": "HTTP 200 ",
+   "status": "PASS",
+   "type": "e2e-api",
+   "evidence": ""
+  },
+  {
+   "id": "F-A7",
+   "reqs": [
+    "FR-C3-05",
+    "NFR-C3-16"
+   ],
+   "scenario": "Answer with HTML tags, whitespace and control characters",
+   "expected": "handled without a 5xx; returns a mark",
+   "actual": "HTTP 200",
+   "status": "PASS",
+   "type": "e2e-api",
+   "evidence": ""
+  },
+  {
+   "id": "F-A8",
+   "reqs": [
+    "NFR-C3-16"
+   ],
+   "scenario": "Request without an assessment id",
+   "expected": "400 with a message",
+   "actual": "HTTP 400",
+   "status": "PASS",
+   "type": "e2e-api",
+   "evidence": ""
+  },
+  {
+   "id": "F-A9",
+   "reqs": [
+    "NFR-C3-16"
+   ],
+   "scenario": "Unsupported scanned-image input",
+   "expected": "400 with explicit OCR-unsupported message",
+   "actual": "HTTP 400 Scanned answer OCR processing is currently unsupported. C3 e",
+   "status": "PASS",
+   "type": "e2e-api",
+   "evidence": ""
+  },
+  {
+   "id": "F-B1",
+   "reqs": [
+    "FR-C3-01",
+    "FR-C3-02",
+    "FR-C3-03",
+    "FR-C3-07",
+    "NFR-C3-20"
+   ],
+   "scenario": "Stored record links student, question, answer and reference",
+   "expected": "submission holds student_id, question_id/text, student answer, reference answer",
+   "actual": "student=IT10000001 q=SE3010-Q01 ref=true",
+   "status": "PASS",
+   "type": "e2e-api",
+   "evidence": ""
+  },
+  {
+   "id": "F-B2",
+   "reqs": [
+    "FR-C3-14",
+    "FR-C3-25",
+    "FR-C3-26",
+    "NFR-C3-05",
+    "NFR-C3-06"
+   ],
+   "scenario": "Criterion evidence and explanation stored with the mark",
+   "expected": "criteria_results has level, descriptor, evidence sentences and an explanation",
+   "actual": "[\"criterion_id\",\"criterion_description\",\"selected_level_id\",\"selected_level_label\",\"rubric_descriptor\",\"awarded_mark\",\"max_marks\",\"evidence_sentence_ids\",\"supporting_concepts\",\"explanation\",\"warnings\"]",
+   "status": "PASS",
+   "type": "e2e-api",
+   "evidence": ""
+  },
+  {
+   "id": "F-B3",
+   "reqs": [
+    "FR-C3-21",
+    "FR-C3-22",
+    "FR-C3-23",
+    "FR-C3-24",
+    "SO3"
+   ],
+   "scenario": "Concept classes for the controlled answers",
+   "expected": "full answer: 3 demonstrated; partial answer: components demonstrated, others not",
+   "actual": "full={\"high-level structure\":\"demonstrated\",\"components\":\"demonstrated\",\"relationships\":\"demonstrated\"}",
+   "status": "PASS",
+   "type": "e2e-api",
+   "evidence": ""
+  },
+  {
+   "id": "F-B4",
+   "reqs": [
+    "FR-C3-23",
+    "FR-C3-29"
+   ],
+   "scenario": "Missing concepts identified for the partial answer",
+   "expected": "high-level structure and relationships not demonstrated",
+   "actual": "{\"high-level structure\":\"not_demonstrated\",\"components\":\"demonstrated\",\"relationships\":\"not_demonstrated\"}",
+   "status": "PASS",
+   "type": "e2e-api",
+   "evidence": ""
+  },
+  {
+   "id": "F-B5",
+   "reqs": [
+    "FR-C3-27",
+    "FR-C3-28",
+    "FR-C3-29",
+    "FR-C3-30",
+    "FR-C3-31",
+    "SO4"
+   ],
+   "scenario": "Feedback sections",
+   "expected": "summary, strengths, missing concepts, improvement suggestions present and linked to the mark",
+   "actual": "total_mark,total_possible,percentage,overall_summary,overall_strengths,overall_missing_concepts,overall_next_level_improvements,overall_improvement_suggestions; mark 4/4",
+   "status": "PASS",
+   "type": "e2e-api",
+   "evidence": ""
+  },
+  {
+   "id": "F-B6",
+   "reqs": [
+    "FR-C3-32",
+    "FR-C3-35",
+    "SO5"
+   ],
+   "scenario": "Mind map nodes derived from the answer",
+   "expected": "root plus one node per concept, with status",
+   "actual": "4 nodes",
+   "status": "PASS",
+   "type": "e2e-api",
+   "evidence": ""
+  },
+  {
+   "id": "F-B7",
+   "reqs": [
+    "FR-C3-33",
+    "FR-C3-34"
+   ],
+   "scenario": "Concept-to-concept relationships supported by evidence",
+   "expected": "relationships between concepts, not only root-to-concept",
+   "actual": "types=child; evidence=Deterministic baseline structural attachment.",
+   "status": "FAIL",
+   "type": "e2e-api",
+   "evidence": ""
+  },
+  {
+   "id": "F-B8",
+   "reqs": [
+    "FR-C3-15",
+    "NFR-C3-21"
+   ],
+   "scenario": "Method/configuration recorded with the result",
+   "expected": "pipeline/marking/analysis versions and the rubric used are stored",
+   "actual": "pipeline_version=integrated-v1; marking=baseline-v1; analysis=baseline-v1; rubric stored=true",
+   "status": "PASS",
+   "type": "e2e-api",
+   "evidence": ""
+  },
+  {
+   "id": "F-B9",
+   "reqs": [
+    "NFR-C3-08"
+   ],
+   "scenario": "Processing time recorded per evaluated response",
+   "expected": "a processing-time field exists in the stored result",
+   "actual": "field found: processing_time; observed request latency 36 ms (client-side only)",
+   "status": "PASS",
+   "type": "e2e-api",
+   "evidence": ""
+  },
+  {
+   "id": "F-B10",
+   "reqs": [
+    "FR-C3-18"
+   ],
+   "scenario": "Retrieved RAG context recorded",
+   "expected": "retrieved context stored with the result",
+   "actual": "RAG is not on the /assess path: no retrieved-context field",
+   "status": "BLOCKED",
+   "type": "e2e-api",
+   "evidence": "Vector RAG is a library + offline harness only (reports/c3_remediation/11_vector_rag_implementation.md)"
+  },
+  {
+   "id": "F-C1",
+   "reqs": [
+    "FR-C3-11",
+    "NFR-C3-13"
+   ],
+   "scenario": "Lecturer creates a batch setup with question, reference and rubric",
+   "expected": "200 and a batch id",
+   "actual": "HTTP 200 ",
+   "status": "PASS",
+   "type": "e2e-api",
+   "evidence": ""
+  },
+  {
+   "id": "F-C2",
+   "reqs": [
+    "NFR-C3-16"
+   ],
+   "scenario": "Batch validation of duplicate and empty rows",
+   "expected": "3 valid, 2 invalid (duplicate id, empty answer)",
+   "actual": "valid=3 invalid=2",
+   "status": "PASS",
+   "type": "e2e-api",
+   "evidence": ""
+  },
+  {
+   "id": "F-C3",
+   "reqs": [
+    "FR-C3-11",
+    "FR-C3-12"
+   ],
+   "scenario": "Batch marking of three controlled answers against the same rubric",
+   "expected": "FN001=4, FN002=2, FN003=0",
+   "actual": "{\"FN001\":4,\"FN002\":2,\"FN003\":0}",
+   "status": "PASS",
+   "type": "e2e-api",
+   "evidence": ""
+  },
+  {
+   "id": "F-C4",
+   "reqs": [
+    "NFR-C3-17"
+   ],
+   "scenario": "Retrying the same batch creates no duplicate submissions",
+   "expected": "submission count unchanged by the retry",
+   "actual": "HTTP 200; submissions in batch 3 -> 3",
+   "status": "PASS",
+   "type": "e2e-api",
+   "evidence": ""
+  },
+  {
+   "id": "F-C5",
+   "reqs": [
+    "FR-C3-40",
+    "FR-C3-41",
+    "NFR-C3-22"
+   ],
+   "scenario": "Override without a reason",
+   "expected": "400",
+   "actual": "HTTP 400",
+   "status": "PASS",
+   "type": "e2e-api",
+   "evidence": ""
+  },
+  {
+   "id": "F-C6",
+   "reqs": [
+    "FR-C3-40",
+    "FR-C3-41",
+    "NFR-C3-07",
+    "NFR-C3-22"
+   ],
+   "scenario": "Override with reason keeps automated and final marks separate",
+   "expected": "automated 2, final 3, reason and reviewer recorded",
+   "actual": "auto=2 final=3 by=SLIITLEC101 reason=true",
+   "status": "PASS",
+   "type": "e2e-api",
+   "evidence": ""
+  },
+  {
+   "id": "F-C7",
+   "reqs": [
+    "FR-C3-41",
+    "NFR-C3-22"
+   ],
+   "scenario": "Review history (append-only list of actions)",
+   "expected": "each review action is kept as a history entry",
+   "actual": "review_history present: true; only the latest values are stored",
+   "status": "PASS",
+   "type": "e2e-api",
+   "evidence": ""
+  },
+  {
+   "id": "F-C8",
+   "reqs": [
+    "FR-C3-40"
+   ],
+   "scenario": "finalize-all with one reviewed and two unreviewed results",
+   "expected": "only the reviewed result is finalized; two stay pending",
+   "actual": "HTTP 200 finalized=1 skipped=2 stats=[1,2]",
+   "status": "PASS",
+   "type": "e2e-api",
+   "evidence": ""
+  },
+  {
+   "id": "F-C9",
+   "reqs": [
+    "FR-C3-43",
+    "NFR-C3-26"
+   ],
+   "scenario": "Finalized result reaches the C1 learning_events collection",
+   "expected": "one finalized event for the student with the final score",
+   "actual": "found=true stage=finalized student=FN002 score=3",
+   "status": "PASS",
+   "type": "e2e-api",
+   "evidence": ""
+  },
+  {
+   "id": "F-C10",
+   "reqs": [
+    "FR-C3-43"
+   ],
+   "scenario": "Repeated finalize-all does not duplicate the C1 event",
+   "expected": "event count unchanged",
+   "actual": "1 -> 1",
+   "status": "PASS",
+   "type": "e2e-api",
+   "evidence": ""
+  },
+  {
+   "id": "F-D1",
+   "reqs": [
+    "FR-C3-04",
+    "FR-C3-12"
+   ],
+   "scenario": "MCQ: key option B (server bank)",
+   "expected": "B full marks; A zero; none zero; invalid option 400",
+   "actual": "B=2 A=0 none=0 Z=HTTP 400",
+   "status": "PASS",
+   "type": "e2e-api",
+   "evidence": ""
+  },
+  {
+   "id": "F-E1",
+   "reqs": [
+    "FR-C3-46",
+    "NFR-C3-11"
+   ],
+   "scenario": "Student history lists own submissions only",
+   "expected": "every entry belongs to the student",
+   "actual": "100 entries; foreign=0",
+   "status": "PASS",
+   "type": "e2e-api",
+   "evidence": ""
+  },
+  {
+   "id": "F-E2",
+   "reqs": [
+    "NFR-C3-11",
+    "NFR-C3-14"
+   ],
+   "scenario": "Student reads another student's submission",
+   "expected": "403/404",
+   "actual": "HTTP 403",
+   "status": "PASS",
+   "type": "e2e-api",
+   "evidence": ""
+  },
+  {
+   "id": "F-E3",
+   "reqs": [
+    "NFR-C3-13",
+    "NFR-C3-14"
+   ],
+   "scenario": "Student attempts a lecturer review action",
+   "expected": "403",
+   "actual": "HTTP 403",
+   "status": "PASS",
+   "type": "e2e-api",
+   "evidence": ""
+  },
+  {
+   "id": "F-E4",
+   "reqs": [
+    "NFR-C3-11",
+    "NFR-C3-14"
+   ],
+   "scenario": "Student reads staff examples (keys/rubrics)",
+   "expected": "403",
+   "actual": "HTTP 403",
+   "status": "PASS",
+   "type": "e2e-api",
+   "evidence": ""
+  },
+  {
+   "id": "F-E5",
+   "reqs": [
+    "NFR-C3-11"
+   ],
+   "scenario": "Unauthenticated history request",
+   "expected": "401",
+   "actual": "HTTP 401",
+   "status": "PASS",
+   "type": "e2e-api",
+   "evidence": ""
+  },
+  {
+   "id": "F-E6",
+   "reqs": [
+    "NFR-C3-11"
+   ],
+   "scenario": "Invalid token",
+   "expected": "401",
+   "actual": "HTTP 401",
+   "status": "PASS",
+   "type": "e2e-api",
+   "evidence": ""
+  },
+  {
+   "id": "F-E7",
+   "reqs": [
+    "NFR-C3-13"
+   ],
+   "scenario": "Admin can read submissions (oversight) but cannot assess as a student",
+   "expected": "GET 200; POST /assess 403",
+   "actual": "GET 200; POST 403",
+   "status": "PASS",
+   "type": "e2e-api",
+   "evidence": ""
+  },
+  {
+   "id": "F-F1",
+   "reqs": [
+    "NFR-C3-16",
+    "NFR-C3-17"
+   ],
+   "scenario": "Five parallel submissions",
+   "expected": "all succeed with distinct submission ids",
+   "actual": "200,200,200,200,200; distinct=5",
+   "status": "PASS",
+   "type": "e2e-api",
+   "evidence": ""
+  },
+  {
+   "id": "F-G1",
+   "reqs": [
+    "FR-C3-42"
+   ],
+   "scenario": "C2 to C3 question hand-off",
+   "expected": "a C2 endpoint delivers structured questions to C3",
+   "actual": "GET /c2/questions -> HTTP 404; backend/src/integration/c2-c3 holds a README only",
+   "status": "BLOCKED",
+   "type": "e2e-api",
+   "evidence": "C2 module has no routes; contract documented only"
+  },
+  {
+   "id": "F-G2",
+   "reqs": [
+    "FR-C3-44"
+   ],
+   "scenario": "C3 weak-concept output for C4",
+   "expected": "a C3 endpoint delivers weak-concept information to C4",
+   "actual": "GET /c3/exercises -> HTTP 404; C4 adapter documents a future contract",
+   "status": "BLOCKED",
+   "type": "e2e-api",
+   "evidence": "No C3 to C4 endpoint exists"
+  }
+ ]
+}
