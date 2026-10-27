@@ -1,5 +1,6 @@
 import React from 'react';
 
+// Feedback lists shown under a criterion: [key in the feedback object, heading, CSS class]. Empty lists are hidden.
 const LIST_BLOCKS = [
   ['strengths', 'Strengths', 'strengths'],
   ['missing_or_partial_areas', 'Needs attention', 'gaps'],
@@ -23,8 +24,10 @@ export default function CriterionCard({ criterionMarking, criterionFeedback, sen
     warnings,
   } = criterionMarking;
   const fb = criterionFeedback || {};
+  // Percentage of this criterion's marks earned, and the colour of the pill: full marks green, zero red, otherwise amber.
   const pct = max_marks > 0 ? Math.round((awarded_mark / max_marks) * 100) : 0;
   const tone = awarded_mark === max_marks ? 'status-approved' : awarded_mark === 0 ? 'status-rejected' : 'status-pending';
+  // One list of concept chips (demonstrated / partial / missing) built from the feedback for this criterion.
   const concepts = [
     ...(fb.demonstrated_concepts || []).map((c) => ({ c, kind: 'demonstrated', label: 'Demonstrated' })),
     ...(fb.partial_concepts || []).map((c) => ({ c, kind: 'partial', label: 'Partial' })),
@@ -52,6 +55,7 @@ export default function CriterionCard({ criterionMarking, criterionFeedback, sen
         </div>
       </div>
 
+      {/* The rubric level that was selected, quoted from the rubric itself */}
       {rubric_descriptor && (
         <div className="c3-level-descriptor">
           <span className="c3-descriptor-label">Rubric level reached ({selected_level_id})</span>
@@ -59,6 +63,7 @@ export default function CriterionCard({ criterionMarking, criterionFeedback, sen
         </div>
       )}
 
+      {/* Answer sentences used as evidence (hidden for multiple choice, which has no written evidence) */}
       {showEvidence && (
       <div className="c3-evidence-section">
         <strong>Evidence in the answer</strong>
@@ -90,6 +95,7 @@ export default function CriterionCard({ criterionMarking, criterionFeedback, sen
         </ul>
       )}
 
+      {/* Plain-English reason for the mark */}
       {explanation && (
         <div className="c3-explanation-box">
           <strong>Why this mark</strong>

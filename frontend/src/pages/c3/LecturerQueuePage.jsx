@@ -47,13 +47,16 @@ export default function LecturerQueuePage() {
     return c;
   }, [submissions]);
 
+  // Rows shown: the source tab and the search box are applied here (the status filter is applied by the server).
   const rows = submissions.filter((s) => {
     if (source !== 'all' && sourceKind(s) !== source) return false;
     const t = search.trim().toLowerCase();
     return !t || [s.question_id, s.student_id, s.question_text].some((v) => (v || '').toLowerCase().includes(t));
   });
+  // True when any filter is active (changes the empty-state wording and offers 'Clear filters').
   const filtered = status || source !== 'all' || search.trim();
 
+  // Source tabs; 'Test data' appears only when such submissions exist.
   const sources = [['all', 'All', counts.total], ['student', 'Student submissions', counts.student], ['sample', 'Sample assessments', counts.sample]];
   if (counts.test > 0) sources.push(['test', 'Test data', counts.test]);
 

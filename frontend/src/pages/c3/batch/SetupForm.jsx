@@ -2,6 +2,7 @@ import React from 'react';
 
 // Pure form for step 1 (assessment setup). Errors are computed by the page and shown next to each field.
 export default function SetupForm({ value, onChange, errors, showErrors, criteriaSum, examples, onLoadExample, onSubmit, saving, saveError }) {
+  // Small helpers: set(k) updates one field; err(k)/aria(k) show and announce that field's validation error.
   const set = (k) => (e) => onChange({ [k]: e.target.value });
   const isMcq = value.answerType === 'mcq';
   const err = (k) => (showErrors && errors[k] ? <p className="c3-error" id={`${k}-err`} role="alert">{errors[k]}</p> : null);
@@ -91,6 +92,7 @@ export default function SetupForm({ value, onChange, errors, showErrors, criteri
         {err('questionText')}
       </div>
 
+      {/* Multiple choice: options and the correct answer. Written answers: reference answer, concepts and rubric. */}
       {isMcq ? (
         <fieldset className="c3-field" style={{ border: 0, padding: 0 }}>
           <legend className="c3-label">Options and correct answer</legend>

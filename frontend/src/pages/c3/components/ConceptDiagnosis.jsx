@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 
+// Display text and pill colour for each concept status ('missing' is an older name for 'not_demonstrated').
 const STATUS_LABEL = { demonstrated: 'Demonstrated', partial: 'Partial', not_demonstrated: 'Missing', missing: 'Missing' };
 const STATUS_CLASS = { demonstrated: 'status-approved', partial: 'status-pending', not_demonstrated: 'status-rejected', missing: 'status-rejected' };
 
@@ -11,6 +12,7 @@ export default function ConceptDiagnosis({ analysis, sentenceMap }) {
   if (!analysis || !analysis.concept_matches || analysis.concept_matches.length === 0) return null;
 
   const { concept_matches: matches, sentence_count } = analysis;
+  // Treat the older status name 'missing' as 'not_demonstrated' so both filter and count the same way.
   const norm = (s) => (s === 'missing' ? 'not_demonstrated' : s);
   const count = (s) => matches.filter((c) => norm(c.status) === s).length;
   const shown = matches.filter((c) => filter === 'all' || norm(c.status) === filter);
@@ -59,6 +61,7 @@ export default function ConceptDiagnosis({ analysis, sentenceMap }) {
               </tr>
             ) : (
               shown.map((item) => {
+                // Share of the concept's words found in the answer, and the first sentence that supports it.
                 const pct = Math.round((item.overlap_score || 0) * 100);
                 const ids = item.evidence_sentence_ids || [];
                 return (
