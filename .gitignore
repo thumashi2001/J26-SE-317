@@ -95,3 +95,16 @@ evidence/
 
 # Local C4 Colab source ZIP at repo root (do not ignore every *.zip)
 /c4-source.zip
+
+# Local scratch, seed helpers with demo passwords, and generated PP1 screenshot evidence (not product code)
+/scratch/
+/backend/seed_users.js
+/reports/c3_remediation/ui_screenshots/
+/frontend/public/evidence_feedback.html
+/frontend/public/evidence_integration.html
+/frontend/public/evidence_mcq_result.html
+/frontend/public/evidence_model_training.html
+/scripts/generate_evidence_screenshots.py
+/scripts/sync_verified_screenshots.py
+/frontend/tests/fixtures/subjective_student_detail.json
+/frontend/tests/fixtures/subjective_student_live.json
