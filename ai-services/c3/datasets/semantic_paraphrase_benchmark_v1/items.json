@@ -1,0 +1,1669 @@
+{
+ "benchmark": "semantic-paraphrase-benchmark",
+ "version": "v1",
+ "item_count": 82,
+ "items": [
+  {
+   "item_id": "PB1-G01-P1",
+   "group_id": "G01",
+   "split": "dev",
+   "question_id": "PB1-G01",
+   "question_text": "What is software architecture?",
+   "concept": "components",
+   "student_answer": "An architecture describes the overall organisation of a system: its parts and how they connect to each other.",
+   "category": "paraphrase",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "demonstrated",
+    "proposed_rationale": "Same meaning as the concept in different words."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": {
+    "date": "2026-10-27",
+    "source": "smoke run in report 30 (semantic layer on, MiniLM)",
+    "concept_names_used": "as in that smoke run; the original audit's concept names may differ",
+    "semantic_score": 0.3112,
+    "threshold": 0.5,
+    "lexical_status": "not_demonstrated",
+    "note": "Historical observation only. Re-measure before relying on it."
+   }
+  },
+  {
+   "item_id": "PB1-G01-P2",
+   "group_id": "G01",
+   "split": "dev",
+   "question_id": "PB1-G01",
+   "question_text": "What is software architecture?",
+   "concept": "components",
+   "student_answer": "A system is divided into building blocks, each with its own responsibility.",
+   "category": "paraphrase",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "demonstrated",
+    "proposed_rationale": "Same meaning, second independent phrasing."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": null
+  },
+  {
+   "item_id": "PB1-G01-PT",
+   "group_id": "G01",
+   "split": "dev",
+   "question_id": "PB1-G01",
+   "question_text": "What is software architecture?",
+   "concept": "components",
+   "student_answer": "Architecture is about how the system is organised overall.",
+   "category": "partial",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "partial",
+    "proposed_rationale": "Touches the idea but leaves out what makes it the concept."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": null
+  },
+  {
+   "item_id": "PB1-G01-RI",
+   "group_id": "G01",
+   "split": "dev",
+   "question_id": "PB1-G01",
+   "question_text": "What is software architecture?",
+   "concept": "components",
+   "student_answer": "Software architecture is the user interface design, meaning colours and screen layout.",
+   "category": "related_incorrect",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "contradicted",
+    "proposed_rationale": "On topic and related, but states something that conflicts with the concept."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": null
+  },
+  {
+   "item_id": "PB1-G01-M",
+   "group_id": "G01",
+   "split": "dev",
+   "question_id": "PB1-G01",
+   "question_text": "What is software architecture?",
+   "concept": "components",
+   "student_answer": "Good architecture helps a team deliver a project on time and within budget.",
+   "category": "missing",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "missing",
+    "proposed_rationale": "Does not address the concept at all."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": null
+  },
+  {
+   "item_id": "PB1-G01-N",
+   "group_id": "G01",
+   "split": "dev",
+   "question_id": "PB1-G01",
+   "question_text": "What is software architecture?",
+   "concept": "components",
+   "student_answer": "A system has no separate parts; architecture does not divide software into components.",
+   "category": "negation",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "contradicted",
+    "proposed_rationale": "Uses the concept's words but asserts the opposite."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": null
+  },
+  {
+   "item_id": "PB1-G01-TA",
+   "group_id": "G01",
+   "split": "dev",
+   "question_id": "PB1-G01",
+   "question_text": "What is software architecture?",
+   "concept": "components",
+   "student_answer": "The architecture identifies the main modules or services of the system and what each is responsible for.",
+   "category": "technical_alt",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "demonstrated",
+    "proposed_rationale": "Valid alternative explanation using different technical terms."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": null
+  },
+  {
+   "item_id": "PB1-G01-KT",
+   "group_id": "G01",
+   "split": "dev",
+   "question_id": "PB1-G01",
+   "question_text": "What is software architecture?",
+   "concept": "components",
+   "student_answer": "Components are the electronic components such as resistors soldered on the circuit board of a computer.",
+   "category": "keyword_trap",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "missing",
+    "proposed_rationale": "Contains the concept's words in an unrelated sense; does not show the concept."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": null
+  },
+  {
+   "item_id": "PB1-G02-P1",
+   "group_id": "G02",
+   "split": "dev",
+   "question_id": "PB1-G02",
+   "question_text": "Explain encapsulation in object-oriented programming.",
+   "concept": "encapsulation",
+   "student_answer": "An object keeps its data private and only lets other code reach it through the methods it provides.",
+   "category": "paraphrase",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "demonstrated",
+    "proposed_rationale": "Same meaning as the concept in different words."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": null
+  },
+  {
+   "item_id": "PB1-G02-P2",
+   "group_id": "G02",
+   "split": "dev",
+   "question_id": "PB1-G02",
+   "question_text": "Explain encapsulation in object-oriented programming.",
+   "concept": "encapsulation",
+   "student_answer": "The internal state of a class is hidden from outside code. Other parts of the program must go through a defined set of operations to read or change it.",
+   "category": "paraphrase",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "demonstrated",
+    "proposed_rationale": "Same meaning, second independent phrasing."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": null
+  },
+  {
+   "item_id": "PB1-G02-PT",
+   "group_id": "G02",
+   "split": "dev",
+   "question_id": "PB1-G02",
+   "question_text": "Explain encapsulation in object-oriented programming.",
+   "concept": "encapsulation",
+   "student_answer": "Encapsulation means putting variables and methods together inside a class.",
+   "category": "partial",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "partial",
+    "proposed_rationale": "Touches the idea but leaves out what makes it the concept."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": null
+  },
+  {
+   "item_id": "PB1-G02-RI",
+   "group_id": "G02",
+   "split": "dev",
+   "question_id": "PB1-G02",
+   "question_text": "Explain encapsulation in object-oriented programming.",
+   "concept": "encapsulation",
+   "student_answer": "Encapsulation is when a class inherits fields and methods from a parent class.",
+   "category": "related_incorrect",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "contradicted",
+    "proposed_rationale": "On topic and related, but states something that conflicts with the concept."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": null
+  },
+  {
+   "item_id": "PB1-G02-M",
+   "group_id": "G02",
+   "split": "dev",
+   "question_id": "PB1-G02",
+   "question_text": "Explain encapsulation in object-oriented programming.",
+   "concept": "encapsulation",
+   "student_answer": "Object-oriented programming models real-world things as objects with behaviour.",
+   "category": "missing",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "missing",
+    "proposed_rationale": "Does not address the concept at all."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": null
+  },
+  {
+   "item_id": "PB1-G02-N",
+   "group_id": "G02",
+   "split": "dev",
+   "question_id": "PB1-G02",
+   "question_text": "Explain encapsulation in object-oriented programming.",
+   "concept": "encapsulation",
+   "student_answer": "Encapsulation does not hide anything; it exposes all data directly to other classes.",
+   "category": "negation",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "contradicted",
+    "proposed_rationale": "Uses the concept's words but asserts the opposite."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": null
+  },
+  {
+   "item_id": "PB1-G02-TA",
+   "group_id": "G02",
+   "split": "dev",
+   "question_id": "PB1-G02",
+   "question_text": "Explain encapsulation in object-oriented programming.",
+   "concept": "encapsulation",
+   "student_answer": "Access modifiers such as private restrict direct access, and getters and setters mediate any change to an object's fields.",
+   "category": "technical_alt",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "demonstrated",
+    "proposed_rationale": "Valid alternative explanation using different technical terms."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": null
+  },
+  {
+   "item_id": "PB1-G02-KT",
+   "group_id": "G02",
+   "split": "dev",
+   "question_id": "PB1-G02",
+   "question_text": "Explain encapsulation in object-oriented programming.",
+   "concept": "encapsulation",
+   "student_answer": "Encapsulation of the capsule: a pharmaceutical capsule encapsulates powder medicine inside a gelatin shell.",
+   "category": "keyword_trap",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "missing",
+    "proposed_rationale": "Contains the concept's words in an unrelated sense; does not show the concept."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": null
+  },
+  {
+   "item_id": "PB1-G03-P1",
+   "group_id": "G03",
+   "split": "dev",
+   "question_id": "PB1-G03",
+   "question_text": "What is separation of concerns?",
+   "concept": "separation of concerns",
+   "student_answer": "Each part of a program should deal with one distinct job, so that changing one job does not force changes in the others.",
+   "category": "paraphrase",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "demonstrated",
+    "proposed_rationale": "Same meaning as the concept in different words."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": null
+  },
+  {
+   "item_id": "PB1-G03-P2",
+   "group_id": "G03",
+   "split": "dev",
+   "question_id": "PB1-G03",
+   "question_text": "What is separation of concerns?",
+   "concept": "separation of concerns",
+   "student_answer": "Splitting the code by responsibility, for example one layer for displaying data and another for storing it, keeps each area focused.",
+   "category": "paraphrase",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "demonstrated",
+    "proposed_rationale": "Same meaning, second independent phrasing."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": null
+  },
+  {
+   "item_id": "PB1-G03-PT",
+   "group_id": "G03",
+   "split": "dev",
+   "question_id": "PB1-G03",
+   "question_text": "What is separation of concerns?",
+   "concept": "separation of concerns",
+   "student_answer": "It means dividing a program into sections.",
+   "category": "partial",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "partial",
+    "proposed_rationale": "Touches the idea but leaves out what makes it the concept."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": null
+  },
+  {
+   "item_id": "PB1-G03-RI",
+   "group_id": "G03",
+   "split": "dev",
+   "question_id": "PB1-G03",
+   "question_text": "What is separation of concerns?",
+   "concept": "separation of concerns",
+   "student_answer": "Separation of concerns means keeping each developer in a separate office so they do not disturb one another.",
+   "category": "related_incorrect",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "contradicted",
+    "proposed_rationale": "On topic and related, but states something that conflicts with the concept."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": null
+  },
+  {
+   "item_id": "PB1-G03-M",
+   "group_id": "G03",
+   "split": "dev",
+   "question_id": "PB1-G03",
+   "question_text": "What is separation of concerns?",
+   "concept": "separation of concerns",
+   "student_answer": "Programs written in a clean style are easier to read.",
+   "category": "missing",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "missing",
+    "proposed_rationale": "Does not address the concept at all."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": null
+  },
+  {
+   "item_id": "PB1-G03-N",
+   "group_id": "G03",
+   "split": "dev",
+   "question_id": "PB1-G03",
+   "question_text": "What is separation of concerns?",
+   "concept": "separation of concerns",
+   "student_answer": "Separation of concerns says one module should handle every responsibility in the program.",
+   "category": "negation",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "contradicted",
+    "proposed_rationale": "Uses the concept's words but asserts the opposite."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": null
+  },
+  {
+   "item_id": "PB1-G03-TA",
+   "group_id": "G03",
+   "split": "dev",
+   "question_id": "PB1-G03",
+   "question_text": "What is separation of concerns?",
+   "concept": "separation of concerns",
+   "student_answer": "Following the single-responsibility idea, the presentation, business logic and data access are kept in independent layers.",
+   "category": "technical_alt",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "demonstrated",
+    "proposed_rationale": "Valid alternative explanation using different technical terms."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": null
+  },
+  {
+   "item_id": "PB1-G03-KT",
+   "group_id": "G03",
+   "split": "dev",
+   "question_id": "PB1-G03",
+   "question_text": "What is separation of concerns?",
+   "concept": "separation of concerns",
+   "student_answer": "The separation of the two companies caused concerns among investors.",
+   "category": "keyword_trap",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "missing",
+    "proposed_rationale": "Contains the concept's words in an unrelated sense; does not show the concept."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": null
+  },
+  {
+   "item_id": "PB1-G04-P1",
+   "group_id": "G04",
+   "split": "dev",
+   "question_id": "PB1-G04",
+   "question_text": "Why do teams run regression tests?",
+   "concept": "regression testing",
+   "student_answer": "They re-run earlier tests after a change to confirm that features which used to work have not been broken.",
+   "category": "paraphrase",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "demonstrated",
+    "proposed_rationale": "Same meaning as the concept in different words."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": null
+  },
+  {
+   "item_id": "PB1-G04-P2",
+   "group_id": "G04",
+   "split": "dev",
+   "question_id": "PB1-G04",
+   "question_text": "Why do teams run regression tests?",
+   "concept": "regression testing",
+   "student_answer": "After new code is added, old checks are repeated so that nothing that worked before has silently stopped working.",
+   "category": "paraphrase",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "demonstrated",
+    "proposed_rationale": "Same meaning, second independent phrasing."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": null
+  },
+  {
+   "item_id": "PB1-G04-PT",
+   "group_id": "G04",
+   "split": "dev",
+   "question_id": "PB1-G04",
+   "question_text": "Why do teams run regression tests?",
+   "concept": "regression testing",
+   "student_answer": "Regression testing means running tests.",
+   "category": "partial",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "partial",
+    "proposed_rationale": "Touches the idea but leaves out what makes it the concept."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": null
+  },
+  {
+   "item_id": "PB1-G04-RI",
+   "group_id": "G04",
+   "split": "dev",
+   "question_id": "PB1-G04",
+   "question_text": "Why do teams run regression tests?",
+   "concept": "regression testing",
+   "student_answer": "Regression testing checks that the software can handle a very large number of users at once.",
+   "category": "related_incorrect",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "contradicted",
+    "proposed_rationale": "On topic and related, but states something that conflicts with the concept."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": null
+  },
+  {
+   "item_id": "PB1-G04-M",
+   "group_id": "G04",
+   "split": "dev",
+   "question_id": "PB1-G04",
+   "question_text": "Why do teams run regression tests?",
+   "concept": "regression testing",
+   "student_answer": "Testing is important to find defects before release.",
+   "category": "missing",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "missing",
+    "proposed_rationale": "Does not address the concept at all."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": null
+  },
+  {
+   "item_id": "PB1-G04-N",
+   "group_id": "G04",
+   "split": "dev",
+   "question_id": "PB1-G04",
+   "question_text": "Why do teams run regression tests?",
+   "concept": "regression testing",
+   "student_answer": "Regression testing never needs to be repeated after a change; it is a one-time check before first release.",
+   "category": "negation",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "contradicted",
+    "proposed_rationale": "Uses the concept's words but asserts the opposite."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": null
+  },
+  {
+   "item_id": "PB1-G04-TA",
+   "group_id": "G04",
+   "split": "dev",
+   "question_id": "PB1-G04",
+   "question_text": "Why do teams run regression tests?",
+   "concept": "regression testing",
+   "student_answer": "Automated suites in the CI pipeline guard against unintended side effects of new commits by re-executing previously passing test cases.",
+   "category": "technical_alt",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "demonstrated",
+    "proposed_rationale": "Valid alternative explanation using different technical terms."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": null
+  },
+  {
+   "item_id": "PB1-G04-KT",
+   "group_id": "G04",
+   "split": "dev",
+   "question_id": "PB1-G04",
+   "question_text": "Why do teams run regression tests?",
+   "concept": "regression testing",
+   "student_answer": "A regression line fitted to the testing scores of students predicts their final marks.",
+   "category": "keyword_trap",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "missing",
+    "proposed_rationale": "Contains the concept's words in an unrelated sense; does not show the concept."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": null
+  },
+  {
+   "item_id": "PB1-G05-P1",
+   "group_id": "G05",
+   "split": "dev",
+   "question_id": "PB1-G05",
+   "question_text": "How does branching help when using version control?",
+   "concept": "branching",
+   "student_answer": "Developers can work on a separate copy of the code line without affecting the main version until the work is ready.",
+   "category": "paraphrase",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "demonstrated",
+    "proposed_rationale": "Same meaning as the concept in different words."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": null
+  },
+  {
+   "item_id": "PB1-G05-P2",
+   "group_id": "G05",
+   "split": "dev",
+   "question_id": "PB1-G05",
+   "question_text": "How does branching help when using version control?",
+   "concept": "branching",
+   "student_answer": "Each feature gets its own parallel line of development, and it is joined back to the main line when finished.",
+   "category": "paraphrase",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "demonstrated",
+    "proposed_rationale": "Same meaning, second independent phrasing."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": null
+  },
+  {
+   "item_id": "PB1-G05-PT",
+   "group_id": "G05",
+   "split": "dev",
+   "question_id": "PB1-G05",
+   "question_text": "How does branching help when using version control?",
+   "concept": "branching",
+   "student_answer": "A branch is a copy of the code.",
+   "category": "partial",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "partial",
+    "proposed_rationale": "Touches the idea but leaves out what makes it the concept."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": null
+  },
+  {
+   "item_id": "PB1-G05-RI",
+   "group_id": "G05",
+   "split": "dev",
+   "question_id": "PB1-G05",
+   "question_text": "How does branching help when using version control?",
+   "concept": "branching",
+   "student_answer": "Branching deletes the older versions of the files to save disk space.",
+   "category": "related_incorrect",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "contradicted",
+    "proposed_rationale": "On topic and related, but states something that conflicts with the concept."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": null
+  },
+  {
+   "item_id": "PB1-G05-M",
+   "group_id": "G05",
+   "split": "dev",
+   "question_id": "PB1-G05",
+   "question_text": "How does branching help when using version control?",
+   "concept": "branching",
+   "student_answer": "Version control stores the history of every file.",
+   "category": "missing",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "missing",
+    "proposed_rationale": "Does not address the concept at all."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": null
+  },
+  {
+   "item_id": "PB1-G05-N",
+   "group_id": "G05",
+   "split": "dev",
+   "question_id": "PB1-G05",
+   "question_text": "How does branching help when using version control?",
+   "concept": "branching",
+   "student_answer": "Branching forces every developer to edit the same single line of code at the same time.",
+   "category": "negation",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "contradicted",
+    "proposed_rationale": "Uses the concept's words but asserts the opposite."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": null
+  },
+  {
+   "item_id": "PB1-G05-TA",
+   "group_id": "G05",
+   "split": "dev",
+   "question_id": "PB1-G05",
+   "question_text": "How does branching help when using version control?",
+   "concept": "branching",
+   "student_answer": "Feature branches isolate in-progress commits; a pull request then merges the branch into main after review.",
+   "category": "technical_alt",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "demonstrated",
+    "proposed_rationale": "Valid alternative explanation using different technical terms."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": null
+  },
+  {
+   "item_id": "PB1-G05-KT",
+   "group_id": "G05",
+   "split": "dev",
+   "question_id": "PB1-G05",
+   "question_text": "How does branching help when using version control?",
+   "concept": "branching",
+   "student_answer": "The company has many branching offices, and head office keeps strict control of each version of the policy.",
+   "category": "keyword_trap",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "missing",
+    "proposed_rationale": "Contains the concept's words in an unrelated sense; does not show the concept."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": null
+  },
+  {
+   "item_id": "PB1-G06-P1",
+   "group_id": "G06",
+   "split": "dev",
+   "question_id": "PB1-G06",
+   "question_text": "Why is low coupling desirable between modules?",
+   "concept": "low coupling",
+   "student_answer": "Modules should depend on each other as little as possible, so a change in one rarely forces a change in another.",
+   "category": "paraphrase",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "demonstrated",
+    "proposed_rationale": "Same meaning as the concept in different words."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": null
+  },
+  {
+   "item_id": "PB1-G06-P2",
+   "group_id": "G06",
+   "split": "dev",
+   "question_id": "PB1-G06",
+   "question_text": "Why is low coupling desirable between modules?",
+   "concept": "low coupling",
+   "student_answer": "When parts of a system are only loosely linked, they can be replaced or tested independently.",
+   "category": "paraphrase",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "demonstrated",
+    "proposed_rationale": "Same meaning, second independent phrasing."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": null
+  },
+  {
+   "item_id": "PB1-G06-PT",
+   "group_id": "G06",
+   "split": "dev",
+   "question_id": "PB1-G06",
+   "question_text": "Why is low coupling desirable between modules?",
+   "concept": "low coupling",
+   "student_answer": "Modules should not be too tangled.",
+   "category": "partial",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "partial",
+    "proposed_rationale": "Touches the idea but leaves out what makes it the concept."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": null
+  },
+  {
+   "item_id": "PB1-G06-RI",
+   "group_id": "G06",
+   "split": "dev",
+   "question_id": "PB1-G06",
+   "question_text": "Why is low coupling desirable between modules?",
+   "concept": "low coupling",
+   "student_answer": "Low coupling means a module contains many unrelated functions inside it.",
+   "category": "related_incorrect",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "contradicted",
+    "proposed_rationale": "On topic and related, but states something that conflicts with the concept."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": null
+  },
+  {
+   "item_id": "PB1-G06-M",
+   "group_id": "G06",
+   "split": "dev",
+   "question_id": "PB1-G06",
+   "question_text": "Why is low coupling desirable between modules?",
+   "concept": "low coupling",
+   "student_answer": "Modules make large programs easier to organise.",
+   "category": "missing",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "missing",
+    "proposed_rationale": "Does not address the concept at all."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": null
+  },
+  {
+   "item_id": "PB1-G06-N",
+   "group_id": "G06",
+   "split": "dev",
+   "question_id": "PB1-G06",
+   "question_text": "Why is low coupling desirable between modules?",
+   "concept": "low coupling",
+   "student_answer": "Modules should depend on as many other modules as possible, because heavy dependence is good design, not low coupling.",
+   "category": "negation",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "contradicted",
+    "proposed_rationale": "Uses the concept's words but asserts the opposite."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": null
+  },
+  {
+   "item_id": "PB1-G06-TA",
+   "group_id": "G06",
+   "split": "dev",
+   "question_id": "PB1-G06",
+   "question_text": "Why is low coupling desirable between modules?",
+   "concept": "low coupling",
+   "student_answer": "Loose coupling is achieved by programming to interfaces so that implementations can be swapped without changing the client.",
+   "category": "technical_alt",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "demonstrated",
+    "proposed_rationale": "Valid alternative explanation using different technical terms."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": null
+  },
+  {
+   "item_id": "PB1-G06-KT",
+   "group_id": "G06",
+   "split": "dev",
+   "question_id": "PB1-G06",
+   "question_text": "Why is low coupling desirable between modules?",
+   "concept": "low coupling",
+   "student_answer": "Low voltage coupling of the two railway carriages keeps the train moving.",
+   "category": "keyword_trap",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "missing",
+    "proposed_rationale": "Contains the concept's words in an unrelated sense; does not show the concept."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": null
+  },
+  {
+   "item_id": "PB1-G07-P1",
+   "group_id": "G07",
+   "split": "heldout",
+   "question_id": "PB1-G07",
+   "question_text": "What is the purpose of database normalisation?",
+   "concept": "normalisation",
+   "student_answer": "Tables are organised so that each fact is stored in only one place, which avoids repeating data.",
+   "category": "paraphrase",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "demonstrated",
+    "proposed_rationale": "Same meaning as the concept in different words."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": null
+  },
+  {
+   "item_id": "PB1-G07-P2",
+   "group_id": "G07",
+   "split": "heldout",
+   "question_id": "PB1-G07",
+   "question_text": "What is the purpose of database normalisation?",
+   "concept": "normalisation",
+   "student_answer": "The data is split into related tables to remove duplication and prevent update anomalies.",
+   "category": "paraphrase",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "demonstrated",
+    "proposed_rationale": "Same meaning, second independent phrasing."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": null
+  },
+  {
+   "item_id": "PB1-G07-PT",
+   "group_id": "G07",
+   "split": "heldout",
+   "question_id": "PB1-G07",
+   "question_text": "What is the purpose of database normalisation?",
+   "concept": "normalisation",
+   "student_answer": "It makes the database neater.",
+   "category": "partial",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "partial",
+    "proposed_rationale": "Touches the idea but leaves out what makes it the concept."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": null
+  },
+  {
+   "item_id": "PB1-G07-RI",
+   "group_id": "G07",
+   "split": "heldout",
+   "question_id": "PB1-G07",
+   "question_text": "What is the purpose of database normalisation?",
+   "concept": "normalisation",
+   "student_answer": "Normalisation means copying the same data into many tables so queries are faster.",
+   "category": "related_incorrect",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "contradicted",
+    "proposed_rationale": "On topic and related, but states something that conflicts with the concept."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": null
+  },
+  {
+   "item_id": "PB1-G07-M",
+   "group_id": "G07",
+   "split": "heldout",
+   "question_id": "PB1-G07",
+   "question_text": "What is the purpose of database normalisation?",
+   "concept": "normalisation",
+   "student_answer": "Databases store information in tables of rows and columns.",
+   "category": "missing",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "missing",
+    "proposed_rationale": "Does not address the concept at all."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": null
+  },
+  {
+   "item_id": "PB1-G07-N",
+   "group_id": "G07",
+   "split": "heldout",
+   "question_id": "PB1-G07",
+   "question_text": "What is the purpose of database normalisation?",
+   "concept": "normalisation",
+   "student_answer": "Normalisation does not reduce redundancy; its purpose is to add duplicate copies of every record.",
+   "category": "negation",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "contradicted",
+    "proposed_rationale": "Uses the concept's words but asserts the opposite."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": null
+  },
+  {
+   "item_id": "PB1-G07-TA",
+   "group_id": "G07",
+   "split": "heldout",
+   "question_id": "PB1-G07",
+   "question_text": "What is the purpose of database normalisation?",
+   "concept": "normalisation",
+   "student_answer": "Applying the normal forms, such as 3NF, removes transitive dependencies between non-key attributes.",
+   "category": "technical_alt",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "demonstrated",
+    "proposed_rationale": "Valid alternative explanation using different technical terms."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": null
+  },
+  {
+   "item_id": "PB1-G07-KT",
+   "group_id": "G07",
+   "split": "heldout",
+   "question_id": "PB1-G07",
+   "question_text": "What is the purpose of database normalisation?",
+   "concept": "normalisation",
+   "student_answer": "The normalisation of relations between the two countries was announced after the treaty.",
+   "category": "keyword_trap",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "missing",
+    "proposed_rationale": "Contains the concept's words in an unrelated sense; does not show the concept."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": null
+  },
+  {
+   "item_id": "PB1-G08-P1",
+   "group_id": "G08",
+   "split": "heldout",
+   "question_id": "PB1-G08",
+   "question_text": "How does a load balancer improve a web service?",
+   "concept": "load balancing",
+   "student_answer": "Incoming requests are shared out across several servers so that no single machine is overwhelmed.",
+   "category": "paraphrase",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "demonstrated",
+    "proposed_rationale": "Same meaning as the concept in different words."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": null
+  },
+  {
+   "item_id": "PB1-G08-P2",
+   "group_id": "G08",
+   "split": "heldout",
+   "question_id": "PB1-G08",
+   "question_text": "How does a load balancer improve a web service?",
+   "concept": "load balancing",
+   "student_answer": "Traffic is distributed between multiple back-end machines, and if one fails the others keep serving users.",
+   "category": "paraphrase",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "demonstrated",
+    "proposed_rationale": "Same meaning, second independent phrasing."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": null
+  },
+  {
+   "item_id": "PB1-G08-PT",
+   "group_id": "G08",
+   "split": "heldout",
+   "question_id": "PB1-G08",
+   "question_text": "How does a load balancer improve a web service?",
+   "concept": "load balancing",
+   "student_answer": "It uses more than one server.",
+   "category": "partial",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "partial",
+    "proposed_rationale": "Touches the idea but leaves out what makes it the concept."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": null
+  },
+  {
+   "item_id": "PB1-G08-RI",
+   "group_id": "G08",
+   "split": "heldout",
+   "question_id": "PB1-G08",
+   "question_text": "How does a load balancer improve a web service?",
+   "concept": "load balancing",
+   "student_answer": "A load balancer encrypts the user's passwords before they are stored.",
+   "category": "related_incorrect",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "contradicted",
+    "proposed_rationale": "On topic and related, but states something that conflicts with the concept."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": null
+  },
+  {
+   "item_id": "PB1-G08-M",
+   "group_id": "G08",
+   "split": "heldout",
+   "question_id": "PB1-G08",
+   "question_text": "How does a load balancer improve a web service?",
+   "concept": "load balancing",
+   "student_answer": "Web services should be available all day.",
+   "category": "missing",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "missing",
+    "proposed_rationale": "Does not address the concept at all."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": null
+  },
+  {
+   "item_id": "PB1-G08-N",
+   "group_id": "G08",
+   "split": "heldout",
+   "question_id": "PB1-G08",
+   "question_text": "How does a load balancer improve a web service?",
+   "concept": "load balancing",
+   "student_answer": "A load balancer sends every request to one single server and never uses the other servers.",
+   "category": "negation",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "contradicted",
+    "proposed_rationale": "Uses the concept's words but asserts the opposite."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": null
+  },
+  {
+   "item_id": "PB1-G08-TA",
+   "group_id": "G08",
+   "split": "heldout",
+   "question_id": "PB1-G08",
+   "question_text": "How does a load balancer improve a web service?",
+   "concept": "load balancing",
+   "student_answer": "A reverse proxy using round-robin or least-connections forwards each request to a healthy node in the pool.",
+   "category": "technical_alt",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "demonstrated",
+    "proposed_rationale": "Valid alternative explanation using different technical terms."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": null
+  },
+  {
+   "item_id": "PB1-G08-KT",
+   "group_id": "G08",
+   "split": "heldout",
+   "question_id": "PB1-G08",
+   "question_text": "How does a load balancer improve a web service?",
+   "concept": "load balancing",
+   "student_answer": "The balancing of the load on the lorry was checked before the driver left.",
+   "category": "keyword_trap",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "missing",
+    "proposed_rationale": "Contains the concept's words in an unrelated sense; does not show the concept."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": null
+  },
+  {
+   "item_id": "PB1-G09-P1",
+   "group_id": "G09",
+   "split": "heldout",
+   "question_id": "PB1-G09",
+   "question_text": "What is requirements traceability?",
+   "concept": "requirements traceability",
+   "student_answer": "Every requirement can be followed forwards to the design, code and tests that implement it, and backwards to where it came from.",
+   "category": "paraphrase",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "demonstrated",
+    "proposed_rationale": "Same meaning as the concept in different words."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": null
+  },
+  {
+   "item_id": "PB1-G09-P2",
+   "group_id": "G09",
+   "split": "heldout",
+   "question_id": "PB1-G09",
+   "question_text": "What is requirements traceability?",
+   "concept": "requirements traceability",
+   "student_answer": "There are recorded links between what the customer asked for and the artefacts built to satisfy it.",
+   "category": "paraphrase",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "demonstrated",
+    "proposed_rationale": "Same meaning, second independent phrasing."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": null
+  },
+  {
+   "item_id": "PB1-G09-PT",
+   "group_id": "G09",
+   "split": "heldout",
+   "question_id": "PB1-G09",
+   "question_text": "What is requirements traceability?",
+   "concept": "requirements traceability",
+   "student_answer": "It means keeping a list of the requirements.",
+   "category": "partial",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "partial",
+    "proposed_rationale": "Touches the idea but leaves out what makes it the concept."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": null
+  },
+  {
+   "item_id": "PB1-G09-RI",
+   "group_id": "G09",
+   "split": "heldout",
+   "question_id": "PB1-G09",
+   "question_text": "What is requirements traceability?",
+   "concept": "requirements traceability",
+   "student_answer": "Requirements traceability is the process of measuring how fast the program runs.",
+   "category": "related_incorrect",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "contradicted",
+    "proposed_rationale": "On topic and related, but states something that conflicts with the concept."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": null
+  },
+  {
+   "item_id": "PB1-G09-M",
+   "group_id": "G09",
+   "split": "heldout",
+   "question_id": "PB1-G09",
+   "question_text": "What is requirements traceability?",
+   "concept": "requirements traceability",
+   "student_answer": "Requirements are gathered by interviewing stakeholders.",
+   "category": "missing",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "missing",
+    "proposed_rationale": "Does not address the concept at all."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": null
+  },
+  {
+   "item_id": "PB1-G09-N",
+   "group_id": "G09",
+   "split": "heldout",
+   "question_id": "PB1-G09",
+   "question_text": "What is requirements traceability?",
+   "concept": "requirements traceability",
+   "student_answer": "Requirements traceability says there should be no link between a requirement and the tests, so each is kept apart.",
+   "category": "negation",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "contradicted",
+    "proposed_rationale": "Uses the concept's words but asserts the opposite."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": null
+  },
+  {
+   "item_id": "PB1-G09-TA",
+   "group_id": "G09",
+   "split": "heldout",
+   "question_id": "PB1-G09",
+   "question_text": "What is requirements traceability?",
+   "concept": "requirements traceability",
+   "student_answer": "A traceability matrix maps each requirement ID to its test cases and to the modules that realise it.",
+   "category": "technical_alt",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "demonstrated",
+    "proposed_rationale": "Valid alternative explanation using different technical terms."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": null
+  },
+  {
+   "item_id": "PB1-G09-KT",
+   "group_id": "G09",
+   "split": "heldout",
+   "question_id": "PB1-G09",
+   "question_text": "What is requirements traceability?",
+   "concept": "requirements traceability",
+   "student_answer": "The requirements for the course were traceable to the university website, which traces the history of the campus.",
+   "category": "keyword_trap",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "missing",
+    "proposed_rationale": "Contains the concept's words in an unrelated sense; does not show the concept."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": null
+  },
+  {
+   "item_id": "PB1-G10-P1",
+   "group_id": "G10",
+   "split": "heldout",
+   "question_id": "PB1-G10",
+   "question_text": "What is continuous integration?",
+   "concept": "continuous integration",
+   "student_answer": "Developers merge their changes into the shared code often, and each merge is automatically built and tested.",
+   "category": "paraphrase",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "demonstrated",
+    "proposed_rationale": "Same meaning as the concept in different words."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": null
+  },
+  {
+   "item_id": "PB1-G10-P2",
+   "group_id": "G10",
+   "split": "heldout",
+   "question_id": "PB1-G10",
+   "question_text": "What is continuous integration?",
+   "concept": "continuous integration",
+   "student_answer": "Small updates are combined into the main code several times a day, with automated checks that report problems quickly.",
+   "category": "paraphrase",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "demonstrated",
+    "proposed_rationale": "Same meaning, second independent phrasing."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": null
+  },
+  {
+   "item_id": "PB1-G10-PT",
+   "group_id": "G10",
+   "split": "heldout",
+   "question_id": "PB1-G10",
+   "question_text": "What is continuous integration?",
+   "concept": "continuous integration",
+   "student_answer": "Code is tested automatically.",
+   "category": "partial",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "partial",
+    "proposed_rationale": "Touches the idea but leaves out what makes it the concept."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": null
+  },
+  {
+   "item_id": "PB1-G10-RI",
+   "group_id": "G10",
+   "split": "heldout",
+   "question_id": "PB1-G10",
+   "question_text": "What is continuous integration?",
+   "concept": "continuous integration",
+   "student_answer": "Continuous integration means releasing the software to customers only once a year after all work is finished.",
+   "category": "related_incorrect",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "contradicted",
+    "proposed_rationale": "On topic and related, but states something that conflicts with the concept."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": null
+  },
+  {
+   "item_id": "PB1-G10-M",
+   "group_id": "G10",
+   "split": "heldout",
+   "question_id": "PB1-G10",
+   "question_text": "What is continuous integration?",
+   "concept": "continuous integration",
+   "student_answer": "Teams use tools such as chat and issue trackers to communicate.",
+   "category": "missing",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "missing",
+    "proposed_rationale": "Does not address the concept at all."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": null
+  },
+  {
+   "item_id": "PB1-G10-N",
+   "group_id": "G10",
+   "split": "heldout",
+   "question_id": "PB1-G10",
+   "question_text": "What is continuous integration?",
+   "concept": "continuous integration",
+   "student_answer": "Continuous integration does not involve any automatic building or testing; developers merge by hand once a term.",
+   "category": "negation",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "contradicted",
+    "proposed_rationale": "Uses the concept's words but asserts the opposite."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": null
+  },
+  {
+   "item_id": "PB1-G10-TA",
+   "group_id": "G10",
+   "split": "heldout",
+   "question_id": "PB1-G10",
+   "question_text": "What is continuous integration?",
+   "concept": "continuous integration",
+   "student_answer": "On every push the CI server compiles the project and runs the test suite, failing the pipeline if a test breaks.",
+   "category": "technical_alt",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "demonstrated",
+    "proposed_rationale": "Valid alternative explanation using different technical terms."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": null
+  },
+  {
+   "item_id": "PB1-G10-KT",
+   "group_id": "G10",
+   "split": "heldout",
+   "question_id": "PB1-G10",
+   "question_text": "What is continuous integration?",
+   "concept": "continuous integration",
+   "student_answer": "Continuous rain caused the integration of the two schools to be delayed.",
+   "category": "keyword_trap",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "missing",
+    "proposed_rationale": "Contains the concept's words in an unrelated sense; does not show the concept."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": null
+  },
+  {
+   "item_id": "PB1-G01-P1-INT",
+   "group_id": "G01",
+   "split": "dev",
+   "question_id": "PB1-G01",
+   "question_text": "What is software architecture?",
+   "concept": "interactions",
+   "student_answer": "An architecture describes the overall organisation of a system: its parts and how they connect to each other.",
+   "category": "paraphrase",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "demonstrated",
+    "proposed_rationale": "Same meaning as the concept in different words."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": {
+    "date": "2026-10-27",
+    "source": "smoke run in report 30 (semantic layer on, MiniLM)",
+    "semantic_score": 0.1884,
+    "threshold": 0.5,
+    "lexical_status": "not_demonstrated",
+    "note": "Historical observation only. Re-measure before relying on it."
+   }
+  },
+  {
+   "item_id": "PB1-G01-P1-ORG",
+   "group_id": "G01",
+   "split": "dev",
+   "question_id": "PB1-G01",
+   "question_text": "What is software architecture?",
+   "concept": "organisation",
+   "student_answer": "An architecture describes the overall organisation of a system: its parts and how they connect to each other.",
+   "category": "paraphrase",
+   "draft": {
+    "author": "AI-drafted text (Claude, 2026-10-27); NOT a human label",
+    "proposed_label": "demonstrated",
+    "proposed_rationale": "Same meaning as the concept in different words."
+   },
+   "label_status": "draft_unreviewed",
+   "annotations": [],
+   "adjudication": null,
+   "final_label": null,
+   "historical_observation": {
+    "date": "2026-10-27",
+    "source": "smoke run in report 30 (semantic layer on, MiniLM)",
+    "semantic_score": 0.4339,
+    "threshold": 0.5,
+    "lexical_status": "demonstrated",
+    "note": "Historical observation only. Re-measure before relying on it."
+   }
+  }
+ ]
+}

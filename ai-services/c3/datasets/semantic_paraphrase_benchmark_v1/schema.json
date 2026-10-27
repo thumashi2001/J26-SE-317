@@ -1,0 +1,27 @@
+{
+  "$comment": "Documentation of items.json. The enforcing code is datasets/paraphrase_benchmark/validate.py (item_problems).",
+  "title": "semantic-paraphrase-benchmark item (v1)",
+  "type": "object",
+  "required": ["item_id", "group_id", "split", "question_id", "question_text", "concept", "student_answer", "category", "draft", "label_status", "annotations", "adjudication", "final_label"],
+  "properties": {
+    "item_id": {"type": "string", "description": "unique, e.g. PB1-G03-P1"},
+    "group_id": {"type": "string", "description": "one question/concept source; all items of a group share one split"},
+    "split": {"enum": ["dev", "heldout"]},
+    "question_id": {"type": "string"},
+    "question_text": {"type": "string"},
+    "concept": {"type": "string", "description": "the single expected concept this item asks about"},
+    "student_answer": {"type": "string"},
+    "category": {"enum": ["paraphrase", "partial", "related_incorrect", "missing", "negation", "technical_alt", "keyword_trap"]},
+    "draft": {"type": "object", "description": "who wrote the text and the drafter's intended label. NOT ground truth.",
+              "required": ["author", "proposed_label"],
+              "properties": {"author": {"type": "string"}, "proposed_label": {"enum": ["demonstrated", "partial", "missing", "contradicted"]}, "proposed_rationale": {"type": "string"}}},
+    "label_status": {"enum": ["draft_unreviewed", "annotated", "needs_adjudication", "human_labelled", "adjudicated"], "description": "derived from annotations; must match"},
+    "annotations": {"type": "array", "description": "independent human labels; >= 2 needed before an item is scored",
+                    "items": {"type": "object", "required": ["annotator_id", "label", "rationale"],
+                              "properties": {"annotator_id": {"pattern": "^ANN\\d{2}$"}, "label": {"enum": ["demonstrated", "partial", "missing", "contradicted"]}, "rationale": {"type": "string", "minLength": 1}}}},
+    "adjudication": {"type": ["object", "null"], "description": "required when annotators disagree",
+                     "properties": {"adjudicator_id": {"pattern": "^ADJ\\d{2}$"}, "label": {"enum": ["demonstrated", "partial", "missing", "contradicted"]}, "rationale": {"type": "string"}}},
+    "final_label": {"type": ["string", "null"], "description": "agreed or adjudicated human label; null until settled"},
+    "historical_observation": {"type": ["object", "null"], "description": "previously observed model behaviour kept as history; never used as a label or re-used as a result"}
+  }
+}
