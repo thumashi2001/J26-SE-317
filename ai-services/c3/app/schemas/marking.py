@@ -1,3 +1,9 @@
+"""Data shapes for Function 2: rubric-aware marking.
+
+A rubric is a tree:  Rubric -> criteria -> scoring levels (each level has a fixed mark and an optional evidence rule).
+The marks a student can receive are ONLY the `mark` values written in the rubric levels; the engine never computes a
+mark from a percentage or a model score. The validators below are input validation (is the rubric well formed?).
+"""
 from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
@@ -8,6 +14,8 @@ EvidenceRuleType = Literal["required_concept_count"]
 
 
 class EvidenceRule(BaseModel):
+    """How many of a level's required concepts must be demonstrated (or partial) for that level to be reached."""
+
     model_config = ConfigDict(str_strip_whitespace=True)
 
     type: EvidenceRuleType
@@ -17,6 +25,8 @@ class EvidenceRule(BaseModel):
 
     @model_validator(mode="after")
     def validate_thresholds(self) -> "EvidenceRule":
+        # The three checks keep the rule self-consistent: it must ask for something, and partial credit must be switched
+        # on exactly when partial concepts are required.
         if self.minimum_demonstrated == 0 and self.minimum_partial == 0:
             raise ValueError("evidence_rule must require at least one concept")
         if self.minimum_partial > 0 and not self.allow_partial:
@@ -31,6 +41,8 @@ class EvidenceRule(BaseModel):
 
 
 class ScoringLevel(BaseModel):
+    """One rung of a criterion (for example 'Developing' = 2 marks). The mark is fixed by the lecturer."""
+
     model_config = ConfigDict(str_strip_whitespace=True)
 
     level_id: str = Field(min_length=1)
@@ -50,13 +62,15 @@ class ScoringLevel(BaseModel):
 
 
 class RubricCriterion(BaseModel):
+    """One thing being marked (for example 'understanding of architectural structure'), worth max_marks."""
+
     model_config = ConfigDict(str_strip_whitespace=True)
 
     criterion_id: str = Field(min_length=1)
     description: str = Field(min_length=1)
     max_marks: float = Field(gt=0.0)
     required_concepts: list[str] = Field(default_factory=list)
-    scoring_levels: list[ScoringLevel] = Field(min_length=1)
+    scoring_levels: list[ScoringLevel] = Field(min_length=1)  # at least one level is mandatory
 
     @field_validator("required_concepts")
     @classmethod
@@ -67,6 +81,8 @@ class RubricCriterion(BaseModel):
 
 
 class Rubric(BaseModel):
+    """The whole marking scheme: at least one criterion."""
+
     model_config = ConfigDict(str_strip_whitespace=True)
 
     rubric_id: str = Field(min_length=1)
@@ -75,24 +91,30 @@ class Rubric(BaseModel):
 
 
 class MarkingRequest(AnswerAnalysisRequest):
+    """Everything in an analysis request plus the rubric to mark against."""
+
     rubric: Rubric
 
 
 class CriterionMarkingResult(BaseModel):
+    """The marking outcome for ONE criterion: which level was reached and the evidence behind it."""
+
     criterion_id: str
     criterion_description: str
     selected_level_id: str
     selected_level_label: str
     rubric_descriptor: str
-    awarded_mark: float = Field(ge=0.0)
+    awarded_mark: float = Field(ge=0.0)         # equals the `mark` of the selected level
     max_marks: float = Field(gt=0.0)
-    evidence_sentence_ids: list[int]
-    supporting_concepts: list[str]
+    evidence_sentence_ids: list[int]             # answer sentences that support the decision
+    supporting_concepts: list[str]               # concepts found that justify the level
     explanation: str
     warnings: list[str]
 
 
 class MarkingResponse(BaseModel):
+    """Marks for every criterion plus the total (the sum of the criterion marks)."""
+
     question_id: str
     criteria_results: list[CriterionMarkingResult]
     total_awarded_marks: float = Field(ge=0.0)

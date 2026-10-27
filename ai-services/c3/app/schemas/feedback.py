@@ -1,13 +1,18 @@
+"""Data shapes for Function 3: explanations and feedback (built from the marking result, never able to change it)."""
 from pydantic import BaseModel, Field
 
 from app.schemas.marking import MarkingRequest
 
 
 class FeedbackRequest(BaseModel):
+    """Feedback is requested with the same payload as marking (the service re-marks to keep feedback consistent)."""
+
     marking_request: MarkingRequest
 
 
 class CriterionFeedback(BaseModel):
+    """Feedback for one criterion: the mark, the concept status lists, and the text shown to the student."""
+
     criterion_id: str
     criterion_description: str
     max_marks: float = Field(gt=0.0)
@@ -19,15 +24,17 @@ class CriterionFeedback(BaseModel):
     demonstrated_concepts: list[str]
     partial_concepts: list[str]
     missing_concepts: list[str]
-    next_level_improvements: list[str] = []
+    next_level_improvements: list[str] = []     # concepts only needed by a HIGHER rubric level
     explanation: str
     strengths: list[str]
     missing_or_partial_areas: list[str]
-    improvement_suggestions: list[str]
+    improvement_suggestions: list[str]          # the "how to improve" text
     warnings: list[str]
 
 
 class OverallFeedback(BaseModel):
+    """Whole-answer summary built by merging the per-criterion feedback."""
+
     total_mark: float = Field(ge=0.0)
     total_possible: float = Field(gt=0.0)
     percentage: float | None = Field(default=None, ge=0.0, le=100.0)

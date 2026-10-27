@@ -9,6 +9,10 @@ Two backends, each reported honestly through `active_backend`:
   * "dense"  - genuine remote embeddings (C3_EMBEDDING_PROVIDER: gemini | openai).
   * "tfidf"  - a lexical TF-IDF baseline. It is NOT a dense embedding model.
 If "dense" is requested but unavailable, construction fails; there is no silent fallback.
+
+STATUS: offline library and experiments. vector_store_config_status() is only what /health reports (configuration, no
+index is built at start-up). NOT USED BY LIVE MARKING: the web service's /c3/assess path never imports or calls this
+module's functionality.
 """
 
 import logging

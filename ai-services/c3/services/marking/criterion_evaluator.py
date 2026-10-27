@@ -1,3 +1,24 @@
+"""THE FUNCTION THAT AWARDS THE MARK: evaluate_criterion() at the bottom of this file.
+
+SIMPLE ENGLISH
+    A rubric criterion is a ladder of levels, each with a fixed mark, for example
+        L4 "Proficient" = 4 marks  (needs all 3 concepts)
+        L2 "Developing" = 2 marks  (needs at least 1 concept)
+        L0 "Unsatisfactory" = 0 marks (no requirement)
+    The engine starts at the TOP rung and walks down. The first rung whose requirements are satisfied by the
+    evidence found in the student's answer is the level awarded, and the student gets exactly that level's mark.
+
+HOW "EVIDENCE" IS DECIDED
+    Evidence comes from Function 1 (services/semantic/analyzer.py): for every concept the analyzer says
+    demonstrated / partial / not_demonstrated using TOKEN OVERLAP (shared words), never a trained model.
+    So the awarded mark is: fixed rubric rules + word matching. There is no machine-learning model, embedding, LLM or
+    percentage formula in this file.
+
+WORKED EXAMPLE (rubric above, answer = "The system is made of components.")
+    concept statuses: components = demonstrated, the other two = not_demonstrated
+    try L4: needs 3 demonstrated -> only 1 found -> not supported
+    try L2: needs 1 demonstrated -> 1 found       -> supported  => awarded mark = 2
+"""
 from dataclasses import dataclass
 
 from app.schemas.analysis import AnswerAnalysisResponse
@@ -8,17 +29,21 @@ from services.semantic.baseline import token_overlap_score
 
 @dataclass(frozen=True)
 class LevelEvidence:
-    supported: bool
-    concepts: list[str]
-    sentence_ids: list[int]
-    reasons: list[str]
+    """Verdict for ONE rubric level: is it supported by the answer, and what evidence backs that."""
+
+    supported: bool           # True = the answer meets this level's requirements
+    concepts: list[str]       # concepts that were found and count towards this level
+    sentence_ids: list[int]   # answer sentences that contain that evidence
+    reasons: list[str]        # why the level was NOT supported (empty when supported)
 
 
 def _concept_matches(analysis: AnswerAnalysisResponse) -> dict[str, object]:
+    # Look-up table: concept name (lowercase) -> its ConceptMatch from Function 1.
     return {match.concept.casefold(): match for match in analysis.concept_matches}
 
 
 def _effective_concepts(criterion: RubricCriterion, level: ScoringLevel) -> list[str]:
+    """Concepts a level really requires = the criterion's concepts plus the level's own (no duplicates)."""
     concepts: list[str] = []
     seen: set[str] = set()
     for c in criterion.required_concepts:
@@ -37,12 +62,14 @@ def _level_evidence(
     level: ScoringLevel,
     analysis: AnswerAnalysisResponse,
 ) -> LevelEvidence:
+    """Decide whether the answer satisfies ONE level (this is where the rubric rules are applied)."""
     matches = _concept_matches(analysis)
     effective_required_concepts = _effective_concepts(criterion, level)
     concepts: list[str] = []
     sentence_ids: set[int] = set()
     reasons: list[str] = []
 
+    # CASE 1 - the lowest "zero marks" level has no requirement, so it is always supported (it is the safety net).
     if level.mark == 0.0 and level.evidence_rule is None and not level.required_concepts and not level.evidence_requirements:
         for required_concept in effective_required_concepts:
             match = matches.get(required_concept.casefold())
@@ -56,6 +83,7 @@ def _level_evidence(
             reasons=[],
         )
 
+    # CASE 2 - no explicit counting rule: EVERY required concept must be fully demonstrated.
     if level.evidence_rule is None:
         for required_concept in effective_required_concepts:
             match = matches.get(required_concept.casefold())
@@ -71,6 +99,7 @@ def _level_evidence(
                 continue
             concepts.append(required_concept)
             sentence_ids.update(match.evidence_sentence_ids)
+    # CASE 3 - an explicit rule ("at least N demonstrated / M partial"): count the concepts and compare with the rule.
     else:
         demonstrated_count = 0
         partial_count = 0
@@ -87,6 +116,7 @@ def _level_evidence(
                 sentence_ids.update(match.evidence_sentence_ids)
             elif match.status == "partial":
                 partial_count += 1
+                # Partial concepts only help when the rubric explicitly allows partial credit.
                 if level.evidence_rule.allow_partial:
                     concepts.append(required_concept)
                     sentence_ids.update(match.evidence_sentence_ids)
@@ -100,6 +130,7 @@ def _level_evidence(
                 "partial concept count is below the evidence-rule minimum"
             )
 
+    # Optional extra requirements (phrases the level wants to see): each needs at least one shared word with the answer.
     answer_tokens = tokenize(analysis.normalized_answer)
     for requirement in level.evidence_requirements:
         if token_overlap_score(requirement, answer_tokens) == 0.0:
@@ -117,6 +148,7 @@ def _level_evidence(
         or level.evidence_requirements
         or level.evidence_rule
     )
+    # A level is supported only if it asked for something AND nothing was missing (no reasons collected).
     supported = has_requirements and not reasons
     if level.mark == 0.0 and not has_requirements:
         supported = True
@@ -135,6 +167,7 @@ def _explanation(
     evidence: LevelEvidence,
     warnings: list[str],
 ) -> str:
+    """One-sentence explanation stored with the result (the richer 'how to improve' text is built in services/feedback)."""
     if warnings:
         return (
             f"Selected rubric level '{level.label}' ({level.mark:g} marks) for "
@@ -161,10 +194,12 @@ def evaluate_criterion(
     This evaluator never converts a percentage of concepts into marks. Marks
     come only from the selected scoring level supplied by the rubric.
     """
+    # Order the levels from the highest mark down (ties keep the rubric's own order).
     ordered_levels = sorted(
         enumerate(criterion.scoring_levels),
         key=lambda item: (-item[1].mark, item[0]),
     )
+    # Walk down the ladder; the first supported level with a positive mark wins and its mark is awarded.
     for _, level in ordered_levels:
         if level.mark <= 0.0:
             continue
@@ -172,6 +207,7 @@ def evaluate_criterion(
         if evidence.supported:
             return _result_for_level(criterion, level, evidence, [])
 
+    # Nothing positive was supported: fall back to the lowest level (usually 0 marks) and say so in a warning.
     lowest_level = min(
         criterion.scoring_levels,
         key=lambda level: level.mark,
@@ -190,6 +226,7 @@ def _result_for_level(
     evidence: LevelEvidence,
     warnings: list[str],
 ) -> CriterionMarkingResult:
+    """Package the chosen level as the criterion's result. awarded_mark is simply the level's rubric mark."""
     return CriterionMarkingResult(
         criterion_id=criterion.criterion_id,
         criterion_description=criterion.description,

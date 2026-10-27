@@ -9,6 +9,9 @@ Ground truth is the per-concept label fixed when each fixture answer was written
 it is author-labelled by construction and NOT human-marker validated. No label is derived from any model output.
 Nothing here changes the live /assess behaviour: the experiment is offline and reads only local files and the cached
 all-MiniLM-L6-v2 weights.
+
+STATUS: exploratory offline experiment (pretrained MiniLM, no training). Running select/evaluate rewrites
+frozen_config.json and the results JSON in the repository, so do not run it casually.
 """
 from __future__ import annotations
 

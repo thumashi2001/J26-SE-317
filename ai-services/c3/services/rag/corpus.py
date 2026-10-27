@@ -4,6 +4,9 @@ AdaptiveLearnSE Component 3 - Training-only retrieval corpus for Vector RAG.
 The corpus is built from the TRAIN split of a repaired dataset directory only: question reference answers and
 question-level expected concepts of eligible train questions. Validation/test questions, student answers and marks are never read, so retrieval
 cannot leak held-out information. Every document carries provenance (question id, module, source file hash).
+
+STATUS: offline (builds the retrieval corpus for the RAG experiments from the training split only). NOT USED BY LIVE
+MARKING: the web service's /c3/assess path never imports or calls this module's functionality.
 """
 
 from __future__ import annotations

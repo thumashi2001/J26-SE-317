@@ -4,6 +4,8 @@ AdaptiveLearnSE Component 3 — Experiment framework (real models only).
 Shared building blocks for conditions A-F: metric computation with bootstrap intervals,
 provenance-stamped result files, prompt builders and strict response parsing. A failed model call
 is recorded as `failed` and excluded from the error metrics (and counted); it is never scored as 0.
+
+STATUS: offline research library (metrics, prompt builders, provenance stamping). Never imported by the web service.
 """
 
 import hashlib

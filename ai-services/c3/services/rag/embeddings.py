@@ -4,6 +4,11 @@ AdaptiveLearnSE Component 3 — Real dense embedding providers (Gemini, OpenAI, 
 Embeddings are produced by genuine remote embedding models; nothing is simulated. Vectors are
 validated (finite, consistent dimension) and L2-normalised so a dot product equals cosine
 similarity. An optional JSONL cache makes experiment runs reproducible and cheap.
+
+STATUS: offline. LocalSentenceTransformerEmbedding runs the PRETRAINED all-MiniLM-L6-v2 weights locally (they were
+downloaded, not trained or fine-tuned in this project). Embeddings are used by the RAG library and the experiments.
+Live marking has no embedding step. NOT USED BY LIVE MARKING: the web service's /c3/assess path never imports or calls
+this module's functionality.
 """
 
 import hashlib

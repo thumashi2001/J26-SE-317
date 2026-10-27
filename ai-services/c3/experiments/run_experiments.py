@@ -7,6 +7,9 @@ AdaptiveLearnSE Component 3 — Experiment runner for conditions baseline, A, B,
 
 All LLM/embedding/Neo4j calls are real. Outputs (predictions CSV, summary JSON, results table,
 run manifest) are written to experiments/results/<run_id>/ and contain only measured values.
+
+STATUS: offline research runner (run from ai-services/c3). Needs credentials for any LLM condition; --smoke checks the
+setup. Outputs go to experiments/results/ (git-ignored).
 """
 
 import argparse

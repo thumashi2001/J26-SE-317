@@ -1,3 +1,9 @@
+"""Data shapes for Function 4: the answer-specific concept mind map.
+
+A mind map here is a small graph: one root node (the question) and one node per concept, joined by relationships.
+In the current implementation every relationship is a structural root -> concept link ("child"); no semantic
+concept-to-concept relationship is generated.
+"""
 
 from pydantic import BaseModel
 
@@ -9,12 +15,14 @@ class MindMapRequest(BaseModel):
 
 
 class Node(BaseModel):
+    """A box in the map: the question (root) or one concept with its status and evidence sentences."""
+
     node_id: str
     type: str
     concept: str
     label: str
     source: str
-    status: str | None = None
+    status: str | None = None                       # demonstrated / partial / missing (concept nodes only)
     evidence_sentence_ids: list[int] = []
     parent_node_id: str | None = None
     children: list[str] = []
@@ -22,6 +30,8 @@ class Node(BaseModel):
 
 
 class Relationship(BaseModel):
+    """A line between two nodes. `evidence` explains why the line exists."""
+
     relationship_id: str
     source_node_id: str
     target_node_id: str

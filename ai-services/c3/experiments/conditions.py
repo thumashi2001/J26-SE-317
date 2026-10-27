@@ -11,6 +11,9 @@ AdaptiveLearnSE Component 3 — Experimental conditions A-F (real execution only
             VALIDATION only, then frozen for the test split.
 
 Every LLM call goes through CachedLLMProvider so a re-run reproduces the recorded real responses.
+
+STATUS: offline research code. Conditions A-D and F need LLM credentials / live Neo4j; E is the same deterministic
+engine the live system uses. Never imported by the web service.
 """
 
 import itertools

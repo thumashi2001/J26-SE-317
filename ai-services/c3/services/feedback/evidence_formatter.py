@@ -1,3 +1,10 @@
+"""Sorts a criterion's concepts into four lists used by the feedback text.
+
+SIMPLE ENGLISH
+    For the level the student reached, which concepts did they show (demonstrated), partly show (partial) or not show
+    (missing)? And which concepts are only asked for by a HIGHER level (next_level), i.e. what to learn to climb up?
+    The status of each concept comes from Function 1 (word overlap); this module only groups them.
+"""
 from app.schemas.analysis import AnswerAnalysisResponse
 from app.schemas.marking import CriterionMarkingResult, RubricCriterion
 
@@ -14,6 +21,7 @@ def concept_status_lists(
       are classified into demonstrated, partial, or missing.
     - Concepts required only by higher scoring levels are classified into next_level.
     """
+    # Look-up: concept name (lowercase) -> Function 1 status.
     matches = {match.concept.casefold(): match for match in analysis.concept_matches}
 
     selected_level = next(
@@ -59,6 +67,8 @@ def concept_status_lists(
         if c.casefold() not in current_seen:
             if c.casefold() in higher_seen:
                 continue
+            # When the student is on the zero-mark level, the criterion's concepts belong to the NEXT level up,
+            # not to what the student is "missing" at their current level.
             if selected_level is not None and selected_level.mark == 0.0 and higher_levels:
                 if c.casefold() not in higher_seen:
                     higher_exclusive_concepts.append(c)
@@ -83,6 +93,7 @@ def concept_status_lists(
             partial.append(concept)
 
     # 5. Classify higher-level concepts:
+    # not found / partly found -> still to learn (next_level); fully found -> already a strength.
     for concept in higher_exclusive_concepts:
         match = matches.get(concept.casefold())
         if match is None or match.status == "not_demonstrated":
@@ -99,6 +110,7 @@ def concept_status_lists(
 
 
 def evidence_warning(result: CriterionMarkingResult) -> str | None:
+    """A warning when a criterion has no matching sentence at all (so the explanation cannot point at evidence)."""
     if result.evidence_sentence_ids:
         return None
     return (

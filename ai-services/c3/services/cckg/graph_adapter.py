@@ -2,6 +2,10 @@
 AdaptiveLearnSE Component 3 — Co-Evolving Curriculum Knowledge Graph (CCKG) Adapter
 Implements GraphRAG retrieval for curriculum concepts, prerequisite graphs, and citations.
 Operates against live Neo4j when available, with a deterministic in-memory ontology fallback.
+
+STATUS: /health reports its status; the GraphRAG experiment condition D uses it (strict mode requires live Neo4j).
+Without Neo4j it falls back to the in-memory ontology below. NOT USED BY LIVE MARKING: the web service's /c3/assess
+path never imports or calls this module's functionality. Mind maps are stored in MongoDB, not in Neo4j.
 """
 
 import logging

@@ -5,6 +5,10 @@ Flow: retrieve evidence (training-only corpus) -> build a prompt in which retrie
 evidence -> real LLM provider -> validate the structured result against the rubric -> return marks, per-criterion
 evidence, concept findings, feedback and retrieval provenance. The result is ALWAYS `pending_review`: the lecturer
 stays the final authority. If no LLM is available the status says so; nothing is invented.
+
+STATUS: library + experiment harness, not wired into /c3/assess. The LLM part is blocked without LLM credentials, so
+no RAG marks exist in the evidence. NOT USED BY LIVE MARKING: the web service's /c3/assess path never imports or calls
+this module's functionality.
 """
 
 from __future__ import annotations

@@ -1,3 +1,11 @@
+"""Function 3: assemble the feedback object (per-criterion explanations, strengths, gaps and improvement advice).
+
+SIMPLE ENGLISH
+    The marking engine has already decided the marks. This module only WRITES ABOUT that decision: for each criterion
+    it lists which concepts were found, which are partly covered, which are missing, and what to improve next. The
+    wording comes from rule-based text builders in explanation_builder.py (no language model), and nothing here can
+    change a mark.
+"""
 from app.schemas.analysis import AnswerAnalysisRequest, AnswerAnalysisResponse
 from app.schemas.feedback import (
     CriterionFeedback,
@@ -23,6 +31,7 @@ FEEDBACK_VERSION = "baseline-v1"
 
 
 def _analysis_request(request: FeedbackRequest) -> AnswerAnalysisRequest:
+    """Same concept-merging step as in marking: the question's concepts plus every concept used in the rubric."""
     marking_req = request.marking_request
     expected = list(marking_req.expected_concepts or [])
     seen = {c.casefold() for c in expected}
@@ -41,6 +50,7 @@ def _analysis_request(request: FeedbackRequest) -> AnswerAnalysisRequest:
 
 
 def _unique(values: list[str]) -> list[str]:
+    # Remove duplicates but keep the original order.
     return list(dict.fromkeys(values))
 
 
@@ -50,6 +60,7 @@ def build_feedback_from_results(
     rubric: Rubric,
     question_text: str | None = None,
 ) -> FeedbackResponse:
+    """Turn the finished marking + analysis into the feedback object shown to the student and lecturer."""
     criteria_by_id = {
         criterion.criterion_id: criterion
         for criterion in rubric.criteria
@@ -63,11 +74,13 @@ def build_feedback_from_results(
 
     for result in marking.criteria_results:
         criterion = criteria_by_id[result.criterion_id]
+        # Sort this criterion's concepts into demonstrated / partial / missing / "needed only for a higher level".
         demonstrated, partial, missing, next_level = concept_status_lists(
             criterion, analysis, result.selected_level_id
         )
         strengths = build_strengths(demonstrated)
         areas = build_missing_or_partial_areas(partial, missing)
+        # The "how to improve" text: uses the rubric level, the mark, the evidence and the question wording.
         suggestions = build_contextual_improvements(
             criterion=criterion,
             result=result,
@@ -109,6 +122,7 @@ def build_feedback_from_results(
         all_suggestions.extend(suggestions)
         all_next_level.extend(next_level)
 
+    # Whole-answer summary = the per-criterion lists merged without duplicates.
     all_missing = _unique(all_missing)
     all_suggestions = _unique(all_suggestions)
     all_next_level = _unique(all_next_level)
@@ -142,6 +156,7 @@ def generate_feedback(request: FeedbackRequest) -> FeedbackResponse:
     The baseline constructs feedback from structured upstream marking and concept evidence
     without an additional generative dependency.
     """
+    # Used by the stand-alone /feedback/generate endpoint: re-mark and re-analyse, then build the feedback from them.
     marking = mark_answer(request.marking_request)
     analysis = analyze_answer(_analysis_request(request))
     return build_feedback_from_results(
@@ -150,4 +165,3 @@ def generate_feedback(request: FeedbackRequest) -> FeedbackResponse:
         rubric=request.marking_request.rubric,
         question_text=request.marking_request.question_text,
     )
-
