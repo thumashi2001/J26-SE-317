@@ -1,0 +1,88 @@
+{
+  "STAMP": "Model-behaviour observation only. No human labels are used or implied.",
+  "model": "all-MiniLM-L6-v2",
+  "sentences": [
+    "An architecture describes the overall organisation of a system: its parts and how they connect to each other."
+  ],
+  "G01_items": [
+    {
+      "item_id": "PB1-G01-P1",
+      "concept": "components",
+      "category": "paraphrase",
+      "lexical_status": "not_demonstrated",
+      "semantic_score": 0.3112
+    },
+    {
+      "item_id": "PB1-G01-P2",
+      "concept": "components",
+      "category": "paraphrase",
+      "lexical_status": "not_demonstrated",
+      "semantic_score": 0.3635
+    },
+    {
+      "item_id": "PB1-G01-PT",
+      "concept": "components",
+      "category": "partial",
+      "lexical_status": "not_demonstrated",
+      "semantic_score": 0.2813
+    },
+    {
+      "item_id": "PB1-G01-RI",
+      "concept": "components",
+      "category": "related_incorrect",
+      "lexical_status": "not_demonstrated",
+      "semantic_score": 0.2368
+    },
+    {
+      "item_id": "PB1-G01-M",
+      "concept": "components",
+      "category": "missing",
+      "lexical_status": "not_demonstrated",
+      "semantic_score": 0.2206
+    },
+    {
+      "item_id": "PB1-G01-N",
+      "concept": "components",
+      "category": "negation",
+      "lexical_status": "demonstrated",
+      "semantic_score": 0.4648
+    },
+    {
+      "item_id": "PB1-G01-TA",
+      "concept": "components",
+      "category": "technical_alt",
+      "lexical_status": "not_demonstrated",
+      "semantic_score": 0.3667
+    },
+    {
+      "item_id": "PB1-G01-KT",
+      "concept": "components",
+      "category": "keyword_trap",
+      "lexical_status": "demonstrated",
+      "semantic_score": 0.7099
+    },
+    {
+      "item_id": "PB1-G01-P1-INT",
+      "concept": "interactions",
+      "category": "paraphrase",
+      "lexical_status": "not_demonstrated",
+      "semantic_score": 0.1884
+    },
+    {
+      "item_id": "PB1-G01-P1-ORG",
+      "concept": "organisation",
+      "category": "paraphrase",
+      "lexical_status": "demonstrated",
+      "semantic_score": 0.4339
+    }
+  ],
+  "alternative_concept_wordings_vs_architecture_answer": {
+    "components": 0.3112,
+    "parts": 0.2409,
+    "building blocks": 0.2406,
+    "the components of a system": 0.5802,
+    "interactions": 0.1884,
+    "how parts connect": 0.293,
+    "organisation": 0.4339
+  }
+}

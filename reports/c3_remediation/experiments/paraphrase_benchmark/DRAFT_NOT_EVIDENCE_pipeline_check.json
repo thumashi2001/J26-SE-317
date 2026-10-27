@@ -1,0 +1,3502 @@
+{
+  "STAMP": "NOT EVIDENCE: labels are AI-drafted proposals, not human labels. Pipeline check only.",
+  "dev": {
+    "lexical_layer_off": {
+      "by_category": {
+        "keyword_trap": {
+          "accuracy": 0.0,
+          "fn": 0,
+          "fp": 6,
+          "macro_f1": 0.0,
+          "n": 6,
+          "negative": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "positive": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "tn": 0,
+          "tp": 0
+        },
+        "missing": {
+          "accuracy": 1.0,
+          "fn": 0,
+          "fp": 0,
+          "macro_f1": 0.5,
+          "n": 6,
+          "negative": {
+            "f1": 1.0,
+            "precision": 1.0,
+            "recall": 1.0
+          },
+          "positive": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "tn": 6,
+          "tp": 0
+        },
+        "negation": {
+          "accuracy": 0.0,
+          "fn": 0,
+          "fp": 6,
+          "macro_f1": 0.0,
+          "n": 6,
+          "negative": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "positive": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "tn": 0,
+          "tp": 0
+        },
+        "paraphrase": {
+          "accuracy": 0.0714,
+          "fn": 13,
+          "fp": 0,
+          "macro_f1": 0.0667,
+          "n": 14,
+          "negative": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "positive": {
+            "f1": 0.1333,
+            "precision": 1.0,
+            "recall": 0.0714
+          },
+          "tn": 0,
+          "tp": 1
+        },
+        "partial": {
+          "accuracy": 0.6667,
+          "fn": 0,
+          "fp": 2,
+          "macro_f1": 0.4,
+          "n": 6,
+          "negative": {
+            "f1": 0.8,
+            "precision": 1.0,
+            "recall": 0.6667
+          },
+          "positive": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "tn": 4,
+          "tp": 0
+        },
+        "related_incorrect": {
+          "accuracy": 0.1667,
+          "fn": 0,
+          "fp": 5,
+          "macro_f1": 0.1429,
+          "n": 6,
+          "negative": {
+            "f1": 0.2857,
+            "precision": 1.0,
+            "recall": 0.1667
+          },
+          "positive": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "tn": 1,
+          "tp": 0
+        },
+        "technical_alt": {
+          "accuracy": 0.0,
+          "fn": 6,
+          "fp": 0,
+          "macro_f1": 0.0,
+          "n": 6,
+          "negative": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "positive": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "tn": 0,
+          "tp": 0
+        }
+      },
+      "by_concept": {
+        "branching": {
+          "accuracy": 0.25,
+          "fn": 3,
+          "fp": 3,
+          "macro_f1": 0.2,
+          "n": 8,
+          "negative": {
+            "f1": 0.4,
+            "precision": 0.4,
+            "recall": 0.4
+          },
+          "positive": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "tn": 2,
+          "tp": 0
+        },
+        "components": {
+          "accuracy": 0.375,
+          "fn": 3,
+          "fp": 2,
+          "macro_f1": 0.2727,
+          "n": 8,
+          "negative": {
+            "f1": 0.5455,
+            "precision": 0.5,
+            "recall": 0.6
+          },
+          "positive": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "tn": 3,
+          "tp": 0
+        },
+        "encapsulation": {
+          "accuracy": 0.125,
+          "fn": 3,
+          "fp": 4,
+          "macro_f1": 0.1111,
+          "n": 8,
+          "negative": {
+            "f1": 0.2222,
+            "precision": 0.25,
+            "recall": 0.2
+          },
+          "positive": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "tn": 1,
+          "tp": 0
+        },
+        "interactions": {
+          "accuracy": 0.0,
+          "fn": 1,
+          "fp": 0,
+          "macro_f1": 0.0,
+          "n": 1,
+          "negative": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "positive": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "tn": 0,
+          "tp": 0
+        },
+        "low coupling": {
+          "accuracy": 0.25,
+          "fn": 3,
+          "fp": 3,
+          "macro_f1": 0.2,
+          "n": 8,
+          "negative": {
+            "f1": 0.4,
+            "precision": 0.4,
+            "recall": 0.4
+          },
+          "positive": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "tn": 2,
+          "tp": 0
+        },
+        "organisation": {
+          "accuracy": 1.0,
+          "fn": 0,
+          "fp": 0,
+          "macro_f1": 0.5,
+          "n": 1,
+          "negative": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "positive": {
+            "f1": 1.0,
+            "precision": 1.0,
+            "recall": 1.0
+          },
+          "tn": 0,
+          "tp": 1
+        },
+        "regression testing": {
+          "accuracy": 0.125,
+          "fn": 3,
+          "fp": 4,
+          "macro_f1": 0.1111,
+          "n": 8,
+          "negative": {
+            "f1": 0.2222,
+            "precision": 0.25,
+            "recall": 0.2
+          },
+          "positive": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "tn": 1,
+          "tp": 0
+        },
+        "separation of concerns": {
+          "accuracy": 0.25,
+          "fn": 3,
+          "fp": 3,
+          "macro_f1": 0.2,
+          "n": 8,
+          "negative": {
+            "f1": 0.4,
+            "precision": 0.4,
+            "recall": 0.4
+          },
+          "positive": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "tn": 2,
+          "tp": 0
+        }
+      },
+      "errors": {
+        "false_negatives": [
+          {
+            "category": "paraphrase",
+            "item_id": "PB1-G01-P1",
+            "lexical_status": "not_demonstrated",
+            "semantic_score": 0.3112,
+            "truth": "demonstrated"
+          },
+          {
+            "category": "paraphrase",
+            "item_id": "PB1-G01-P2",
+            "lexical_status": "not_demonstrated",
+            "semantic_score": 0.3635,
+            "truth": "demonstrated"
+          },
+          {
+            "category": "technical_alt",
+            "item_id": "PB1-G01-TA",
+            "lexical_status": "not_demonstrated",
+            "semantic_score": 0.3667,
+            "truth": "demonstrated"
+          },
+          {
+            "category": "paraphrase",
+            "item_id": "PB1-G02-P1",
+            "lexical_status": "not_demonstrated",
+            "semantic_score": 0.3376,
+            "truth": "demonstrated"
+          },
+          {
+            "category": "paraphrase",
+            "item_id": "PB1-G02-P2",
+            "lexical_status": "not_demonstrated",
+            "semantic_score": 0.2973,
+            "truth": "demonstrated"
+          },
+          {
+            "category": "technical_alt",
+            "item_id": "PB1-G02-TA",
+            "lexical_status": "not_demonstrated",
+            "semantic_score": 0.3164,
+            "truth": "demonstrated"
+          },
+          {
+            "category": "paraphrase",
+            "item_id": "PB1-G03-P1",
+            "lexical_status": "partial",
+            "semantic_score": 0.152,
+            "truth": "demonstrated"
+          },
+          {
+            "category": "paraphrase",
+            "item_id": "PB1-G03-P2",
+            "lexical_status": "not_demonstrated",
+            "semantic_score": 0.3406,
+            "truth": "demonstrated"
+          },
+          {
+            "category": "technical_alt",
+            "item_id": "PB1-G03-TA",
+            "lexical_status": "not_demonstrated",
+            "semantic_score": 0.401,
+            "truth": "demonstrated"
+          },
+          {
+            "category": "paraphrase",
+            "item_id": "PB1-G04-P1",
+            "lexical_status": "not_demonstrated",
+            "semantic_score": 0.3162,
+            "truth": "demonstrated"
+          },
+          {
+            "category": "paraphrase",
+            "item_id": "PB1-G04-P2",
+            "lexical_status": "not_demonstrated",
+            "semantic_score": 0.096,
+            "truth": "demonstrated"
+          },
+          {
+            "category": "technical_alt",
+            "item_id": "PB1-G04-TA",
+            "lexical_status": "not_demonstrated",
+            "semantic_score": 0.2285,
+            "truth": "demonstrated"
+          },
+          {
+            "category": "paraphrase",
+            "item_id": "PB1-G05-P1",
+            "lexical_status": "not_demonstrated",
+            "semantic_score": 0.2121,
+            "truth": "demonstrated"
+          },
+          {
+            "category": "paraphrase",
+            "item_id": "PB1-G05-P2",
+            "lexical_status": "not_demonstrated",
+            "semantic_score": 0.4154,
+            "truth": "demonstrated"
+          },
+          {
+            "category": "technical_alt",
+            "item_id": "PB1-G05-TA",
+            "lexical_status": "not_demonstrated",
+            "semantic_score": 0.4697,
+            "truth": "demonstrated"
+          },
+          {
+            "category": "paraphrase",
+            "item_id": "PB1-G06-P1",
+            "lexical_status": "not_demonstrated",
+            "semantic_score": 0.1887,
+            "truth": "demonstrated"
+          },
+          {
+            "category": "paraphrase",
+            "item_id": "PB1-G06-P2",
+            "lexical_status": "not_demonstrated",
+            "semantic_score": 0.2038,
+            "truth": "demonstrated"
+          },
+          {
+            "category": "technical_alt",
+            "item_id": "PB1-G06-TA",
+            "lexical_status": "partial",
+            "semantic_score": 0.5724,
+            "truth": "demonstrated"
+          },
+          {
+            "category": "paraphrase",
+            "item_id": "PB1-G01-P1-INT",
+            "lexical_status": "not_demonstrated",
+            "semantic_score": 0.1884,
+            "truth": "demonstrated"
+          }
+        ],
+        "false_positives": [
+          {
+            "category": "negation",
+            "item_id": "PB1-G01-N",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.4648,
+            "truth": "contradicted"
+          },
+          {
+            "category": "keyword_trap",
+            "item_id": "PB1-G01-KT",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.7099,
+            "truth": "missing"
+          },
+          {
+            "category": "partial",
+            "item_id": "PB1-G02-PT",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.7974,
+            "truth": "partial"
+          },
+          {
+            "category": "related_incorrect",
+            "item_id": "PB1-G02-RI",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.7892,
+            "truth": "contradicted"
+          },
+          {
+            "category": "negation",
+            "item_id": "PB1-G02-N",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.7064,
+            "truth": "contradicted"
+          },
+          {
+            "category": "keyword_trap",
+            "item_id": "PB1-G02-KT",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.5724,
+            "truth": "missing"
+          },
+          {
+            "category": "related_incorrect",
+            "item_id": "PB1-G03-RI",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.7112,
+            "truth": "contradicted"
+          },
+          {
+            "category": "negation",
+            "item_id": "PB1-G03-N",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.6454,
+            "truth": "contradicted"
+          },
+          {
+            "category": "keyword_trap",
+            "item_id": "PB1-G03-KT",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.5244,
+            "truth": "missing"
+          },
+          {
+            "category": "partial",
+            "item_id": "PB1-G04-PT",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.8109,
+            "truth": "partial"
+          },
+          {
+            "category": "related_incorrect",
+            "item_id": "PB1-G04-RI",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.6394,
+            "truth": "contradicted"
+          },
+          {
+            "category": "negation",
+            "item_id": "PB1-G04-N",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.5755,
+            "truth": "contradicted"
+          },
+          {
+            "category": "keyword_trap",
+            "item_id": "PB1-G04-KT",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.493,
+            "truth": "missing"
+          },
+          {
+            "category": "related_incorrect",
+            "item_id": "PB1-G05-RI",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.5509,
+            "truth": "contradicted"
+          },
+          {
+            "category": "negation",
+            "item_id": "PB1-G05-N",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.6106,
+            "truth": "contradicted"
+          },
+          {
+            "category": "keyword_trap",
+            "item_id": "PB1-G05-KT",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.3605,
+            "truth": "missing"
+          },
+          {
+            "category": "related_incorrect",
+            "item_id": "PB1-G06-RI",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.6568,
+            "truth": "contradicted"
+          },
+          {
+            "category": "negation",
+            "item_id": "PB1-G06-N",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.4739,
+            "truth": "contradicted"
+          },
+          {
+            "category": "keyword_trap",
+            "item_id": "PB1-G06-KT",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.3794,
+            "truth": "missing"
+          }
+        ]
+      },
+      "label_by_status": {
+        "contradicted": {
+          "demonstrated": 11,
+          "not_demonstrated": 1
+        },
+        "demonstrated": {
+          "demonstrated": 1,
+          "not_demonstrated": 17,
+          "partial": 2
+        },
+        "missing": {
+          "demonstrated": 6,
+          "not_demonstrated": 5,
+          "partial": 1
+        },
+        "partial": {
+          "demonstrated": 2,
+          "not_demonstrated": 4
+        }
+      },
+      "overall": {
+        "accuracy": 0.24,
+        "fn": 19,
+        "fp": 19,
+        "macro_f1": 0.2083,
+        "negative": {
+          "f1": 0.3667,
+          "precision": 0.3667,
+          "recall": 0.3667
+        },
+        "positive": {
+          "f1": 0.05,
+          "precision": 0.05,
+          "recall": 0.05
+        },
+        "tn": 11,
+        "tp": 1
+      }
+    },
+    "n_items": 50,
+    "n_positive": 20,
+    "semantic_layer_on_chosen_threshold": {
+      "by_category": {
+        "keyword_trap": {
+          "accuracy": 0.0,
+          "fn": 0,
+          "fp": 6,
+          "macro_f1": 0.0,
+          "n": 6,
+          "negative": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "positive": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "tn": 0,
+          "tp": 0
+        },
+        "missing": {
+          "accuracy": 0.8333,
+          "fn": 0,
+          "fp": 1,
+          "macro_f1": 0.4545,
+          "n": 6,
+          "negative": {
+            "f1": 0.9091,
+            "precision": 1.0,
+            "recall": 0.8333
+          },
+          "positive": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "tn": 5,
+          "tp": 0
+        },
+        "negation": {
+          "accuracy": 0.0,
+          "fn": 0,
+          "fp": 6,
+          "macro_f1": 0.0,
+          "n": 6,
+          "negative": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "positive": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "tn": 0,
+          "tp": 0
+        },
+        "paraphrase": {
+          "accuracy": 0.5,
+          "fn": 7,
+          "fp": 0,
+          "macro_f1": 0.3333,
+          "n": 14,
+          "negative": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "positive": {
+            "f1": 0.6667,
+            "precision": 1.0,
+            "recall": 0.5
+          },
+          "tn": 0,
+          "tp": 7
+        },
+        "partial": {
+          "accuracy": 0.5,
+          "fn": 0,
+          "fp": 3,
+          "macro_f1": 0.3333,
+          "n": 6,
+          "negative": {
+            "f1": 0.6667,
+            "precision": 1.0,
+            "recall": 0.5
+          },
+          "positive": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "tn": 3,
+          "tp": 0
+        },
+        "related_incorrect": {
+          "accuracy": 0.1667,
+          "fn": 0,
+          "fp": 5,
+          "macro_f1": 0.1429,
+          "n": 6,
+          "negative": {
+            "f1": 0.2857,
+            "precision": 1.0,
+            "recall": 0.1667
+          },
+          "positive": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "tn": 1,
+          "tp": 0
+        },
+        "technical_alt": {
+          "accuracy": 0.8333,
+          "fn": 1,
+          "fp": 0,
+          "macro_f1": 0.4545,
+          "n": 6,
+          "negative": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "positive": {
+            "f1": 0.9091,
+            "precision": 1.0,
+            "recall": 0.8333
+          },
+          "tn": 0,
+          "tp": 5
+        }
+      },
+      "by_concept": {
+        "branching": {
+          "accuracy": 0.375,
+          "fn": 1,
+          "fp": 4,
+          "macro_f1": 0.3651,
+          "n": 8,
+          "negative": {
+            "f1": 0.2857,
+            "precision": 0.5,
+            "recall": 0.2
+          },
+          "positive": {
+            "f1": 0.4444,
+            "precision": 0.3333,
+            "recall": 0.6667
+          },
+          "tn": 1,
+          "tp": 2
+        },
+        "components": {
+          "accuracy": 0.75,
+          "fn": 0,
+          "fp": 2,
+          "macro_f1": 0.75,
+          "n": 8,
+          "negative": {
+            "f1": 0.75,
+            "precision": 1.0,
+            "recall": 0.6
+          },
+          "positive": {
+            "f1": 0.75,
+            "precision": 0.6,
+            "recall": 1.0
+          },
+          "tn": 3,
+          "tp": 3
+        },
+        "encapsulation": {
+          "accuracy": 0.375,
+          "fn": 1,
+          "fp": 4,
+          "macro_f1": 0.3651,
+          "n": 8,
+          "negative": {
+            "f1": 0.2857,
+            "precision": 0.5,
+            "recall": 0.2
+          },
+          "positive": {
+            "f1": 0.4444,
+            "precision": 0.3333,
+            "recall": 0.6667
+          },
+          "tn": 1,
+          "tp": 2
+        },
+        "interactions": {
+          "accuracy": 0.0,
+          "fn": 1,
+          "fp": 0,
+          "macro_f1": 0.0,
+          "n": 1,
+          "negative": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "positive": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "tn": 0,
+          "tp": 0
+        },
+        "low coupling": {
+          "accuracy": 0.375,
+          "fn": 2,
+          "fp": 3,
+          "macro_f1": 0.3651,
+          "n": 8,
+          "negative": {
+            "f1": 0.4444,
+            "precision": 0.5,
+            "recall": 0.4
+          },
+          "positive": {
+            "f1": 0.2857,
+            "precision": 0.25,
+            "recall": 0.3333
+          },
+          "tn": 2,
+          "tp": 1
+        },
+        "organisation": {
+          "accuracy": 1.0,
+          "fn": 0,
+          "fp": 0,
+          "macro_f1": 0.5,
+          "n": 1,
+          "negative": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "positive": {
+            "f1": 1.0,
+            "precision": 1.0,
+            "recall": 1.0
+          },
+          "tn": 0,
+          "tp": 1
+        },
+        "regression testing": {
+          "accuracy": 0.125,
+          "fn": 2,
+          "fp": 5,
+          "macro_f1": 0.1111,
+          "n": 8,
+          "negative": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "positive": {
+            "f1": 0.2222,
+            "precision": 0.1667,
+            "recall": 0.3333
+          },
+          "tn": 0,
+          "tp": 1
+        },
+        "separation of concerns": {
+          "accuracy": 0.5,
+          "fn": 1,
+          "fp": 3,
+          "macro_f1": 0.5,
+          "n": 8,
+          "negative": {
+            "f1": 0.5,
+            "precision": 0.6667,
+            "recall": 0.4
+          },
+          "positive": {
+            "f1": 0.5,
+            "precision": 0.4,
+            "recall": 0.6667
+          },
+          "tn": 2,
+          "tp": 2
+        }
+      },
+      "errors": {
+        "false_negatives": [
+          {
+            "category": "paraphrase",
+            "item_id": "PB1-G02-P2",
+            "lexical_status": "not_demonstrated",
+            "semantic_score": 0.2973,
+            "truth": "demonstrated"
+          },
+          {
+            "category": "paraphrase",
+            "item_id": "PB1-G03-P1",
+            "lexical_status": "partial",
+            "semantic_score": 0.152,
+            "truth": "demonstrated"
+          },
+          {
+            "category": "paraphrase",
+            "item_id": "PB1-G04-P2",
+            "lexical_status": "not_demonstrated",
+            "semantic_score": 0.096,
+            "truth": "demonstrated"
+          },
+          {
+            "category": "technical_alt",
+            "item_id": "PB1-G04-TA",
+            "lexical_status": "not_demonstrated",
+            "semantic_score": 0.2285,
+            "truth": "demonstrated"
+          },
+          {
+            "category": "paraphrase",
+            "item_id": "PB1-G05-P1",
+            "lexical_status": "not_demonstrated",
+            "semantic_score": 0.2121,
+            "truth": "demonstrated"
+          },
+          {
+            "category": "paraphrase",
+            "item_id": "PB1-G06-P1",
+            "lexical_status": "not_demonstrated",
+            "semantic_score": 0.1887,
+            "truth": "demonstrated"
+          },
+          {
+            "category": "paraphrase",
+            "item_id": "PB1-G06-P2",
+            "lexical_status": "not_demonstrated",
+            "semantic_score": 0.2038,
+            "truth": "demonstrated"
+          },
+          {
+            "category": "paraphrase",
+            "item_id": "PB1-G01-P1-INT",
+            "lexical_status": "not_demonstrated",
+            "semantic_score": 0.1884,
+            "truth": "demonstrated"
+          }
+        ],
+        "false_positives": [
+          {
+            "category": "negation",
+            "item_id": "PB1-G01-N",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.4648,
+            "truth": "contradicted"
+          },
+          {
+            "category": "keyword_trap",
+            "item_id": "PB1-G01-KT",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.7099,
+            "truth": "missing"
+          },
+          {
+            "category": "partial",
+            "item_id": "PB1-G02-PT",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.7974,
+            "truth": "partial"
+          },
+          {
+            "category": "related_incorrect",
+            "item_id": "PB1-G02-RI",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.7892,
+            "truth": "contradicted"
+          },
+          {
+            "category": "negation",
+            "item_id": "PB1-G02-N",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.7064,
+            "truth": "contradicted"
+          },
+          {
+            "category": "keyword_trap",
+            "item_id": "PB1-G02-KT",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.5724,
+            "truth": "missing"
+          },
+          {
+            "category": "related_incorrect",
+            "item_id": "PB1-G03-RI",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.7112,
+            "truth": "contradicted"
+          },
+          {
+            "category": "negation",
+            "item_id": "PB1-G03-N",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.6454,
+            "truth": "contradicted"
+          },
+          {
+            "category": "keyword_trap",
+            "item_id": "PB1-G03-KT",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.5244,
+            "truth": "missing"
+          },
+          {
+            "category": "partial",
+            "item_id": "PB1-G04-PT",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.8109,
+            "truth": "partial"
+          },
+          {
+            "category": "related_incorrect",
+            "item_id": "PB1-G04-RI",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.6394,
+            "truth": "contradicted"
+          },
+          {
+            "category": "missing",
+            "item_id": "PB1-G04-M",
+            "lexical_status": "partial",
+            "semantic_score": 0.4899,
+            "truth": "missing"
+          },
+          {
+            "category": "negation",
+            "item_id": "PB1-G04-N",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.5755,
+            "truth": "contradicted"
+          },
+          {
+            "category": "keyword_trap",
+            "item_id": "PB1-G04-KT",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.493,
+            "truth": "missing"
+          },
+          {
+            "category": "partial",
+            "item_id": "PB1-G05-PT",
+            "lexical_status": "not_demonstrated",
+            "semantic_score": 0.5484,
+            "truth": "partial"
+          },
+          {
+            "category": "related_incorrect",
+            "item_id": "PB1-G05-RI",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.5509,
+            "truth": "contradicted"
+          },
+          {
+            "category": "negation",
+            "item_id": "PB1-G05-N",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.6106,
+            "truth": "contradicted"
+          },
+          {
+            "category": "keyword_trap",
+            "item_id": "PB1-G05-KT",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.3605,
+            "truth": "missing"
+          },
+          {
+            "category": "related_incorrect",
+            "item_id": "PB1-G06-RI",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.6568,
+            "truth": "contradicted"
+          },
+          {
+            "category": "negation",
+            "item_id": "PB1-G06-N",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.4739,
+            "truth": "contradicted"
+          },
+          {
+            "category": "keyword_trap",
+            "item_id": "PB1-G06-KT",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.3794,
+            "truth": "missing"
+          }
+        ]
+      },
+      "label_by_status": {
+        "contradicted": {
+          "demonstrated": 11,
+          "not_demonstrated": 1
+        },
+        "demonstrated": {
+          "demonstrated": 12,
+          "not_demonstrated": 7,
+          "partial": 1
+        },
+        "missing": {
+          "demonstrated": 7,
+          "not_demonstrated": 5
+        },
+        "partial": {
+          "demonstrated": 3,
+          "not_demonstrated": 3
+        }
+      },
+      "overall": {
+        "accuracy": 0.42,
+        "fn": 8,
+        "fp": 21,
+        "macro_f1": 0.4179,
+        "negative": {
+          "f1": 0.383,
+          "precision": 0.5294,
+          "recall": 0.3
+        },
+        "positive": {
+          "f1": 0.4528,
+          "precision": 0.3636,
+          "recall": 0.6
+        },
+        "tn": 9,
+        "tp": 12
+      },
+      "threshold": 0.3
+    },
+    "semantic_layer_on_default_threshold": {
+      "by_category": {
+        "keyword_trap": {
+          "accuracy": 0.0,
+          "fn": 0,
+          "fp": 6,
+          "macro_f1": 0.0,
+          "n": 6,
+          "negative": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "positive": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "tn": 0,
+          "tp": 0
+        },
+        "missing": {
+          "accuracy": 1.0,
+          "fn": 0,
+          "fp": 0,
+          "macro_f1": 0.5,
+          "n": 6,
+          "negative": {
+            "f1": 1.0,
+            "precision": 1.0,
+            "recall": 1.0
+          },
+          "positive": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "tn": 6,
+          "tp": 0
+        },
+        "negation": {
+          "accuracy": 0.0,
+          "fn": 0,
+          "fp": 6,
+          "macro_f1": 0.0,
+          "n": 6,
+          "negative": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "positive": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "tn": 0,
+          "tp": 0
+        },
+        "paraphrase": {
+          "accuracy": 0.0714,
+          "fn": 13,
+          "fp": 0,
+          "macro_f1": 0.0667,
+          "n": 14,
+          "negative": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "positive": {
+            "f1": 0.1333,
+            "precision": 1.0,
+            "recall": 0.0714
+          },
+          "tn": 0,
+          "tp": 1
+        },
+        "partial": {
+          "accuracy": 0.5,
+          "fn": 0,
+          "fp": 3,
+          "macro_f1": 0.3333,
+          "n": 6,
+          "negative": {
+            "f1": 0.6667,
+            "precision": 1.0,
+            "recall": 0.5
+          },
+          "positive": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "tn": 3,
+          "tp": 0
+        },
+        "related_incorrect": {
+          "accuracy": 0.1667,
+          "fn": 0,
+          "fp": 5,
+          "macro_f1": 0.1429,
+          "n": 6,
+          "negative": {
+            "f1": 0.2857,
+            "precision": 1.0,
+            "recall": 0.1667
+          },
+          "positive": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "tn": 1,
+          "tp": 0
+        },
+        "technical_alt": {
+          "accuracy": 0.1667,
+          "fn": 5,
+          "fp": 0,
+          "macro_f1": 0.1429,
+          "n": 6,
+          "negative": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "positive": {
+            "f1": 0.2857,
+            "precision": 1.0,
+            "recall": 0.1667
+          },
+          "tn": 0,
+          "tp": 1
+        }
+      },
+      "by_concept": {
+        "branching": {
+          "accuracy": 0.125,
+          "fn": 3,
+          "fp": 4,
+          "macro_f1": 0.1111,
+          "n": 8,
+          "negative": {
+            "f1": 0.2222,
+            "precision": 0.25,
+            "recall": 0.2
+          },
+          "positive": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "tn": 1,
+          "tp": 0
+        },
+        "components": {
+          "accuracy": 0.375,
+          "fn": 3,
+          "fp": 2,
+          "macro_f1": 0.2727,
+          "n": 8,
+          "negative": {
+            "f1": 0.5455,
+            "precision": 0.5,
+            "recall": 0.6
+          },
+          "positive": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "tn": 3,
+          "tp": 0
+        },
+        "encapsulation": {
+          "accuracy": 0.125,
+          "fn": 3,
+          "fp": 4,
+          "macro_f1": 0.1111,
+          "n": 8,
+          "negative": {
+            "f1": 0.2222,
+            "precision": 0.25,
+            "recall": 0.2
+          },
+          "positive": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "tn": 1,
+          "tp": 0
+        },
+        "interactions": {
+          "accuracy": 0.0,
+          "fn": 1,
+          "fp": 0,
+          "macro_f1": 0.0,
+          "n": 1,
+          "negative": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "positive": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "tn": 0,
+          "tp": 0
+        },
+        "low coupling": {
+          "accuracy": 0.375,
+          "fn": 2,
+          "fp": 3,
+          "macro_f1": 0.3651,
+          "n": 8,
+          "negative": {
+            "f1": 0.4444,
+            "precision": 0.5,
+            "recall": 0.4
+          },
+          "positive": {
+            "f1": 0.2857,
+            "precision": 0.25,
+            "recall": 0.3333
+          },
+          "tn": 2,
+          "tp": 1
+        },
+        "organisation": {
+          "accuracy": 1.0,
+          "fn": 0,
+          "fp": 0,
+          "macro_f1": 0.5,
+          "n": 1,
+          "negative": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "positive": {
+            "f1": 1.0,
+            "precision": 1.0,
+            "recall": 1.0
+          },
+          "tn": 0,
+          "tp": 1
+        },
+        "regression testing": {
+          "accuracy": 0.125,
+          "fn": 3,
+          "fp": 4,
+          "macro_f1": 0.1111,
+          "n": 8,
+          "negative": {
+            "f1": 0.2222,
+            "precision": 0.25,
+            "recall": 0.2
+          },
+          "positive": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "tn": 1,
+          "tp": 0
+        },
+        "separation of concerns": {
+          "accuracy": 0.25,
+          "fn": 3,
+          "fp": 3,
+          "macro_f1": 0.2,
+          "n": 8,
+          "negative": {
+            "f1": 0.4,
+            "precision": 0.4,
+            "recall": 0.4
+          },
+          "positive": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "tn": 2,
+          "tp": 0
+        }
+      },
+      "errors": {
+        "false_negatives": [
+          {
+            "category": "paraphrase",
+            "item_id": "PB1-G01-P1",
+            "lexical_status": "not_demonstrated",
+            "semantic_score": 0.3112,
+            "truth": "demonstrated"
+          },
+          {
+            "category": "paraphrase",
+            "item_id": "PB1-G01-P2",
+            "lexical_status": "not_demonstrated",
+            "semantic_score": 0.3635,
+            "truth": "demonstrated"
+          },
+          {
+            "category": "technical_alt",
+            "item_id": "PB1-G01-TA",
+            "lexical_status": "not_demonstrated",
+            "semantic_score": 0.3667,
+            "truth": "demonstrated"
+          },
+          {
+            "category": "paraphrase",
+            "item_id": "PB1-G02-P1",
+            "lexical_status": "not_demonstrated",
+            "semantic_score": 0.3376,
+            "truth": "demonstrated"
+          },
+          {
+            "category": "paraphrase",
+            "item_id": "PB1-G02-P2",
+            "lexical_status": "not_demonstrated",
+            "semantic_score": 0.2973,
+            "truth": "demonstrated"
+          },
+          {
+            "category": "technical_alt",
+            "item_id": "PB1-G02-TA",
+            "lexical_status": "not_demonstrated",
+            "semantic_score": 0.3164,
+            "truth": "demonstrated"
+          },
+          {
+            "category": "paraphrase",
+            "item_id": "PB1-G03-P1",
+            "lexical_status": "partial",
+            "semantic_score": 0.152,
+            "truth": "demonstrated"
+          },
+          {
+            "category": "paraphrase",
+            "item_id": "PB1-G03-P2",
+            "lexical_status": "not_demonstrated",
+            "semantic_score": 0.3406,
+            "truth": "demonstrated"
+          },
+          {
+            "category": "technical_alt",
+            "item_id": "PB1-G03-TA",
+            "lexical_status": "not_demonstrated",
+            "semantic_score": 0.401,
+            "truth": "demonstrated"
+          },
+          {
+            "category": "paraphrase",
+            "item_id": "PB1-G04-P1",
+            "lexical_status": "not_demonstrated",
+            "semantic_score": 0.3162,
+            "truth": "demonstrated"
+          },
+          {
+            "category": "paraphrase",
+            "item_id": "PB1-G04-P2",
+            "lexical_status": "not_demonstrated",
+            "semantic_score": 0.096,
+            "truth": "demonstrated"
+          },
+          {
+            "category": "technical_alt",
+            "item_id": "PB1-G04-TA",
+            "lexical_status": "not_demonstrated",
+            "semantic_score": 0.2285,
+            "truth": "demonstrated"
+          },
+          {
+            "category": "paraphrase",
+            "item_id": "PB1-G05-P1",
+            "lexical_status": "not_demonstrated",
+            "semantic_score": 0.2121,
+            "truth": "demonstrated"
+          },
+          {
+            "category": "paraphrase",
+            "item_id": "PB1-G05-P2",
+            "lexical_status": "not_demonstrated",
+            "semantic_score": 0.4154,
+            "truth": "demonstrated"
+          },
+          {
+            "category": "technical_alt",
+            "item_id": "PB1-G05-TA",
+            "lexical_status": "not_demonstrated",
+            "semantic_score": 0.4697,
+            "truth": "demonstrated"
+          },
+          {
+            "category": "paraphrase",
+            "item_id": "PB1-G06-P1",
+            "lexical_status": "not_demonstrated",
+            "semantic_score": 0.1887,
+            "truth": "demonstrated"
+          },
+          {
+            "category": "paraphrase",
+            "item_id": "PB1-G06-P2",
+            "lexical_status": "not_demonstrated",
+            "semantic_score": 0.2038,
+            "truth": "demonstrated"
+          },
+          {
+            "category": "paraphrase",
+            "item_id": "PB1-G01-P1-INT",
+            "lexical_status": "not_demonstrated",
+            "semantic_score": 0.1884,
+            "truth": "demonstrated"
+          }
+        ],
+        "false_positives": [
+          {
+            "category": "negation",
+            "item_id": "PB1-G01-N",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.4648,
+            "truth": "contradicted"
+          },
+          {
+            "category": "keyword_trap",
+            "item_id": "PB1-G01-KT",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.7099,
+            "truth": "missing"
+          },
+          {
+            "category": "partial",
+            "item_id": "PB1-G02-PT",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.7974,
+            "truth": "partial"
+          },
+          {
+            "category": "related_incorrect",
+            "item_id": "PB1-G02-RI",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.7892,
+            "truth": "contradicted"
+          },
+          {
+            "category": "negation",
+            "item_id": "PB1-G02-N",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.7064,
+            "truth": "contradicted"
+          },
+          {
+            "category": "keyword_trap",
+            "item_id": "PB1-G02-KT",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.5724,
+            "truth": "missing"
+          },
+          {
+            "category": "related_incorrect",
+            "item_id": "PB1-G03-RI",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.7112,
+            "truth": "contradicted"
+          },
+          {
+            "category": "negation",
+            "item_id": "PB1-G03-N",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.6454,
+            "truth": "contradicted"
+          },
+          {
+            "category": "keyword_trap",
+            "item_id": "PB1-G03-KT",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.5244,
+            "truth": "missing"
+          },
+          {
+            "category": "partial",
+            "item_id": "PB1-G04-PT",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.8109,
+            "truth": "partial"
+          },
+          {
+            "category": "related_incorrect",
+            "item_id": "PB1-G04-RI",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.6394,
+            "truth": "contradicted"
+          },
+          {
+            "category": "negation",
+            "item_id": "PB1-G04-N",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.5755,
+            "truth": "contradicted"
+          },
+          {
+            "category": "keyword_trap",
+            "item_id": "PB1-G04-KT",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.493,
+            "truth": "missing"
+          },
+          {
+            "category": "partial",
+            "item_id": "PB1-G05-PT",
+            "lexical_status": "not_demonstrated",
+            "semantic_score": 0.5484,
+            "truth": "partial"
+          },
+          {
+            "category": "related_incorrect",
+            "item_id": "PB1-G05-RI",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.5509,
+            "truth": "contradicted"
+          },
+          {
+            "category": "negation",
+            "item_id": "PB1-G05-N",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.6106,
+            "truth": "contradicted"
+          },
+          {
+            "category": "keyword_trap",
+            "item_id": "PB1-G05-KT",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.3605,
+            "truth": "missing"
+          },
+          {
+            "category": "related_incorrect",
+            "item_id": "PB1-G06-RI",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.6568,
+            "truth": "contradicted"
+          },
+          {
+            "category": "negation",
+            "item_id": "PB1-G06-N",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.4739,
+            "truth": "contradicted"
+          },
+          {
+            "category": "keyword_trap",
+            "item_id": "PB1-G06-KT",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.3794,
+            "truth": "missing"
+          }
+        ]
+      },
+      "label_by_status": {
+        "contradicted": {
+          "demonstrated": 11,
+          "not_demonstrated": 1
+        },
+        "demonstrated": {
+          "demonstrated": 2,
+          "not_demonstrated": 17,
+          "partial": 1
+        },
+        "missing": {
+          "demonstrated": 6,
+          "not_demonstrated": 5,
+          "partial": 1
+        },
+        "partial": {
+          "demonstrated": 3,
+          "not_demonstrated": 3
+        }
+      },
+      "overall": {
+        "accuracy": 0.24,
+        "fn": 18,
+        "fp": 20,
+        "macro_f1": 0.22,
+        "negative": {
+          "f1": 0.3448,
+          "precision": 0.3571,
+          "recall": 0.3333
+        },
+        "positive": {
+          "f1": 0.0952,
+          "precision": 0.0909,
+          "recall": 0.1
+        },
+        "tn": 10,
+        "tp": 2
+      },
+      "threshold": 0.5
+    },
+    "threshold_sensitivity": [
+      {
+        "macro_f1": 0.3633,
+        "missed": 4,
+        "positive_f1": 0.5161,
+        "threshold": 0.2,
+        "wrongly_detected": 26
+      },
+      {
+        "macro_f1": 0.3333,
+        "missed": 6,
+        "positive_f1": 0.4667,
+        "threshold": 0.22,
+        "wrongly_detected": 26
+      },
+      {
+        "macro_f1": 0.3676,
+        "missed": 7,
+        "positive_f1": 0.4561,
+        "threshold": 0.24,
+        "wrongly_detected": 24
+      },
+      {
+        "macro_f1": 0.3912,
+        "missed": 7,
+        "positive_f1": 0.4643,
+        "threshold": 0.26,
+        "wrongly_detected": 23
+      },
+      {
+        "macro_f1": 0.4141,
+        "missed": 7,
+        "positive_f1": 0.4727,
+        "threshold": 0.28,
+        "wrongly_detected": 22
+      },
+      {
+        "macro_f1": 0.4179,
+        "missed": 8,
+        "positive_f1": 0.4528,
+        "threshold": 0.3,
+        "wrongly_detected": 21
+      },
+      {
+        "macro_f1": 0.36,
+        "missed": 11,
+        "positive_f1": 0.36,
+        "threshold": 0.32,
+        "wrongly_detected": 21
+      },
+      {
+        "macro_f1": 0.3397,
+        "missed": 12,
+        "positive_f1": 0.3265,
+        "threshold": 0.34,
+        "wrongly_detected": 21
+      },
+      {
+        "macro_f1": 0.3189,
+        "missed": 13,
+        "positive_f1": 0.2917,
+        "threshold": 0.36,
+        "wrongly_detected": 21
+      },
+      {
+        "macro_f1": 0.2754,
+        "missed": 15,
+        "positive_f1": 0.2174,
+        "threshold": 0.38,
+        "wrongly_detected": 21
+      },
+      {
+        "macro_f1": 0.2754,
+        "missed": 15,
+        "positive_f1": 0.2174,
+        "threshold": 0.4,
+        "wrongly_detected": 21
+      },
+      {
+        "macro_f1": 0.2289,
+        "missed": 17,
+        "positive_f1": 0.1364,
+        "threshold": 0.42,
+        "wrongly_detected": 21
+      },
+      {
+        "macro_f1": 0.2289,
+        "missed": 17,
+        "positive_f1": 0.1364,
+        "threshold": 0.44,
+        "wrongly_detected": 21
+      },
+      {
+        "macro_f1": 0.2289,
+        "missed": 17,
+        "positive_f1": 0.1364,
+        "threshold": 0.46,
+        "wrongly_detected": 21
+      },
+      {
+        "macro_f1": 0.2044,
+        "missed": 18,
+        "positive_f1": 0.093,
+        "threshold": 0.48,
+        "wrongly_detected": 21
+      },
+      {
+        "macro_f1": 0.22,
+        "missed": 18,
+        "positive_f1": 0.0952,
+        "threshold": 0.5,
+        "wrongly_detected": 20
+      },
+      {
+        "macro_f1": 0.22,
+        "missed": 18,
+        "positive_f1": 0.0952,
+        "threshold": 0.52,
+        "wrongly_detected": 20
+      },
+      {
+        "macro_f1": 0.22,
+        "missed": 18,
+        "positive_f1": 0.0952,
+        "threshold": 0.54,
+        "wrongly_detected": 20
+      },
+      {
+        "macro_f1": 0.2352,
+        "missed": 18,
+        "positive_f1": 0.0976,
+        "threshold": 0.56,
+        "wrongly_detected": 19
+      },
+      {
+        "macro_f1": 0.2083,
+        "missed": 19,
+        "positive_f1": 0.05,
+        "threshold": 0.58,
+        "wrongly_detected": 19
+      },
+      {
+        "macro_f1": 0.2083,
+        "missed": 19,
+        "positive_f1": 0.05,
+        "threshold": 0.6,
+        "wrongly_detected": 19
+      },
+      {
+        "macro_f1": 0.2083,
+        "missed": 19,
+        "positive_f1": 0.05,
+        "threshold": 0.62,
+        "wrongly_detected": 19
+      },
+      {
+        "macro_f1": 0.2083,
+        "missed": 19,
+        "positive_f1": 0.05,
+        "threshold": 0.64,
+        "wrongly_detected": 19
+      },
+      {
+        "macro_f1": 0.2083,
+        "missed": 19,
+        "positive_f1": 0.05,
+        "threshold": 0.66,
+        "wrongly_detected": 19
+      },
+      {
+        "macro_f1": 0.2083,
+        "missed": 19,
+        "positive_f1": 0.05,
+        "threshold": 0.68,
+        "wrongly_detected": 19
+      },
+      {
+        "macro_f1": 0.2083,
+        "missed": 19,
+        "positive_f1": 0.05,
+        "threshold": 0.7,
+        "wrongly_detected": 19
+      },
+      {
+        "macro_f1": 0.2083,
+        "missed": 19,
+        "positive_f1": 0.05,
+        "threshold": 0.72,
+        "wrongly_detected": 19
+      },
+      {
+        "macro_f1": 0.2083,
+        "missed": 19,
+        "positive_f1": 0.05,
+        "threshold": 0.74,
+        "wrongly_detected": 19
+      },
+      {
+        "macro_f1": 0.2083,
+        "missed": 19,
+        "positive_f1": 0.05,
+        "threshold": 0.76,
+        "wrongly_detected": 19
+      },
+      {
+        "macro_f1": 0.2083,
+        "missed": 19,
+        "positive_f1": 0.05,
+        "threshold": 0.78,
+        "wrongly_detected": 19
+      },
+      {
+        "macro_f1": 0.2083,
+        "missed": 19,
+        "positive_f1": 0.05,
+        "threshold": 0.8,
+        "wrongly_detected": 19
+      },
+      {
+        "macro_f1": 0.2083,
+        "missed": 19,
+        "positive_f1": 0.05,
+        "threshold": 0.82,
+        "wrongly_detected": 19
+      },
+      {
+        "macro_f1": 0.2083,
+        "missed": 19,
+        "positive_f1": 0.05,
+        "threshold": 0.84,
+        "wrongly_detected": 19
+      },
+      {
+        "macro_f1": 0.2083,
+        "missed": 19,
+        "positive_f1": 0.05,
+        "threshold": 0.86,
+        "wrongly_detected": 19
+      },
+      {
+        "macro_f1": 0.2083,
+        "missed": 19,
+        "positive_f1": 0.05,
+        "threshold": 0.88,
+        "wrongly_detected": 19
+      },
+      {
+        "macro_f1": 0.2083,
+        "missed": 19,
+        "positive_f1": 0.05,
+        "threshold": 0.9,
+        "wrongly_detected": 19
+      }
+    ]
+  },
+  "heldout": {
+    "lexical_layer_off": {
+      "by_category": {
+        "keyword_trap": {
+          "accuracy": 0.25,
+          "fn": 0,
+          "fp": 3,
+          "macro_f1": 0.2,
+          "n": 4,
+          "negative": {
+            "f1": 0.4,
+            "precision": 1.0,
+            "recall": 0.25
+          },
+          "positive": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "tn": 1,
+          "tp": 0
+        },
+        "missing": {
+          "accuracy": 1.0,
+          "fn": 0,
+          "fp": 0,
+          "macro_f1": 0.5,
+          "n": 4,
+          "negative": {
+            "f1": 1.0,
+            "precision": 1.0,
+            "recall": 1.0
+          },
+          "positive": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "tn": 4,
+          "tp": 0
+        },
+        "negation": {
+          "accuracy": 0.25,
+          "fn": 0,
+          "fp": 3,
+          "macro_f1": 0.2,
+          "n": 4,
+          "negative": {
+            "f1": 0.4,
+            "precision": 1.0,
+            "recall": 0.25
+          },
+          "positive": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "tn": 1,
+          "tp": 0
+        },
+        "paraphrase": {
+          "accuracy": 0.0,
+          "fn": 8,
+          "fp": 0,
+          "macro_f1": 0.0,
+          "n": 8,
+          "negative": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "positive": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "tn": 0,
+          "tp": 0
+        },
+        "partial": {
+          "accuracy": 1.0,
+          "fn": 0,
+          "fp": 0,
+          "macro_f1": 0.5,
+          "n": 4,
+          "negative": {
+            "f1": 1.0,
+            "precision": 1.0,
+            "recall": 1.0
+          },
+          "positive": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "tn": 4,
+          "tp": 0
+        },
+        "related_incorrect": {
+          "accuracy": 0.25,
+          "fn": 0,
+          "fp": 3,
+          "macro_f1": 0.2,
+          "n": 4,
+          "negative": {
+            "f1": 0.4,
+            "precision": 1.0,
+            "recall": 0.25
+          },
+          "positive": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "tn": 1,
+          "tp": 0
+        },
+        "technical_alt": {
+          "accuracy": 0.0,
+          "fn": 4,
+          "fp": 0,
+          "macro_f1": 0.0,
+          "n": 4,
+          "negative": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "positive": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "tn": 0,
+          "tp": 0
+        }
+      },
+      "by_concept": {
+        "continuous integration": {
+          "accuracy": 0.25,
+          "fn": 3,
+          "fp": 3,
+          "macro_f1": 0.2,
+          "n": 8,
+          "negative": {
+            "f1": 0.4,
+            "precision": 0.4,
+            "recall": 0.4
+          },
+          "positive": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "tn": 2,
+          "tp": 0
+        },
+        "load balancing": {
+          "accuracy": 0.5,
+          "fn": 3,
+          "fp": 1,
+          "macro_f1": 0.3333,
+          "n": 8,
+          "negative": {
+            "f1": 0.6667,
+            "precision": 0.5714,
+            "recall": 0.8
+          },
+          "positive": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "tn": 4,
+          "tp": 0
+        },
+        "normalisation": {
+          "accuracy": 0.25,
+          "fn": 3,
+          "fp": 3,
+          "macro_f1": 0.2,
+          "n": 8,
+          "negative": {
+            "f1": 0.4,
+            "precision": 0.4,
+            "recall": 0.4
+          },
+          "positive": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "tn": 2,
+          "tp": 0
+        },
+        "requirements traceability": {
+          "accuracy": 0.375,
+          "fn": 3,
+          "fp": 2,
+          "macro_f1": 0.2727,
+          "n": 8,
+          "negative": {
+            "f1": 0.5455,
+            "precision": 0.5,
+            "recall": 0.6
+          },
+          "positive": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "tn": 3,
+          "tp": 0
+        }
+      },
+      "errors": {
+        "false_negatives": [
+          {
+            "category": "paraphrase",
+            "item_id": "PB1-G07-P1",
+            "lexical_status": "not_demonstrated",
+            "semantic_score": 0.1239,
+            "truth": "demonstrated"
+          },
+          {
+            "category": "paraphrase",
+            "item_id": "PB1-G07-P2",
+            "lexical_status": "not_demonstrated",
+            "semantic_score": 0.1985,
+            "truth": "demonstrated"
+          },
+          {
+            "category": "technical_alt",
+            "item_id": "PB1-G07-TA",
+            "lexical_status": "not_demonstrated",
+            "semantic_score": 0.243,
+            "truth": "demonstrated"
+          },
+          {
+            "category": "paraphrase",
+            "item_id": "PB1-G08-P1",
+            "lexical_status": "not_demonstrated",
+            "semantic_score": 0.4472,
+            "truth": "demonstrated"
+          },
+          {
+            "category": "paraphrase",
+            "item_id": "PB1-G08-P2",
+            "lexical_status": "not_demonstrated",
+            "semantic_score": 0.4472,
+            "truth": "demonstrated"
+          },
+          {
+            "category": "technical_alt",
+            "item_id": "PB1-G08-TA",
+            "lexical_status": "not_demonstrated",
+            "semantic_score": 0.4743,
+            "truth": "demonstrated"
+          },
+          {
+            "category": "paraphrase",
+            "item_id": "PB1-G09-P1",
+            "lexical_status": "not_demonstrated",
+            "semantic_score": 0.4765,
+            "truth": "demonstrated"
+          },
+          {
+            "category": "paraphrase",
+            "item_id": "PB1-G09-P2",
+            "lexical_status": "not_demonstrated",
+            "semantic_score": 0.2951,
+            "truth": "demonstrated"
+          },
+          {
+            "category": "technical_alt",
+            "item_id": "PB1-G09-TA",
+            "lexical_status": "partial",
+            "semantic_score": 0.7197,
+            "truth": "demonstrated"
+          },
+          {
+            "category": "paraphrase",
+            "item_id": "PB1-G10-P1",
+            "lexical_status": "not_demonstrated",
+            "semantic_score": 0.1773,
+            "truth": "demonstrated"
+          },
+          {
+            "category": "paraphrase",
+            "item_id": "PB1-G10-P2",
+            "lexical_status": "not_demonstrated",
+            "semantic_score": 0.1045,
+            "truth": "demonstrated"
+          },
+          {
+            "category": "technical_alt",
+            "item_id": "PB1-G10-TA",
+            "lexical_status": "not_demonstrated",
+            "semantic_score": 0.1157,
+            "truth": "demonstrated"
+          }
+        ],
+        "false_positives": [
+          {
+            "category": "related_incorrect",
+            "item_id": "PB1-G07-RI",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.6216,
+            "truth": "contradicted"
+          },
+          {
+            "category": "negation",
+            "item_id": "PB1-G07-N",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.5646,
+            "truth": "contradicted"
+          },
+          {
+            "category": "keyword_trap",
+            "item_id": "PB1-G07-KT",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.396,
+            "truth": "missing"
+          },
+          {
+            "category": "keyword_trap",
+            "item_id": "PB1-G08-KT",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.3798,
+            "truth": "missing"
+          },
+          {
+            "category": "related_incorrect",
+            "item_id": "PB1-G09-RI",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.8226,
+            "truth": "contradicted"
+          },
+          {
+            "category": "negation",
+            "item_id": "PB1-G09-N",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.695,
+            "truth": "contradicted"
+          },
+          {
+            "category": "related_incorrect",
+            "item_id": "PB1-G10-RI",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.5303,
+            "truth": "contradicted"
+          },
+          {
+            "category": "negation",
+            "item_id": "PB1-G10-N",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.4939,
+            "truth": "contradicted"
+          },
+          {
+            "category": "keyword_trap",
+            "item_id": "PB1-G10-KT",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.2549,
+            "truth": "missing"
+          }
+        ]
+      },
+      "label_by_status": {
+        "contradicted": {
+          "demonstrated": 6,
+          "partial": 2
+        },
+        "demonstrated": {
+          "not_demonstrated": 11,
+          "partial": 1
+        },
+        "missing": {
+          "demonstrated": 3,
+          "not_demonstrated": 3,
+          "partial": 2
+        },
+        "partial": {
+          "not_demonstrated": 3,
+          "partial": 1
+        }
+      },
+      "overall": {
+        "accuracy": 0.3438,
+        "fn": 12,
+        "fp": 9,
+        "macro_f1": 0.2558,
+        "negative": {
+          "f1": 0.5116,
+          "precision": 0.4783,
+          "recall": 0.55
+        },
+        "positive": {
+          "f1": 0.0,
+          "precision": 0.0,
+          "recall": 0.0
+        },
+        "tn": 11,
+        "tp": 0
+      }
+    },
+    "n_items": 32,
+    "n_positive": 12,
+    "semantic_layer_on_chosen_threshold": {
+      "by_category": {
+        "keyword_trap": {
+          "accuracy": 0.0,
+          "fn": 0,
+          "fp": 4,
+          "macro_f1": 0.0,
+          "n": 4,
+          "negative": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "positive": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "tn": 0,
+          "tp": 0
+        },
+        "missing": {
+          "accuracy": 0.75,
+          "fn": 0,
+          "fp": 1,
+          "macro_f1": 0.4286,
+          "n": 4,
+          "negative": {
+            "f1": 0.8571,
+            "precision": 1.0,
+            "recall": 0.75
+          },
+          "positive": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "tn": 3,
+          "tp": 0
+        },
+        "negation": {
+          "accuracy": 0.0,
+          "fn": 0,
+          "fp": 4,
+          "macro_f1": 0.0,
+          "n": 4,
+          "negative": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "positive": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "tn": 0,
+          "tp": 0
+        },
+        "paraphrase": {
+          "accuracy": 0.375,
+          "fn": 5,
+          "fp": 0,
+          "macro_f1": 0.2727,
+          "n": 8,
+          "negative": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "positive": {
+            "f1": 0.5455,
+            "precision": 1.0,
+            "recall": 0.375
+          },
+          "tn": 0,
+          "tp": 3
+        },
+        "partial": {
+          "accuracy": 0.5,
+          "fn": 0,
+          "fp": 2,
+          "macro_f1": 0.3333,
+          "n": 4,
+          "negative": {
+            "f1": 0.6667,
+            "precision": 1.0,
+            "recall": 0.5
+          },
+          "positive": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "tn": 2,
+          "tp": 0
+        },
+        "related_incorrect": {
+          "accuracy": 0.0,
+          "fn": 0,
+          "fp": 4,
+          "macro_f1": 0.0,
+          "n": 4,
+          "negative": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "positive": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "tn": 0,
+          "tp": 0
+        },
+        "technical_alt": {
+          "accuracy": 0.5,
+          "fn": 2,
+          "fp": 0,
+          "macro_f1": 0.3333,
+          "n": 4,
+          "negative": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "positive": {
+            "f1": 0.6667,
+            "precision": 1.0,
+            "recall": 0.5
+          },
+          "tn": 0,
+          "tp": 2
+        }
+      },
+      "by_concept": {
+        "continuous integration": {
+          "accuracy": 0.25,
+          "fn": 3,
+          "fp": 3,
+          "macro_f1": 0.2,
+          "n": 8,
+          "negative": {
+            "f1": 0.4,
+            "precision": 0.4,
+            "recall": 0.4
+          },
+          "positive": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "tn": 2,
+          "tp": 0
+        },
+        "load balancing": {
+          "accuracy": 0.5,
+          "fn": 0,
+          "fp": 4,
+          "macro_f1": 0.4667,
+          "n": 8,
+          "negative": {
+            "f1": 0.3333,
+            "precision": 1.0,
+            "recall": 0.2
+          },
+          "positive": {
+            "f1": 0.6,
+            "precision": 0.4286,
+            "recall": 1.0
+          },
+          "tn": 1,
+          "tp": 3
+        },
+        "normalisation": {
+          "accuracy": 0.25,
+          "fn": 3,
+          "fp": 3,
+          "macro_f1": 0.2,
+          "n": 8,
+          "negative": {
+            "f1": 0.4,
+            "precision": 0.4,
+            "recall": 0.4
+          },
+          "positive": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "tn": 2,
+          "tp": 0
+        },
+        "requirements traceability": {
+          "accuracy": 0.25,
+          "fn": 1,
+          "fp": 5,
+          "macro_f1": 0.2,
+          "n": 8,
+          "negative": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "positive": {
+            "f1": 0.4,
+            "precision": 0.2857,
+            "recall": 0.6667
+          },
+          "tn": 0,
+          "tp": 2
+        }
+      },
+      "errors": {
+        "false_negatives": [
+          {
+            "category": "paraphrase",
+            "item_id": "PB1-G07-P1",
+            "lexical_status": "not_demonstrated",
+            "semantic_score": 0.1239,
+            "truth": "demonstrated"
+          },
+          {
+            "category": "paraphrase",
+            "item_id": "PB1-G07-P2",
+            "lexical_status": "not_demonstrated",
+            "semantic_score": 0.1985,
+            "truth": "demonstrated"
+          },
+          {
+            "category": "technical_alt",
+            "item_id": "PB1-G07-TA",
+            "lexical_status": "not_demonstrated",
+            "semantic_score": 0.243,
+            "truth": "demonstrated"
+          },
+          {
+            "category": "paraphrase",
+            "item_id": "PB1-G09-P2",
+            "lexical_status": "not_demonstrated",
+            "semantic_score": 0.2951,
+            "truth": "demonstrated"
+          },
+          {
+            "category": "paraphrase",
+            "item_id": "PB1-G10-P1",
+            "lexical_status": "not_demonstrated",
+            "semantic_score": 0.1773,
+            "truth": "demonstrated"
+          },
+          {
+            "category": "paraphrase",
+            "item_id": "PB1-G10-P2",
+            "lexical_status": "not_demonstrated",
+            "semantic_score": 0.1045,
+            "truth": "demonstrated"
+          },
+          {
+            "category": "technical_alt",
+            "item_id": "PB1-G10-TA",
+            "lexical_status": "not_demonstrated",
+            "semantic_score": 0.1157,
+            "truth": "demonstrated"
+          }
+        ],
+        "false_positives": [
+          {
+            "category": "related_incorrect",
+            "item_id": "PB1-G07-RI",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.6216,
+            "truth": "contradicted"
+          },
+          {
+            "category": "negation",
+            "item_id": "PB1-G07-N",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.5646,
+            "truth": "contradicted"
+          },
+          {
+            "category": "keyword_trap",
+            "item_id": "PB1-G07-KT",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.396,
+            "truth": "missing"
+          },
+          {
+            "category": "partial",
+            "item_id": "PB1-G08-PT",
+            "lexical_status": "not_demonstrated",
+            "semantic_score": 0.373,
+            "truth": "partial"
+          },
+          {
+            "category": "related_incorrect",
+            "item_id": "PB1-G08-RI",
+            "lexical_status": "partial",
+            "semantic_score": 0.4865,
+            "truth": "contradicted"
+          },
+          {
+            "category": "negation",
+            "item_id": "PB1-G08-N",
+            "lexical_status": "partial",
+            "semantic_score": 0.61,
+            "truth": "contradicted"
+          },
+          {
+            "category": "keyword_trap",
+            "item_id": "PB1-G08-KT",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.3798,
+            "truth": "missing"
+          },
+          {
+            "category": "partial",
+            "item_id": "PB1-G09-PT",
+            "lexical_status": "partial",
+            "semantic_score": 0.4614,
+            "truth": "partial"
+          },
+          {
+            "category": "related_incorrect",
+            "item_id": "PB1-G09-RI",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.8226,
+            "truth": "contradicted"
+          },
+          {
+            "category": "missing",
+            "item_id": "PB1-G09-M",
+            "lexical_status": "partial",
+            "semantic_score": 0.5042,
+            "truth": "missing"
+          },
+          {
+            "category": "negation",
+            "item_id": "PB1-G09-N",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.695,
+            "truth": "contradicted"
+          },
+          {
+            "category": "keyword_trap",
+            "item_id": "PB1-G09-KT",
+            "lexical_status": "partial",
+            "semantic_score": 0.4829,
+            "truth": "missing"
+          },
+          {
+            "category": "related_incorrect",
+            "item_id": "PB1-G10-RI",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.5303,
+            "truth": "contradicted"
+          },
+          {
+            "category": "negation",
+            "item_id": "PB1-G10-N",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.4939,
+            "truth": "contradicted"
+          },
+          {
+            "category": "keyword_trap",
+            "item_id": "PB1-G10-KT",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.2549,
+            "truth": "missing"
+          }
+        ]
+      },
+      "label_by_status": {
+        "contradicted": {
+          "demonstrated": 8
+        },
+        "demonstrated": {
+          "demonstrated": 5,
+          "not_demonstrated": 7
+        },
+        "missing": {
+          "demonstrated": 5,
+          "not_demonstrated": 3
+        },
+        "partial": {
+          "demonstrated": 2,
+          "not_demonstrated": 2
+        }
+      },
+      "overall": {
+        "accuracy": 0.3125,
+        "fn": 7,
+        "fp": 15,
+        "macro_f1": 0.3125,
+        "negative": {
+          "f1": 0.3125,
+          "precision": 0.4167,
+          "recall": 0.25
+        },
+        "positive": {
+          "f1": 0.3125,
+          "precision": 0.25,
+          "recall": 0.4167
+        },
+        "tn": 5,
+        "tp": 5
+      },
+      "threshold": 0.3
+    },
+    "semantic_layer_on_default_threshold": {
+      "by_category": {
+        "keyword_trap": {
+          "accuracy": 0.25,
+          "fn": 0,
+          "fp": 3,
+          "macro_f1": 0.2,
+          "n": 4,
+          "negative": {
+            "f1": 0.4,
+            "precision": 1.0,
+            "recall": 0.25
+          },
+          "positive": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "tn": 1,
+          "tp": 0
+        },
+        "missing": {
+          "accuracy": 0.75,
+          "fn": 0,
+          "fp": 1,
+          "macro_f1": 0.4286,
+          "n": 4,
+          "negative": {
+            "f1": 0.8571,
+            "precision": 1.0,
+            "recall": 0.75
+          },
+          "positive": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "tn": 3,
+          "tp": 0
+        },
+        "negation": {
+          "accuracy": 0.0,
+          "fn": 0,
+          "fp": 4,
+          "macro_f1": 0.0,
+          "n": 4,
+          "negative": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "positive": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "tn": 0,
+          "tp": 0
+        },
+        "paraphrase": {
+          "accuracy": 0.0,
+          "fn": 8,
+          "fp": 0,
+          "macro_f1": 0.0,
+          "n": 8,
+          "negative": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "positive": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "tn": 0,
+          "tp": 0
+        },
+        "partial": {
+          "accuracy": 1.0,
+          "fn": 0,
+          "fp": 0,
+          "macro_f1": 0.5,
+          "n": 4,
+          "negative": {
+            "f1": 1.0,
+            "precision": 1.0,
+            "recall": 1.0
+          },
+          "positive": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "tn": 4,
+          "tp": 0
+        },
+        "related_incorrect": {
+          "accuracy": 0.25,
+          "fn": 0,
+          "fp": 3,
+          "macro_f1": 0.2,
+          "n": 4,
+          "negative": {
+            "f1": 0.4,
+            "precision": 1.0,
+            "recall": 0.25
+          },
+          "positive": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "tn": 1,
+          "tp": 0
+        },
+        "technical_alt": {
+          "accuracy": 0.25,
+          "fn": 3,
+          "fp": 0,
+          "macro_f1": 0.2,
+          "n": 4,
+          "negative": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "positive": {
+            "f1": 0.4,
+            "precision": 1.0,
+            "recall": 0.25
+          },
+          "tn": 0,
+          "tp": 1
+        }
+      },
+      "by_concept": {
+        "continuous integration": {
+          "accuracy": 0.25,
+          "fn": 3,
+          "fp": 3,
+          "macro_f1": 0.2,
+          "n": 8,
+          "negative": {
+            "f1": 0.4,
+            "precision": 0.4,
+            "recall": 0.4
+          },
+          "positive": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "tn": 2,
+          "tp": 0
+        },
+        "load balancing": {
+          "accuracy": 0.375,
+          "fn": 3,
+          "fp": 2,
+          "macro_f1": 0.2727,
+          "n": 8,
+          "negative": {
+            "f1": 0.5455,
+            "precision": 0.5,
+            "recall": 0.6
+          },
+          "positive": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "tn": 3,
+          "tp": 0
+        },
+        "normalisation": {
+          "accuracy": 0.25,
+          "fn": 3,
+          "fp": 3,
+          "macro_f1": 0.2,
+          "n": 8,
+          "negative": {
+            "f1": 0.4,
+            "precision": 0.4,
+            "recall": 0.4
+          },
+          "positive": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "tn": 2,
+          "tp": 0
+        },
+        "requirements traceability": {
+          "accuracy": 0.375,
+          "fn": 2,
+          "fp": 3,
+          "macro_f1": 0.3651,
+          "n": 8,
+          "negative": {
+            "f1": 0.4444,
+            "precision": 0.5,
+            "recall": 0.4
+          },
+          "positive": {
+            "f1": 0.2857,
+            "precision": 0.25,
+            "recall": 0.3333
+          },
+          "tn": 2,
+          "tp": 1
+        }
+      },
+      "errors": {
+        "false_negatives": [
+          {
+            "category": "paraphrase",
+            "item_id": "PB1-G07-P1",
+            "lexical_status": "not_demonstrated",
+            "semantic_score": 0.1239,
+            "truth": "demonstrated"
+          },
+          {
+            "category": "paraphrase",
+            "item_id": "PB1-G07-P2",
+            "lexical_status": "not_demonstrated",
+            "semantic_score": 0.1985,
+            "truth": "demonstrated"
+          },
+          {
+            "category": "technical_alt",
+            "item_id": "PB1-G07-TA",
+            "lexical_status": "not_demonstrated",
+            "semantic_score": 0.243,
+            "truth": "demonstrated"
+          },
+          {
+            "category": "paraphrase",
+            "item_id": "PB1-G08-P1",
+            "lexical_status": "not_demonstrated",
+            "semantic_score": 0.4472,
+            "truth": "demonstrated"
+          },
+          {
+            "category": "paraphrase",
+            "item_id": "PB1-G08-P2",
+            "lexical_status": "not_demonstrated",
+            "semantic_score": 0.4472,
+            "truth": "demonstrated"
+          },
+          {
+            "category": "technical_alt",
+            "item_id": "PB1-G08-TA",
+            "lexical_status": "not_demonstrated",
+            "semantic_score": 0.4743,
+            "truth": "demonstrated"
+          },
+          {
+            "category": "paraphrase",
+            "item_id": "PB1-G09-P1",
+            "lexical_status": "not_demonstrated",
+            "semantic_score": 0.4765,
+            "truth": "demonstrated"
+          },
+          {
+            "category": "paraphrase",
+            "item_id": "PB1-G09-P2",
+            "lexical_status": "not_demonstrated",
+            "semantic_score": 0.2951,
+            "truth": "demonstrated"
+          },
+          {
+            "category": "paraphrase",
+            "item_id": "PB1-G10-P1",
+            "lexical_status": "not_demonstrated",
+            "semantic_score": 0.1773,
+            "truth": "demonstrated"
+          },
+          {
+            "category": "paraphrase",
+            "item_id": "PB1-G10-P2",
+            "lexical_status": "not_demonstrated",
+            "semantic_score": 0.1045,
+            "truth": "demonstrated"
+          },
+          {
+            "category": "technical_alt",
+            "item_id": "PB1-G10-TA",
+            "lexical_status": "not_demonstrated",
+            "semantic_score": 0.1157,
+            "truth": "demonstrated"
+          }
+        ],
+        "false_positives": [
+          {
+            "category": "related_incorrect",
+            "item_id": "PB1-G07-RI",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.6216,
+            "truth": "contradicted"
+          },
+          {
+            "category": "negation",
+            "item_id": "PB1-G07-N",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.5646,
+            "truth": "contradicted"
+          },
+          {
+            "category": "keyword_trap",
+            "item_id": "PB1-G07-KT",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.396,
+            "truth": "missing"
+          },
+          {
+            "category": "negation",
+            "item_id": "PB1-G08-N",
+            "lexical_status": "partial",
+            "semantic_score": 0.61,
+            "truth": "contradicted"
+          },
+          {
+            "category": "keyword_trap",
+            "item_id": "PB1-G08-KT",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.3798,
+            "truth": "missing"
+          },
+          {
+            "category": "related_incorrect",
+            "item_id": "PB1-G09-RI",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.8226,
+            "truth": "contradicted"
+          },
+          {
+            "category": "missing",
+            "item_id": "PB1-G09-M",
+            "lexical_status": "partial",
+            "semantic_score": 0.5042,
+            "truth": "missing"
+          },
+          {
+            "category": "negation",
+            "item_id": "PB1-G09-N",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.695,
+            "truth": "contradicted"
+          },
+          {
+            "category": "related_incorrect",
+            "item_id": "PB1-G10-RI",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.5303,
+            "truth": "contradicted"
+          },
+          {
+            "category": "negation",
+            "item_id": "PB1-G10-N",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.4939,
+            "truth": "contradicted"
+          },
+          {
+            "category": "keyword_trap",
+            "item_id": "PB1-G10-KT",
+            "lexical_status": "demonstrated",
+            "semantic_score": 0.2549,
+            "truth": "missing"
+          }
+        ]
+      },
+      "label_by_status": {
+        "contradicted": {
+          "demonstrated": 7,
+          "partial": 1
+        },
+        "demonstrated": {
+          "demonstrated": 1,
+          "not_demonstrated": 11
+        },
+        "missing": {
+          "demonstrated": 4,
+          "not_demonstrated": 3,
+          "partial": 1
+        },
+        "partial": {
+          "not_demonstrated": 3,
+          "partial": 1
+        }
+      },
+      "overall": {
+        "accuracy": 0.3125,
+        "fn": 11,
+        "fp": 11,
+        "macro_f1": 0.2667,
+        "negative": {
+          "f1": 0.45,
+          "precision": 0.45,
+          "recall": 0.45
+        },
+        "positive": {
+          "f1": 0.0833,
+          "precision": 0.0833,
+          "recall": 0.0833
+        },
+        "tn": 9,
+        "tp": 1
+      },
+      "threshold": 0.5
+    },
+    "threshold_sensitivity": [
+      {
+        "macro_f1": 0.3725,
+        "missed": 5,
+        "positive_f1": 0.4118,
+        "threshold": 0.2,
+        "wrongly_detected": 15
+      },
+      {
+        "macro_f1": 0.3725,
+        "missed": 5,
+        "positive_f1": 0.4118,
+        "threshold": 0.22,
+        "wrongly_detected": 15
+      },
+      {
+        "macro_f1": 0.3725,
+        "missed": 5,
+        "positive_f1": 0.4118,
+        "threshold": 0.24,
+        "wrongly_detected": 15
+      },
+      {
+        "macro_f1": 0.3431,
+        "missed": 6,
+        "positive_f1": 0.3636,
+        "threshold": 0.26,
+        "wrongly_detected": 15
+      },
+      {
+        "macro_f1": 0.3431,
+        "missed": 6,
+        "positive_f1": 0.3636,
+        "threshold": 0.28,
+        "wrongly_detected": 15
+      },
+      {
+        "macro_f1": 0.3125,
+        "missed": 7,
+        "positive_f1": 0.3125,
+        "threshold": 0.3,
+        "wrongly_detected": 15
+      },
+      {
+        "macro_f1": 0.3125,
+        "missed": 7,
+        "positive_f1": 0.3125,
+        "threshold": 0.32,
+        "wrongly_detected": 15
+      },
+      {
+        "macro_f1": 0.3125,
+        "missed": 7,
+        "positive_f1": 0.3125,
+        "threshold": 0.34,
+        "wrongly_detected": 15
+      },
+      {
+        "macro_f1": 0.3125,
+        "missed": 7,
+        "positive_f1": 0.3125,
+        "threshold": 0.36,
+        "wrongly_detected": 15
+      },
+      {
+        "macro_f1": 0.3431,
+        "missed": 7,
+        "positive_f1": 0.3226,
+        "threshold": 0.38,
+        "wrongly_detected": 14
+      },
+      {
+        "macro_f1": 0.3431,
+        "missed": 7,
+        "positive_f1": 0.3226,
+        "threshold": 0.4,
+        "wrongly_detected": 14
+      },
+      {
+        "macro_f1": 0.3431,
+        "missed": 7,
+        "positive_f1": 0.3226,
+        "threshold": 0.42,
+        "wrongly_detected": 14
+      },
+      {
+        "macro_f1": 0.3431,
+        "missed": 7,
+        "positive_f1": 0.3226,
+        "threshold": 0.44,
+        "wrongly_detected": 14
+      },
+      {
+        "macro_f1": 0.2749,
+        "missed": 9,
+        "positive_f1": 0.2069,
+        "threshold": 0.46,
+        "wrongly_detected": 14
+      },
+      {
+        "macro_f1": 0.2227,
+        "missed": 11,
+        "positive_f1": 0.0769,
+        "threshold": 0.48,
+        "wrongly_detected": 13
+      },
+      {
+        "macro_f1": 0.2667,
+        "missed": 11,
+        "positive_f1": 0.0833,
+        "threshold": 0.5,
+        "wrongly_detected": 11
+      },
+      {
+        "macro_f1": 0.2874,
+        "missed": 11,
+        "positive_f1": 0.087,
+        "threshold": 0.52,
+        "wrongly_detected": 10
+      },
+      {
+        "macro_f1": 0.2874,
+        "missed": 11,
+        "positive_f1": 0.087,
+        "threshold": 0.54,
+        "wrongly_detected": 10
+      },
+      {
+        "macro_f1": 0.2874,
+        "missed": 11,
+        "positive_f1": 0.087,
+        "threshold": 0.56,
+        "wrongly_detected": 10
+      },
+      {
+        "macro_f1": 0.2874,
+        "missed": 11,
+        "positive_f1": 0.087,
+        "threshold": 0.58,
+        "wrongly_detected": 10
+      },
+      {
+        "macro_f1": 0.2874,
+        "missed": 11,
+        "positive_f1": 0.087,
+        "threshold": 0.6,
+        "wrongly_detected": 10
+      },
+      {
+        "macro_f1": 0.3074,
+        "missed": 11,
+        "positive_f1": 0.0909,
+        "threshold": 0.62,
+        "wrongly_detected": 9
+      },
+      {
+        "macro_f1": 0.3074,
+        "missed": 11,
+        "positive_f1": 0.0909,
+        "threshold": 0.64,
+        "wrongly_detected": 9
+      },
+      {
+        "macro_f1": 0.3074,
+        "missed": 11,
+        "positive_f1": 0.0909,
+        "threshold": 0.66,
+        "wrongly_detected": 9
+      },
+      {
+        "macro_f1": 0.3074,
+        "missed": 11,
+        "positive_f1": 0.0909,
+        "threshold": 0.68,
+        "wrongly_detected": 9
+      },
+      {
+        "macro_f1": 0.3074,
+        "missed": 11,
+        "positive_f1": 0.0909,
+        "threshold": 0.7,
+        "wrongly_detected": 9
+      },
+      {
+        "macro_f1": 0.2558,
+        "missed": 12,
+        "positive_f1": 0.0,
+        "threshold": 0.72,
+        "wrongly_detected": 9
+      },
+      {
+        "macro_f1": 0.2558,
+        "missed": 12,
+        "positive_f1": 0.0,
+        "threshold": 0.74,
+        "wrongly_detected": 9
+      },
+      {
+        "macro_f1": 0.2558,
+        "missed": 12,
+        "positive_f1": 0.0,
+        "threshold": 0.76,
+        "wrongly_detected": 9
+      },
+      {
+        "macro_f1": 0.2558,
+        "missed": 12,
+        "positive_f1": 0.0,
+        "threshold": 0.78,
+        "wrongly_detected": 9
+      },
+      {
+        "macro_f1": 0.2558,
+        "missed": 12,
+        "positive_f1": 0.0,
+        "threshold": 0.8,
+        "wrongly_detected": 9
+      },
+      {
+        "macro_f1": 0.2558,
+        "missed": 12,
+        "positive_f1": 0.0,
+        "threshold": 0.82,
+        "wrongly_detected": 9
+      },
+      {
+        "macro_f1": 0.2558,
+        "missed": 12,
+        "positive_f1": 0.0,
+        "threshold": 0.84,
+        "wrongly_detected": 9
+      },
+      {
+        "macro_f1": 0.2558,
+        "missed": 12,
+        "positive_f1": 0.0,
+        "threshold": 0.86,
+        "wrongly_detected": 9
+      },
+      {
+        "macro_f1": 0.2558,
+        "missed": 12,
+        "positive_f1": 0.0,
+        "threshold": 0.88,
+        "wrongly_detected": 9
+      },
+      {
+        "macro_f1": 0.2558,
+        "missed": 12,
+        "positive_f1": 0.0,
+        "threshold": 0.9,
+        "wrongly_detected": 9
+      }
+    ]
+  },
+  "label_source": "draft.proposed_label",
+  "selection_on_dev": {
+    "dev_gain_over_lexical": 0.2096,
+    "dev_macro_f1_at_threshold": 0.4179,
+    "dev_macro_f1_lexical": 0.2083,
+    "grid": [
+      0.2,
+      0.9,
+      36
+    ],
+    "rule": "max macro-F1 on DEV, ties -> higher threshold",
+    "threshold": 0.3
+  }
+}
