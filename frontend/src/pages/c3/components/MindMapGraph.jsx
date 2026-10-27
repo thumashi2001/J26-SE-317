@@ -26,6 +26,7 @@ function normalise(mindmap) {
   return { nodes, edges, rootId };
 }
 
+// Draws the answer-to-concept map: nodes are concepts/sentences coloured by status; click a node to see its evidence.
 export default function MindMapGraph({ mindmap, sentences = [] }) {
   const [selectedId, setSelectedId] = useState(null);
   const [filter, setFilter] = useState('all');

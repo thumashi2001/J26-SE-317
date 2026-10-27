@@ -1,3 +1,6 @@
+// Presentation panels for the batch page: AnswerInput (step 2), ValidationSummary (step 3), ResultsTable (step 4),
+// PastBatches (earlier batches) and InspectDialog (one student's result). They hold no marking logic.
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import AssessmentResult from '../components/AssessmentResult.jsx';
@@ -55,6 +58,7 @@ export function AnswerInput({ setup, mode, onMode, csv, onCsv, rows, onRows, onE
 }
 
 // Step 3: what the checks found, then run marking.
+// Step 3: shows which rows are valid and which are rejected (with the reason) before marking starts.
 export function ValidationSummary({ result, onBack, onRun, busy, error }) {
   return (
     <section className="panel" aria-label="Check results">
@@ -111,6 +115,7 @@ export function ValidationSummary({ result, onBack, onRun, busy, error }) {
 }
 
 // Step 4: cohort results.
+// Step 4: one row per student with status and mark; click a row to inspect.
 export function ResultsTable({ setup, summary, stats, items, search, onSearch, status, onStatus, onRefresh, onInspect, onFinalizeAll, finalizing, finalizeMsg, onMore, onNew }) {
   const max = setup.max_marks;
   return (
@@ -197,6 +202,7 @@ export function ResultsTable({ setup, summary, stats, items, search, onSearch, s
   );
 }
 
+// List of the lecturer's earlier batches.
 export function PastBatches({ setups, loading, error, onRetry, onOpen, onNew }) {
   if (loading) return <Spinner label="Loading past batches..." />;
   if (error) return <Notice tone="error" title="Past batches unavailable" onRetry={onRetry}>{error}</Notice>;
@@ -226,6 +232,7 @@ export function PastBatches({ setups, loading, error, onRetry, onOpen, onNew }) 
 }
 
 // Review one student's result without leaving the batch.
+// Full result for one student with the accept / change-mark / finalize controls.
 export function InspectDialog({ detail, loading, error, msg, mark, onMark, reason, onReason, markError, reasonError, busy, onAccept, onOverride, onFinalize, onClose }) {
   const r = detail?.result;
   const total = r?.total_possible_marks;

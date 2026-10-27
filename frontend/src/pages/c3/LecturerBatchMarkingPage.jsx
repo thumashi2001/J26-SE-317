@@ -1,3 +1,7 @@
+// LECTURER BATCH MARKING: a guided flow  1 Setup -> 2 Answers -> 3 Check -> 4 Results.
+// Setup saves the question/rubric on the server, Check is a dry run, Results marks the rows and lets the lecturer inspect,
+// review and finalize each one. All marking happens on the server; this page only collects input and shows results.
+
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
@@ -17,6 +21,7 @@ import { AnswerInput, InspectDialog, PastBatches, ResultsTable, ValidationSummar
 import { ConfirmDialog, Notice, PageHeader, Stepper, friendlyError } from './components/c3ui.jsx';
 import './c3.css';
 
+// Empty starting values for the setup form.
 const BLANK_SETUP = {
   moduleId: 'SE3010',
   questionId: '',
@@ -40,6 +45,7 @@ const EXAMPLE_ROWS = {
   text: 'student_id,answer\nIT21001001,"High cohesion means a module does one well-defined job. Loose coupling reduces dependencies between modules, for example with microservices."\nIT21001002,"Cohesion and coupling are good metrics for modularity."\nIT21001003,""\nIT21001001,"Duplicate row for the first student."',
 };
 
+// Turn pasted CSV text (student_id, answer or option) into row objects for the server.
 function parseCsv(text) {
   const out = [];
   for (const raw of text.split('\n')) {
@@ -60,6 +66,7 @@ function parseCsv(text) {
   return out;
 }
 
+// Client-side checks for the setup form (required fields, rubric marks adding up to the total). The server validates again.
 function setupErrors(v) {
   const e = {};
   const max = Number(v.maxMarks);
@@ -132,6 +139,7 @@ export default function LecturerBatchMarkingPage() {
 
   const patchSetup = (patch) => setSetup((s) => ({ ...s, ...patch }));
 
+  // Fill the setup form from a lecturer example (staff-only list from the server).
   const loadExample = (id) => {
     const ex = examples.find((x) => x.id === id);
     const p = ex?.config;
@@ -158,6 +166,7 @@ export default function LecturerBatchMarkingPage() {
     setStep('setup');
   };
 
+  // Step 1 -> 2: save the setup and keep the returned batch.
   const saveSetup = async () => {
     setShowErrors(true);
     if (Object.keys(errors).length > 0) return;
@@ -192,6 +201,7 @@ export default function LecturerBatchMarkingPage() {
 
   const batchId = activeSetup?.batch_id || activeSetup?._id;
 
+  // Step 2 -> 3: dry-run validation; nothing is marked or saved yet.
   const checkAnswers = async () => {
     setAnswersError(null);
     const list = mode === 'csv' ? parseCsv(csv) : rows.filter((r) => r.student_id.trim());
@@ -210,6 +220,7 @@ export default function LecturerBatchMarkingPage() {
     }
   };
 
+  // Reload the batch rows and status counts.
   const refreshResults = async (id = activeSetup?.batch_id) => {
     if (!id) return;
     setResultsError(null);
@@ -222,6 +233,7 @@ export default function LecturerBatchMarkingPage() {
     }
   };
 
+  // Step 3 -> 4: mark the valid rows (server-side), then load the results.
   const runMarking = async () => {
     if (!checkResult || checkResult.valid_items.length === 0) return;
     setMarking(true);
@@ -237,6 +249,7 @@ export default function LecturerBatchMarkingPage() {
     }
   };
 
+  // Finalize every REVIEWED result; unreviewed ones are skipped and reported back.
   const finalizeAll = async () => {
     setFinalizing(true);
     try {
@@ -279,6 +292,7 @@ export default function LecturerBatchMarkingPage() {
     await refreshResults();
   };
 
+  // Accept or override from the inspect dialog; an override needs a mark within range and a reason.
   const review = async (decision) => {
     setDetailMsg(null);
     setDetailError(null);
@@ -304,6 +318,7 @@ export default function LecturerBatchMarkingPage() {
     }
   };
 
+  // Finalize the single inspected result.
   const finalizeOne = async () => {
     setReviewBusy(true);
     setDetailError(null);

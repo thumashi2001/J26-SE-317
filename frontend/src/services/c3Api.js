@@ -1,3 +1,8 @@
+// C3 API CLIENT: one small function per backend route under /api/v1/c3. Each returns the parsed JSON, or throws an error
+// carrying the HTTP status (see apiClient.js). The login token is added by apiClient, not here.
+// Student calls: listAssessments, assessAnswer, listSubmissions, getSubmission.
+// Lecturer/admin calls: listExamples, reviewSubmission, finalizeSubmission and the batch functions.
+
 import { api } from './apiClient.js';
 
 /**

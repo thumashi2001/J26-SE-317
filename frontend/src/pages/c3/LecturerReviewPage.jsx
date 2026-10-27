@@ -1,3 +1,6 @@
+// LECTURER REVIEW: shows one submission with the full evidence and lets the lecturer accept the automatic mark,
+// change it (mark within 0..total plus a written reason), and finalize (lock) the result. The lecturer is the final authority.
+
 import React, { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { finalizeSubmission, getSubmission, reviewSubmission } from '../../services/c3Api.js';
@@ -23,6 +26,7 @@ export default function LecturerReviewPage() {
   const [reasonError, setReasonError] = useState(null);
   const [finalizeOpen, setFinalizeOpen] = useState(false);
 
+  // Fetch the submission and its saved evaluation.
   const load = async () => {
     setLoading(true);
     setLoadError(null);
@@ -68,8 +72,10 @@ export default function LecturerReviewPage() {
   const decision = result?.lecturer_decision;
   const finalized = status === 'finalized';
 
+  // Update the page state after a successful review/finalize without reloading.
   const apply = (patch) => setData((prev) => ({ ...prev, submission: { ...prev.submission, status: patch.status }, result: { ...prev.result, ...patch } }));
 
+  // Accept: keeps the automatic mark as the reviewed mark.
   const accept = async () => {
     setBusy(true);
     setError(null);
@@ -85,12 +91,14 @@ export default function LecturerReviewPage() {
     }
   };
 
+  // Override dialog: checks the mark range and requires a reason before saving.
   const openOverride = () => {
     setMarkError(null);
     setReasonError(null);
     setOverrideOpen(true);
   };
 
+  // Change the mark. Validation here mirrors the server rules (0..total, reason required); the server checks again.
   const saveOverride = async (e) => {
     e.preventDefault();
     const num = Number(newMark);
@@ -120,6 +128,7 @@ export default function LecturerReviewPage() {
     }
   };
 
+  // Finalize: makes the result official; it cannot be changed afterwards.
   const finalize = async () => {
     setBusy(true);
     setError(null);

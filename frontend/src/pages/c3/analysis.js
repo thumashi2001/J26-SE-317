@@ -1,3 +1,7 @@
+// SIMPLE ENGLISH: the backend returns one big "evaluation" object (marking, analysis, feedback, mind map). normaliseEvaluation
+// sorts it into the parts the result page needs. If a part is missing, it stays missing and gets a reason text, so the page can
+// say "not available because ..." instead of showing an empty box or made-up content.
+
 // Turns a stored/returned evaluation into what the result view can show, and says explicitly when a part of the
 // analysis does not exist. Pure functions: no data is invented here; a missing part stays missing and gets a reason.
 
@@ -16,6 +20,7 @@ const MCQ_FEEDBACK_BLOCKS = [
 
 const list = (v) => (Array.isArray(v) ? v.filter((x) => x != null && String(x).trim() !== '') : []);
 
+// True when the evaluation belongs to a multiple-choice question (answer_type, or an "mcq-" marking version).
 export function isMcq(ev) {
   if (!ev || typeof ev !== 'object') return false;
   const type = String(ev.answer_type || '').toLowerCase();
@@ -25,6 +30,8 @@ export function isMcq(ev) {
 // The Python service says "Function 2 proposed ..." in its summary; show it in plain language.
 export const plainSummary = (t) => String(t).replace(/^Function \d+ proposed/, 'The automatic marking proposed');
 
+// Returns { kind, warnings, criteria, sentences, concepts, feedback, map, answerKey }; each of concepts/feedback/map is
+// either { available: true, ... } or { available: false, reason }.
 export function normaliseEvaluation(ev) {
   const empty = !ev || typeof ev !== 'object' || !(ev.marking || ev.analysis || ev.feedback || ev.mindmap || ev.total_awarded_marks != null);
   if (empty) {

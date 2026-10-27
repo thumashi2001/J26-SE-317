@@ -29,6 +29,7 @@ export default function AssessmentPage() {
   // Only an explicit {available: true} from the server would ever hide the notice; nothing here is C2-originated today.
   const [c2Available, setC2Available] = useState(false);
 
+  // Ask the server which demo questions exist (question text and options only, never keys or rubrics).
   const loadAssessments = async () => {
     setLoadError(null);
     setAssessments(null); // shows the loading state again, so "Try again" visibly re-requests
@@ -49,6 +50,7 @@ export default function AssessmentPage() {
     }
   };
 
+  // The student's own earlier submissions (the server filters to the signed-in student).
   const loadHistory = async () => {
     setHistoryLoading(true);
     setHistoryError(null);
@@ -71,6 +73,7 @@ export default function AssessmentPage() {
   const isMcq = selected && (selected.answer_type === 'mcq' || selected.answer_type === 'multiple-choice');
   const sample = selected && !isMcq ? SAMPLE_ANSWERS[selected.id] : null;
 
+  // Pick a question; nothing is preselected, and the previous answer/result is cleared.
   const choose = (a) => {
     setSelectedId(a.id);
     setAnswer('');
@@ -80,6 +83,8 @@ export default function AssessmentPage() {
     setResult(null);
   };
 
+  // Sends ONLY demo_id plus the answer (or chosen option). The server looks up the rubric/key itself, marks the answer
+  // and saves it as pending_review; the page then shows the returned evaluation.
   const submit = async (e) => {
     e.preventDefault();
     if (!selected) return;
@@ -116,6 +121,7 @@ export default function AssessmentPage() {
     }
   };
 
+  // Open an earlier submission; the server returns a redacted copy for students.
   const openSubmission = async (id) => {
     setDetailBusy(true);
     setHistoryError(null);

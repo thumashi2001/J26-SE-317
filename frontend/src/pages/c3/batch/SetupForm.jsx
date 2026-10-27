@@ -7,6 +7,7 @@ export default function SetupForm({ value, onChange, errors, showErrors, criteri
   const err = (k) => (showErrors && errors[k] ? <p className="c3-error" id={`${k}-err`} role="alert">{errors[k]}</p> : null);
   const aria = (k) => (showErrors && errors[k] ? { 'aria-invalid': true, 'aria-describedby': `${k}-err` } : {});
 
+  // Rubric editing helpers: add/remove criteria and options, keep ids and marks consistent.
   const updateCriterion = (i, patch) => {
     const next = value.criteria.map((c, idx) => {
       if (idx !== i) return c;

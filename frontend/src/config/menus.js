@@ -23,7 +23,7 @@ export const LECTURER_MENU = [
   { to: '/lecturer/c1', label: 'Class insights' },
   { to: '/lecturer/c2', label: 'Exam intelligence' },
   { to: '/lecturer/c3/batch', label: 'Batch marking' },
-  { to: '/lecturer/c3', label: 'Marking review' },
+  { to: '/lecturer/c3', label: 'Marking review', end: true },
   { to: '/lecturer/c4', label: 'Adaptive paths' },
 ];
 
@@ -39,7 +39,7 @@ export const ADMIN_MENU = [
 export const LECTURER_SECTIONS = [
   { to: '/lecturer/c1', title: 'Class insights', owner: 'Component 1', text: 'See how your class is learning, the hardest topics, and who may need help.' },
   { to: '/lecturer/c2', title: 'Exam intelligence', owner: 'Component 2', text: 'Question papers, rubrics and exam patterns.' },
-  { to: '/lecturer/c3', title: 'Marking review', owner: 'Component 3', text: 'Review automated marks and feedback before students see them.' },
+  { to: '/lecturer/c3', title: 'Marking review', owner: 'Component 3', text: 'Check automatic marks, adjust them where needed and finalize results.' },
   { to: '/lecturer/c4', title: 'Adaptive paths', owner: 'Component 4', text: 'Check the study plans recommended to students.' },
 ];
 

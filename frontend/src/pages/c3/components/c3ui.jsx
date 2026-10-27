@@ -3,6 +3,7 @@ import React, { useEffect, useRef } from 'react';
 // Small shared pieces for the marking pages. They only compose the global classes from index.css
 // (.page-head, .pill, .btn, .tabs, .notice, .panel) so the marking pages match the rest of AdaptiveLearnSE.
 
+// Page title row.
 export function PageHeader({ title, subtitle, actions }) {
   return (
     <header className="page-head c3-head">
@@ -15,6 +16,7 @@ export function PageHeader({ title, subtitle, actions }) {
   );
 }
 
+// Status code -> label and colour class.
 const STATUS = {
   pending_review: { label: 'Awaiting review', cls: 'status-pending' },
   reviewed: { label: 'Reviewed', cls: 'c3-status-info' },
@@ -23,11 +25,13 @@ const STATUS = {
 };
 
 // Shows the real backend state of a submission, nothing else.
+// Coloured label for a submission status (pending_review, reviewed, finalized).
 export function StatusPill({ status }) {
   const s = STATUS[status || 'pending_review'] || { label: String(status), cls: 'c3-status-info' };
   return <span className={`pill ${s.cls}`}>{s.label}</span>;
 }
 
+// Loading indicator with a text label.
 export function Spinner({ label }) {
   return (
     <span className="c3-spin-wrap" role="status">
@@ -73,6 +77,7 @@ export function Unavailable({ title, reason }) {
   );
 }
 
+// Placeholder when a list has no items.
 export function EmptyState({ title, children, action }) {
   return (
     <div className="panel c3-empty">
@@ -207,6 +212,7 @@ export function sourceKind(s) {
 }
 export const SOURCE_LABEL = { student: 'Student', sample: 'Sample', test: 'Test data' };
 
+// Badge shown on sample/test-data submissions in the lecturer views.
 export function SourceBadge({ submission }) {
   const kind = sourceKind(submission);
   if (kind === 'student') return null;

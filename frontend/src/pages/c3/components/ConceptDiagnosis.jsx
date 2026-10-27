@@ -6,6 +6,7 @@ const STATUS_CLASS = { demonstrated: 'status-approved', partial: 'status-pending
 // Concept coverage of the answer, with the sentences that support each concept.
 // The overlap figure is the share of the concept's words found in the answer (a word-match measure, not a meaning score).
 export default function ConceptDiagnosis({ analysis, sentenceMap }) {
+  // Filter chips: all / demonstrated / partial / missing.
   const [filter, setFilter] = useState('all');
   if (!analysis || !analysis.concept_matches || analysis.concept_matches.length === 0) return null;
 

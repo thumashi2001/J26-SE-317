@@ -73,7 +73,6 @@ export default function LecturerHome() {
       <div className="sections">
         {LECTURER_SECTIONS.map((s) => (
           <Link key={s.to} to={s.to} className="section-card">
-            <span className="chip">{s.owner}</span>
             <h3>{s.title}</h3>
             <p>{s.text}</p>
           </Link>

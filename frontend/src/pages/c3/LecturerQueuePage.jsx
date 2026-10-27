@@ -1,3 +1,6 @@
+// LECTURER QUEUE: list of saved submissions waiting for review (filter by status, source and search text).
+// Each row links to the review page. Counts at the top are computed from the loaded list.
+
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { listSubmissions } from '../../services/c3Api.js';
@@ -13,6 +16,7 @@ export default function LecturerQueuePage() {
   const [source, setSource] = useState('all');
   const [search, setSearch] = useState('');
 
+  // Load submissions from the server; reloads when the status filter changes.
   const load = async () => {
     setLoading(true);
     setError(null);
@@ -30,6 +34,7 @@ export default function LecturerQueuePage() {
     load();
   }, [status]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Totals per status and per source (student / sample / test data).
   const counts = useMemo(() => {
     const c = { total: submissions.length, pending: 0, reviewed: 0, finalized: 0, student: 0, sample: 0, test: 0 };
     submissions.forEach((s) => {
