@@ -1,3 +1,15 @@
+// SUBMISSION SERVICE: saving results to MongoDB and the lecturer review workflow.
+//
+// WHAT IS STORED (two collections per submission):
+//   c3_submissions  one document per student answer: who, which question, the answer text, status
+//   c3_results      one document per submission: the automated mark, the WHOLE AI response in `ai_evaluation`
+//                   (marking, analysis, feedback, mind map), and the lecturer decision fields
+//                   (lecturer_decision, final_mark, override_reason, reviewed_by/at, finalized_by/at, review_history)
+// MongoDB therefore only STORES results. It never calculates or supplies a mark.
+//
+// STATUS LIFE CYCLE: pending_review (automatic proposal) -> reviewed (lecturer accepted/changed) -> finalized (locked).
+// The automatic mark (automated_mark) is never overwritten: a lecturer change goes into final_mark with a reason.
+
 import { getDb } from '../../../config/db.js';
 import { ObjectId } from 'mongodb';
 import { redactEvaluationForStudent } from './redaction.js';
@@ -9,6 +21,7 @@ function httpError(status, message) {
   return err;
 }
 
+// Mongo ids are ObjectId objects; this turns a 24-character hex string into one (other values are returned unchanged).
 function parseId(id) {
   if (!id) return null;
   if (ObjectId.isValid(id) && typeof id === 'string' && id.length === 24) {
@@ -17,6 +30,7 @@ function parseId(id) {
   return id;
 }
 
+// Shortcuts to the two collections.
 function submissionsCol() {
   return getDb().collection('c3_submissions');
 }
@@ -25,6 +39,7 @@ function resultsCol() {
   return getDb().collection('c3_results');
 }
 
+// Label a submission as a real student answer, a PP1 demo, or a test fixture (the lecturer queue shows a badge for the last two).
 export function detectProvenance(s) {
   if (!s) return 'student';
   if (s.is_demo === true) return 'pp1_demo';
@@ -45,6 +60,7 @@ export function detectProvenance(s) {
  * Creates a submission record and associated AI result record.
  * Status starts as 'pending_review' (AI Proposed) — human-in-the-loop requirement.
  */
+// (called by c3Controller.assessAnswer and by batch marking)
 export async function createSubmissionWithResult({ studentId, payload, aiResult }) {
   const now = new Date();
   const isDemo = Boolean(payload.is_demo) || ['SE3010-Q01', 'SE-ARCH-001', 'SE2020-Q03', 'SE3040-Q02'].includes(payload.question_id);
@@ -52,6 +68,8 @@ export async function createSubmissionWithResult({ studentId, payload, aiResult 
     aiResult?.selected_labels?.length ? `Selected Option: ${aiResult.selected_labels.join(', ')}` :
     (payload.selected_option_id || payload.selected_options ? String(payload.selected_option_id || payload.selected_options) : '')
   );
+  // The submission document. For MCQ the reference_answer / correct_options fields are filled from the full evaluation;
+  // they are staff-only and are removed again when a student reads their submission (see getSubmissionDetail).
   const subDoc = {
     student_id: studentId,
     question_id: payload.question_id,
@@ -71,10 +89,12 @@ export async function createSubmissionWithResult({ studentId, payload, aiResult 
     updated_at: now,
   };
 
+  // The automated mark is read from the AI/MCQ result; it is stored unchanged as automated_mark.
   const automatedMark = aiResult?.total_awarded_marks ?? aiResult?.marking?.total_awarded_marks ?? 0;
   const totalPossible = aiResult?.total_possible_marks ?? aiResult?.marking?.total_possible_marks ?? 0;
   const percentage = aiResult?.percentage ?? (totalPossible > 0 ? Math.round((automatedMark / totalPossible) * 1000) / 10 : 0);
 
+  // (Only batch marking uses batch_id; a demo submission has none, so every demo answer creates a new submission.)
   // Check if a submission already exists for this student in this batch to prevent duplicates
   let existingSub = null;
   if (payload.batch_id && studentId) {
@@ -169,6 +189,7 @@ export async function createSubmissionWithResult({ studentId, payload, aiResult 
     resultId = String(resResult.insertedId);
   }
 
+  // Best-effort hand-off to Component 1 (Cognitive Digital Twin); a failure here must not fail the student's submission.
   // Synchronize initial assessment evidence to C1 (Cognitive Digital Twin)
   syncC3AssessmentToC1({
     studentId,
@@ -192,6 +213,7 @@ export async function createSubmissionWithResult({ studentId, payload, aiResult 
  * Lists submissions.
  * Students only see their own submissions; lecturers see all submissions.
  */
+// Students automatically get only their own rows (the filter is applied on the server, not in the browser).
 export async function listSubmissions({ studentId, role, status, batchId }) {
   if ((status !== undefined && typeof status !== 'string') || (batchId !== undefined && typeof batchId !== 'string')) {
     throw httpError(400, 'Invalid filter');
@@ -255,6 +277,8 @@ export async function listSubmissions({ studentId, role, status, batchId }) {
 /**
  * Retrieves single submission and complete evaluation details.
  */
+// The detail view. The role decides how much is returned: staff get everything, a student gets their own answer and a
+// redacted evaluation (no answer key, rubric or reference answer).
 export async function getSubmissionDetail(submissionId, studentId, role) {
   const parsed = parseId(submissionId);
   const submission = await submissionsCol().findOne({
@@ -297,6 +321,7 @@ export async function getSubmissionDetail(submissionId, studentId, role) {
       ? Math.round((automatedMark / totalPossible) * 1000) / 10
       : null);
 
+  // ---- role-based projection of the stored record -------------------------------------------------------------
   // Students see their own answer and results, never the authoritative configuration (reference answer, rubric,
   // expected concepts, answer key). Lecturers and admins receive everything for review.
   const isStaff = role === 'lecturer' || role === 'admin';
@@ -346,6 +371,8 @@ export async function getSubmissionDetail(submissionId, studentId, role) {
  * Lecturer Review: Accept AI mark or Override AI mark with mandatory reason.
  * Status becomes 'reviewed'.
  */
+// Review rules: accept keeps the automatic mark; override needs a number within 0..total and a written reason.
+// Each review appends an entry to review_history so earlier decisions stay visible.
 export async function reviewSubmission(submissionId, lecturerId, { decision, new_mark, override_reason }) {
   const parsed = parseId(submissionId);
   const submission = await submissionsCol().findOne({
@@ -412,6 +439,7 @@ export async function reviewSubmission(submissionId, lecturerId, { decision, new
     updated_at: now,
   };
 
+  // The filter `status != finalized` makes the update atomic: a result finalized a moment earlier cannot be changed.
   const reviewWrite = await resultsCol().updateOne(
     { _id: result._id, status: { $ne: 'finalized' } },
     {
@@ -445,6 +473,7 @@ export async function reviewSubmission(submissionId, lecturerId, { decision, new
  * Lecturer Finalization: Finalizes the assessment result.
  * Status becomes 'finalized'.
  */
+// Finalize locks the result. Only a reviewed result can be finalized; the C1 hand-off then sends the FINAL mark.
 export async function finalizeSubmission(submissionId, lecturerId) {
   const parsed = parseId(submissionId);
   const submission = await submissionsCol().findOne({

@@ -1,9 +1,17 @@
+// WHERE THE QUESTION, RUBRIC AND ANSWER KEY COME FROM FOR A STUDENT.
+//
+// SIMPLE ENGLISH
+//   A student's browser only ever sends: which demo assessment (demo_id) and the student's own answer. The server
+//   looks up the question, rubric and answer key itself in the built-in demo bank (data/demoAssessments.js). A student
+//   can therefore never choose an easier question, supply their own answer key, or see the rubric.
+//   MongoDB is NOT consulted for the demo question or rubric: they are code, not database records.
 import { DEMO_ASSESSMENTS } from '../data/demoAssessments.js';
 
 // Students are untrusted: they may supply only their own answer. The question, answer key, rubric and
 // maximum marks always come from the server's built-in demo bank (students never resolve lecturer batches).
 // Lecturers and admins are trusted authors and may still send an inline configuration.
 
+// If a student's request contains ANY of these fields it is rejected (400): they are server-owned configuration.
 const FORBIDDEN_STUDENT_FIELDS = [
   'correct_answer', 'correct_option_id', 'rubric', 'max_marks', 'reference_answer', 'expected_concepts',
   'options', 'answer_type', 'question_text', 'is_demo',
@@ -13,6 +21,7 @@ function httpError(status, message) {
   return Object.assign(new Error(message), { status });
 }
 
+// Validate a student's request and turn it into a full marking payload (server config + the student's answer).
 export async function resolveStudentAssessment(payload) {
   const supplied = FORBIDDEN_STUDENT_FIELDS.filter((k) => payload[k] !== undefined && payload[k] !== null);
   if (supplied.length > 0) {
@@ -28,6 +37,7 @@ export async function resolveStudentAssessment(payload) {
   }
   if (typeof demo_id !== 'string') throw httpError(400, 'Invalid demo_id');
 
+  // The only fields taken from the student's request.
   const answerFields = {
     student_answer: payload.student_answer,
     selected_option_id: payload.selected_option_id,
@@ -37,6 +47,7 @@ export async function resolveStudentAssessment(payload) {
   // Own properties only: names such as "constructor" or "__proto__" must not resolve.
   if (!Object.hasOwn(DEMO_ASSESSMENTS, demo_id)) throw httpError(404, 'Unknown demo assessment');
   const demo = DEMO_ASSESSMENTS[demo_id];
+  // structuredClone = a private copy, so marking can never modify the shared demo bank.
   return { ...structuredClone(demo.config), ...answerFields, is_demo: true, config_source: 'server_demo_bank' };
 }
 
@@ -63,6 +74,7 @@ export async function listPublicAssessments() {
     title: demo.title,
     question_text: demo.config.question_text,
     answer_type: demo.config.answer_type || 'short',
+    // Maximum marks: explicit value (MCQ) or the sum of the rubric criteria's marks (written answers).
     max_marks: demo.config.max_marks ?? demo.config.rubric?.criteria?.reduce((sum, c) => sum + Number(c.max_marks || 0), 0) ?? null,
     options: publicOptions(demo.config.options),
   }));

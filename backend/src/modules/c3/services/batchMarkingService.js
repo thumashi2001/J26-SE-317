@@ -1,3 +1,11 @@
+// BATCH MARKING SERVICE: a lecturer sets up one question (a "batch"), pastes many student answers, and marks them together.
+//
+// FLOW:  createBatchSetup -> validateBatchAnswers (dry run, nothing saved) -> processBatchMarking (marks + saves each row)
+//        -> lecturer reviews each result in the review page -> finalizeBatchSubmissions (locks the reviewed ones).
+// Written answers go to the Python service one at a time (aiClient.assessAnswer); MCQ rows are marked in Node (mcqMarkingService).
+// One failing row never stops the others: it is reported as "failed" and the rest continue.
+// A batch belongs to the lecturer who created it (admins can see all); see assertBatchAccess.
+
 import { getDb } from '../../../config/db.js';
 import { ObjectId } from 'mongodb';
 import * as mcqSvc from './mcqMarkingService.js';
@@ -6,12 +14,14 @@ import * as submissionSvc from './submissionService.js';
 import { syncC3AssessmentToC1 } from '../../../integration/c3-c1/index.js';
 import { LIMITS, assertMaxChars, assertMaxItems } from './limits.js';
 
+// Build an Error carrying an HTTP status; the C3 error handler turns it into a JSON reply.
 function httpError(status, message) {
   const err = new Error(message);
   err.status = status;
   return err;
 }
 
+// Reject missing or non-text batch ids early (HTTP 400).
 function requireStringId(id) {
   if (typeof id !== 'string' || !id.trim()) throw httpError(400, 'A valid batch identifier is required');
   return id.trim();
@@ -25,6 +35,7 @@ function assertBatchAccess(setup, lecturerId, role) {
   }
 }
 
+// Turn a 24-character hex string into a Mongo ObjectId; other values are returned unchanged.
 function parseId(id) {
   if (!id) return null;
   if (ObjectId.isValid(id) && typeof id === 'string' && id.length === 24) {
@@ -33,6 +44,7 @@ function parseId(id) {
   return id;
 }
 
+// Shortcuts to the three collections used here.
 export function batchSetupsCol() {
   return getDb().collection('c3_batch_setups');
 }
@@ -48,6 +60,7 @@ function resultsCol() {
 /**
  * Validates and sanitizes assessment setup data.
  */
+// Checks size limits, then copies only the allowed fields into a clean object (unknown fields are dropped).
 export function validateSetupData(setupData) {
   if (!setupData || typeof setupData !== 'object') {
     throw httpError(400, 'Assessment setup data is required');
@@ -188,6 +201,7 @@ export function validateSetupData(setupData) {
 /**
  * Creates and persists a shared batch assessment setup.
  */
+// Saves a new batch setup. The batch id is built from the question id plus a time stamp; status starts as "active".
 export async function createBatchSetup({ lecturerId, setupData }) {
   const sanitized = validateSetupData(setupData);
   const now = new Date();
@@ -212,6 +226,7 @@ export async function createBatchSetup({ lecturerId, setupData }) {
 /**
  * Lists all batch setups with submission summary statistics.
  */
+// Lecturers see only their own batches; admins see all. Newest first, at most 100, each with counts of pending/reviewed/finalized/failed submissions.
 export async function listBatchSetups({ lecturerId, role }) {
   const query = {};
   if (role !== 'admin') {
@@ -267,6 +282,7 @@ export async function listBatchSetups({ lecturerId, role }) {
 /**
  * Retrieves a single batch setup and its associated student results.
  */
+// One batch with its submissions and results; access is checked first.
 export async function getBatchSetup(setupId, role, lecturerId) {
   const parsed = parseId(requireStringId(setupId));
   const setup = await batchSetupsCol().findOne({
@@ -361,6 +377,8 @@ export async function getBatchSetup(setupId, role, lecturerId) {
 /**
  * Validates multiple student answers against a batch setup prior to marking.
  */
+// Dry run: sorts the pasted rows into valid and invalid (empty or duplicate student id, empty or too long answer, unknown MCQ option).
+// Nothing is saved and no marking happens here.
 export async function validateBatchAnswers({ setupId, items, lecturerId, role }) {
   const parsed = parseId(requireStringId(setupId));
   const setup = await batchSetupsCol().findOne({
@@ -488,6 +506,8 @@ export async function validateBatchAnswers({ setupId, items, lecturerId, role })
 /**
  * Executes automated batch marking for all valid student answers against the shared setup.
  */
+// Marks every valid row and saves a pending_review result for each. Marks come from the same engines as a single
+// student answer: rubric levels (Python) for written answers, answer-key comparison (Node) for MCQ.
 export async function processBatchMarking({ lecturerId, role, setupId, items, aiUrl }) {
   const parsed = parseId(requireStringId(setupId));
   const setup = await batchSetupsCol().findOne({
@@ -510,6 +530,7 @@ export async function processBatchMarking({ lecturerId, role, setupId, items, ai
   let successCount = 0;
   let failCount = 0;
 
+  // One row at a time; a failure is caught per row so the rest of the batch still completes.
   for (const item of validation.valid_items) {
     try {
       const startedAt = Date.now();
@@ -530,6 +551,7 @@ export async function processBatchMarking({ lecturerId, role, setupId, items, ai
         payload.student_answer = item.student_answer;
         payload.expected_concepts = setup.expected_concepts || [];
 
+        // MCQ: no Python call, the selected option is compared with the stored key.
         aiResult = mcqSvc.evaluateMcqAnswer(payload);
       } else {
         payload.rubric = setup.rubric;
@@ -537,6 +559,7 @@ export async function processBatchMarking({ lecturerId, role, setupId, items, ai
         payload.expected_concepts = setup.expected_concepts || [];
         payload.student_answer = item.student_answer;
 
+        // Written answer: ONE call to the Python /c3/assess endpoint (analysis, rubric marking, feedback, mind map).
         aiResult = await aiClient.assessAnswer(aiUrl, payload);
       }
 
@@ -586,6 +609,8 @@ export async function processBatchMarking({ lecturerId, role, setupId, items, ai
 /**
  * Finalizes all eligible submissions in a batch in one confirmed operation.
  */
+// Locks results. Policy: only results a lecturer already reviewed are finalized; unreviewed ones stay pending and are counted.
+// If nothing is reviewed yet the call fails with 409, so a mark can never be finalized without a human decision.
 export async function finalizeBatchSubmissions({ lecturerId, role, batchId }) {
   const setup = await batchSetupsCol().findOne({ batch_id: requireStringId(batchId) });
   if (!setup) {
@@ -630,6 +655,7 @@ export async function finalizeBatchSubmissions({ lecturerId, role, batchId }) {
     const decision = r.lecturer_decision || 'accepted';
 
     // Conditional update: a concurrent finalize of the same result is counted once.
+    // `status: reviewed` in the filter makes this an atomic claim: if two requests race, only one matches and is counted.
     const claim = await resultsCol().updateOne(
       { _id: r._id, status: 'reviewed' },
       {

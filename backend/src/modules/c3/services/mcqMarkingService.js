@@ -3,8 +3,15 @@
  *
  * Implements deterministic, authoritative answer-key evaluation for Multiple-Choice Questions (MCQ).
  * Keeps objective evaluation strictly separate from subjective semantic NLP/rubric evaluation.
+ *
+ * HOW MCQ MARKING WORKS (viva summary)
+ *   MCQ marking runs entirely inside Node.js. The Python AI service is NOT called. The mark is a plain comparison:
+ *   if the option(s) the student selected equal the answer key, the student gets the full marks, otherwise 0.
+ *   There is no AI model, similarity score or threshold involved. The answer key comes from the server's demo bank
+ *   (data/demoAssessments.js), never from the browser.
  */
 
+// Build an Error that carries an HTTP status (400 = the question/answer data is invalid).
 function httpError(status, message) {
   const err = new Error(message);
   err.status = status;
@@ -123,6 +130,7 @@ export function evaluateMcqAnswer(payload = {}) {
   }
 
   // 3. Validate Authoritative Answer Key
+  // (the key is the server-held correct option id(s); an MCQ without a key cannot be marked)
   let correctKeyRaw = payload.correct_options || payload.correct_answer || payload.answer_key;
   if (!correctKeyRaw && payload.rubric?.criteria?.[0]?.scoring_levels) {
     // If answer key is defined in rubric descriptor or level
@@ -155,6 +163,7 @@ export function evaluateMcqAnswer(payload = {}) {
   }
 
   // 5. Extract and Validate Student Submission
+  // (the student's selection can be an id, a label such as "B", or the option text; "nothing selected" is allowed)
   let studentSelectionsRaw = payload.selected_options ?? payload.selected_option_id ?? payload.student_answer;
   let isUnanswered = false;
 
@@ -189,6 +198,7 @@ export function evaluateMcqAnswer(payload = {}) {
   }
 
   // 6. Answer-Key Comparison & Mark Calculation
+  // THE MCQ MARK IS DECIDED HERE: full marks if the selection equals the key exactly, otherwise zero.
   let awardedMark = 0.0;
   let isCorrect = false;
 
@@ -237,6 +247,10 @@ export function evaluateMcqAnswer(payload = {}) {
     : `Awarded 0/${maxMarks} marks because selected option (${selectedLabels.join(', ')}) does not match the authoritative answer key (${correctLabels.join(', ')}).`;
 
   // 7. Assemble Standardized Response Structure
+  // The result has the same top-level shape as a written-answer result (marking / analysis / feedback / mindmap)
+  // so the rest of the system can store and display it. NOTE: this FULL object contains the answer key
+  // (correct_option_ids / correct_labels and key wording); students only ever receive the redacted copy
+  // built in services/redaction.js.
   return {
     question_id: qId,
     answer_type: 'mcq',
@@ -309,6 +323,7 @@ export function evaluateMcqAnswer(payload = {}) {
       rubric_alignment: `Mark: ${awardedMark}/${maxMarks} (${percentage}%) based on authoritative answer key.`,
       warnings: [],
     },
+    // A tiny key-based map (root + the key option). Only lecturers see it; the student copy has no map.
     mindmap: {
       nodes: [
         { id: qId, label: qText.slice(0, 30) + '...', type: 'root' },
