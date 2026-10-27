@@ -81,7 +81,7 @@ def build_feedback_from_results(
             criterion, analysis, result.selected_level_id
         )
         # Concepts whose only mentions are negated are listed with the missing ones (no credit) but also called out.
-        contradicted = [c for c in missing if c.casefold() in contradicted_names]
+        contradicted = [c for c in (*demonstrated, *partial, *missing) if c.casefold() in contradicted_names]
         strengths = build_strengths(demonstrated)
         areas = build_missing_or_partial_areas(partial, missing)
         # The "how to improve" text: uses the rubric level, the mark, the evidence and the question wording.
@@ -96,7 +96,8 @@ def build_feedback_from_results(
         )
         criterion_warnings = list(result.warnings)
         for concept in contradicted:
-            criterion_warnings.append(f"Possible contradiction: your answer appears to deny '{concept}'. No credit was given; your lecturer will check.")
+            credit = "No credit was given" if concept in missing else "Credit was not withheld"
+            criterion_warnings.append(f"Possible contradiction: your answer appears to deny '{concept}'. {credit}; your lecturer will check.")
         evidence_warning_message = evidence_warning(result)
         if evidence_warning_message is not None:
             criterion_warnings.append(evidence_warning_message)

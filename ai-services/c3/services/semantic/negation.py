@@ -12,6 +12,8 @@ SIMPLE ENGLISH
 
 from __future__ import annotations
 
+import os
+
 from services.preprocessing.text_normalizer import tokenize
 from services.semantic.baseline import token_overlap_score
 
@@ -26,6 +28,17 @@ VERB_CUES = frozenset({
 # before them ("values with no repeating groups") is not negated.
 DETERMINER_CUES = frozenset({"no", "none", "nothing", "nobody", "without", "neither", "nor"})
 NEGATION_CUES = VERB_CUES | DETERMINER_CUES
+ENV_POLICY = "C3_CONTRADICTION_POLICY"
+WITHHOLD_CREDIT = "withhold_credit"  # default: a concept that is only ever negated earns no credit (lecturer reviews every result)
+WARN_ONLY = "warn_only"              # flag and warn, but leave the concept's status (and so the mark) untouched
+
+
+def contradiction_policy() -> str:
+    """What a possible contradiction does: withhold credit (default) or only warn. Unknown values use the default."""
+    value = os.getenv(ENV_POLICY, WITHHOLD_CREDIT).strip().lower()
+    return value if value in (WITHHOLD_CREDIT, WARN_ONLY) else WITHHOLD_CREDIT
+
+
 # A cue only counts when it is within this many words of one of the concept's words.
 WINDOW = 4
 # "not only X but also Y" and "no longer" are not negations of X.

@@ -66,7 +66,7 @@ def test_only_negated_mentions_become_contradicted_and_lose_credit():
     assert match.contradicted and match.status == "not_demonstrated" and match.negated_sentence_ids == [1]
     assert match.evidence_sentence_ids == [1]  # the lecturer is pointed at the negating sentence
     assert any("Possible contradiction" in w and "encryption" in w for w in result.warnings)
-    assert result.contradiction_check == "negation-cue-v1"
+    assert result.contradiction_check == "negation-cue-v1/withhold_credit"
 
 
 def test_affirmed_and_negated_mentions_are_conflicting_not_contradicted():
@@ -140,3 +140,34 @@ def test_wrong_statements_without_a_negation_cue_are_NOT_detected(sentence):
 def test_a_correct_negated_sentence_is_also_flagged_so_the_result_is_only_a_possible_contradiction():
     match = _analyse("Encapsulation does not mean exposing data.", ["encapsulation"]).concept_matches[0]
     assert match.contradicted  # false positive by design: the lecturer decides
+
+
+# ------------------------------------------------------------ policy: withhold or warn only
+
+def test_warn_only_policy_flags_but_leaves_status_and_mark_unchanged(monkeypatch):
+    monkeypatch.setenv("C3_CONTRADICTION_POLICY", "warn_only")
+    result = _analyse("The system does not cover encryption.", ["encryption"])
+    match = result.concept_matches[0]
+    assert match.contradicted and match.status == "demonstrated"  # flag only
+    assert any("NOT withheld" in w for w in result.warnings)
+    assert result.contradiction_check == "negation-cue-v1/warn_only"
+    data = _assess("It has no high-level structure. It does not organize components and has no relationships.")
+    assert data["total_awarded_marks"] == 4.0  # same as an affirmed answer: nothing changed the mark
+    fb = data["feedback"]["criteria_feedback"][0]
+    assert set(fb["contradicted_concepts"]) == {"high-level structure", "components", "relationships"}
+    assert not fb["missing_concepts"]
+    assert any("Credit was not withheld" in w for w in fb["warnings"])
+
+
+def test_unknown_policy_value_falls_back_to_the_default(monkeypatch):
+    monkeypatch.setenv("C3_CONTRADICTION_POLICY", "delete_everything")
+    assert _analyse("The system does not cover encryption.", ["encryption"]).concept_matches[0].status == "not_demonstrated"
+
+
+def test_default_policy_marks_and_lecturer_table_agree():
+    data = _assess("It organizes components. It has no relationships between them.")
+    statuses = {c["concept"]: c for c in data["analysis"]["concept_matches"]}
+    assert statuses["relationships"]["contradicted"] and statuses["relationships"]["status"] == "not_demonstrated"
+    fb = data["feedback"]["criteria_feedback"][0]
+    assert fb["contradicted_concepts"] == ["relationships"] and "relationships" in fb["missing_concepts"]
+    assert data["total_awarded_marks"] == data["marking"]["total_awarded_marks"] == fb["awarded_mark"]

@@ -18,7 +18,7 @@ from app.schemas.analysis import (
 )
 from services.preprocessing.text_normalizer import process_text, tokenize
 from services.semantic.baseline import lexical_cosine_similarity, token_overlap_score
-from services.semantic.negation import sentence_mentions, sentence_negates
+from services.semantic.negation import WARN_ONLY, contradiction_policy, sentence_mentions, sentence_negates
 from services.semantic.semantic_matcher import get_matcher, semantic_threshold
 
 ANALYSIS_VERSION = "baseline-v1"
@@ -62,10 +62,12 @@ def _flag_contradictions(matches: list[ConceptMatch], sentences: list[str]) -> l
 
     Every sentence that contains all of a concept's words is either affirming it or negating it (negation cue nearby).
       all such sentences negate  -> contradicted: status becomes not_demonstrated, so it can earn no credit anywhere
+                                    (unless C3_CONTRADICTION_POLICY=warn_only: then only the flag and warning are added)
       some affirm, some negate   -> conflicting: status is left alone, the lecturer is warned
     This is a possible contradiction by wording, not a meaning check; a correct negated sentence is flagged too.
     """
     warnings: list[str] = []
+    warn_only = contradiction_policy() == WARN_ONLY
     for match in matches:
         mentioning = [i for i, s in enumerate(sentences, start=1) if sentence_mentions(match.concept, s)]
         negated = [i for i in mentioning if sentence_negates(match.concept, sentences[i - 1])]
@@ -74,9 +76,12 @@ def _flag_contradictions(matches: list[ConceptMatch], sentences: list[str]) -> l
         match.negated_sentence_ids = negated
         if len(negated) == len(mentioning):
             match.contradicted = True
-            match.status = "not_demonstrated"
-            match.evidence_sentence_ids = negated
-            warnings.append(f"Possible contradiction: the answer negates '{match.concept}' (sentence {negated[0]}); no credit given, lecturer to check.")
+            if warn_only:
+                warnings.append(f"Possible contradiction: the answer negates '{match.concept}' (sentence {negated[0]}); credit was NOT withheld (warn-only policy), lecturer to check.")
+            else:
+                match.status = "not_demonstrated"
+                match.evidence_sentence_ids = negated
+                warnings.append(f"Possible contradiction: the answer negates '{match.concept}' (sentence {negated[0]}); no credit given, lecturer to check.")
         else:
             match.conflicting = True
             warnings.append(f"Conflicting statements about '{match.concept}' (negated in sentence {negated[0]}); lecturer to check.")
@@ -150,5 +155,5 @@ def analyze_answer(request: AnswerAnalysisRequest) -> AnswerAnalysisResponse:
         concept_matches=concept_matches,
         warnings=warnings,
         analysis_version=SEMANTIC_ANALYSIS_VERSION if semantic_ran else ANALYSIS_VERSION,
-        contradiction_check=CONTRADICTION_CHECK,
+        contradiction_check=f"{CONTRADICTION_CHECK}/{contradiction_policy()}",
     )

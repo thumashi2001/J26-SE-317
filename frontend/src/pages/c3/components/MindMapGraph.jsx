@@ -162,7 +162,7 @@ export default function MindMapGraph({ mindmap, sentences = [] }) {
           {/* Concept-to-concept lines touching this node (typed ones name the cue phrase the student used). */}
           {selected.node_id !== root.node_id && edges.filter((e) => e.type !== 'child' && (e.source === selected.node_id || e.target === selected.node_id)).length > 0 && (
             <div className="c3-inspector-evidence">
-              <strong>Relationships in the answer</strong>
+              <strong>Relationships as the student wrote them</strong>
               {edges.filter((e) => e.type !== 'child' && (e.source === selected.node_id || e.target === selected.node_id)).map((e) => (
                 <div key={e.id} className="c3-evidence-quote">
                   <span className="c3-sentence-tag">{REL_LABEL[e.type] || e.type}</span> {e.evidence}
