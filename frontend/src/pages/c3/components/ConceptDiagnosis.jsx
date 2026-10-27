@@ -71,6 +71,9 @@ export default function ConceptDiagnosis({ analysis, sentenceMap }) {
                     </td>
                     <td>
                       <span className={`pill ${STATUS_CLASS[item.status] || 'c3-status-info'}`}>{STATUS_LABEL[item.status] || item.status}</span>
+                      {/* Negation-cue flags from the analysis: a possible contradiction earns no credit; conflicting statements are left for the lecturer. */}
+                      {item.contradicted && <div className="small muted">Possible contradiction: the answer seems to deny this (check sentence {(item.negated_sentence_ids || []).join(', ')}).</div>}
+                      {item.conflicting && !item.contradicted && <div className="small muted">Conflicting statements: also negated in sentence {(item.negated_sentence_ids || []).join(', ')}.</div>}
                     </td>
                     <td style={{ minWidth: 120 }}>
                       <div className="c3-bar" role="img" aria-label={`${pct}% of the concept's words found`}>

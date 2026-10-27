@@ -57,6 +57,10 @@ class ConceptMatch(BaseModel):
     # Optional semantic layer (C3_SEMANTIC_MATCH=local). Absent/"lexical" means word matching only.
     match_method: Literal["lexical", "semantic"] = "lexical"   # "semantic" = status upgraded by sentence-embedding similarity
     semantic_score: float | None = None                         # best sentence cosine similarity (informational)
+    # Negation-cue check (services/semantic/negation.py): a POSSIBLE contradiction, never a verified error.
+    contradicted: bool = False            # True = every sentence naming the concept also negates it; status is then not_demonstrated
+    conflicting: bool = False             # True = one sentence affirms the concept and another negates it (status unchanged)
+    negated_sentence_ids: list[int] = []  # sentences that name the concept next to a negation cue
 
 
 class AnswerAnalysisResponse(BaseModel):
@@ -71,3 +75,4 @@ class AnswerAnalysisResponse(BaseModel):
     concept_matches: list[ConceptMatch]
     warnings: list[str]
     analysis_version: str
+    contradiction_check: str | None = None  # which contradiction rule ran (None = results made before it existed)

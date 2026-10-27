@@ -24,6 +24,7 @@ class CriterionFeedback(BaseModel):
     demonstrated_concepts: list[str]
     partial_concepts: list[str]
     missing_concepts: list[str]
+    contradicted_concepts: list[str] = []      # subset of missing_concepts whose only mentions are negated (possible contradiction)
     next_level_improvements: list[str] = []     # concepts only needed by a HIGHER rubric level
     explanation: str
     strengths: list[str]

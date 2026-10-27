@@ -73,12 +73,15 @@ def build_feedback_from_results(
     all_next_level: list[str] = []
     warnings = list(marking.warnings)
 
+    contradicted_names = {m.concept.casefold() for m in analysis.concept_matches if m.contradicted}
     for result in marking.criteria_results:
         criterion = criteria_by_id[result.criterion_id]
         # Sort this criterion's concepts into demonstrated / partial / missing / "needed only for a higher level".
         demonstrated, partial, missing, next_level = concept_status_lists(
             criterion, analysis, result.selected_level_id
         )
+        # Concepts whose only mentions are negated are listed with the missing ones (no credit) but also called out.
+        contradicted = [c for c in missing if c.casefold() in contradicted_names]
         strengths = build_strengths(demonstrated)
         areas = build_missing_or_partial_areas(partial, missing)
         # The "how to improve" text: uses the rubric level, the mark, the evidence and the question wording.
@@ -92,6 +95,8 @@ def build_feedback_from_results(
             question_text=question_text,
         )
         criterion_warnings = list(result.warnings)
+        for concept in contradicted:
+            criterion_warnings.append(f"Possible contradiction: your answer appears to deny '{concept}'. No credit was given; your lecturer will check.")
         evidence_warning_message = evidence_warning(result)
         if evidence_warning_message is not None:
             criterion_warnings.append(evidence_warning_message)
@@ -110,6 +115,7 @@ def build_feedback_from_results(
                 demonstrated_concepts=demonstrated,
                 partial_concepts=partial,
                 missing_concepts=missing,
+                contradicted_concepts=contradicted,
                 next_level_improvements=next_level,
                 explanation=build_explanation(result, analysis),
                 strengths=strengths,

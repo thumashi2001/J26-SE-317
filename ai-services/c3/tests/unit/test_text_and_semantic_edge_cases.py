@@ -142,12 +142,7 @@ def test_concept_evidence_sentence_ids_are_one_based() -> None:
     assert result.concept_matches[0].evidence_sentence_ids == [2]
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="AUDIT-S1: negation not detected - 'The system does not cover encryption.' marks concept "
-    "'encryption' as demonstrated with overlap 1.0 (analyzer.py:19-33, baseline.py:33-39 pure token overlap); "
-    "expected not demonstrated",
-)
+# AUDIT-S1 fixed by services/semantic/negation.py (possible-contradiction flag); the strict xfail marker was removed.
 def test_negated_mention_is_not_demonstrated() -> None:
     match = analyze_answer(request("The system does not cover encryption.", ["encryption"])).concept_matches[0]
     assert match.status != "demonstrated"

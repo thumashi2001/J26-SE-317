@@ -18,9 +18,11 @@ from app.schemas.analysis import (
 )
 from services.preprocessing.text_normalizer import process_text, tokenize
 from services.semantic.baseline import lexical_cosine_similarity, token_overlap_score
+from services.semantic.negation import sentence_mentions, sentence_negates
 from services.semantic.semantic_matcher import get_matcher, semantic_threshold
 
 ANALYSIS_VERSION = "baseline-v1"
+CONTRADICTION_CHECK = "negation-cue-v1"  # recorded on every analysis so stored results show which rule produced them
 SEMANTIC_ANALYSIS_VERSION = "semantic-v1"  # used only when the optional semantic layer actually ran
 
 
@@ -55,6 +57,32 @@ def _match_concepts(concepts: list[str], sentences: list[str], answer_tokens: li
     return matches
 
 
+def _flag_contradictions(matches: list[ConceptMatch], sentences: list[str]) -> list[str]:
+    """Mark concepts whose only mentions are negated ("... does not hide ..."); return lecturer-facing warnings.
+
+    Every sentence that contains all of a concept's words is either affirming it or negating it (negation cue nearby).
+      all such sentences negate  -> contradicted: status becomes not_demonstrated, so it can earn no credit anywhere
+      some affirm, some negate   -> conflicting: status is left alone, the lecturer is warned
+    This is a possible contradiction by wording, not a meaning check; a correct negated sentence is flagged too.
+    """
+    warnings: list[str] = []
+    for match in matches:
+        mentioning = [i for i, s in enumerate(sentences, start=1) if sentence_mentions(match.concept, s)]
+        negated = [i for i in mentioning if sentence_negates(match.concept, sentences[i - 1])]
+        if not negated:
+            continue
+        match.negated_sentence_ids = negated
+        if len(negated) == len(mentioning):
+            match.contradicted = True
+            match.status = "not_demonstrated"
+            match.evidence_sentence_ids = negated
+            warnings.append(f"Possible contradiction: the answer negates '{match.concept}' (sentence {negated[0]}); no credit given, lecturer to check.")
+        else:
+            match.conflicting = True
+            warnings.append(f"Conflicting statements about '{match.concept}' (negated in sentence {negated[0]}); lecturer to check.")
+    return warnings
+
+
 def _add_semantic_evidence(matches: list[ConceptMatch], sentences: list[str]) -> bool:
     """Optional semantic layer: upgrade a concept to `demonstrated` when a sentence means it (cosine >= threshold).
 
@@ -70,7 +98,8 @@ def _add_semantic_evidence(matches: list[ConceptMatch], sentences: list[str]) ->
     threshold = semantic_threshold()
     for row, match in zip(sims, matches, strict=True):
         match.semantic_score = round(float(row.max()), 4)
-        if match.status != "demonstrated" and match.semantic_score >= threshold:
+        # A negated concept is never rescued by similarity: a sentence that denies a concept is still similar to it.
+        if match.status != "demonstrated" and not match.contradicted and match.semantic_score >= threshold:
             match.status = "demonstrated"
             match.match_method = "semantic"
             hits = [i for i, v in enumerate(row, start=1) if v >= threshold]
@@ -104,6 +133,7 @@ def analyze_answer(request: AnswerAnalysisRequest) -> AnswerAnalysisResponse:
         warnings.append("expected_concepts were not provided")
 
     concept_matches = _match_concepts(concepts, processed_answer.sentences, processed_answer.tokens)
+    warnings.extend(_flag_contradictions(concept_matches, processed_answer.sentences))
     semantic_ran = _add_semantic_evidence(concept_matches, processed_answer.sentences)
 
     # 4) assemble the evidence object used by marking, feedback and the mind map
@@ -120,4 +150,5 @@ def analyze_answer(request: AnswerAnalysisRequest) -> AnswerAnalysisResponse:
         concept_matches=concept_matches,
         warnings=warnings,
         analysis_version=SEMANTIC_ANALYSIS_VERSION if semantic_ran else ANALYSIS_VERSION,
+        contradiction_check=CONTRADICTION_CHECK,
     )
