@@ -61,8 +61,9 @@ def _flag_contradictions(matches: list[ConceptMatch], sentences: list[str]) -> l
     """Mark concepts whose only mentions are negated ("... does not hide ..."); return lecturer-facing warnings.
 
     Every sentence that contains all of a concept's words is either affirming it or negating it (negation cue nearby).
-      all such sentences negate  -> contradicted: status becomes not_demonstrated, so it can earn no credit anywhere
-                                    (unless C3_CONTRADICTION_POLICY=warn_only: then only the flag and warning are added)
+      all such sentences negate  -> contradicted: a flag and a lecturer warning are added; by DEFAULT (warn_only) the status
+                                    and so the mark are untouched. With C3_CONTRADICTION_POLICY=withhold_credit the status
+                                    becomes not_demonstrated, so it earns no credit anywhere
       some affirm, some negate   -> conflicting: status is left alone, the lecturer is warned
     This is a possible contradiction by wording, not a meaning check; a correct negated sentence is flagged too.
     """

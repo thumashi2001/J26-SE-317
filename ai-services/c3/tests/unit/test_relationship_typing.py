@@ -95,11 +95,12 @@ def test_generated_map_is_consistent_with_typed_relationships():
     assert result == _map("The service depends on the database. The cache leads to lower load.")  # deterministic
 
 
-def test_a_negated_dependency_is_not_typed_end_to_end():
-    result = _map("The service does not depend on the database.")
-    kinds = {r.relationship_type for r in result.relationships}
-    assert "depends_on" not in kinds
-    # the contradiction rule also withholds credit: 'not' sits next to both concept words
+def test_a_negated_dependency_is_not_typed_end_to_end(monkeypatch):
+    for policy in ("warn_only", "withhold_credit"):
+        monkeypatch.setenv("C3_CONTRADICTION_POLICY", policy)
+        result = _map("The service does not depend on the database.")
+        assert "depends_on" not in {r.relationship_type for r in result.relationships}  # negation blocks typing in both modes
+    # under withhold_credit the negated concepts also lose credit; 'not' sits next to both concept words
     statuses = {n.concept: n.status for n in result.nodes if n.type == "concept"}
     assert statuses["service"] == statuses["database"] == "not_demonstrated"
 

@@ -8,6 +8,8 @@ SIMPLE ENGLISH
       * it cannot see a wrong statement that has no negation ("encapsulation exposes all data" is not detected);
       * a correct negated sentence ("encapsulation does not mean copying") is also reported, so the result is a
         POSSIBLE contradiction that the lecturer must check, never a verified error.
+    The accuracy of this rule has NOT been measured (no human-labelled contradiction data exists). By default it only warns
+    (C3_CONTRADICTION_POLICY=warn_only); marks are untouched unless withhold_credit is chosen explicitly.
 """
 
 from __future__ import annotations
@@ -29,14 +31,18 @@ VERB_CUES = frozenset({
 DETERMINER_CUES = frozenset({"no", "none", "nothing", "nobody", "without", "neither", "nor"})
 NEGATION_CUES = VERB_CUES | DETERMINER_CUES
 ENV_POLICY = "C3_CONTRADICTION_POLICY"
-WITHHOLD_CREDIT = "withhold_credit"  # default: a concept that is only ever negated earns no credit (lecturer reviews every result)
-WARN_ONLY = "warn_only"              # flag and warn, but leave the concept's status (and so the mark) untouched
+WARN_ONLY = "warn_only"              # DEFAULT: flag and warn, but leave the concept's status (and so the mark) untouched
+WITHHOLD_CREDIT = "withhold_credit"  # opt-in: a concept that is only ever negated earns no credit (needs supervisor approval)
+DEFAULT_POLICY = WARN_ONLY
 
 
 def contradiction_policy() -> str:
-    """What a possible contradiction does: withhold credit (default) or only warn. Unknown values use the default."""
-    value = os.getenv(ENV_POLICY, WITHHOLD_CREDIT).strip().lower()
-    return value if value in (WITHHOLD_CREDIT, WARN_ONLY) else WITHHOLD_CREDIT
+    """What a possible contradiction does: only warn (default) or withhold credit. Unset or unknown values use the default.
+
+    Withholding credit changes marks, so it must be switched on explicitly until the supervisor approves that marking policy.
+    """
+    value = os.getenv(ENV_POLICY, DEFAULT_POLICY).strip().lower()
+    return value if value in (WITHHOLD_CREDIT, WARN_ONLY) else DEFAULT_POLICY
 
 
 # A cue only counts when it is within this many words of one of the concept's words.

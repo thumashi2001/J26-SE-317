@@ -80,7 +80,7 @@ def build_feedback_from_results(
         demonstrated, partial, missing, next_level = concept_status_lists(
             criterion, analysis, result.selected_level_id
         )
-        # Concepts whose only mentions are negated are listed with the missing ones (no credit) but also called out.
+        # Concepts whose only mentions are negated are called out; under withhold_credit they are also in the missing list.
         contradicted = [c for c in (*demonstrated, *partial, *missing) if c.casefold() in contradicted_names]
         strengths = build_strengths(demonstrated)
         areas = build_missing_or_partial_areas(partial, missing)

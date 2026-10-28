@@ -142,7 +142,13 @@ def test_concept_evidence_sentence_ids_are_one_based() -> None:
     assert result.concept_matches[0].evidence_sentence_ids == [2]
 
 
-# AUDIT-S1 fixed by services/semantic/negation.py (possible-contradiction flag); the strict xfail marker was removed.
+@pytest.mark.xfail(
+    strict=True,
+    reason="AUDIT-S1 (partly addressed): 'The system does not cover encryption.' is now FLAGGED as a possible contradiction "
+    "(services/semantic/negation.py) but under the default C3_CONTRADICTION_POLICY=warn_only its status stays 'demonstrated' "
+    "so marks are unchanged; withhold_credit (opt-in, awaiting supervisor approval) makes it not demonstrated "
+    "(tests/unit/test_contradiction_detection.py)",
+)
 def test_negated_mention_is_not_demonstrated() -> None:
     match = analyze_answer(request("The system does not cover encryption.", ["encryption"])).concept_matches[0]
     assert match.status != "demonstrated"
