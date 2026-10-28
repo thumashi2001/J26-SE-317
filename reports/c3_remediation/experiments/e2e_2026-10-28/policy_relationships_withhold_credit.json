@@ -1,0 +1,95 @@
+{
+  "policy": "withhold_credit",
+  "rows": [
+    {
+      "id": "P0",
+      "desc": "service reports the policy under test (withhold_credit)",
+      "status": "Passed",
+      "note": "negation-cue-v1/withhold_credit"
+    },
+    {
+      "id": "P1",
+      "desc": "affirmed answer: full rubric mark and no flag",
+      "status": "Passed",
+      "note": "4"
+    },
+    {
+      "id": "P2",
+      "desc": "denied answer: concepts are flagged as possible contradictions",
+      "status": "Passed",
+      "note": "3"
+    },
+    {
+      "id": "P3",
+      "desc": "withhold_credit: negated concepts earn no credit",
+      "status": "Passed",
+      "note": "0"
+    },
+    {
+      "id": "P4",
+      "desc": "the lecturer-facing warning names the policy effect",
+      "status": "Passed",
+      "note": "Possible contradiction: the answer negates 'high-level structure' (sentence 1); no credit given, lecturer to check."
+    },
+    {
+      "id": "P5",
+      "desc": "feedback lists contradicted concepts; missing list matches the policy",
+      "status": "Passed",
+      "note": "{\"c\":[\"high-level structure\",\"components\",\"relationships\"],\"m\":[],\"d\":[]}"
+    },
+    {
+      "id": "P6",
+      "desc": "the student response never exposes the AI estimate or review history",
+      "status": "Passed",
+      "note": ""
+    },
+    {
+      "id": "R1",
+      "desc": "a fixed cue phrase gives a typed, directed relation with evidence",
+      "status": "Passed",
+      "note": "[{\"relationship_id\":\"72cd609b65aeb97e62b36f07dff42b2d\",\"source_node_id\":\"concept_components\",\"target_node_id\":\"concept_high-level_structure\",\"relationship_type\":\"part_of\",\"evidence\":\"Sentence 1 says 'components are part of high-level structure' (cue phrase 'are part of'); this records what the stude"
+    },
+    {
+      "id": "R2",
+      "desc": "typing does not change the rubric mark",
+      "status": "Passed",
+      "note": "2"
+    },
+    {
+      "id": "R3",
+      "desc": "a negated cue is not typed (stays mentioned together or absent)",
+      "status": "Passed",
+      "note": "[\"co_mentioned\"]"
+    },
+    {
+      "id": "B0",
+      "desc": "the assess responses returned submission ids",
+      "status": "Passed",
+      "note": "6ae175d86713c0601199d82f 6ae175d86713c0601199d831"
+    },
+    {
+      "id": "B1",
+      "desc": "lecturer concept table shows the possible-contradiction note",
+      "status": "Passed",
+      "note": ""
+    },
+    {
+      "id": "B2",
+      "desc": "withhold_credit: the lecturer sees the withheld mark with the warning",
+      "status": "Passed",
+      "note": "0 / 4"
+    },
+    {
+      "id": "B3",
+      "desc": "mind-map inspector lists the typed relation as the student wrote it",
+      "status": "Passed",
+      "note": "Selected concept\ncomponents\nDemonstrated\nClose\nRelationships as the student wrote them\nIs part of Sentence 1 says 'components are part of high-level structure' (cue phrase 'are part of'); this records"
+    },
+    {
+      "id": "B4",
+      "desc": "no page errors on the review pages",
+      "status": "Passed",
+      "note": ""
+    }
+  ]
+}

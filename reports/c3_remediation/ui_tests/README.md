@@ -31,3 +31,5 @@ Remaining limitation: the guard cannot see how the backend was started. A backen
 
 ## Files
 `e2e.mjs` (browser + API permission checks; 106 checks in the latest verified run, 2026-10-22; 105 and 103 in the runs before it), `functional.mjs` (API-level requirements run, controlled fixtures, results in `functional_phase*.json`), `ui.mjs` (launch/login helpers), `capture.mjs`, `guard.mjs`, `guard.test.mjs`, `browser_results.json` / `api_permission_matrix.json` (latest verified run), `*_historical*` (earlier runs of 72, 79, 99, 103 and 105 checks, kept unmodified).
+
+`policy_relationships.mjs <warn_only|withhold_credit> out.json` (needs `C3_WEB_BASE`): contradiction-policy and typed-relationship checks (15 checks, API plus Chrome). Start the C3 Python service with the policy under test (leave `C3_CONTRADICTION_POLICY` unset to test the default `warn_only`); the script verifies the active policy first. Results are in `../experiments/e2e_2026-10-28/`. Assertions cover wiring on hand-written answers, not detection accuracy.
