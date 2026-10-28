@@ -56,6 +56,66 @@ def _unique(values: list[str]) -> list[str]:
     return list(dict.fromkeys(values))
 
 
+def _contradiction_warnings(contradicted: list[str], withheld: bool) -> list[str]:
+    """One warning per possibly-denied concept; the wording says whether the active policy withheld credit."""
+    credit = "No credit was given" if withheld else "Credit was not withheld"
+    return [
+        f"Possible contradiction: your answer appears to deny '{concept}'. {credit}; your lecturer will check."
+        for concept in contradicted
+    ]
+
+
+def _criterion_feedback(
+    criterion,
+    result,
+    analysis: AnswerAnalysisResponse,
+    contradicted_names: set[str],
+    withheld: bool,
+    question_text: str | None,
+) -> tuple[CriterionFeedback, str | None]:
+    """Feedback for one criterion, plus the evidence warning (if any) that must also appear in the overall warnings."""
+    # Sort this criterion's concepts into demonstrated / partial / missing / "needed only for a higher level".
+    demonstrated, partial, missing, next_level = concept_status_lists(criterion, analysis, result.selected_level_id)
+    # Concepts whose only mentions are negated are called out; under withhold_credit they are also in the missing list.
+    contradicted = [c for c in (*demonstrated, *partial, *missing, *next_level) if c.casefold() in contradicted_names]
+    strengths = build_strengths(demonstrated)
+    # The "how to improve" text: uses the rubric level, the mark, the evidence and the question wording.
+    suggestions = build_contextual_improvements(
+        criterion=criterion,
+        result=result,
+        demonstrated=demonstrated,
+        partial=partial,
+        missing=missing,
+        next_level=next_level,
+        question_text=question_text,
+    )
+    criterion_warnings = list(result.warnings) + _contradiction_warnings(contradicted, withheld)
+    evidence_message = evidence_warning(result)
+    if evidence_message is not None:
+        criterion_warnings.append(evidence_message)
+    feedback = CriterionFeedback(
+        criterion_id=result.criterion_id,
+        criterion_description=result.criterion_description,
+        max_marks=result.max_marks,
+        selected_level_id=result.selected_level_id,
+        selected_level_descriptor=result.rubric_descriptor,
+        awarded_mark=result.awarded_mark,
+        evidence_sentence_ids=result.evidence_sentence_ids,
+        supporting_concepts=result.supporting_concepts,
+        demonstrated_concepts=demonstrated,
+        partial_concepts=partial,
+        missing_concepts=missing,
+        contradicted_concepts=contradicted,
+        next_level_improvements=next_level,
+        explanation=build_explanation(result, analysis),
+        strengths=strengths,
+        missing_or_partial_areas=build_missing_or_partial_areas(partial, missing),
+        improvement_suggestions=suggestions,
+        warnings=criterion_warnings,
+    )
+    return feedback, evidence_message
+
+
 def build_feedback_from_results(
     marking: MarkingResponse,
     analysis: AnswerAnalysisResponse,
@@ -78,66 +138,16 @@ def build_feedback_from_results(
     withheld = contradiction_policy() == WITHHOLD_CREDIT
     contradicted_names = {m.concept.casefold() for m in analysis.concept_matches if m.contradicted}
     for result in marking.criteria_results:
-        criterion = criteria_by_id[result.criterion_id]
-        # Sort this criterion's concepts into demonstrated / partial / missing / "needed only for a higher level".
-        demonstrated, partial, missing, next_level = concept_status_lists(
-            criterion, analysis, result.selected_level_id
+        feedback, evidence_message = _criterion_feedback(
+            criteria_by_id[result.criterion_id], result, analysis, contradicted_names, withheld, question_text
         )
-        # Concepts whose only mentions are negated are called out; under withhold_credit they are also in the missing
-        # list.
-        contradicted = [
-            c for c in (*demonstrated, *partial, *missing, *next_level) if c.casefold() in contradicted_names
-        ]
-        strengths = build_strengths(demonstrated)
-        areas = build_missing_or_partial_areas(partial, missing)
-        # The "how to improve" text: uses the rubric level, the mark, the evidence and the question wording.
-        suggestions = build_contextual_improvements(
-            criterion=criterion,
-            result=result,
-            demonstrated=demonstrated,
-            partial=partial,
-            missing=missing,
-            next_level=next_level,
-            question_text=question_text,
-        )
-        criterion_warnings = list(result.warnings)
-        for concept in contradicted:
-            credit = "No credit was given" if withheld else "Credit was not withheld"
-            criterion_warnings.append(
-                f"Possible contradiction: your answer appears to deny '{concept}'. "
-                f"{credit}; your lecturer will check."
-            )
-        evidence_warning_message = evidence_warning(result)
-        if evidence_warning_message is not None:
-            criterion_warnings.append(evidence_warning_message)
-            warnings.append(evidence_warning_message)
-
-        criteria_feedback.append(
-            CriterionFeedback(
-                criterion_id=result.criterion_id,
-                criterion_description=result.criterion_description,
-                max_marks=result.max_marks,
-                selected_level_id=result.selected_level_id,
-                selected_level_descriptor=result.rubric_descriptor,
-                awarded_mark=result.awarded_mark,
-                evidence_sentence_ids=result.evidence_sentence_ids,
-                supporting_concepts=result.supporting_concepts,
-                demonstrated_concepts=demonstrated,
-                partial_concepts=partial,
-                missing_concepts=missing,
-                contradicted_concepts=contradicted,
-                next_level_improvements=next_level,
-                explanation=build_explanation(result, analysis),
-                strengths=strengths,
-                missing_or_partial_areas=areas,
-                improvement_suggestions=suggestions,
-                warnings=criterion_warnings,
-            )
-        )
-        all_strengths.extend(strengths)
-        all_missing.extend(missing)
-        all_suggestions.extend(suggestions)
-        all_next_level.extend(next_level)
+        criteria_feedback.append(feedback)
+        if evidence_message is not None:
+            warnings.append(evidence_message)
+        all_strengths.extend(feedback.strengths)
+        all_missing.extend(feedback.missing_concepts)
+        all_suggestions.extend(feedback.improvement_suggestions)
+        all_next_level.extend(feedback.next_level_improvements)
 
     # Whole-answer summary = the per-criterion lists merged without duplicates.
     all_missing = _unique(all_missing)

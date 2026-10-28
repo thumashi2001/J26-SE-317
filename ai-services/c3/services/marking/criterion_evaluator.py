@@ -58,6 +58,85 @@ def _effective_concepts(criterion: RubricCriterion, level: ScoringLevel) -> list
     return concepts
 
 
+def _is_safety_net_level(level: ScoringLevel) -> bool:
+    """The lowest "zero marks" level with no requirement of any kind: it is always supported."""
+    return (
+        level.mark == 0.0
+        and level.evidence_rule is None
+        and not level.required_concepts
+        and not level.evidence_requirements
+    )
+
+
+def _all_demonstrated_evidence(
+    required: list[str], matches: dict[str, object]
+) -> tuple[list[str], set[int], list[str]]:
+    """CASE 2 - no explicit counting rule: EVERY required concept must be fully demonstrated."""
+    concepts: list[str] = []
+    sentence_ids: set[int] = set()
+    reasons: list[str] = []
+    for required_concept in required:
+        match = matches.get(required_concept.casefold())
+        if match is None:
+            reasons.append(f"required concept not supplied by analysis: {required_concept}")
+            continue
+        if match.status != "demonstrated":
+            reasons.append(f"required concept is not fully demonstrated by lexical evidence: {required_concept}")
+            continue
+        concepts.append(required_concept)
+        sentence_ids.update(match.evidence_sentence_ids)
+    return concepts, sentence_ids, reasons
+
+
+def _rule_counted_evidence(
+    level: ScoringLevel, required: list[str], matches: dict[str, object]
+) -> tuple[list[str], set[int], list[str]]:
+    """CASE 3 - an explicit rule ("at least N demonstrated / M partial"): count the concepts, compare with the rule."""
+    concepts: list[str] = []
+    sentence_ids: set[int] = set()
+    reasons: list[str] = []
+    demonstrated_count = 0
+    partial_count = 0
+    for required_concept in required:
+        match = matches.get(required_concept.casefold())
+        if match is None:
+            reasons.append(f"required concept not supplied by analysis: {required_concept}")
+            continue
+        if match.status == "demonstrated":
+            demonstrated_count += 1
+            concepts.append(required_concept)
+            sentence_ids.update(match.evidence_sentence_ids)
+        elif match.status == "partial":
+            partial_count += 1
+            # Partial concepts only help when the rubric explicitly allows partial credit.
+            if level.evidence_rule.allow_partial:
+                concepts.append(required_concept)
+                sentence_ids.update(match.evidence_sentence_ids)
+
+    if demonstrated_count < level.evidence_rule.minimum_demonstrated:
+        reasons.append("demonstrated concept count is below the evidence-rule minimum")
+    if partial_count < level.evidence_rule.minimum_partial:
+        reasons.append("partial concept count is below the evidence-rule minimum")
+    return concepts, sentence_ids, reasons
+
+
+def _requirement_evidence(level: ScoringLevel, analysis: AnswerAnalysisResponse) -> tuple[set[int], list[str]]:
+    """Optional extra requirements (phrases the level wants): each needs at least one word shared with the answer."""
+    sentence_ids: set[int] = set()
+    reasons: list[str] = []
+    answer_tokens = tokenize(analysis.normalized_answer)
+    for requirement in level.evidence_requirements:
+        if token_overlap_score(requirement, answer_tokens) == 0.0:
+            reasons.append(f"evidence requirement not supported by lexical overlap: {requirement}")
+            continue
+        sentence_ids.update(
+            sentence_id
+            for sentence_id, sentence in enumerate(analysis.sentences, start=1)
+            if token_overlap_score(requirement, tokenize(sentence.text)) > 0.0
+        )
+    return sentence_ids, reasons
+
+
 def _level_evidence(
     criterion: RubricCriterion,
     level: ScoringLevel,
@@ -66,88 +145,26 @@ def _level_evidence(
     """Decide whether the answer satisfies ONE level (this is where the rubric rules are applied)."""
     matches = _concept_matches(analysis)
     effective_required_concepts = _effective_concepts(criterion, level)
-    concepts: list[str] = []
-    sentence_ids: set[int] = set()
-    reasons: list[str] = []
 
     # CASE 1 - the lowest "zero marks" level has no requirement, so it is always supported (it is the safety net).
-    if (
-        level.mark == 0.0
-        and level.evidence_rule is None
-        and not level.required_concepts
-        and not level.evidence_requirements
-    ):
+    if _is_safety_net_level(level):
+        concepts: list[str] = []
+        sentence_ids: set[int] = set()
         for required_concept in effective_required_concepts:
             match = matches.get(required_concept.casefold())
             if match and match.status == "demonstrated":
                 concepts.append(required_concept)
                 sentence_ids.update(match.evidence_sentence_ids)
-        return LevelEvidence(
-            supported=True,
-            concepts=concepts,
-            sentence_ids=sorted(sentence_ids),
-            reasons=[],
-        )
+        return LevelEvidence(supported=True, concepts=concepts, sentence_ids=sorted(sentence_ids), reasons=[])
 
-    # CASE 2 - no explicit counting rule: EVERY required concept must be fully demonstrated.
     if level.evidence_rule is None:
-        for required_concept in effective_required_concepts:
-            match = matches.get(required_concept.casefold())
-            if match is None:
-                reasons.append(
-                    f"required concept not supplied by analysis: {required_concept}"
-                )
-                continue
-            if match.status != "demonstrated":
-                reasons.append(
-                    f"required concept is not fully demonstrated by lexical evidence: {required_concept}"
-                )
-                continue
-            concepts.append(required_concept)
-            sentence_ids.update(match.evidence_sentence_ids)
-    # CASE 3 - an explicit rule ("at least N demonstrated / M partial"): count the concepts and compare with the rule.
+        concepts, sentence_ids, reasons = _all_demonstrated_evidence(effective_required_concepts, matches)
     else:
-        demonstrated_count = 0
-        partial_count = 0
-        for required_concept in effective_required_concepts:
-            match = matches.get(required_concept.casefold())
-            if match is None:
-                reasons.append(
-                    f"required concept not supplied by analysis: {required_concept}"
-                )
-                continue
-            if match.status == "demonstrated":
-                demonstrated_count += 1
-                concepts.append(required_concept)
-                sentence_ids.update(match.evidence_sentence_ids)
-            elif match.status == "partial":
-                partial_count += 1
-                # Partial concepts only help when the rubric explicitly allows partial credit.
-                if level.evidence_rule.allow_partial:
-                    concepts.append(required_concept)
-                    sentence_ids.update(match.evidence_sentence_ids)
+        concepts, sentence_ids, reasons = _rule_counted_evidence(level, effective_required_concepts, matches)
 
-        if demonstrated_count < level.evidence_rule.minimum_demonstrated:
-            reasons.append(
-                "demonstrated concept count is below the evidence-rule minimum"
-            )
-        if partial_count < level.evidence_rule.minimum_partial:
-            reasons.append(
-                "partial concept count is below the evidence-rule minimum"
-            )
-
-    # Optional extra requirements (phrases the level wants to see): each needs at least one shared word with the answer.
-    answer_tokens = tokenize(analysis.normalized_answer)
-    for requirement in level.evidence_requirements:
-        if token_overlap_score(requirement, answer_tokens) == 0.0:
-            reasons.append(f"evidence requirement not supported by lexical overlap: {requirement}")
-            continue
-        requirement_sentence_ids = [
-            sentence_id
-            for sentence_id, sentence in enumerate(analysis.sentences, start=1)
-            if token_overlap_score(requirement, tokenize(sentence.text)) > 0.0
-        ]
-        sentence_ids.update(requirement_sentence_ids)
+    requirement_ids, requirement_reasons = _requirement_evidence(level, analysis)
+    sentence_ids.update(requirement_ids)
+    reasons.extend(requirement_reasons)
 
     has_requirements = bool(
         effective_required_concepts

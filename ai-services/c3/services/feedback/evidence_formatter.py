@@ -28,7 +28,12 @@ def concept_status_lists(
         (lvl for lvl in criterion.scoring_levels if lvl.level_id == selected_level_id),
         None,
     )
+    current_concepts, higher_exclusive_concepts = _split_by_level(criterion, selected_level)
+    return _classify(current_concepts, higher_exclusive_concepts, matches)
 
+
+def _split_by_level(criterion: RubricCriterion, selected_level) -> tuple[list[str], list[str]]:
+    """Split the criterion's concepts into (required at the reached level, required only by a higher level)."""
     # 1. Determine higher levels (levels with mark > selected_level.mark)
     higher_levels = [
         lvl
@@ -76,7 +81,12 @@ def concept_status_lists(
                 continue
             current_concepts.append(c)
             current_seen.add(c.casefold())
+    return current_concepts, higher_exclusive_concepts
 
+
+def _classify(current_concepts: list[str], higher_exclusive_concepts: list[str], matches: dict) -> tuple[
+        list[str], list[str], list[str], list[str]]:
+    """Group the concepts by the Function 1 status of each: (demonstrated, partial, missing, next_level)."""
     # 4. Classify current concepts into demonstrated, partial, missing
     demonstrated: list[str] = []
     partial: list[str] = []
