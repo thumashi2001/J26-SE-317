@@ -26,6 +26,7 @@ from services.feedback.explanation_builder import (
 )
 from services.marking.marking_engine import mark_answer
 from services.semantic.analyzer import analyze_answer
+from services.semantic.negation import WITHHOLD_CREDIT, contradiction_policy
 
 FEEDBACK_VERSION = "baseline-v1"
 
@@ -73,6 +74,7 @@ def build_feedback_from_results(
     all_next_level: list[str] = []
     warnings = list(marking.warnings)
 
+    withheld = contradiction_policy() == WITHHOLD_CREDIT  # the wording must follow the active policy, not the concept list
     contradicted_names = {m.concept.casefold() for m in analysis.concept_matches if m.contradicted}
     for result in marking.criteria_results:
         criterion = criteria_by_id[result.criterion_id]
@@ -81,7 +83,7 @@ def build_feedback_from_results(
             criterion, analysis, result.selected_level_id
         )
         # Concepts whose only mentions are negated are called out; under withhold_credit they are also in the missing list.
-        contradicted = [c for c in (*demonstrated, *partial, *missing) if c.casefold() in contradicted_names]
+        contradicted = [c for c in (*demonstrated, *partial, *missing, *next_level) if c.casefold() in contradicted_names]
         strengths = build_strengths(demonstrated)
         areas = build_missing_or_partial_areas(partial, missing)
         # The "how to improve" text: uses the rubric level, the mark, the evidence and the question wording.
@@ -96,7 +98,7 @@ def build_feedback_from_results(
         )
         criterion_warnings = list(result.warnings)
         for concept in contradicted:
-            credit = "No credit was given" if concept in missing else "Credit was not withheld"
+            credit = "No credit was given" if withheld else "Credit was not withheld"
             criterion_warnings.append(f"Possible contradiction: your answer appears to deny '{concept}'. {credit}; your lecturer will check.")
         evidence_warning_message = evidence_warning(result)
         if evidence_warning_message is not None:

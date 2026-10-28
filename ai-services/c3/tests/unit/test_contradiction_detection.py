@@ -210,3 +210,13 @@ def test_withhold_credit_marks_and_lecturer_table_agree(monkeypatch):
     fb = data["feedback"]["criteria_feedback"][0]
     assert fb["contradicted_concepts"] == ["relationships"] and "relationships" in fb["missing_concepts"]
     assert data["total_awarded_marks"] == data["marking"]["total_awarded_marks"] == fb["awarded_mark"]
+
+def test_withhold_credit_zero_mark_answer_still_names_the_contradicted_concepts_in_feedback(monkeypatch):
+    # Found by the policy E2E run: at the zero-mark level the rubric's concepts are 'next level' items, not 'missing',
+    # so the contradiction note must be built from them too or the student would never see it.
+    monkeypatch.setenv("C3_CONTRADICTION_POLICY", "withhold_credit")
+    data = _assess("It has no high-level structure. It does not organize components and there are no relationships.")
+    fb = data["feedback"]["criteria_feedback"][0]
+    assert data["total_awarded_marks"] == 0.0
+    assert set(fb["contradicted_concepts"]) == {"high-level structure", "components", "relationships"}
+    assert any("Possible contradiction" in w and "No credit was given" in w for w in fb["warnings"])  # wording follows the policy
