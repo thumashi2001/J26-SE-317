@@ -48,7 +48,8 @@ def build_concept_nodes(analysis: AnswerAnalysisResponse, expected_concepts: lis
         if concept_lower in processed_concepts:
             continue
 
-        # "student_answer" = the student's words touched this concept; "expected_concept" = it only comes from the rubric.
+        # "student_answer" = the student's words touched this concept; "expected_concept" = it only comes from the
+        # rubric.
         source = "student_answer" if match.status in ["demonstrated", "partial"] else "expected_concept"
         nodes.append(Node(
             node_id=generate_node_id(match.concept),

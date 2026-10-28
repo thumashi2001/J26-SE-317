@@ -135,7 +135,6 @@ def run_tfidf(d: dict[str, pd.DataFrame]) -> dict[str, Any]:
     from sklearn.ensemble import GradientBoostingRegressor
     from sklearn.feature_extraction.text import TfidfVectorizer
     from sklearn.linear_model import Ridge
-    from sklearn.metrics.pairwise import cosine_similarity
 
     t0 = time.time()
     vec = TfidfVectorizer(ngram_range=(1, 2), sublinear_tf=True, min_df=2, max_features=3000, lowercase=True)

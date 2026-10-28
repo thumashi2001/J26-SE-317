@@ -2,7 +2,8 @@
 AdaptiveLearnSE Component 3 - Training-only retrieval corpus for Vector RAG.
 
 The corpus is built from the TRAIN split of a repaired dataset directory only: question reference answers and
-question-level expected concepts of eligible train questions. Validation/test questions, student answers and marks are never read, so retrieval
+question-level expected concepts of eligible train questions. Validation/test questions, student answers and marks are
+    never read, so retrieval
 cannot leak held-out information. Every document carries provenance (question id, module, source file hash).
 
 STATUS: offline (builds the retrieval corpus for the RAG experiments from the training split only). NOT USED BY LIVE
@@ -53,8 +54,9 @@ def build_training_corpus(dataset_dir: str | Path, split: str = "train") -> tupl
             dropped += 1
             return
         seen.add(key)
-        docs.append({"doc_id": doc_id, "title": title[:90] or doc_id, "content": content, "citation": f"{split}:{doc_id}",
-                     "source_type": source_type, "question_id": question_id, "module_code": module_of.get(question_id, "")})
+        docs.append({"doc_id": doc_id, "title": title[:90] or doc_id, "content": content,
+                     "citation": f"{split}:{doc_id}", "source_type": source_type, "question_id": question_id,
+                     "module_code": module_of.get(question_id, "")})
 
     for q in questions.to_dict("records"):
         add(f"{q['question_id']}#ref", q["question_text"], q["reference_answer"], "reference_answer", q["question_id"])
@@ -62,8 +64,8 @@ def build_training_corpus(dataset_dir: str | Path, split: str = "train") -> tupl
         # the usable "rubric knowledge" document.
         concepts = q.get("expected_concepts", "").strip()
         if concepts and concepts.lower() not in ("nan", "none", "[]"):
-            add(f"{q['question_id']}#concepts", q["question_text"], f"Expected concepts: {concepts}", "expected_concepts",
-                q["question_id"])
+            add(f"{q['question_id']}#concepts", q["question_text"], f"Expected concepts: {concepts}",
+                "expected_concepts", q["question_id"])
 
     provenance = {
         "dataset_dir": d.name, "split_used": split, "questions_used": int(len(questions)), "documents": len(docs),

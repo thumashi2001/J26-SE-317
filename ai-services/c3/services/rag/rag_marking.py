@@ -52,7 +52,9 @@ def retrieve_evidence(store: CurriculumVectorStore | None, query: str, question_
         if h.get("question_id") == question_id or h["content"] in seen:
             continue
         seen.add(h["content"])
-        hits.append({k: h.get(k) for k in ("doc_id", "citation", "source_type", "question_id", "relevance_score", "content")})
+        hits.append(
+            {k: h.get(k) for k in ("doc_id", "citation", "source_type", "question_id", "relevance_score", "content")}
+        )
         if len(hits) == top_k:
             break
     return {"status": "ok" if hits else "empty", "hits": hits}

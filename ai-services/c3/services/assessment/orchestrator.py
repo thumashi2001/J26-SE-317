@@ -3,12 +3,16 @@
 READ THIS FIRST (viva summary)
     Student answer
       -> F1  analyze_answer          word-overlap evidence for each concept           (services/semantic/analyzer.py)
-      -> F2  evaluate_criterion      rubric level lookup => the awarded marks          (services/marking/criterion_evaluator.py)
+      -> F2  evaluate_criterion      rubric level lookup => the awarded marks
+          (services/marking/criterion_evaluator.py)
       -> F3  build_feedback_from_results  explanations + "how to improve" text         (services/feedback/*)
       -> F4  build_mindmap_from_analysis  root + concept nodes                          (services/mindmap/*)
-    The marks are deterministic and rule based (F2). No LLM, vector search or Neo4j query is used here. OPTIONALLY (only when
-    C3_ML_MODEL_DIR points at a saved checkpoint) a fine-tuned transformer adds an ADVISORY "ai_estimate" next to the rubric
-    mark (services/ml/scorer.py); it never changes a mark. The feedback and the mind map can never change the marks either:
+    The marks are deterministic and rule based (F2). No LLM, vector search or Neo4j query is used here. OPTIONALLY (only
+        when
+    C3_ML_MODEL_DIR points at a saved checkpoint) a fine-tuned transformer adds an ADVISORY "ai_estimate" next to the
+        rubric
+    mark (services/ml/scorer.py); it never changes a mark. The feedback and the mind map can never change the marks
+        either:
     the marks are fixed in step F2 and step 3 below re-checks that.
 """
 from app.schemas.analysis import AnswerAnalysisRequest, AnswerAnalysisResponse
@@ -77,11 +81,13 @@ def _ai_estimate(request: AssessmentRequest, awarded: float, possible: float) ->
     rubric_ratio = min(1.0, max(0.0, awarded / possible))
     diff = ratio - rubric_ratio
     return AIScoreEstimate(estimated_ratio=ratio, estimated_marks=round(ratio * possible, 2), rubric_ratio=rubric_ratio,
-                           difference=round(diff, 4), needs_review=abs(diff) > AI_REVIEW_THRESHOLD, model=scorer.model_name)
+                           difference=round(diff, 4), needs_review=abs(diff) > AI_REVIEW_THRESHOLD,
+                           model=scorer.model_name)
 
 
 def _mark(request: AssessmentRequest, analysis: AnswerAnalysisResponse) -> MarkingResponse:
-    """Function 2: choose one rubric level per criterion and total the fixed marks (the only place marks are decided)."""
+    """Function 2: choose one rubric level per criterion and total the fixed marks (the only place marks are
+        decided)."""
     criteria_results = [evaluate_criterion(criterion, analysis) for criterion in request.rubric.criteria]
     total_awarded_marks = sum(result.awarded_mark for result in criteria_results)
     total_possible_marks = sum(result.max_marks for result in criteria_results)
@@ -155,7 +161,9 @@ def assess_answer(request: AssessmentRequest) -> AssessmentResponse:
         marking.warnings + feedback.warnings + mindmap.warnings
     ))
     if ai_estimate is not None and ai_estimate.needs_review:
-        all_warnings.append("The AI score estimate differs noticeably from the rubric mark; lecturer review is recommended.")
+        all_warnings.append(
+            "The AI score estimate differs noticeably from the rubric mark; lecturer review is recommended."
+        )
 
     # The single object returned to Node, which stores it in MongoDB (c3_results.ai_evaluation).
     return AssessmentResponse(

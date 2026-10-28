@@ -3,12 +3,15 @@ mark ratio (0..1).
 
 WHAT THIS IS
     The model was fine-tuned in experiments/model_comparison_extra.py and chosen on VALIDATION only. It is an
-    ADVISORY second opinion shown next to the rubric mark. It never changes a mark: the rubric engine (F2) stays the only
+    ADVISORY second opinion shown next to the rubric mark. It never changes a mark: the rubric engine (F2) stays the
+        only
     source of marks, and the lecturer stays the final authority.
 
 WHAT THIS IS NOT
-    Its training labels are tier-derived (not human-marked), so agreement with the rubric mark or with the dataset is not
-    evidence of agreement with human markers. It is disabled unless C3_ML_MODEL_DIR points at a checkpoint folder, and any
+    Its training labels are tier-derived (not human-marked), so agreement with the rubric mark or with the dataset is
+        not
+    evidence of agreement with human markers. It is disabled unless C3_ML_MODEL_DIR points at a checkpoint folder, and
+        any
     failure (no torch, missing files, bad input) returns None so marking continues without it.
 
 Checkpoint folder layout (written by model_comparison_extra.py): model.pt (state_dict + model_name + max_len), tokenizer

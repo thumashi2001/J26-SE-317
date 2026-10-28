@@ -1,14 +1,19 @@
 """C2 -> C3 input adapter: turn a C2 question record into the question context C3 needs, without inventing anything.
 
 SIMPLE ENGLISH
-    C2 (`ai-services/c2/services/question_repository.py`, `build_question_repository`) produces question records with an id,
-    the question text, context, a `marks` figure and its `marks_status`. It does NOT produce a rubric, a reference answer or
-    expected concepts. So a C2 record alone can never be marked: this adapter keeps what C2 really provides, refuses a record
-    that is unusable, takes the mark total only when C2 says it was extracted or calculated, and returns an explicit list of
+    C2 (`ai-services/c2/services/question_repository.py`, `build_question_repository`) produces question records with an
+        id,
+    the question text, context, a `marks` figure and its `marks_status`. It does NOT produce a rubric, a reference
+        answer or
+    expected concepts. So a C2 record alone can never be marked: this adapter keeps what C2 really provides, refuses a
+        record
+    that is unusable, takes the mark total only when C2 says it was extracted or calculated, and returns an explicit
+        list of
     what the lecturer still has to supply. `build_assessment_request` then joins the C2 context with a lecturer-supplied
     rubric and the student's answer; it never fabricates a rubric.
 
-    There is no HTTP endpoint on the C2 side in this repository, so this is a library function, not a network integration.
+    There is no HTTP endpoint on the C2 side in this repository, so this is a library function, not a network
+        integration.
 """
 
 from __future__ import annotations
@@ -43,7 +48,9 @@ def question_context_from_c2(record: dict) -> dict:
         "context": (record.get("context") or "").strip(),
         "max_marks": float(marks) if trusted else None,
         "max_marks_note": None if trusted else f"C2 marks not usable (marks_status={status!r}, marks={marks!r})",
-        "metadata": {k: record.get(k) for k in ("paper_id", "module_code", "module_name", "topic", "bloom_level", "difficulty")},
+        "metadata": {
+            k: record.get(k) for k in ("paper_id", "module_code", "module_name", "topic", "bloom_level", "difficulty")
+        },
         "lecturer_must_supply": list(LECTURER_MUST_SUPPLY),
     }
 

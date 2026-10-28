@@ -71,7 +71,12 @@ def _level_evidence(
     reasons: list[str] = []
 
     # CASE 1 - the lowest "zero marks" level has no requirement, so it is always supported (it is the safety net).
-    if level.mark == 0.0 and level.evidence_rule is None and not level.required_concepts and not level.evidence_requirements:
+    if (
+        level.mark == 0.0
+        and level.evidence_rule is None
+        and not level.required_concepts
+        and not level.evidence_requirements
+    ):
         for required_concept in effective_required_concepts:
             match = matches.get(required_concept.casefold())
             if match and match.status == "demonstrated":
@@ -168,7 +173,8 @@ def _explanation(
     evidence: LevelEvidence,
     warnings: list[str],
 ) -> str:
-    """One-sentence explanation stored with the result (the richer 'how to improve' text is built in services/feedback)."""
+    """One-sentence explanation stored with the result (the richer 'how to improve' text is built in
+        services/feedback)."""
     if warnings:
         return (
             f"Selected rubric level '{level.label}' ({level.mark:g} marks) for "

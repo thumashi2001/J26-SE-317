@@ -6,6 +6,10 @@ extend-exclude = [".venv", ".venv_c3", "scratch", "datasets/backup_*"]
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "B", "UP"]
 
+[tool.ruff.lint.per-file-ignores]
+# load_dotenv() must run before the provider modules are imported, so these imports are deliberately not at the top.
+"app/main.py" = ["E402"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-m 'not live_llm and not neo4j'"

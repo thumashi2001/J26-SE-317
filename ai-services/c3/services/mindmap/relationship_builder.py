@@ -2,13 +2,16 @@
 
 LIMITATION TO STATE HONESTLY IN THE VIVA
     Root -> concept lines are purely structural "child" links. Concept-to-concept lines come in two kinds:
-      * typed (is_a, part_of, depends_on, leads_to, contrasts_with): only when BOTH concepts are demonstrated or partial,
+      * typed (is_a, part_of, depends_on, leads_to, contrasts_with): only when BOTH concepts are demonstrated or
+          partial,
         sit in the same sentence, and a fixed cue phrase ("part of", "depends on", "leads to", ...) stands between them
         with no negation word. The cue phrase and sentence number are written on the line as evidence. Direction follows
         the wording (source -> target), e.g. "A depends on B" gives A --depends_on--> B.
       * "co_mentioned": the concepts share a sentence but no cue phrase links them (co-occurrence only).
-    The cue list is small and hand-written. It misses relations phrased in other ways and can not tell a true statement from
-    a false one ("a database is part of a cat" is typed part_of); typing records what the student WROTE, not whether it is
+    The cue list is small and hand-written. It misses relations phrased in other ways and can not tell a true statement
+        from
+    a false one ("a database is part of a cat" is typed part_of); typing records what the student WROTE, not whether it
+        is
     correct. No relation is inferred from similarity or from an LLM.
 """
 import hashlib
@@ -24,7 +27,11 @@ CUE_RULES: tuple[tuple[re.Pattern, str, bool], ...] = tuple(
     for pattern, rel_type, forward in (
         (r"(?:is|are) (?:a |an )?(?:type|kind|form|subtype|example) of", "is_a", True),
         (r"(?:is|are) (?:a |an |the )?(?:part|component|element|member|subset) of", "part_of", True),
-        (r"consists? of|consisting of|(?:is|are) (?:made up|composed) of|contains?|includes?|comprises?", "part_of", False),
+        (
+            r"consists? of|consisting of|(?:is|are) (?:made up|composed) of|contains?|includes?|comprises?",
+            "part_of",
+            False,
+        ),
         (r"(?:is|are) (?:used|required|needed) by", "depends_on", False),
         (r"depends? on|relies on|rely on|requires?|needs?|uses?|calls?", "depends_on", True),
         (r"causes?|leads? to|results? in|enables?|produces?", "leads_to", True),
@@ -32,7 +39,8 @@ CUE_RULES: tuple[tuple[re.Pattern, str, bool], ...] = tuple(
     )
 )
 MAX_CUE_WORDS = 5  # the phrase between the two concepts may be at most this long
-ARTICLES = {"the", "a", "an", "its", "their", "this", "that"}  # ignored just before the second concept ("depends on THE database")
+# ignored just before the second concept ("depends on THE database")
+ARTICLES = {"the", "a", "an", "its", "their", "this", "that"}
 
 
 def generate_relationship_id(source_id: str, target_id: str, rel_type: str) -> str:
@@ -56,7 +64,8 @@ def _plain(word: str) -> str:
 def typed_relation_between(concept_a: str, concept_b: str, sentence: str):
     """(source concept, target concept, type, cue phrase) if a fixed cue phrase links the two concepts, else None.
 
-    The two concepts must each appear as a contiguous phrase, the words between them must match a cue rule exactly, and no
+    The two concepts must each appear as a contiguous phrase, the words between them must match a cue rule exactly, and
+        no
     negation word may be among them ("A does not depend on B" is not typed).
     """
     tokens = tokenize(sentence)
@@ -96,13 +105,17 @@ def _typed_for(a: Node, b: Node, shared: list[int], sentences: list[str] | None)
     return None
 
 
-def build_cooccurrence_relationships(concept_nodes: list[Node], sentences: list[str] | None = None) -> list[Relationship]:
+def build_cooccurrence_relationships(
+    concept_nodes: list[Node], sentences: list[str] | None = None
+) -> list[Relationship]:
     """Link two concepts that share an evidence sentence (FR-C3-33: relationships "where evidence exists").
 
-    Only concepts with student evidence can be linked (missing concepts have no sentence). Without a cue phrase the type is
+    Only concepts with student evidence can be linked (missing concepts have no sentence). Without a cue phrase the type
+        is
     symmetric ("co_mentioned") and the line carries the shared sentence numbers.
 
-    When the sentence texts are given and both concepts are demonstrated/partial, a cue phrase between them upgrades the line
+    When the sentence texts are given and both concepts are demonstrated/partial, a cue phrase between them upgrades the
+        line
     to a typed relationship (see the module docstring); the first shared sentence with a cue decides the type.
     """
     relationships = []
@@ -119,7 +132,8 @@ def build_cooccurrence_relationships(concept_nodes: list[Node], sentences: list[
                     source_node_id=src.node_id,
                     target_node_id=tgt.node_id,
                     relationship_type=rel_type,
-                    evidence=(f"Sentence {sentence_no} says '{src.concept} {phrase} {tgt.concept}' (cue phrase '{phrase}'); "
+                    evidence=(f"Sentence {sentence_no} says '{src.concept} {phrase} {tgt.concept}' "
+                              f"(cue phrase '{phrase}'); "
                               "this records what the student wrote, not whether it is correct."),
                 ))
                 continue

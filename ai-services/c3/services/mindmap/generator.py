@@ -65,7 +65,8 @@ def build_mindmap_from_analysis(
 def generate_mindmap(request: MindMapRequest) -> MindMapResponse:
     """
     Generate a deterministic concept-based mind map from the student answer analysis.
-    A single deterministic root is used to provide a stable contextual entry point for the generated concept structure and to simplify downstream visualization.
+    A single deterministic root is used to provide a stable contextual entry point for the generated concept structure
+        and to simplify downstream visualization.
     """
     analysis_request = request.analysis_request
     analysis = analyze_answer(analysis_request)

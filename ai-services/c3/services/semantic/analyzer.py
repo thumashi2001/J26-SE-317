@@ -8,7 +8,8 @@ SIMPLE ENGLISH
         not_demonstrated  none of the words appear                             (overlap = 0)
     This is plain word matching ("lexical" analysis). On its own it does not understand meaning, so a correct answer
     written in different words (a paraphrase) is reported as not_demonstrated. With C3_SEMANTIC_MATCH=local an optional
-    sentence-embedding layer (services/semantic/semantic_matcher.py) upgrades such concepts and flags them "semantic". These statuses feed the marking engine.
+    sentence-embedding layer (services/semantic/semantic_matcher.py) upgrades such concepts and flags them "semantic".
+        These statuses feed the marking engine.
 """
 from app.schemas.analysis import (
     AnswerAnalysisRequest,
@@ -61,8 +62,10 @@ def _flag_contradictions(matches: list[ConceptMatch], sentences: list[str]) -> l
     """Mark concepts whose only mentions are negated ("... does not hide ..."); return lecturer-facing warnings.
 
     Every sentence that contains all of a concept's words is either affirming it or negating it (negation cue nearby).
-      all such sentences negate  -> contradicted: a flag and a lecturer warning are added; by DEFAULT (warn_only) the status
-                                    and so the mark are untouched. With C3_CONTRADICTION_POLICY=withhold_credit the status
+      all such sentences negate  -> contradicted: a flag and a lecturer warning are added; by DEFAULT (warn_only) the
+          status
+                                    and so the mark are untouched. With C3_CONTRADICTION_POLICY=withhold_credit the
+                                        status
                                     becomes not_demonstrated, so it earns no credit anywhere
       some affirm, some negate   -> conflicting: status is left alone, the lecturer is warned
     This is a possible contradiction by wording, not a meaning check; a correct negated sentence is flagged too.
@@ -78,14 +81,23 @@ def _flag_contradictions(matches: list[ConceptMatch], sentences: list[str]) -> l
         if len(negated) == len(mentioning):
             match.contradicted = True
             if warn_only:
-                warnings.append(f"Possible contradiction: the answer negates '{match.concept}' (sentence {negated[0]}); credit was NOT withheld (warn-only policy), lecturer to check.")
+                warnings.append(
+                    f"Possible contradiction: the answer negates '{match.concept}' (sentence {negated[0]}); "
+                    "credit was NOT withheld (warn-only policy), lecturer to check."
+                )
             else:
                 match.status = "not_demonstrated"
                 match.evidence_sentence_ids = negated
-                warnings.append(f"Possible contradiction: the answer negates '{match.concept}' (sentence {negated[0]}); no credit given, lecturer to check.")
+                warnings.append(
+                    f"Possible contradiction: the answer negates '{match.concept}' (sentence {negated[0]}); "
+                    "no credit given, lecturer to check."
+                )
         else:
             match.conflicting = True
-            warnings.append(f"Conflicting statements about '{match.concept}' (negated in sentence {negated[0]}); lecturer to check.")
+            warnings.append(
+                f"Conflicting statements about '{match.concept}' (negated in sentence {negated[0]}); "
+                "lecturer to check."
+            )
     return warnings
 
 

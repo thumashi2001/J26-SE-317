@@ -1,14 +1,17 @@
-"""Negation-cue check: does a sentence that names a concept also negate it? (possible contradiction, NOT a meaning check)
+"""Negation-cue check: does a sentence that names a concept also negate it? (possible contradiction, NOT a meaning
+    check)
 
 SIMPLE ENGLISH
     "Encapsulation does not hide anything" contains the word "encapsulation", so word matching alone would credit it.
-    This module notices that a negation word ("not", "no", "never", "cannot", "doesn't", ...) sits right next to the concept's
+    This module notices that a negation word ("not", "no", "never", "cannot", "doesn't", ...) sits right next to the
+        concept's
     words and reports the sentence as NEGATED. It is a deliberately small, deterministic rule:
       * it can only see negation that is spelled with one of the cues below, close to the concept's words;
       * it cannot see a wrong statement that has no negation ("encapsulation exposes all data" is not detected);
       * a correct negated sentence ("encapsulation does not mean copying") is also reported, so the result is a
         POSSIBLE contradiction that the lecturer must check, never a verified error.
-    The accuracy of this rule has NOT been measured (no human-labelled contradiction data exists). By default it only warns
+    The accuracy of this rule has NOT been measured (no human-labelled contradiction data exists). By default it only
+        warns
     (C3_CONTRADICTION_POLICY=warn_only); marks are untouched unless withhold_credit is chosen explicitly.
 """
 
@@ -26,20 +29,25 @@ VERB_CUES = frozenset({
     "isnt", "arent", "wasnt", "werent", "doesnt", "dont", "didnt", "wont", "wouldnt", "shouldnt", "cant", "couldnt",
     "hasnt", "havent",
 })
-# Determiner-style negations negate the noun phrase AFTER them ("no components", "without interfaces"). A concept that comes
+# Determiner-style negations negate the noun phrase AFTER them ("no components", "without interfaces"). A concept that
+# comes
 # before them ("values with no repeating groups") is not negated.
 DETERMINER_CUES = frozenset({"no", "none", "nothing", "nobody", "without", "neither", "nor"})
 NEGATION_CUES = VERB_CUES | DETERMINER_CUES
 ENV_POLICY = "C3_CONTRADICTION_POLICY"
-WARN_ONLY = "warn_only"              # DEFAULT: flag and warn, but leave the concept's status (and so the mark) untouched
-WITHHOLD_CREDIT = "withhold_credit"  # opt-in: a concept that is only ever negated earns no credit (needs supervisor approval)
+# DEFAULT: flag and warn, but leave the concept's status (and so the mark) untouched
+WARN_ONLY = "warn_only"
+# opt-in: a concept that is only ever negated earns no credit (needs supervisor approval)
+WITHHOLD_CREDIT = "withhold_credit"
 DEFAULT_POLICY = WARN_ONLY
 
 
 def contradiction_policy() -> str:
-    """What a possible contradiction does: only warn (default) or withhold credit. Unset or unknown values use the default.
+    """What a possible contradiction does: only warn (default) or withhold credit. Unset or unknown values use the
+        default.
 
-    Withholding credit changes marks, so it must be switched on explicitly until the supervisor approves that marking policy.
+    Withholding credit changes marks, so it must be switched on explicitly until the supervisor approves that marking
+        policy.
     """
     value = os.getenv(ENV_POLICY, DEFAULT_POLICY).strip().lower()
     return value if value in (WITHHOLD_CREDIT, WARN_ONLY) else DEFAULT_POLICY
@@ -62,7 +70,8 @@ def sentence_mentions(concept: str, sentence: str) -> bool:
 
 
 def sentence_negates(concept: str, sentence: str) -> bool:
-    """True when the sentence mentions the concept AND a negation cue is placed so that it can scope over a concept word."""
+    """True when the sentence mentions the concept AND a negation cue is placed so that it can scope over a concept
+        word."""
     tokens = tokenize(sentence)
     if token_overlap_score(concept, tokens) != 1.0:
         return False

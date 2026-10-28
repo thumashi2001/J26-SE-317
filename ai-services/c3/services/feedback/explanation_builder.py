@@ -118,7 +118,10 @@ def _concept_hint(concept: str, architecture: bool) -> str:
     low = concept.casefold()
     if architecture:
         if "structure" in low:
-            return f"For '{concept}': describe the overall structure of the system, meaning its main parts and how they are organised."
+            return (
+                f"For '{concept}': describe the overall structure of the system, "
+                "meaning its main parts and how they are organised."
+            )
         if "component" in low:
             return f"For '{concept}': name the main components and state what each one is responsible for."
         if any(k in low for k in ("relationship", "interaction", "communicat", "connect", "depend")):
@@ -156,17 +159,24 @@ def build_contextual_improvements(
     higher = sorted((lvl for lvl in levels if float(lvl.mark) > awarded), key=lambda lvl: float(lvl.mark))
     next_lvl = higher[0] if higher else None
     needed = list(dict.fromkeys([*partial, *missing, *next_level]))
-    all_rubric_concepts = list(criterion.required_concepts or []) + [c for lvl in levels for c in (lvl.required_concepts or [])]
+    all_rubric_concepts = list(criterion.required_concepts or []) + [
+        c for lvl in levels for c in (lvl.required_concepts or [])
+    ]
     architecture = _is_architecture_context(question_text, criterion.description, *all_rubric_concepts)
     has_evidence = bool(result.evidence_sentence_ids)
 
     # Incomplete rubric metadata: say so instead of inventing specifics.
     if not all_rubric_concepts and not (demonstrated or partial or missing or next_level):
         if next_lvl is None or awarded >= maximum:
-            return [f"This criterion is at its top rubric level ({awarded:g}/{maximum:g}); no further improvement is needed for it."]
+            return [
+                f"This criterion is at its top rubric level ({awarded:g}/{maximum:g}); "
+                "no further improvement is needed for it."
+            ]
         return [
-            f"The rubric for this criterion ('{criterion.description}') lists no expected concepts, so specific guidance cannot "
-            "be generated. Re-read the question and this criterion, and make sure every part is addressed with a clear explanation.",
+            f"The rubric for this criterion ('{criterion.description}') lists no expected concepts, "
+            "so specific guidance cannot "
+            "be generated. Re-read the question and this criterion, and make sure every part is addressed "
+            "with a clear explanation.",
         ]
 
     # Top level reached (or nothing left to gain): advanced guidance, consistent with the mark.
@@ -175,7 +185,10 @@ def build_contextual_improvements(
         if demonstrated:
             out.append(f"The concepts found in your wording were {_quoted(demonstrated)}.")
         if architecture:
-            out.append("To go further, justify your design choices (for example why the parts are separated this way) and mention a trade-off.")
+            out.append(
+                "To go further, justify your design choices (for example why the parts are separated this way) "
+                "and mention a trade-off."
+            )
         else:
             out.append("To go further, support your points with a specific example and say why it matters.")
         return out
@@ -187,14 +200,18 @@ def build_contextual_improvements(
     if not has_evidence:
         # Zero evidence: do NOT pretend to know what the student misunderstood.
         out.append(
-            "No sentence in your answer matched the concepts for this criterion, so the system cannot tell what you did or did not "
+            "No sentence in your answer matched the concepts for this criterion, so the system cannot tell "
+            "what you did or did not "
             f"understand. It currently scores {awarded:g}/{maximum:g}; to reach {target}, write about {wanted}."
         )
     else:
         found = f"Your wording matched {_quoted(demonstrated)}. " if demonstrated else ""
         out.append(f"{found}This criterion scores {awarded:g}/{maximum:g}; to reach {target}, cover {wanted}.")
     for concept in partial:
-        out.append(f"For '{concept}': it is only partly covered; state it more completely and explain how it applies to the question.")
+        out.append(
+            f"For '{concept}': it is only partly covered; "
+            "state it more completely and explain how it applies to the question."
+        )
     for concept in [c for c in needed if c not in partial]:
         out.append(_concept_hint(concept, architecture))
     if architecture:

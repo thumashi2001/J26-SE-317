@@ -97,7 +97,8 @@ class MarkingRequest(AnswerAnalysisRequest):
     """Everything in an analysis request plus the rubric to mark against."""
 
     rubric: Rubric
-    # Optional total supplied by the caller (for example the C2 question record). It is never used to compute a mark; it is
+    # Optional total supplied by the caller (for example the C2 question record). It is never used to compute a mark; it
+    # is
     # only cross-checked against the rubric so an inconsistent configuration is rejected instead of silently marked.
     max_marks: float | None = Field(default=None, gt=0.0)
 

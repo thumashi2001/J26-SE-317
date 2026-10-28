@@ -36,7 +36,9 @@ CANONICAL_CONCEPTS = {
     "high cohesion": {
         "concept_id": "C-COHESION",
         "topic_id": "TOPIC-SE3010-MOD",
-        "description": "Internal module coherence where all elements collaborate to perform a single well-defined task.",
+        "description": (
+            "Internal module coherence where all elements collaborate to perform a single well-defined task."
+        ),
         "prerequisites": [],
         "citation": "SLIIT SE3010 Lecture 03 (Modularity), Slide 14-22"
     },
@@ -50,7 +52,10 @@ CANONICAL_CONCEPTS = {
     "microservices": {
         "concept_id": "C-MICROSERVICES",
         "topic_id": "TOPIC-SE3010-PAT",
-        "description": "Distributed architectural pattern organizing applications into autonomous, independently deployable services.",
+        "description": (
+            "Distributed architectural pattern organizing applications into autonomous, "
+            "independently deployable services."
+        ),
         "prerequisites": ["loose coupling"],
         "citation": "SLIIT SE3010 Lecture 07 (Microservices), Slide 04-18"
     },
@@ -71,14 +76,18 @@ CANONICAL_CONCEPTS = {
     "test adequacy": {
         "concept_id": "C-TEST-ADEQ",
         "topic_id": "TOPIC-SE3030-COV",
-        "description": "Criteria determining whether test suites sufficiently exercise program logic and failure modes.",
+        "description": (
+            "Criteria determining whether test suites sufficiently exercise program logic and failure modes."
+        ),
         "prerequisites": ["branch coverage"],
         "citation": "SLIIT SE3030 Lecture 05 (Test Adequacy & Mutation), Slide 02-14"
     },
     "relational normalization": {
         "concept_id": "C-NORMALIZATION",
         "topic_id": "TOPIC-SE3020-NORM",
-        "description": "Systematic decomposition of relations to eliminate anomalies and redundancy (1NF, 2NF, 3NF, BCNF).",
+        "description": (
+            "Systematic decomposition of relations to eliminate anomalies and redundancy (1NF, 2NF, 3NF, BCNF)."
+        ),
         "prerequisites": [],
         "citation": "SLIIT SE3020 Lecture 02 (Normalization), Slide 10-35"
     },
@@ -121,7 +130,8 @@ class CCKGGraphAdapter:
         self.strict = strict if strict is not None else os.getenv("C3_CCKG_STRICT", "0") == "1"
         self.uri = uri or os.getenv("NEO4J_URI", "bolt://127.0.0.1:7687")
         self.user = user or os.getenv("NEO4J_USER", "neo4j")
-        self.password = password or os.getenv("NEO4J_PASSWORD", "change-me-in-development")  # matches docker-compose.yml
+        # the default matches docker-compose.yml
+        self.password = password or os.getenv("NEO4J_PASSWORD", "change-me-in-development")
         self._driver = None
         self._is_live_neo4j = False
         self._init_connection()
@@ -140,7 +150,9 @@ class CCKGGraphAdapter:
         except Exception as e:
             self._is_live_neo4j = False
             if self.strict:
-                raise CCKGUnavailableError(f"Live Neo4j required (strict mode) but not reachable at {self.uri}: {e}") from e
+                raise CCKGUnavailableError(
+                    f"Live Neo4j required (strict mode) but not reachable at {self.uri}: {e}"
+                ) from e
             logger.info(f"Live Neo4j not reachable ({e}). Using canonical in-memory CCKG store.")
 
     @property

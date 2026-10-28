@@ -60,7 +60,9 @@ def validate_rubric(rubric: Rubric) -> None:
                 errors.append(f"level {level.level_id} has an invalid evidence requirement")
             # The evidence rule ("at least N concepts") must be satisfiable with the concepts that actually exist.
             if level.evidence_rule is not None:
-                effective_concepts = {c.casefold() for c in criterion.required_concepts} | {c.casefold() for c in level.required_concepts}
+                effective_concepts = {c.casefold() for c in criterion.required_concepts} | {
+                    c.casefold() for c in level.required_concepts
+                }
                 required_concept_count = len(effective_concepts)
                 if required_concept_count == 0:
                     errors.append(

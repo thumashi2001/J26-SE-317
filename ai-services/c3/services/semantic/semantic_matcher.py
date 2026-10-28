@@ -7,12 +7,15 @@ SIMPLE ENGLISH
     similarity. A concept counts as semantically found when its best sentence reaches a threshold.
 
 WHAT IT DOES NOT DO
-    It never awards marks. It only adds evidence (a status upgrade flagged `match_method="semantic"` plus the score) that
-    the rubric engine then reads exactly like lexical evidence; marks still come only from explicit rubric levels and the
+    It never awards marks. It only adds evidence (a status upgrade flagged `match_method="semantic"` plus the score)
+        that
+    the rubric engine then reads exactly like lexical evidence; marks still come only from explicit rubric levels and
+        the
     lecturer stays final. The threshold is calibrated on TRAIN answers only (experiments/semantic_concept_eval.py).
 
 SWITCH
-    Off unless C3_SEMANTIC_MATCH=local. Any failure (no sentence-transformers, no weights, bad input) returns None and the
+    Off unless C3_SEMANTIC_MATCH=local. Any failure (no sentence-transformers, no weights, bad input) returns None and
+        the
     lexical result is used unchanged.
 
 STATUS: optional runtime component of POST /c3/assess; off by default.

@@ -55,11 +55,14 @@ class ConceptMatch(BaseModel):
     overlap_score: float = Field(ge=0.0, le=1.0)  # share of the concept's words found in the answer
     evidence_sentence_ids: list[int]      # sentences that contain at least one of the concept's words
     # Optional semantic layer (C3_SEMANTIC_MATCH=local). Absent/"lexical" means word matching only.
-    match_method: Literal["lexical", "semantic"] = "lexical"   # "semantic" = status upgraded by sentence-embedding similarity
+    # "semantic" = status upgraded by sentence-embedding similarity
+    match_method: Literal["lexical", "semantic"] = "lexical"
     semantic_score: float | None = None                         # best sentence cosine similarity (informational)
     # Negation-cue check (services/semantic/negation.py): a POSSIBLE contradiction, never a verified error.
-    contradicted: bool = False            # True = every sentence naming the concept also negates it; status is then not_demonstrated
-    conflicting: bool = False             # True = one sentence affirms the concept and another negates it (status unchanged)
+    # True = every sentence naming the concept also negates it; status is then not_demonstrated
+    contradicted: bool = False
+    # True = one sentence affirms the concept and another negates it (status unchanged)
+    conflicting: bool = False
     negated_sentence_ids: list[int] = []  # sentences that name the concept next to a negation cue
 
 
