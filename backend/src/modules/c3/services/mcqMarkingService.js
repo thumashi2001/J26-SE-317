@@ -87,6 +87,47 @@ function resolveOptionId(selector, normalizedOptions) {
 }
 
 /**
+ * The configured deduction for an answered-but-wrong selection: 0 (default, no penalty) up to the question's max marks.
+ */
+function parsePenalty(raw, maxMarks) {
+  if (raw === undefined || raw === null || raw === '') return 0;
+  const penalty = Number(raw);
+  if (!Number.isFinite(penalty) || penalty < 0 || penalty > maxMarks) {
+    throw httpError(400, 'incorrect_penalty must be a number between 0 and max_marks');
+  }
+  return penalty;
+}
+
+/**
+ * Totals several MCQ results (FR-C3-011).
+ *
+ * total_awarded_marks is the plain sum of the questions' marks. If any question carried an incorrect_penalty, the
+ * deductions are summed in total_penalty and net_total_marks = max(0, awarded - penalty), so the total never goes below
+ * zero. With no penalties configured, net_total_marks equals total_awarded_marks.
+ *
+ * @param {Array<Object>} results - objects returned by evaluateMcqAnswer
+ */
+export function aggregateMcqResults(results = []) {
+  const list = Array.isArray(results) ? results : [];
+  const sum = (pick) => list.reduce((acc, r) => acc + (Number(pick(r)) || 0), 0);
+  const round = (n) => Math.round(n * 1000) / 1000;
+  const awarded = round(sum((r) => r.total_awarded_marks));
+  const possible = round(sum((r) => r.total_possible_marks));
+  const penalty = round(sum((r) => r.penalty_applied));
+  const net = Math.max(0, round(awarded - penalty));
+  return {
+    question_count: list.length,
+    answered_count: list.filter((r) => !r.is_unanswered).length,
+    correct_count: list.filter((r) => r.is_correct).length,
+    total_awarded_marks: awarded,
+    total_penalty: penalty,
+    net_total_marks: net,
+    total_possible_marks: possible,
+    percentage: possible > 0 ? Math.round((net / possible) * 1000) / 10 : 0,
+  };
+}
+
+/**
  * Evaluates an MCQ answer against the authoritative question answer key.
  *
  * @param {Object} payload
@@ -96,6 +137,7 @@ function resolveOptionId(selector, normalizedOptions) {
  * @param {string|Array} [payload.correct_answer] - Authoritative correct option ID(s)
  * @param {Array} [payload.correct_options] - Authoritative correct option ID(s)
  * @param {string|number} [payload.max_marks] - Maximum possible mark (default 1.0)
+ * @param {string|number} [payload.incorrect_penalty] - Deducted from a total for a wrong, answered selection (default 0)
  * @param {string|Array} [payload.selected_option_id] - Student's chosen option ID
  * @param {Array} [payload.selected_options] - Student's chosen options for multi-select
  * @param {string} [payload.student_answer] - Fallback student response text or option ID
@@ -222,6 +264,12 @@ export function evaluateMcqAnswer(payload = {}) {
   awardedMark = Math.max(0.0, Math.min(maxMarks, awardedMark));
   const percentage = Math.round((awardedMark / maxMarks) * 1000) / 10;
 
+  // Optional negative-marking rule (FR-C3-010): the question's own mark stays 0 for a wrong answer; the penalty is only
+  // recorded here and subtracted when several MCQ results are totalled (aggregateMcqResults). An unanswered question
+  // is never penalised.
+  const incorrectPenalty = parsePenalty(payload.incorrect_penalty, maxMarks);
+  const penaltyApplied = !isCorrect && !isUnanswered ? incorrectPenalty : 0;
+
   // Labels for reporting
   const selectedLabels = canonicalSelectedIds.map((id) => {
     const opt = normalizedOptions.find((o) => o.option_id === id);
@@ -259,6 +307,8 @@ export function evaluateMcqAnswer(payload = {}) {
     total_awarded_marks: awardedMark,
     total_possible_marks: maxMarks,
     percentage: percentage,
+    incorrect_penalty: incorrectPenalty,
+    penalty_applied: penaltyApplied,
     selected_option_ids: canonicalSelectedIds,
     selected_labels: selectedLabels,
     correct_option_ids: canonicalCorrectIds,
