@@ -46,6 +46,8 @@ class MindMapSummary(BaseModel):
     demonstrated_count: int
     partial_count: int
     missing_count: int
+    # Credited concepts (demonstrated/partial) with no concept-to-concept line; needs 2+ credited concepts to apply.
+    disconnected_concepts: list[str] = []
 
 
 class MindMapResponse(BaseModel):

@@ -19,7 +19,9 @@ from app.schemas.analysis import (
 )
 from services.preprocessing.text_normalizer import process_text, tokenize
 from services.semantic.baseline import lexical_cosine_similarity, token_overlap_score
+from services.semantic.keywords import extract_keywords
 from services.semantic.negation import WARN_ONLY, contradiction_policy, sentence_mentions, sentence_negates
+from services.semantic.relevance import check_relevance
 from services.semantic.semantic_matcher import get_matcher, semantic_threshold
 
 ANALYSIS_VERSION = "baseline-v1"
@@ -62,11 +64,9 @@ def _flag_contradictions(matches: list[ConceptMatch], sentences: list[str]) -> l
     """Mark concepts whose only mentions are negated ("... does not hide ..."); return lecturer-facing warnings.
 
     Every sentence that contains all of a concept's words is either affirming it or negating it (negation cue nearby).
-      all such sentences negate  -> contradicted: a flag and a lecturer warning are added; by DEFAULT (warn_only) the
-          status
-                                    and so the mark are untouched. With C3_CONTRADICTION_POLICY=withhold_credit the
-                                        status
-                                    becomes not_demonstrated, so it earns no credit anywhere
+      all such sentences negate  -> contradicted: a flag and a lecturer warning are added. By DEFAULT (warn_only) the
+                                    status, and so the mark, are untouched. With C3_CONTRADICTION_POLICY=withhold_credit
+                                    the status becomes not_demonstrated, so it earns no credit anywhere
       some affirm, some negate   -> conflicting: status is left alone, the lecturer is warned
     This is a possible contradiction by wording, not a meaning check; a correct negated sentence is flagged too.
     """
@@ -153,6 +153,13 @@ def analyze_answer(request: AnswerAnalysisRequest) -> AnswerAnalysisResponse:
     concept_matches = _match_concepts(concepts, processed_answer.sentences, processed_answer.tokens)
     warnings.extend(_flag_contradictions(concept_matches, processed_answer.sentences))
     semantic_ran = _add_semantic_evidence(concept_matches, processed_answer.sentences)
+    # Descriptive keywords and a possible off-topic flag. Both are information and warnings only; marks never use them.
+    relevance = check_relevance(request.student_answer, request.question_text, request.reference_answer, concepts)
+    if relevance.status == "off_topic":
+        warnings.append(
+            "Possible off-topic answer: it shares very little vocabulary with the question, model answer and expected "
+            f"concepts ({relevance.shared_ratio:.0%}); lecturer to check."
+        )
 
     # 4) assemble the evidence object used by marking, feedback and the mind map
     return AnswerAnalysisResponse(
@@ -169,4 +176,6 @@ def analyze_answer(request: AnswerAnalysisRequest) -> AnswerAnalysisResponse:
         warnings=warnings,
         analysis_version=SEMANTIC_ANALYSIS_VERSION if semantic_ran else ANALYSIS_VERSION,
         contradiction_check=f"{CONTRADICTION_CHECK}/{contradiction_policy()}",
+        keywords=extract_keywords(processed_answer.sentences),
+        relevance=relevance,
     )

@@ -7,12 +7,29 @@ generate_mindmap() is the version behind the stand-alone /mindmap/generate endpo
 Node/Express stores the resulting map inside the submission result in MongoDB; it is not stored in Neo4j.
 """
 from app.schemas.analysis import AnswerAnalysisResponse
-from app.schemas.mindmap import MindMapRequest, MindMapResponse, MindMapSummary
+from app.schemas.mindmap import MindMapRequest, MindMapResponse, MindMapSummary, Node, Relationship
 from services.mindmap.node_builder import build_concept_nodes, build_root_node
 from services.mindmap.relationship_builder import build_baseline_relationships, build_cooccurrence_relationships
 from services.semantic.analyzer import analyze_answer
 
 GENERATION_VERSION = "baseline-v1"
+
+
+def find_disconnected_concepts(concept_nodes: list[Node], relationships: list[Relationship]) -> list[str]:
+    """Credited concepts that have no line to another concept (FR-C3-073).
+
+    The root-to-concept structural lines do not count. With fewer than two credited concepts nothing can be
+    disconnected from anything, so the list is empty.
+    """
+    credited = [n for n in concept_nodes if n.status in ("demonstrated", "partial")]
+    if len(credited) < 2:
+        return []
+    concept_ids = {n.node_id for n in concept_nodes}
+    linked: set[str] = set()
+    for rel in relationships:
+        if rel.source_node_id in concept_ids and rel.target_node_id in concept_ids:
+            linked.update((rel.source_node_id, rel.target_node_id))
+    return [n.concept for n in credited if n.node_id not in linked]
 
 
 def build_mindmap_from_analysis(
@@ -37,13 +54,16 @@ def build_mindmap_from_analysis(
     partial = sum(1 for n in concept_nodes if n.status == "partial")
     missing = sum(1 for n in concept_nodes if n.status == "not_demonstrated")
 
+    disconnected = find_disconnected_concepts(concept_nodes, relationships)
     summary = MindMapSummary(
         total_nodes=len(all_nodes),
         demonstrated_count=demonstrated,
         partial_count=partial,
         missing_count=missing,
+        disconnected_concepts=disconnected,
     )
 
+    # `disconnected` goes in the summary only: most answers have some unlinked concepts, so a warning would be noise.
     warnings = []
     if missing > 0:
         warnings.append(f"Mind map contains {missing} missing expected concept(s).")

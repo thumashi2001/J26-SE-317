@@ -8,12 +8,10 @@ READ THIS FIRST (viva summary)
       -> F3  build_feedback_from_results  explanations + "how to improve" text         (services/feedback/*)
       -> F4  build_mindmap_from_analysis  root + concept nodes                          (services/mindmap/*)
     The marks are deterministic and rule based (F2). No LLM, vector search or Neo4j query is used here. OPTIONALLY (only
-        when
-    C3_ML_MODEL_DIR points at a saved checkpoint) a fine-tuned transformer adds an ADVISORY "ai_estimate" next to the
-        rubric
-    mark (services/ml/scorer.py); it never changes a mark. The feedback and the mind map can never change the marks
-        either:
-    the marks are fixed in step F2 and step 3 below re-checks that.
+    when C3_ML_MODEL_DIR points at a saved checkpoint) a fine-tuned transformer adds an ADVISORY "ai_estimate" next to
+    the rubric mark (services/ml/scorer.py); it never changes a mark. A rule-based "review" flag
+    (services/assessment/review_rules.py) says when a lecturer should look at the result. The feedback, the mind map
+    and the review flag can never change the marks: the marks are fixed in step F2.
 """
 from app.schemas.analysis import AnswerAnalysisRequest, AnswerAnalysisResponse
 from app.schemas.assessment import AIScoreEstimate, AssessmentRequest, AssessmentResponse
@@ -21,6 +19,7 @@ from app.schemas.marking import (
     CriterionMarkingResult,
     MarkingResponse,
 )
+from services.assessment.review_rules import review_assessment
 from services.feedback.generator import build_feedback_from_results
 from services.marking.criterion_evaluator import evaluate_criterion
 from services.marking.rubric_validator import validate_rubric
@@ -86,8 +85,7 @@ def _ai_estimate(request: AssessmentRequest, awarded: float, possible: float) ->
 
 
 def _mark(request: AssessmentRequest, analysis: AnswerAnalysisResponse) -> MarkingResponse:
-    """Function 2: choose one rubric level per criterion and total the fixed marks (the only place marks are
-        decided)."""
+    """Function 2: choose one rubric level per criterion and total the fixed marks (the only place marks are set)."""
     criteria_results = [evaluate_criterion(criterion, analysis) for criterion in request.rubric.criteria]
     total_awarded_marks = sum(result.awarded_mark for result in criteria_results)
     total_possible_marks = sum(result.max_marks for result in criteria_results)
@@ -178,4 +176,5 @@ def assess_answer(request: AssessmentRequest) -> AssessmentResponse:
         warnings=all_warnings,
         pipeline_version=PIPELINE_VERSION,
         ai_estimate=ai_estimate,
+        review=review_assessment(analysis, marking, ai_estimate),
     )

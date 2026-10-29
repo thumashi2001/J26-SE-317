@@ -66,6 +66,24 @@ class ConceptMatch(BaseModel):
     negated_sentence_ids: list[int] = []  # sentences that name the concept next to a negation cue
 
 
+class Keyword(BaseModel):
+    """A frequent content word, or a repeated pair of adjacent content words, found in the answer (FR-C3-017)."""
+
+    term: str
+    count: int = Field(ge=1)
+    kind: Literal["word", "phrase"]
+    sentence_ids: list[int] = []
+
+
+class RelevanceCheck(BaseModel):
+    """Word-overlap check of the answer against the question's topic vocabulary (FR-C3-020). Never changes a mark."""
+
+    status: Literal["relevant", "off_topic", "not_assessed"]
+    content_words: int = Field(ge=0)          # distinct content words in the answer
+    shared_ratio: float | None = None         # share of those words that also occur in the question/reference/concepts
+    basis: str                                # which rule produced the status, for the lecturer
+
+
 class AnswerAnalysisResponse(BaseModel):
     """Result of Function 1; later steps (marking, feedback, mind map) are built from this evidence."""
 
@@ -79,3 +97,5 @@ class AnswerAnalysisResponse(BaseModel):
     warnings: list[str]
     analysis_version: str
     contradiction_check: str | None = None  # which contradiction rule ran (None = results made before it existed)
+    keywords: list[Keyword] = []            # most frequent content words / repeated phrases (descriptive, FR-C3-017)
+    relevance: RelevanceCheck | None = None  # possible off-topic flag (None = results made before it existed)

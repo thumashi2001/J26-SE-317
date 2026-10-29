@@ -26,6 +26,15 @@ class AIScoreEstimate(BaseModel):
                  "and the lecturer's decision is final.")
 
 
+class ReviewSummary(BaseModel):
+    """Which named review rules fired for this result (FR-C3-079). It is not a confidence score and changes no mark."""
+
+    needs_review: bool
+    reasons: list[str] = Field(default_factory=list)       # one "rule: explanation" entry per rule that fired
+    rules_applied: list[str] = Field(default_factory=list)  # the rules that were active for this run
+    rules_version: str
+
+
 class AssessmentResponse(BaseModel):
     """End-to-end C3 assessment output combining F1, F2, F3, and F4 outputs."""
 
@@ -43,3 +52,4 @@ class AssessmentResponse(BaseModel):
     pipeline_version: str = "integrated-v1"
     # Present only when C3_ML_MODEL_DIR is configured and the answer has a reference answer; otherwise None.
     ai_estimate: AIScoreEstimate | None = None
+    review: ReviewSummary | None = None  # rule-based manual-review flag; lecturer-facing, never alters marks
